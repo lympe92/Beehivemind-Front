@@ -7,3 +7,11 @@
 @use 'styles/reset';
 @use 'styles/typography';
 @use 'styles/utilities';
+
+// TODO: Self-host Montserrat για 100% Lighthouse Performance score
+//       1. Κατέβασε weights 300/400/500/700 (WOFF2 only) από gwfh.mranftl.com/fonts/montserrat
+//       2. Μετονόμασε σε montserrat-300.woff2, montserrat-400.woff2, montserrat-500.woff2, montserrat-700.woff2
+//       3. Βάλε τα αρχεία στο src/assets/fonts/
+//       4. Αντικατάστησε το @import παρακάτω με @font-face declarations στο _typography.scss
+//       5. Πρόσθεσε <link rel="preload"> για montserrat-400.woff2 στο index.html
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap');
