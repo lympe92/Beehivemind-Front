@@ -1,0 +1,70 @@
+// =============================================================================
+// TYPOGRAPHY
+// =============================================================================
+
+@use 'sass:math';
+@use 'variables' as *;
+@use 'mixins' as *;
+
+h1, .h1 {
+  @include heading-base;
+  font-size: $h1-size;
+
+  @include respond-below('md') {
+    font-size: $h1-size * 0.75;
+  }
+}
+
+h2, .h2 {
+  @include heading-base;
+  font-size: $h2-size;
+
+  @include respond-below('md') {
+    font-size: $h2-size * 0.85;
+  }
+}
+
+h3, .h3 {
+  @include heading-base;
+  font-size: $h3-size;
+}
+
+h4, .h4 {
+  @include heading-base;
+  font-size: $h4-size;
+}
+
+h5, .h5 {
+  @include heading-base;
+  font-size: $h5-size;
+  font-weight: $font-weight-medium;
+}
+
+h6, .h6 {
+  @include heading-base;
+  font-size: $h6-size;
+  font-weight: $font-weight-medium;
+}
+
+.lead {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-normal;
+  line-height: $line-height-base;
+  color: $color-dark-grey;
+}
+
+.text-muted {
+  color: $color-text-muted;
+}
+
+.text-primary { color: $color-primary; }
+.text-secondary { color: $color-secondary; }
+.text-accent { color: $color-accent; }
+
+.text-center { text-align: center; }
+.text-left   { text-align: left; }
+.text-right  { text-align: right; }
+
+strong, b {
+  font-weight: $font-weight-bold;
+}

@@ -1,0 +1,121 @@
+// =============================================================================
+// VARIABLES
+// Design tokens για το Beehivemind brand
+// =============================================================================
+
+@use 'sass:color';
+
+// -----------------------------------------------------------------------------
+// Colors
+// -----------------------------------------------------------------------------
+
+// Brand
+$color-primary:   #ec861f; // honey/amber - το κύριο χρώμα
+$color-secondary: #1a73b5; // blue - links, CTAs
+$color-accent:    #26a69a; // teal - accents, HR lines
+
+// Neutrals
+$color-dark:      #212121;
+$color-dark-grey: #424242;
+$color-grey:      #757575;
+$color-light-grey:#e0e0e0;
+$color-light:     #f5f5f5;
+$color-white:     #ffffff;
+
+// Semantic
+$color-success:   #43a047;
+$color-warning:   #fb8c00;
+$color-error:     #e53935;
+$color-info:      $color-secondary;
+
+// Text
+$color-text:        $color-dark;
+$color-text-muted:  $color-grey;
+$color-link:        $color-secondary;
+$color-link-hover:  color.adjust($color-secondary, $lightness: -12%);
+
+// -----------------------------------------------------------------------------
+// Typography
+// -----------------------------------------------------------------------------
+
+$font-family-base:    'Montserrat', system-ui, -apple-system, sans-serif;
+$font-family-heading: $font-family-base;
+
+$font-size-base: 1rem;       // 16px
+$font-size-sm:   0.875rem;   // 14px
+$font-size-lg:   1.125rem;   // 18px
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-bold:   700;
+
+$line-height-base:    1.6;
+$line-height-heading: 1.25;
+
+// Heading scale
+$h1-size: 2.5rem;    // 40px
+$h2-size: 2rem;      // 32px
+$h3-size: 1.5rem;    // 24px
+$h4-size: 1.25rem;   // 20px
+$h5-size: 1.125rem;  // 18px
+$h6-size: 1rem;      // 16px
+
+// -----------------------------------------------------------------------------
+// Spacing scale (4px base)
+// -----------------------------------------------------------------------------
+
+$spacing-xs:  0.25rem;  //  4px
+$spacing-sm:  0.5rem;   //  8px
+$spacing-md:  1rem;     // 16px
+$spacing-lg:  1.5rem;   // 24px
+$spacing-xl:  2rem;     // 32px
+$spacing-2xl: 3rem;     // 48px
+$spacing-3xl: 4rem;     // 64px
+$spacing-4xl: 6rem;     // 96px
+
+// -----------------------------------------------------------------------------
+// Breakpoints
+// -----------------------------------------------------------------------------
+
+$breakpoints: (
+  'xs':  0px,
+  'sm':  576px,
+  'md':  768px,
+  'lg':  992px,
+  'xl':  1200px,
+  'xxl': 1400px,
+);
+
+// -----------------------------------------------------------------------------
+// Layout
+// -----------------------------------------------------------------------------
+
+$container-max-width: 1200px;
+$container-padding:   $spacing-md;
+
+// -----------------------------------------------------------------------------
+// Border & Radius
+// -----------------------------------------------------------------------------
+
+$border-color:  $color-light-grey;
+$border-radius-sm: 4px;
+$border-radius:    8px;
+$border-radius-lg: 16px;
+$border-radius-xl: 24px;
+$border-radius-pill: 999px;
+
+// -----------------------------------------------------------------------------
+// Shadows
+// -----------------------------------------------------------------------------
+
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+// -----------------------------------------------------------------------------
+// Transitions
+// -----------------------------------------------------------------------------
+
+$transition-speed:  200ms;
+$transition-easing: ease-in-out;
+$transition-base:   all $transition-speed $transition-easing;

@@ -1,0 +1,147 @@
+// =============================================================================
+// MIXINS
+// =============================================================================
+
+@use 'sass:map';
+@use 'variables' as *;
+
+// -----------------------------------------------------------------------------
+// Responsive breakpoints
+// Χρήση: @include respond-to('md') { ... }
+// Σημαίνει: "από md και πάνω" (mobile-first)
+// -----------------------------------------------------------------------------
+
+@mixin respond-to($breakpoint) {
+  $value: map.get($breakpoints, $breakpoint);
+
+  @if $value == null {
+    @warn "Άγνωστο breakpoint: `#{$breakpoint}`. Διαθέσιμα: #{map.keys($breakpoints)}";
+  } @else if $value == 0px {
+    @content;
+  } @else {
+    @media (min-width: $value) {
+      @content;
+    }
+  }
+}
+
+// Μέχρι breakpoint (max-width)
+@mixin respond-below($breakpoint) {
+  $value: map.get($breakpoints, $breakpoint);
+
+  @if $value == null {
+    @warn "Άγνωστο breakpoint: `#{$breakpoint}`.";
+  } @else {
+    @media (max-width: calc(#{$value} - 1px)) {
+      @content;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Flex helpers
+// -----------------------------------------------------------------------------
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// -----------------------------------------------------------------------------
+// Typography
+// -----------------------------------------------------------------------------
+
+@mixin heading-base {
+  font-family: $font-family-heading;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-heading;
+  color: $color-text;
+}
+
+@mixin truncate($lines: 1) {
+  @if $lines == 1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Visually hidden (accessibility)
+// -----------------------------------------------------------------------------
+
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// -----------------------------------------------------------------------------
+// Focus ring (accessibility)
+// -----------------------------------------------------------------------------
+
+@mixin focus-ring($color: $color-primary) {
+  outline: 2px solid $color;
+  outline-offset: 2px;
+}
+
+// -----------------------------------------------------------------------------
+// Button base
+// -----------------------------------------------------------------------------
+
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  line-height: 1;
+  border: 2px solid transparent;
+  border-radius: $border-radius-pill;
+  cursor: pointer;
+  text-decoration: none;
+  transition: $transition-base;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Section spacing
+// -----------------------------------------------------------------------------
+
+@mixin section-padding {
+  padding-top: $spacing-3xl;
+  padding-bottom: $spacing-3xl;
+
+  @include respond-to('lg') {
+    padding-top: $spacing-4xl;
+    padding-bottom: $spacing-4xl;
+  }
+}
