@@ -1,0 +1,9 @@
+// =============================================================================
+// GLOBAL ENTRY POINT
+// Εδώ φορτώνονται μόνο global styles (reset, typography, utilities)
+// Τα variables/mixins ΔΕΝ παράγουν CSS — φορτώνονται per-component
+// =============================================================================
+
+@use 'styles/reset';
+@use 'styles/typography';
+@use 'styles/utilities';
