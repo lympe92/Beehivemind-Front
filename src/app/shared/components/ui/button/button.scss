@@ -1,5 +1,5 @@
 @use 'sass:color';
-@use 'styles' as *;
+@use 'styles/index' as *;
 
 .btn {
   display: inline-flex;

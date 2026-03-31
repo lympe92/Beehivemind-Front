@@ -1,6 +1,7 @@
 // =============================================================================
 // STYLES INDEX
-// Κάνε @use 'styles' σε components για πρόσβαση σε variables + mixins
+// Κάνε @use 'styles/index' as * σε components για πρόσβαση σε variables + mixins
+// ΠΡΟΣΟΧΗ: μην χρησιμοποιείς @use 'styles' — resolve-άρει στο global styles.scss
 // =============================================================================
 
 @forward 'variables';
