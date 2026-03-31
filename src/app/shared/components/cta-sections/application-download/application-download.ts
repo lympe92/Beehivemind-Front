@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
+import {ImageComponent} from '../../ui/image/image';
 
 @Component({
   selector: 'app-application-download',
   standalone: true,
-  imports: [],
+  imports: [
+    ImageComponent
+  ],
   templateUrl: './application-download.html',
   styleUrl: './application-download.scss',
 })
