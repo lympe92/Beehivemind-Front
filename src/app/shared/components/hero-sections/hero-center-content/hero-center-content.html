@@ -1,81 +1,15 @@
-<header class="hero-anime">
-  <div class="navigation-wrap bg-light start-header start-style">
-    <div class="container">
-      <div class="row">
-        <div class="col-12">
-          <nav class="navbar navbar-expand-lg navbar-light">
-
-            <a class="navbar-brand" href="/" alt="Home"><img src="assets/img/logo.webp" alt="Logo" width="410" height="99"></a>
-
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="navbar-nav ml-auto py-4 py-md-0">
-                <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
-                  <a class="nav-link" href="/features">Features</a>
-                </li>
-                <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
-                  <a class="nav-link" href="/app">Beekeeping App</a>
-                </li>
-                <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
-                  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-                     aria-expanded="false">How to</a>
-                  <div class="dropdown-menu">
-                    <a class="dropdown-item" href="/apiariesandbeehives">Apiaries & Beehives</a>
-                    <a class="dropdown-item" href="/inspections">Inspections</a>
-                    <a class="dropdown-item" href="/harvestandfeeding">Harvest & Feeding</a>
-                    <a class="dropdown-item" href="/financial">Financial</a>
-                  </div>
-                </li>
-                <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
-                  <a class="nav-link" href="https://beehivemind.freshdesk.com/support/home" target="_blank">Help</a>
-                </li>
-                <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
-                  <a class="nav-link" href="/pages/contact-us">Contact</a>
-                </li>
-              </ul>
-
-              <a type="button" href="/auth/register" class="btn btn-outline-primary btn-rounded waves-effect margleft">Get
-                Started</a>
-              <a href="/auth/login" type="button" class="btn btn-primary btn-rounded waves-effect margrena">Login</a>
-            </div>
-          </nav>
-        </div>
-      </div>
+<section class="container">
+  <div class="flex-col items-center">
+    <h1 class="text-center">Tired of inefficient Beekeeping Softwares?</h1>
+    <p class="hero-center__subtitle text-center">
+      Join users who made beehive management easy with our beekeeping software.
+    </p>
+    <div class="hero-center__actions text-center" data-aos="fade-up" data-aos-anchor-placement="bottom-bottom">
+      <app-link [routerLink]="'/auth/login'" variant="primary" size="md">Get Started</app-link>
+      <app-link [routerLink]="'/pages/contact-us'" variant="outline" size="md">Need a consultation? »</app-link>
+    </div>
+    <div class="hero-center__image" data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
+      <app-image [alt]="'Bee'" [width]="473" [height]="473" [src]="'assets/img/bee2.webp'"></app-image>
     </div>
   </div>
-</header>
-
-<div class="container firstit">
-  <div class="row">
-    <div class="col-md-12">
-      <h1 class="text-center">Tired of inefficient Beekeeping Softwares?</h1>
-    </div>
-  </div>
-</div>
-
-<div class="container">
-  <div class="row">
-    <div class="col-md-6 margauto headena">
-      <h4 class="text-center margp">Join users who made beehive management easy with our beekeeping software.</h4>
-    </div>
-  </div>
-</div>
-
-<div class="container margp" data-aos="fade-up" data-aos-anchor-placement="bottom-bottom">
-  <div class="text-center">
-    <a href="/auth/login" type="button" class="btn btn-primary btn-rounded waves-effect">Get Started</a>
-    <a class="needcon" href="/pages/contact-us">Need a consultation? »</a>
-  </div>
-</div>
-
-<div class="container">
-  <div class="row justify-content-center align-items-center">
-    <div class="col-12 col-md-7 col-lg-5 col-xl-4" data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
-      <img class="img-fluid" src="assets\img\bee2.webp" alt="Bee" width="473" height="473">
-    </div>
-  </div>
-</div>
+</section>
