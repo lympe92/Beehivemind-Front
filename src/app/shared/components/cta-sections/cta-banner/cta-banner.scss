@@ -1,0 +1,16 @@
+.cta-banner {
+  background-color: #403b3b;
+
+  &__title {
+    text-align: center;
+  }
+
+
+  &__text {
+    text-align: center;
+  }
+
+  &__actions {
+    justify-self: center;
+  }
+}
