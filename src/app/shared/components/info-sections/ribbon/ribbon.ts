@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
+
+export type RibbonMode = 'default' | 'dark';
 
 @Component({
   selector: 'app-ribbon',
@@ -7,4 +9,6 @@ import { Component } from '@angular/core';
   templateUrl: './ribbon.html',
   styleUrl: './ribbon.scss',
 })
-export class RibbonComponent {}
+export class RibbonComponent {
+  mode = input<RibbonMode>('default');
+}

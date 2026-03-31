@@ -1,0 +1,13 @@
+.ribbon {
+  color: #fff;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 3%;
+  padding-bottom: 3%;
+
+  &--dark {
+    background-color: #403b3b;
+    color: #fff;
+  }
+}
