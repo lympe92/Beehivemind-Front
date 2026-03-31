@@ -1,0 +1,52 @@
+<header [class]="'public-header' + (scrolled() ? ' scroll-on' : '')">
+  <div class="container">
+    <nav class="public-header__nav">
+
+      <a routerLink="/" class="public-header__brand">
+        <app-image src="assets/img/logo.webp" alt="Beehivemind Logo" [width]="410" [height]="99" [priority]="true" />
+      </a>
+
+      <button [class]="'public-header__toggler' + (menuOpen() ? ' is-open' : '')" type="button" (click)="toggleMenu()" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="public-header__collapse" [class.is-open]="menuOpen()">
+        <ul class="public-header__links">
+          <li>
+            <a routerLink="/features" routerLinkActive="active" class="public-header__link">Features</a>
+          </li>
+          <li>
+            <a routerLink="/app" routerLinkActive="active" class="public-header__link">Beekeeping App</a>
+          </li>
+          <li class="public-header__dropdown-wrap">
+            <button class="public-header__link public-header__dropdown-toggle" (click)="toggleDropdown()">
+              How to
+            </button>
+            @if (dropdownOpen()) {
+              <ul class="public-header__dropdown">
+                <li><a routerLink="/apiariesandbeehives" class="public-header__dropdown-item">Apiaries & Beehives</a></li>
+                <li><a routerLink="/inspections" class="public-header__dropdown-item">Inspections</a></li>
+                <li><a routerLink="/harvestandfeeding" class="public-header__dropdown-item">Harvest & Feeding</a></li>
+                <li><a routerLink="/financial" class="public-header__dropdown-item">Financial</a></li>
+              </ul>
+            }
+          </li>
+          <li>
+            <a href="https://beehivemind.freshdesk.com/support/home" target="_blank" rel="noopener" class="public-header__link">Help</a>
+          </li>
+          <li>
+            <a routerLink="/pages/contact-us" routerLinkActive="active" class="public-header__link">Contact</a>
+          </li>
+        </ul>
+
+        <div class="public-header__actions">
+          <app-link [routerLink]="'/auth/register'" variant="outline" size="md">Get Started</app-link>
+          <app-link [routerLink]="'/auth/login'" variant="primary" size="md">Login</app-link>
+        </div>
+      </div>
+
+    </nav>
+  </div>
+</header>

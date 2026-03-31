@@ -1,0 +1,192 @@
+@use 'styles/index' as *;
+
+.public-header {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  padding: 10px 0;
+  background-color: $color-white;
+  box-shadow: 0 10px 30px 0 rgba(138, 155, 165, 0.15);
+  transition: all 0.3s ease-out;
+
+  &.scroll-on {
+    padding: 5px 0;
+    box-shadow: 0 5px 10px 0 rgba(138, 155, 165, 0.15);
+
+    .public-header__brand img {
+      height: 28px;
+    }
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__brand {
+    img {
+      height: 52px;
+      width: auto;
+      display: block;
+      transition: all 0.3s ease-out;
+    }
+  }
+
+  // Hamburger
+  &__toggler {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 17px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    &:focus { outline: none; }
+
+    span {
+      display: block;
+      width: 24px;
+      height: 1px;
+      background-color: $color-dark;
+      transition: all 300ms linear;
+    }
+
+    &.is-open {
+      span:nth-child(1) { transform: translateY(8px) rotate(-45deg); }
+      span:nth-child(2) { opacity: 0; }
+      span:nth-child(3) { transform: translateY(-8px) rotate(45deg); }
+    }
+
+    @include respond-below('lg') {
+      display: flex;
+    }
+  }
+
+  // Nav
+  &__collapse {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xl;
+
+    @include respond-below('lg') {
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+      padding: $spacing-md 0;
+
+      &.is-open {
+        display: flex;
+      }
+    }
+  }
+
+  &__links {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    @include respond-below('lg') {
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+    }
+  }
+
+  &__link {
+    position: relative;
+    display: inline-block;
+    padding: 5px 0;
+    color: $color-dark;
+    font-weight: $font-weight-medium;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 200ms linear;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: $color-primary;
+      opacity: 0;
+      transition: all 200ms linear;
+    }
+
+    &:hover {
+      color: $color-primary;
+
+      &::after {
+        bottom: 0;
+        opacity: 1;
+      }
+    }
+
+    &.active {
+      color: $color-grey;
+
+      &:hover::after { opacity: 0; }
+    }
+  }
+
+  // Dropdown
+  &__dropdown-wrap {
+    position: relative;
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + $spacing-sm);
+    left: 0;
+    min-width: 200px;
+    background-color: $color-white;
+    box-shadow: $shadow-md;
+    border-radius: $border-radius;
+    list-style: none;
+    padding: $spacing-sm 0;
+    margin: 0;
+    z-index: 10;
+
+    @include respond-below('lg') {
+      position: static;
+      box-shadow: none;
+      padding-left: $spacing-md;
+    }
+  }
+
+  &__dropdown-item {
+    display: block;
+    padding: $spacing-sm $spacing-md;
+    color: $color-dark;
+    text-decoration: none;
+    transition: background-color 200ms linear;
+
+    &:hover {
+      background-color: $color-light;
+      color: $color-primary;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
+
+    @include respond-below('lg') {
+      width: 100%;
+      flex-direction: column;
+    }
+  }
+}
