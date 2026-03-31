@@ -1,15 +1,15 @@
-<section class="container firstit">
-  <div class="row">
-    <div class="col-md-12 col-lg-6 align-self-center">
-      <h1 class="text-left">Most intelligent beekeeping software</h1>
-      <h4 class="headena">Increase your business productivity with our beehive management software.</h4>
+<section class="container hero">
+  <div class="flex-col lg:flex-row">
+    <div class="md:w-full lg:w-1/2 self-center">
+      <h1>Most intelligent beekeeping software</h1>
+      <h4>Increase your business productivity with our beehive management software.</h4>
       <div data-aos="fade-up" data-aos-anchor-placement="bottom-bottom">
-        <a href="/auth/login" type="button" class="btn btn-primary btn-rounded waves-effect">Get Started</a>
-        <a class="needcon" href="/pages/contact-us">Need a consultation? »</a>
+        <app-link [routerLink]="'/auth/login'" variant="primary" size="md">Get Started</app-link>
+        <app-link [routerLink]="'/pages/contact-us'" variant="outline" size="md">Need a consultation? »</app-link>
       </div>
     </div>
-    <div class="col-md-12 col-lg-6 order-1 imgi" data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
-      <img src="assets/img/bee4.webp" alt="Bee" width="512" height="358">
+    <div class="md:w-full lg:w-1/2 order-1 " data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
+      <app-image src="assets/img/bee4.webp" alt="Bee" [width]="512" [height]="358" [priority]="true" />
     </div>
   </div>
 </section>
