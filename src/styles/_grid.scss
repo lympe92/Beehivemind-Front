@@ -34,12 +34,18 @@
 .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
 
 @include respond-to('md') {
+  .md\:flex     { display: flex; }
+  .md\:flex-row { display: flex; flex-direction: row; }
+
   .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
   .md\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
   .md\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
 }
 
 @include respond-to('lg') {
+  .lg\:flex     { display: flex; }
+  .lg\:flex-row { display: flex; flex-direction: row; }
+
   .lg\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
   .lg\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
   .lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }

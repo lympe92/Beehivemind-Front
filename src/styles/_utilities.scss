@@ -32,4 +32,25 @@
 
 .mx-auto { margin-inline: auto; }
 
+// Hero top spacing
+.hero {
+  margin-top: 120px;
+
+  @include respond-to('lg') {
+    margin-top: 13%;
+  }
+}
+
+.section-divider {
+  &::after {
+    content: '';
+    display: block;
+    height: 2px;
+    border: 0;
+    background-color: $color-primary;
+    margin-top: 5%;
+    margin-bottom: 5%;
+  }
+}
+
 .sr-only { @include visually-hidden; }

@@ -65,9 +65,8 @@
 
 @mixin heading-base {
   font-family: $font-family-heading;
-  font-weight: $font-weight-bold;
+  font-weight: 300;
   line-height: $line-height-heading;
-  color: $color-text;
 }
 
 @mixin truncate($lines: 1) {
