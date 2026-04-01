@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { TextColumn } from './text-columns.model';
 
 @Component({
   selector: 'app-text-columns',
@@ -7,4 +8,6 @@ import { Component } from '@angular/core';
   templateUrl: './text-columns.html',
   styleUrl: './text-columns.scss',
 })
-export class TextColumnsComponent {}
+export class TextColumnsComponent {
+  columns = input.required<TextColumn[]>();
+}

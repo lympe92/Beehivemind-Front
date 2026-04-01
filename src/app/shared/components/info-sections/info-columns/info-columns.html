@@ -1,13 +1,13 @@
 <section [class]="' info-columns' + (mode() === 'light' ? ' info-columns--light' : '')">
   <div class="container">
-    <h2 class="info-columns__title text-center">Trusted partner</h2>
+    <h2 class="info-columns__title text-center">{{ title() }}</h2>
     <div class="grid md:grid-cols-3">
-    @for (item of items; track item.title) {
-      <div class="info-columns__item text-center">
-        <p class="info-columns__item--title h2">{{ item.title }}</p>
-        <p class="info-columns__item--description h4">{{ item.description }}</p>
-      </div>
-    }
-  </div>
+      @for (item of items(); track item.title) {
+        <div class="info-columns__item text-center">
+          <p class="info-columns__item--title h2">{{ item.title }}</p>
+          <p class="info-columns__item--description h4">{{ item.description }}</p>
+        </div>
+      }
+    </div>
   </div>
 </section>

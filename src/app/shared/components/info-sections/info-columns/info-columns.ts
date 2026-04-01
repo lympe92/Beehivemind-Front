@@ -1,4 +1,5 @@
 import { Component, input } from '@angular/core';
+import { InfoColumnItem } from './info-columns.model';
 
 export type InfoColumnsMode = 'default' | 'light';
 
@@ -11,9 +12,6 @@ export type InfoColumnsMode = 'default' | 'light';
 })
 export class InfoColumnsComponent {
   mode = input<InfoColumnsMode>('default');
-  items = [
-    { title: '1.000+', description: 'Customers' },
-    { title: '10.000+', description: 'Social followers' },
-    { title: '3 years', description: 'Online' },
-  ];
+  title = input.required<string>();
+  items = input.required<InfoColumnItem[]>();
 }

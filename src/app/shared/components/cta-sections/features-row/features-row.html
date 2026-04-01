@@ -1,33 +1,19 @@
 <section class="container">
   <div class="flex flex-wrap">
-    <div class="w-full md:w-1/4">
-      <h3 class="text-center">Optimize your account</h3>
-      <h6 class="text-justify">Cre&shy;a&shy;te your a&shy;ccou&shy;nt, add your a&shy;pi&shy;a&shy;ries, crea&shy;te
-        as ma&shy;ny bee&shy;hi&shy;ves as you wa&shy;nt and na&shy;me gro&shy;ups a&shy;cco&shy;rdi&shy;ng to
-        your needs. Now your a&shy;ccount is re&shy;a&shy;dy to use.</h6>
-    </div>
-    <div class="w-full md:w-1/4">
-      <h3 class="text-center">Inspect your colonies</h3>
-      <h6 class="text-justify">Just open our bee&shy;kee&shy;ping App and work u&shy;si&shy;ng voi&shy;ce com&shy;ma&shy;nds
-        du&shy;ri&shy;ng i&shy;nspe&shy;cti&shy;on. O&shy;nce the i&shy;nspe&shy;cti&shy;on is o&shy;ver, all da&shy;ta
-        you e&shy;nte&shy;red will be a&shy;vai&shy;la&shy;ble to e&shy;va&shy;lu&shy;a&shy;te them.<br></h6>
-    </div>
-    <div class="w-full md:w-1/4">
-      <h3 class="text-center">Analyze inspection data</h3>
-      <h6 class="text-justify">Ana&shy;ly&shy;ze a&shy;pi&shy;a&shy;ry ma&shy;na&shy;ge&shy;ment da&shy;ta to de&shy;te&shy;rmi&shy;na&shy;te
-        what ne&shy;eds to be bet&shy;ter in o&shy;rder to i&shy;ncre&shy;a&shy;se the gro&shy;wth ra&shy;te of
-        your co&shy;lo&shy;ni&shy;es, pro&shy;du&shy;cti&shy;vi&shy;ty and he&shy;althi&shy;ne&shy;ss.</h6>
-    </div>
-    <div class="w-full md:w-1/4">
-      <h3 class="text-center">Diagnose growth issues</h3>
-      <h6 class="text-justify">With our bee&shy;kee&shy;pi&shy;ng soft&shy;wa&shy;re you can a&shy;na&shy;ly&shy;ze
-        a&shy;pi&shy;a&shy;ry ma&shy;na&shy;ge&shy;me&shy;nt da&shy;ta whi&shy;ch will he&shy;lp you to u&shy;nder&shy;sta&shy;nd
-        be&shy;tter the be&shy;es, co&shy;ndu&shy;ct te&shy;sts and draw u&shy;se&shy;fu&shy;l con&shy;clu&shy;si&shy;ons.</h6>
-    </div>
+    @for (item of items(); track item.title) {
+      <div class="w-full md:w-1/4">
+        <h3 class="text-center">{{ item.title }}</h3>
+        <h6 class="text-justify">{{ item.description }}</h6>
+      </div>
+    }
   </div>
 
   <div class="flex justify-center">
     <app-link
-      [routerLink]="'/features'">{{'Explore the features'}}</app-link>
+      [routerLink]="cta().routerLink"
+      [variant]="cta().variant ?? 'primary'"
+      [size]="cta().size ?? 'md'">
+      {{ cta().label }}
+    </app-link>
   </div>
 </section>

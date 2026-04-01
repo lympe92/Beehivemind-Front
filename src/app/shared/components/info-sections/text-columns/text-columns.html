@@ -1,24 +1,12 @@
 <section class="text-columns">
   <div class="container">
     <div class="grid md:grid-cols-3 gap-lg">
-      <div>
-        <h3 class="text-center">Record hives growth</h3>
-        <p>BeehiveMind App is the one and only reliable voice controlled Beekeeping App which allows you
-          to collect data via your voice. Just start the inspection and record how many frames, population,
-          pollen, nectar, brood etc your beehives have.</p>
-      </div>
-      <div>
-        <h3 class="text-center">Book all queen info</h3>
-        <p>No one wants to maintain an unproductive colony. Book all information about Queen's condition,
-          find out the productive queens of your apiaries and take advantage of their genetic material
-          easy and fast.</p>
-      </div>
-      <div>
-        <h3 class="text-center">Control all diseases</h3>
-        <p>Say goodbye to Varroa destructor, Nosema, AFB etc by using this App. Mention all abnormal hive
-          conditions via your voice and take your measures. Furthermore, read the signs of the hives
-          growth through your account's history data.</p>
-      </div>
+      @for (column of columns(); track column.title) {
+        <div>
+          <h3 class="text-center">{{ column.title }}</h3>
+          <p>{{ column.description }}</p>
+        </div>
+      }
     </div>
   </div>
 </section>

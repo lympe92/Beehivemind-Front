@@ -1,22 +1,29 @@
 <section class="container">
   <div class="flex-col lg:flex-row items-center">
     <div class="w-full lg:w-1/2">
-      <h2>See all info about hives' growth with Beehivemind app</h2>
+      <h2>{{ title() }}</h2>
       <div class="split-list">
-      <h3>Stay Hands-On</h3>
-      <p>By using our beekeeping App you remain engaged and focused on high-value work by
-        removing distractions.</p>
-      <h3>Work Smarter</h3>
-      <p>Record all inspections, track down the weaknesses of your beehives and limit them.</p>
-      <h3>Simple Interface</h3>
-      <p>With simple design and user interface our easy to use App allows you to become more effective.</p>
+        @for (item of items(); track item.title) {
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+        }
       </div>
     </div>
     <div class="w-full lg:w-1/2" data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
-      <app-image src="assets/img/comb.webp" alt="Comb" [width]="548" [height]="542" [priority]="true" />
+      <app-image
+        [src]="image().src"
+        [alt]="image().alt"
+        [width]="image().width"
+        [height]="image().height"
+        [priority]="image().priority ?? false" />
     </div>
   </div>
   <div class="text-center" data-aos="fade-up" data-aos-anchor-placement="bottom-bottom">
-    <app-link [routerLink]="'/app'" [variant]="'outline'">{{'Discover how our beekeeping App works »'}}</app-link>
+    <app-link
+      [routerLink]="cta().routerLink"
+      [variant]="cta().variant ?? 'outline'"
+      [size]="cta().size ?? 'md'">
+      {{ cta().label }}
+    </app-link>
   </div>
 </section>

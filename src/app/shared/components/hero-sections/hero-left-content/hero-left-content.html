@@ -1,15 +1,30 @@
 <section class="container hero">
   <div class="flex-col lg:flex-row">
     <div class="md:w-full lg:w-1/2 self-center">
-      <h1>Most intelligent beekeeping software</h1>
-      <h4>Increase your business productivity with our beehive management software.</h4>
+      <h1>{{ title() }}</h1>
+      <h4>{{ subtitle() }}</h4>
       <div data-aos="fade-up" data-aos-anchor-placement="bottom-bottom">
-        <app-link [routerLink]="'/auth/login'" variant="primary" size="md">Get Started</app-link>
-        <app-link [routerLink]="'/pages/contact-us'" variant="outline" size="md">Need a consultation? »</app-link>
+        <app-link
+          [routerLink]="primaryCta().routerLink"
+          [variant]="primaryCta().variant ?? 'primary'"
+          [size]="primaryCta().size ?? 'md'">
+          {{ primaryCta().label }}
+        </app-link>
+        <app-link
+          [routerLink]="secondaryCta().routerLink"
+          [variant]="secondaryCta().variant ?? 'outline'"
+          [size]="secondaryCta().size ?? 'md'">
+          {{ secondaryCta().label }}
+        </app-link>
       </div>
     </div>
-    <div class="md:w-full lg:w-1/2 order-1 " data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
-      <app-image src="assets/img/bee4.webp" alt="Bee" [width]="512" [height]="358" [priority]="true" />
+    <div class="md:w-full lg:w-1/2 order-1" data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
+      <app-image
+        [src]="image().src"
+        [alt]="image().alt"
+        [width]="image().width"
+        [height]="image().height"
+        [priority]="image().priority ?? false" />
     </div>
   </div>
 </section>

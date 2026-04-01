@@ -1,15 +1,28 @@
 <section class="container hero">
   <div class="flex-col items-center">
-    <h1 class="text-center">Tired of inefficient Beekeeping Softwares?</h1>
-    <p class="hero-center__subtitle text-center">
-      Join users who made beehive management easy with our beekeeping software.
-    </p>
+    <h1 class="text-center">{{ title() }}</h1>
+    <p class="hero-center__subtitle text-center">{{ subtitle() }}</p>
     <div class="hero-center__actions text-center" data-aos="fade-up" data-aos-anchor-placement="bottom-bottom">
-      <app-link [routerLink]="'/auth/login'" variant="primary" size="md">Get Started</app-link>
-      <app-link [routerLink]="'/pages/contact-us'" variant="outline" size="md">Need a consultation? »</app-link>
+      <app-link
+        [routerLink]="primaryCta().routerLink"
+        [variant]="primaryCta().variant ?? 'primary'"
+        [size]="primaryCta().size ?? 'md'">
+        {{ primaryCta().label }}
+      </app-link>
+      <app-link
+        [routerLink]="secondaryCta().routerLink"
+        [variant]="secondaryCta().variant ?? 'outline'"
+        [size]="secondaryCta().size ?? 'md'">
+        {{ secondaryCta().label }}
+      </app-link>
     </div>
     <div class="hero-center__image" data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
-      <app-image [alt]="'Bee'" [width]="473" [height]="473" [src]="'assets/img/bee2.webp'"></app-image>
+      <app-image
+        [src]="image().src"
+        [alt]="image().alt"
+        [width]="image().width"
+        [height]="image().height"
+        [priority]="image().priority ?? false" />
     </div>
   </div>
 </section>

@@ -1,15 +1,17 @@
 <section class="cta-banner">
   <div class="container">
     <div class="flex-col">
-      <h2 class="cta-banner__title">What are you waiting for?</h2>
-      <p class="cta-banner__text">
-        That's right, what are you waiting for?<br>
-        The only thing left to do is to register and download BeehiveMind App today!
-      </p>
+      <h2 class="cta-banner__title">{{ title() }}</h2>
+      <p class="cta-banner__text">{{ description() }}</p>
     </div>
 
     <div class="text-center" data-aos="fade-up" data-aos-anchor-placement="bottom-bottom">
-      <app-link [routerLink]="'/auth/register'" [variant]="'outline'">{{'Get Started'}}</app-link>
+      <app-link
+        [routerLink]="cta().routerLink"
+        [variant]="cta().variant ?? 'primary'"
+        [size]="cta().size ?? 'md'">
+        {{ cta().label }}
+      </app-link>
     </div>
   </div>
 </section>

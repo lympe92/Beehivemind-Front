@@ -1,10 +1,14 @@
 <section class="container">
   <div class="flex-col items-center">
-    <h2 class="text-center">Personalize your financial profile</h2>
-    <p class="text-center-column__subtitle text-center">Set cost categories adding their name, description and type.
-      Then use our financial tool to insert your business costs including cost category and amount.</p>
+    <h2 class="text-center">{{ title() }}</h2>
+    <p class="text-center-column__subtitle text-center">{{ subtitle() }}</p>
     <div class="text-center-column__image" data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
-      <app-image [src]="'assets/img/financial.gif'" [alt]="'Financial'" [width]="477" [height]="213"></app-image>
+      <app-image
+        [src]="image().src"
+        [alt]="image().alt"
+        [width]="image().width"
+        [height]="image().height"
+        [priority]="image().priority ?? false" />
     </div>
   </div>
 </section>

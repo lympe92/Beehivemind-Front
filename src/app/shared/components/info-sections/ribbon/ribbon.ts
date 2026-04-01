@@ -11,4 +11,6 @@ export type RibbonMode = 'default' | 'dark';
 })
 export class RibbonComponent {
   mode = input<RibbonMode>('default');
+  quote = input.required<string>();
+  author = input<string>();
 }
