@@ -1,6 +1,30 @@
-<!--<app-hero-center-content></app-hero-center-content>-->
-<!--<app-text-center-column></app-text-center-column>-->
-<!--<app-text-center-column></app-text-center-column>-->
-<!--<app-features-list-cta></app-features-list-cta>-->
-<!--<app-info-columns></app-info-columns>-->
-<!--<app-cta-banner></app-cta-banner>-->
+@if (pageData$ | async; as page) {
+  <app-hero-center-content
+    [title]="page.hero.title"
+    [subtitle]="page.hero.subtitle"
+    [image]="page.hero.image"
+    [primaryCta]="page.hero.primaryCta"
+    [secondaryCta]="page.hero.secondaryCta" />
+
+  @for (col of page.textCenterColumns; track col.title) {
+    <app-text-center-column
+      [title]="col.title"
+      [subtitle]="col.subtitle"
+      [image]="col.image" />
+  }
+
+  <app-features-list-cta
+    [title]="page.featuresListCta.title"
+    [items]="page.featuresListCta.items"
+    [ctaHref]="page.featuresListCta.ctaHref"
+    [ctaLabel]="page.featuresListCta.ctaLabel" />
+
+  <app-info-columns
+    [title]="page.infoColumns.title"
+    [items]="page.infoColumns.items" />
+
+  <app-cta-banner
+    [title]="page.ctaBanner.title"
+    [description]="page.ctaBanner.description"
+    [cta]="page.ctaBanner.cta" />
+}

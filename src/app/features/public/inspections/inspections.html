@@ -1,7 +1,38 @@
-<!--<app-hero-center-content></app-hero-center-content>-->
-<!--<app-split-accordion></app-split-accordion>-->
-<!--<app-features-list-cta></app-features-list-cta>-->
-<!--<app-split-accordion></app-split-accordion>-->
-<!--<app-cta-banner></app-cta-banner>-->
-<!--<app-info-columns></app-info-columns>-->
-<!--<app-cta-banner></app-cta-banner>-->
+@if (pageData$ | async; as page) {
+  <app-hero-center-content
+    [title]="page.hero.title"
+    [subtitle]="page.hero.subtitle"
+    [image]="page.hero.image"
+    [primaryCta]="page.hero.primaryCta"
+    [secondaryCta]="page.hero.secondaryCta" />
+
+  <app-split-accordion
+    [title]="page.splitAccordion1.title"
+    [image]="page.splitAccordion1.image"
+    [items]="page.splitAccordion1.items" />
+
+  <app-features-list-cta
+    [title]="page.featuresListCta.title"
+    [items]="page.featuresListCta.items"
+    [ctaHref]="page.featuresListCta.ctaHref"
+    [ctaLabel]="page.featuresListCta.ctaLabel" />
+
+  <app-split-accordion
+    [title]="page.splitAccordion2.title"
+    [image]="page.splitAccordion2.image"
+    [items]="page.splitAccordion2.items" />
+
+  <app-cta-banner
+    [title]="page.ctaBanner1.title"
+    [description]="page.ctaBanner1.description"
+    [cta]="page.ctaBanner1.cta" />
+
+  <app-info-columns
+    [title]="page.infoColumns.title"
+    [items]="page.infoColumns.items" />
+
+  <app-cta-banner
+    [title]="page.ctaBanner2.title"
+    [description]="page.ctaBanner2.description"
+    [cta]="page.ctaBanner2.cta" />
+}

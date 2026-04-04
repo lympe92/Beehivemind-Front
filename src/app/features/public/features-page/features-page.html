@@ -1,8 +1,33 @@
-<!--<app-hero-center-content></app-hero-center-content>-->
-<!--<app-split-list></app-split-list>-->
-<!--<app-split-list></app-split-list>-->
-<!--<app-split-list></app-split-list>-->
-<!--<app-ribbon></app-ribbon>-->
-<!--<app-split-list></app-split-list>-->
-<!--<app-split-list></app-split-list>-->
-<!--<app-cta-banner></app-cta-banner>-->
+@if (pageData$ | async; as page) {
+  <app-hero-center-content
+    [title]="page.hero.title"
+    [subtitle]="page.hero.subtitle"
+    [image]="page.hero.image"
+    [primaryCta]="page.hero.primaryCta"
+    [secondaryCta]="page.hero.secondaryCta" />
+
+  @for (list of page.splitListsPre; track list.title) {
+    <app-split-list
+      [title]="list.title"
+      [image]="list.image"
+      [items]="list.items"
+      [cta]="list.cta" />
+  }
+
+  <app-ribbon
+    [mode]="page.ribbon.mode"
+    [quote]="page.ribbon.quote" />
+
+  @for (list of page.splitListsPost; track list.title) {
+    <app-split-list
+      [title]="list.title"
+      [image]="list.image"
+      [items]="list.items"
+      [cta]="list.cta" />
+  }
+
+  <app-cta-banner
+    [title]="page.ctaBanner.title"
+    [description]="page.ctaBanner.description"
+    [cta]="page.ctaBanner.cta" />
+}

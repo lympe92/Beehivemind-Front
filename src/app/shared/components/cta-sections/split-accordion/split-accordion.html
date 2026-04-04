@@ -21,7 +21,7 @@
                    [attr.href]="'div#accordion-1 .item-' + (i + 1)"
                    class="colbl">
                   {{ item.title }}
-                  <a style="color:#ec861f;" href="javascript:;">»</a>
+                  <a style="color:#ec861f;" href="javascript:">»</a>
                 </a>
               </h3>
             </div>
@@ -29,7 +29,9 @@
                  role="tabpanel" data-parent="#accordion-1">
               <div class="card-body">
                 <h5 class="card-text text-justify">{{ item.body }}</h5>
-                <a class="colport" [href]="item.linkHref">{{ item.linkLabel }}</a>
+                @if (item.linkHref) {
+                  <a class="colport" [href]="item.linkHref">{{ item.linkLabel }}</a>
+                }
               </div>
             </div>
           </div>

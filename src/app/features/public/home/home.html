@@ -1,157 +1,42 @@
-<app-hero-left-content
-  [title]="'Most intelligent beekeeping software'"
-  [subtitle]="'Increase your business productivity with our beehive management software.'"
-  [image]="{
-    src: 'assets\\img\\bee4.webp',
-    alt: 'Bee',
-    width: 512,
-    height: 358,
-    priority:true
-    }"
-  [primaryCta]="{
-    label: 'Get started',
-    routerLink: '/auth/login',
-    variant: 'primary',
-    }"
-  [secondaryCta]="{
-    label: 'Need a consultation? »',
-    routerLink: '/pages/contact-us',
-    variant: 'outline',
-    }"
-></app-hero-left-content>
+@if (pageData$ | async; as page) {
+  <app-hero-left-content
+    [title]="page.hero.title"
+    [subtitle]="page.hero.subtitle"
+    [image]="page.hero.image"
+    [primaryCta]="page.hero.primaryCta"
+    [secondaryCta]="page.hero.secondaryCta" />
 
-<app-ribbon
-  [mode]="'dark'"
-  [author]="'-Google Play user'"
-  [quote]="'This App made my Business easier and funnier. Easy to use, does what it says.'">
-</app-ribbon>
-<app-split-accordion
-  [title]="'Turn inspections into knowledge'"
-  [image]="{
-  src: 'assets/img/bee1.webp',
-  alt: 'Bee',
-  width: 417,
-  height: 221,
-  priority:false
-  }"
-  [items]="[
-  {
-  title:'Know your bees right now',
-  body:'Do you know your bees? U&shy;se our a&shy;dva&shy;nced to&shy;ols\n'+
-'                to u&shy;nder&shy;sta&shy;nd your bee&shy;hi&shy;ves\' gro&shy;wth, de&shy;cre&shy;a&shy;se bee co&shy;lo&shy;ni&shy;es\n'+
-'                mo&shy;rta&shy;li&shy;ty ra&shy;te and pro&shy;mo&shy;te the ge&shy;ne&shy;tic i&shy;mpro&shy;ve&shy;ment\n'+
-'                of your bee stocks.',
-  linkHref:'/features',
-  linkLabel:'Explore the features we offer »'
-  },
-   {
-  title:'Unified beekeeping mangement',
-  body:'Get the mo&shy;st out of bee&shy;kee&shy;pi&shy;ng u&shy;si&shy;ng\n'+
-'                our voi&shy;ce re&shy;co&shy;gni&shy;ti&shy;on bee&shy;hi&shy;ve ma&shy;na&shy;ge&shy;me&shy;nt sy&shy;stem.\n'+
-'                In this wa&shy;y you can co&shy;ntri&shy;bu&shy;te to su&shy;sta&shy;ina&shy;ble bee&shy;kee&shy;pi&shy;ng\n'+
-'                for a bet&shy;ter world.',
-  linkHref:'/features',
-  linkLabel:'Explore the features we offer »'
-  },
-   {
-  title:'Efficient financial management',
-  body:'Bee&shy;hi&shy;ve&shy;mi&shy;nd ma&shy;kes the fi&shy;na&shy;nci&shy;al\n'+
-'                ma&shy;na&shy;ge&shy;me&shy;nt of your bee&shy;kee&shy;pi&shy;ng bu&shy;si&shy;ness e&shy;ffi&shy;ci&shy;ent.\n'+
-'                Ma&shy;na&shy;ge your bu&shy;si&shy;ness co&shy;sts mo&shy;re e&shy;ffi&shy;ci&shy;e&shy;nt&shy;ly\n'+
-'                throu&shy;gh our fi&shy;na&shy;nci&shy;al ma&shy;na&shy;ge&shy;me&shy;nt sy&shy;stem and grow up\n'+
-'                whi&shy;le re&shy;du&shy;ci&shy;ng your o&shy;ve&shy;rall work&shy;load.',
-  linkHref:'/financial',
-  linkLabel:'Explore the financial mode »'
-  }
-  ]">
-</app-split-accordion>
-<app-features-row
-  [items]="[
-  {
-  title:'Optimize your account',
-  description:'Cre&shy;a&shy;te your a&shy;ccou&shy;nt, add your a&shy;pi&shy;a&shy;ries, crea&shy;te\n'+
-'        as ma&shy;ny bee&shy;hi&shy;ves as you wa&shy;nt and na&shy;me gro&shy;ups a&shy;cco&shy;rdi&shy;ng to\n'+
-'        your needs. Now your a&shy;ccount is re&shy;a&shy;dy to use.'
-  },
-    {
-  title:'Inspect your colonies',
-  description:'Just open our bee&shy;kee&shy;ping App and work u&shy;si&shy;ng voi&shy;ce com&shy;ma&shy;nds\n'+
-'        du&shy;ri&shy;ng i&shy;nspe&shy;cti&shy;on. O&shy;nce the i&shy;nspe&shy;cti&shy;on is o&shy;ver, all da&shy;ta\n'+
-'        you e&shy;nte&shy;red will be a&shy;vai&shy;la&shy;ble to e&shy;va&shy;lu&shy;a&shy;te them.'
-  },
-    {
-  title:'Analyze inspection data',
-  description:'Ana&shy;ly&shy;ze a&shy;pi&shy;a&shy;ry ma&shy;na&shy;ge&shy;ment da&shy;ta to de&shy;te&shy;rmi&shy;na&shy;te\n'+
-'        what ne&shy;eds to be bet&shy;ter in o&shy;rder to i&shy;ncre&shy;a&shy;se the gro&shy;wth ra&shy;te of\n'+
-'        your co&shy;lo&shy;ni&shy;es, pro&shy;du&shy;cti&shy;vi&shy;ty and he&shy;althi&shy;ne&shy;ss.'
-  },
-    {
-  title:'Diagnose growth issues',
-  description:'With our bee&shy;kee&shy;pi&shy;ng soft&shy;wa&shy;re you can a&shy;na&shy;ly&shy;ze\n'+
-'        a&shy;pi&shy;a&shy;ry ma&shy;na&shy;ge&shy;me&shy;nt da&shy;ta whi&shy;ch will he&shy;lp you to u&shy;nder&shy;sta&shy;nd\n'+
-'        be&shy;tter the be&shy;es, co&shy;ndu&shy;ct te&shy;sts and draw u&shy;se&shy;fu&shy;l con&shy;clu&shy;si&shy;ons.'
-  }
-  ]"
-  [cta]="{
-  label:'Explore the features',
-  routerLink:'/features',
-  }"></app-features-row>
-<app-ribbon
-  [mode]="'dark'"
-  [quote]="'Being productive is all about using the right tool!'"
-></app-ribbon>
-<app-split-list
-  [title]="`See all info about hives' growth with Beehivemind app`"
-  [items]="[
-  {
-  title:'Stay Hands-On',
-  description:'By using our beekeeping App you remain engaged and focused on highvalue work by\n'+
-'          removing distractions.'
-  },
-  {
-  title:'Work Smarter',
-  description:'Record all inspections, track down the weeknesses of your beehives and limit them.'
-  },
-  {
-  title:'Simple Interface',
-  description:'With simple design and user interface our easy to use App allows you to become more\n'+
-'          effective.'
-  },
-  ]"
-  [image]="{
-  src: 'assets/img/comb.webp',
-  alt: 'Comb',
-  width: 548,
-  height: 542,
-  priority:false
-  }"
-  [cta]="{
-  label:'Discover how our beekeeping App works »',
-  routerLink:'/app',
-  }"></app-split-list>
-<app-info-columns
-  [mode]="'light'"
-  [title]="'Trusted partner'"
-  [items]="[
-  {
-  title:'1.000+',
-  description:'Customers'
-  },
-   {
-  title:'10.000+',
-  description:'Social followers'
-  },
-   {
-  title:'3 years',
-  description:'Online'
-  },
-  ]"></app-info-columns>
-<app-cta-banner
-  [title]="'What are you waiting for?'"
-  [description]="'That\'s right, what are you waiting for?&nbsp;<br> The only thing left to\n'+
-'            do is to register and download BeehiveMind App today!'"
-  [cta]="{
-  variant:'outline',
-  label:'Get started',
-  routerLink:'/auth/register',
-  }"></app-cta-banner>
+  <app-ribbon
+    [mode]="page.ribbon1.mode"
+    [quote]="page.ribbon1.quote"
+    [author]="page.ribbon1.author" />
+
+  <app-split-accordion
+    [title]="page.splitAccordion.title"
+    [image]="page.splitAccordion.image"
+    [items]="page.splitAccordion.items" />
+
+  <app-features-row
+    [items]="page.featuresRow.items"
+    [cta]="page.featuresRow.cta" />
+
+  <app-ribbon
+    [mode]="page.ribbon2.mode"
+    [quote]="page.ribbon2.quote" />
+
+  <app-split-list
+    [title]="page.splitList.title"
+    [items]="page.splitList.items"
+    [image]="page.splitList.image"
+    [cta]="page.splitList.cta" />
+
+  <app-info-columns
+    [mode]="page.infoColumns.mode"
+    [title]="page.infoColumns.title"
+    [items]="page.infoColumns.items" />
+
+  <app-cta-banner
+    [title]="page.ctaBanner.title"
+    [description]="page.ctaBanner.description"
+    [cta]="page.ctaBanner.cta" />
+}
