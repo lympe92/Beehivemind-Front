@@ -1,0 +1,62 @@
+.raw-index {
+  .page-header {
+    margin-bottom: 24px;
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin: 0 0 4px;
+    }
+
+    p {
+      color: #64748b;
+      font-size: 0.875rem;
+      margin: 0;
+    }
+  }
+}
+
+.models-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.model-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 20px;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &:hover {
+    border-color: #f59e0b;
+    background: #1e293b;
+  }
+
+  &__label {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__count {
+    color: #f1f5f9;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  &__action {
+    color: #f59e0b;
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+}

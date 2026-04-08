@@ -1,0 +1,16 @@
+<div class="raw-index">
+  <div class="page-header">
+    <h2>Raw Data</h2>
+    <p>Full access to all database models</p>
+  </div>
+
+  <div class="models-grid">
+    @for (m of models; track m.key) {
+      <a [routerLink]="['/admin/raw', m.key]" class="model-card">
+        <div class="model-card__label">{{ m.label }}</div>
+        <div class="model-card__count">{{ getCount(m.key) }}</div>
+        <div class="model-card__action">View all →</div>
+      </a>
+    }
+  </div>
+</div>

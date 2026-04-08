@@ -1,29 +1,29 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AsyncPipe } from '@angular/common';
-import { AuthActions } from '../../../store/auth/auth.actions';
+import { EmployeeAuthActions } from '../../../store/employee-auth/employee-auth.actions';
 import {
-  selectAuthError,
-  selectAuthLoading,
-  selectIsLoggedIn,
-} from '../../../store/auth/auth.selectors';
+  selectEmployeeAuthError,
+  selectEmployeeAuthLoading,
+  selectIsEmployeeLoggedIn,
+} from '../../../store/employee-auth/employee-auth.selectors';
 
 @Component({
-  selector: 'app-auth-login',
+  selector: 'app-admin-login',
   standalone: true,
-  imports: [ReactiveFormsModule, AsyncPipe, RouterLink],
+  imports: [ReactiveFormsModule, AsyncPipe],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class LoginComponent implements OnInit {
+export class AdminLoginComponent implements OnInit {
   private store = inject(Store);
   private fb = inject(FormBuilder);
   private router = inject(Router);
 
-  loading$ = this.store.select(selectAuthLoading);
-  error$ = this.store.select(selectAuthError);
+  loading$ = this.store.select(selectEmployeeAuthLoading);
+  error$ = this.store.select(selectEmployeeAuthError);
 
   form: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -31,14 +31,14 @@ export class LoginComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.store.select(selectIsLoggedIn).subscribe((loggedIn) => {
-      if (loggedIn) this.router.navigate(['/dashboard']);
+    this.store.select(selectIsEmployeeLoggedIn).subscribe((loggedIn) => {
+      if (loggedIn) this.router.navigate(['/admin/dashboard']);
     });
   }
 
   submit(): void {
     if (this.form.invalid) return;
     const { email, password } = this.form.value;
-    this.store.dispatch(AuthActions.login({ email, password }));
+    this.store.dispatch(EmployeeAuthActions.login({ email, password }));
   }
 }

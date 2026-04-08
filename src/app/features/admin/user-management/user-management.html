@@ -1,1 +1,81 @@
-<p>User Management</p>
+<div class="user-management">
+  <div class="page-header">
+    <h2>Users</h2>
+    <span class="page-header__total">{{ total() }} total</span>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <input
+      type="text"
+      placeholder="Search by name or email..."
+      [(ngModel)]="search"
+      (keyup.enter)="onSearch()"
+      class="filters__input"
+    />
+    <select [(ngModel)]="statusFilter" (change)="onSearch()" class="filters__select">
+      <option value="">All statuses</option>
+      <option value="active">Active</option>
+      <option value="suspended">Suspended</option>
+      <option value="banned">Banned</option>
+    </select>
+    <select [(ngModel)]="planFilter" (change)="onSearch()" class="filters__select">
+      <option value="">All plans</option>
+      <option value="free">Free</option>
+      <option value="pro">Pro</option>
+      <option value="enterprise">Enterprise</option>
+    </select>
+  </div>
+
+  @if (loading()) {
+    <div class="state-msg">Loading...</div>
+  } @else if (error()) {
+    <div class="state-msg state-msg--error">{{ error() }}</div>
+  } @else {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Plan</th>
+            <th>Status</th>
+            <th>Verified</th>
+            <th>Joined</th>
+            @if (isAtLeastModerator$ | async) {
+              <th>Actions</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user.id) {
+            <tr>
+              <td>{{ user.name }} {{ user.surname }}</td>
+              <td>{{ user.email }}</td>
+              <td><span class="badge badge--plan badge--{{ user.plan }}">{{ user.plan }}</span></td>
+              <td><span class="badge badge--status badge--{{ user.status }}">{{ user.status }}</span></td>
+              <td>{{ user.email_verified ? '✓' : '—' }}</td>
+              <td>{{ user.created_at | slice:0:10 }}</td>
+              @if (isAtLeastModerator$ | async) {
+                <td class="actions">
+                  @if (!user.email_verified) {
+                    <button class="btn btn--sm btn--info" (click)="forceConfirm(user.id)" title="Force confirm email">✓ Confirm</button>
+                  }
+                  @if (user.status !== 'active') {
+                    <button class="btn btn--sm btn--success" (click)="updateStatus(user.id, 'active')">Activate</button>
+                  }
+                  @if (user.status === 'active') {
+                    <button class="btn btn--sm btn--warn" (click)="updateStatus(user.id, 'suspended')">Suspend</button>
+                    <button class="btn btn--sm btn--danger" (click)="updateStatus(user.id, 'banned')">Ban</button>
+                  }
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr><td [attr.colspan]="(isAtLeastModerator$ | async) ? 7 : 6" class="empty">No users found</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

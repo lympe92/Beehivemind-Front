@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, exhaustMap, map, of, tap } from 'rxjs';
+import { catchError, exhaustMap, map, of, switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { AuthActions } from './auth.actions';
 
@@ -15,7 +15,9 @@ export class AuthEffects {
       exhaustMap(({ email, password }) =>
         this.authService.login(email, password).pipe(
           map(({ user, token }) => AuthActions.loginSuccess({ user, token })),
-          catchError((error) => of(AuthActions.loginFailure({ error: error.message }))),
+          catchError((err) =>
+            of(AuthActions.loginFailure({ error: err?.error?.message ?? 'Login failed' })),
+          ),
         ),
       ),
     ),
@@ -24,8 +26,12 @@ export class AuthEffects {
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.logout),
-      tap(() => this.authService.clearSession()),
-      map(() => AuthActions.logoutSuccess()),
+      switchMap(() =>
+        this.authService.logout().pipe(
+          map(() => AuthActions.logoutSuccess()),
+          catchError(() => of(AuthActions.logoutSuccess())),
+        ),
+      ),
     ),
   );
 }

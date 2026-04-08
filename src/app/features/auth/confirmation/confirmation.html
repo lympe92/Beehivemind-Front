@@ -1,1 +1,32 @@
-<p>Confirmation</p>
+<div class="auth-page">
+  <div class="auth-card">
+    @if (state() === 'loading') {
+      <div class="auth-card__header">
+        <h1>Confirming your email...</h1>
+        <p>Please wait a moment.</p>
+      </div>
+    } @else if (state() === 'success') {
+      <div class="auth-card__header">
+        <h1>Email confirmed!</h1>
+        <p>Your account is now active.</p>
+      </div>
+      <div class="auth-info">
+        You can now sign in to your BeehiveMind account.
+      </div>
+      <p class="auth-card__footer">
+        <a routerLink="/auth/login">Go to login</a>
+      </p>
+    } @else {
+      <div class="auth-card__header">
+        <h1>Confirmation failed</h1>
+        <p>The link may be invalid or expired.</p>
+      </div>
+      <div class="auth-form__error" style="margin-top: 16px;">
+        Invalid or expired confirmation token.
+      </div>
+      <p class="auth-card__footer">
+        <a routerLink="/auth/login">Back to login</a>
+      </p>
+    }
+  </div>
+</div>

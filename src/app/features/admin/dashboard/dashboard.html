@@ -1,1 +1,72 @@
-<p>Admin Dashboard</p>
+<div class="dashboard">
+  <h2 class="dashboard__title">Dashboard</h2>
+
+  @if (loading()) {
+    <div class="dashboard__loading">Loading stats...</div>
+  } @else if (error()) {
+    <div class="dashboard__error">{{ error() }}</div>
+  } @else if (stats(); as s) {
+    <div class="stats-grid">
+
+      <!-- Users -->
+      <div class="stat-card stat-card--accent">
+        <div class="stat-card__label">Total Users</div>
+        <div class="stat-card__value">{{ s.users.total }}</div>
+        <div class="stat-card__sub">+{{ s.users.new_this_month }} this month</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__label">Active</div>
+        <div class="stat-card__value">{{ s.users.active }}</div>
+      </div>
+
+      <div class="stat-card stat-card--warn">
+        <div class="stat-card__label">Suspended</div>
+        <div class="stat-card__value">{{ s.users.suspended }}</div>
+      </div>
+
+      <div class="stat-card stat-card--danger">
+        <div class="stat-card__label">Banned</div>
+        <div class="stat-card__value">{{ s.users.banned }}</div>
+      </div>
+
+      <!-- Plans -->
+      <div class="stat-card">
+        <div class="stat-card__label">Free Plan</div>
+        <div class="stat-card__value">{{ s.users.by_plan.free }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__label">Pro Plan</div>
+        <div class="stat-card__value">{{ s.users.by_plan.pro }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__label">Enterprise</div>
+        <div class="stat-card__value">{{ s.users.by_plan.enterprise }}</div>
+      </div>
+
+      <!-- Platform -->
+      <div class="stat-card">
+        <div class="stat-card__label">Employees</div>
+        <div class="stat-card__value">{{ s.employees }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__label">Apiaries</div>
+        <div class="stat-card__value">{{ s.apiaries }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__label">Beehives</div>
+        <div class="stat-card__value">{{ s.beehives }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card__label">Records</div>
+        <div class="stat-card__value">{{ s.records }}</div>
+      </div>
+
+    </div>
+  }
+</div>

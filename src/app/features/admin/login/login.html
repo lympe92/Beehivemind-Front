@@ -1,0 +1,44 @@
+<div class="admin-login">
+  <div class="admin-login__card">
+    <div class="admin-login__header">
+      <h1>BeehiveMind</h1>
+      <p>Admin Panel</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="admin-login__form">
+      @if (error$ | async; as error) {
+        <div class="admin-login__error">{{ error }}</div>
+      }
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="employee@beehivemind.com"
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button type="submit" [disabled]="form.invalid || (loading$ | async)">
+        @if (loading$ | async) {
+          Logging in...
+        } @else {
+          Log In
+        }
+      </button>
+    </form>
+  </div>
+</div>

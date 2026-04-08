@@ -8,12 +8,13 @@ import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { routes } from './app.routes';
 import { appReducers, appEffects } from './store';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { employeeInterceptor } from './core/interceptors/employee.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([employeeInterceptor, authInterceptor])),
     provideStore(appReducers),
     provideEffects(appEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),

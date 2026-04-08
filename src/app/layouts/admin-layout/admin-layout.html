@@ -1,1 +1,82 @@
-<router-outlet />
+<div class="admin-shell" [class.sidebar-collapsed]="!sidebarOpen()">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <span class="sidebar__logo">🐝</span>
+      @if (sidebarOpen()) {
+        <span class="sidebar__brand-name">BeehiveMind</span>
+      }
+    </div>
+
+    <nav class="sidebar__nav">
+      <!-- All employees -->
+      <a routerLink="/admin/dashboard" routerLinkActive="active" class="sidebar__link">
+        <span class="icon">📊</span>
+        @if (sidebarOpen()) { <span>Dashboard</span> }
+      </a>
+
+      <a routerLink="/admin/users" routerLinkActive="active" class="sidebar__link">
+        <span class="icon">👥</span>
+        @if (sidebarOpen()) { <span>Users</span> }
+      </a>
+
+      <!-- Moderator+ -->
+      @if (isAtLeastModerator$ | async) {
+        <a routerLink="/admin/moderation" routerLinkActive="active" class="sidebar__link">
+          <span class="icon">🛡️</span>
+          @if (sidebarOpen()) { <span>Moderation</span> }
+        </a>
+      }
+
+      <!-- Admin+ -->
+      @if (isAtLeastAdmin$ | async) {
+        <div class="sidebar__divider"></div>
+        <a routerLink="/admin/employees" routerLinkActive="active" class="sidebar__link">
+          <span class="icon">👔</span>
+          @if (sidebarOpen()) { <span>Employees</span> }
+        </a>
+        <a routerLink="/admin/coupons" routerLinkActive="active" class="sidebar__link">
+          <span class="icon">🏷️</span>
+          @if (sidebarOpen()) { <span>Coupons</span> }
+        </a>
+      }
+
+      <!-- Superadmin only -->
+      @if (isSuperAdmin$ | async) {
+        <div class="sidebar__divider"></div>
+        <a routerLink="/admin/raw" routerLinkActive="active" class="sidebar__link">
+          <span class="icon">🗄️</span>
+          @if (sidebarOpen()) { <span>Raw Data</span> }
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar__footer">
+      @if (employee$ | async; as emp) {
+        @if (sidebarOpen()) {
+          <div class="sidebar__user">
+            <span class="sidebar__user-name">{{ emp.name }} {{ emp.surname }}</span>
+            <span class="sidebar__user-role">{{ emp.role }}</span>
+          </div>
+        }
+      }
+      <button class="sidebar__logout" (click)="logout()" title="Logout">
+        <span>🚪</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="admin-main">
+    <header class="admin-header">
+      <button class="admin-header__toggle" (click)="toggleSidebar()">
+        {{ sidebarOpen() ? '◀' : '▶' }}
+      </button>
+    </header>
+    <main class="admin-content">
+      <router-outlet />
+    </main>
+  </div>
+
+</div>

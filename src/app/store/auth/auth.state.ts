@@ -1,9 +1,14 @@
 export type UserRole = 'user' | 'admin' | 'superadmin';
 
 export interface User {
-  id: string;
+  id: number;
+  name: string;
+  surname: string;
   email: string;
   role: UserRole;
+  country: string | null;
+  unit: string;
+  show_hints: boolean;
 }
 
 export interface AuthState {
