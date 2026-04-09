@@ -1,0 +1,13 @@
+//@use '../../../../../assets/scss/breakpoints' as breakpoints;
+//@use '../../../../../assets/scss/variables' as vars;
+
+a {
+  cursor: pointer;
+}
+.color-black {
+  color: black !important;
+  &:hover,
+  &:focus {
+    opacity: 0.6;
+  }
+}

@@ -1,0 +1,11 @@
+<a
+  [routerLink]="routerLink()"
+  [queryParams]="queryParams()"
+  [fragment]="fragment()"
+  [target]="target()"
+  [attr.rel]="relAttribute"
+  [attr.aria-label]="ariaLabel() || null"
+  [class]="linkClass()"
+>
+  <ng-content></ng-content>
+</a>
