@@ -1,0 +1,26 @@
+@if (detections(); as row) {
+  <div class="detections-table">
+    <table class="detections-table__table">
+      <thead>
+        <tr>
+          <th>No Queen</th>
+          <th>Varroa</th>
+          <th>American Foulbrood</th>
+          <th>European Foulbrood</th>
+          <th>Nosema</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ row.no_queen }}</td>
+          <td>{{ row.varroa }}</td>
+          <td>{{ row.american_foulbrood }}</td>
+          <td>{{ row.european_foulbrood }}</td>
+          <td>{{ row.nosema }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <p class="detections-table__empty">No data available.</p>
+}

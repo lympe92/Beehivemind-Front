@@ -1,1 +1,87 @@
-<p>User Dashboard</p>
+<div class="dashboard">
+
+  <!-- Filters -->
+  <div class="dashboard__row">
+    <app-dashboard-filters
+      [apiaries]="apiaries()"
+      (apiaryChange)="onApiaryChange($event)"
+      (beehiveChange)="onBeehiveChange($event)" />
+  </div>
+
+  <!-- Variables over Time -->
+  <div class="dashboard__row">
+    <div class="dashboard__card">
+      <div class="dashboard__card-header">Variables over Time</div>
+      <div class="dashboard__card-body">
+        @if (variablesLineOptions(); as opts) {
+          <app-apex-chart [options]="opts" height="300" />
+        } @else {
+          <p class="dashboard__empty">No data available.</p>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Population and Frames over Time -->
+  <div class="dashboard__row">
+    <div class="dashboard__card">
+      <div class="dashboard__card-header">Population and Frames over Time</div>
+      <div class="dashboard__card-body">
+        @if (populationLineOptions(); as opts) {
+          <app-apex-chart [options]="opts" height="300" />
+        } @else {
+          <p class="dashboard__empty">No data available.</p>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Last Inspection / Queens Ages / Brood Ratio -->
+  <div class="dashboard__row dashboard__row--3col">
+    <div class="dashboard__card">
+      <div class="dashboard__card-header">Last Inspection</div>
+      <div class="dashboard__card-body">
+        @if (lastInspectionBarOptions(); as opts) {
+          <app-apex-chart [options]="opts" height="280" />
+        } @else {
+          <p class="dashboard__empty">No data available.</p>
+        }
+      </div>
+    </div>
+
+    <div class="dashboard__card">
+      <div class="dashboard__card-header">Queens Ages</div>
+      <div class="dashboard__card-body">
+        @if (queensPieOptions(); as opts) {
+          <app-apex-chart [options]="opts" height="280" />
+        } @else {
+          <p class="dashboard__empty">No data available.</p>
+        }
+      </div>
+    </div>
+
+    <div class="dashboard__card">
+      <div class="dashboard__card-header">Ratio Opened / Closed Brood</div>
+      <div class="dashboard__card-body">
+        @if (broodPieOptions(); as opts) {
+          <app-apex-chart [options]="opts" height="280" />
+        } @else {
+          <p class="dashboard__empty">No data available.</p>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Detections -->
+  <div class="dashboard__row">
+    <div class="dashboard__card">
+      <div class="dashboard__card-header">Detections</div>
+      <div class="dashboard__card-body">
+        <app-detections-table
+          [inspections]="rawInspections()"
+          [filterLevel]="filterLevel()" />
+      </div>
+    </div>
+  </div>
+
+</div>

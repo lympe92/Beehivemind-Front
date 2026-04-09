@@ -1,0 +1,56 @@
+$accent: #f59e0b;
+$bg-panel: #241a00;
+$border: #3d2e00;
+$text-primary: #fef3c7;
+$text-muted: #a37f2e;
+$radius: 8px;
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+
+    &--3col {
+      grid-template-columns: repeat(3, 1fr);
+
+      @media (max-width: 1024px) {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+
+  &__card {
+    background: $bg-panel;
+    border: 1px solid $border;
+    border-radius: $radius;
+    overflow: hidden;
+  }
+
+  &__card-header {
+    padding: 14px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $accent;
+    border-bottom: 1px solid $border;
+  }
+
+  &__card-body {
+    padding: 16px 20px;
+  }
+
+  &__empty {
+    color: $text-muted;
+    font-size: 0.875rem;
+    text-align: center;
+    padding: 20px 0;
+  }
+}
