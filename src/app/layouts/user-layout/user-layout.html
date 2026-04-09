@@ -1,1 +1,87 @@
-<router-outlet />
+<div class="user-shell" [class.sidebar-collapsed]="!sidebarOpen()">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+
+    <div class="sidebar__brand">
+      <span class="sidebar__logo">🐝</span>
+      @if (sidebarOpen()) {
+        <span class="sidebar__brand-name">BeehiveMind</span>
+      }
+    </div>
+
+    <nav class="sidebar__nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="sidebar__link">
+        <span class="icon">📊</span>
+        @if (sidebarOpen()) { <span>Dashboard</span> }
+      </a>
+
+      <div class="sidebar__divider"></div>
+
+      <a routerLink="/apiary" routerLinkActive="active" class="sidebar__link">
+        <span class="icon">🏡</span>
+        @if (sidebarOpen()) { <span>Apiaries</span> }
+      </a>
+
+      <a routerLink="/beehives" routerLinkActive="active" class="sidebar__link">
+        <span class="icon">🐝</span>
+        @if (sidebarOpen()) { <span>Beehives</span> }
+      </a>
+
+      <a routerLink="/inspections" routerLinkActive="active" class="sidebar__link">
+        <span class="icon">🔍</span>
+        @if (sidebarOpen()) { <span>Inspections</span> }
+      </a>
+
+      <a routerLink="/feeding" routerLinkActive="active" class="sidebar__link">
+        <span class="icon">🍯</span>
+        @if (sidebarOpen()) { <span>Feeding</span> }
+      </a>
+
+      <a routerLink="/harvest" routerLinkActive="active" class="sidebar__link">
+        <span class="icon">⚗️</span>
+        @if (sidebarOpen()) { <span>Harvest</span> }
+      </a>
+
+      <div class="sidebar__divider"></div>
+
+      <a routerLink="/financial" routerLinkActive="active" class="sidebar__link">
+        <span class="icon">💰</span>
+        @if (sidebarOpen()) { <span>Financials</span> }
+      </a>
+    </nav>
+
+    <div class="sidebar__footer">
+      @if (user$ | async; as user) {
+        <a routerLink="/profile" class="sidebar__profile">
+          <div class="sidebar__avatar">
+            {{ user.name.charAt(0) }}{{ user.surname.charAt(0) }}
+          </div>
+          @if (sidebarOpen()) {
+            <div class="sidebar__user">
+              <span class="sidebar__user-name">{{ user.name }} {{ user.surname }}</span>
+              <span class="sidebar__user-role">{{ user.role }}</span>
+            </div>
+          }
+        </a>
+      }
+      <button class="sidebar__logout" (click)="logout()" title="Logout">
+        <span>🚪</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- Main -->
+  <div class="user-main">
+    <header class="user-header">
+      <button class="user-header__toggle" (click)="toggleSidebar()">
+        <span>{{ sidebarOpen() ? '◀' : '▶' }}</span>
+      </button>
+    </header>
+    <main class="user-content">
+      <router-outlet />
+    </main>
+  </div>
+
+</div>
