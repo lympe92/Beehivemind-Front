@@ -1,4 +1,9 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode, PLATFORM_ID } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  isDevMode,
+  PLATFORM_ID,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideStore, META_REDUCERS } from '@ngrx/store';
@@ -10,6 +15,7 @@ import { appReducers, appEffects } from './store';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { employeeInterceptor } from './core/interceptors/employee.interceptor';
 import { createHydrationMetaReducer } from './store/hydration.meta-reducer';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,5 +31,6 @@ export const appConfig: ApplicationConfig = {
     },
     provideEffects(appEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
+    provideClientHydration(withEventReplay()),
   ],
 };

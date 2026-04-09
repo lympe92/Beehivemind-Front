@@ -26,7 +26,6 @@ export class PublicLayoutComponent implements OnInit {
       startWith(null),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(() => {
-      debugger
       const seoKey = this.activatedRoute.firstChild?.snapshot.data?.['seoKey'];
       if (seoKey && SEO_CONFIG[seoKey]) {
         this.seoService.applySEO(SEO_CONFIG[seoKey]);

@@ -54,4 +54,14 @@ export const publicRoutes: Routes = [
     loadComponent: () => import('./privacy/privacy').then((m) => m.PrivacyComponent),
     data: { seoKey: 'privacy' },
   },
+  {
+    path: 'blog',
+    loadComponent: () => import('./blog/blog').then((m) => m.BlogComponent),
+    data: { seoKey: 'blog' },
+  },
+  {
+    path: 'blog/:slug',
+    loadComponent: () =>
+      import('./blog-article/blog-article').then((m) => m.BlogArticleComponent),
+  },
 ];

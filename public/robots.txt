@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Allow: /features
+Allow: /app
+Allow: /apiariesandbeehives
+Allow: /financial
+Allow: /harvestandfeeding
+Allow: /inspections
+Allow: /help
+Allow: /blog
+Allow: /blog/
+
+Disallow: /auth/
+Disallow: /admin/
+Disallow: /dashboard/
+
+Sitemap: https://beehivemind.tech/sitemap.xml
