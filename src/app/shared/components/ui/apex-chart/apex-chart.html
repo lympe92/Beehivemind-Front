@@ -1,0 +1,20 @@
+@if (isBrowser) {
+  <apx-chart
+    [series]="options().series!"
+    [chart]="options().chart!"
+    [xaxis]="options().xaxis!"
+    [yaxis]="options().yaxis!"
+    [title]="options().title!"
+    [labels]="options().labels!"
+    [legend]="options().legend!"
+    [dataLabels]="options().dataLabels!"
+    [colors]="options().colors!"
+    [tooltip]="options().tooltip!"
+    [plotOptions]="options().plotOptions!"
+    [stroke]="options().stroke!"
+    [fill]="options().fill!"
+    [grid]="options().grid!"
+    [responsive]="options().responsive!"
+    [height]="height()"
+  />
+}
