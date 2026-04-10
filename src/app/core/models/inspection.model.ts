@@ -14,6 +14,9 @@ export interface Inspection {
   american_foulbrood: 0 | 1;
   european_foulbrood: 0 | 1;
   nosema: 0 | 1;
+  queen_exists: 0 | 1;
+  queen_cells: 0 | 1;
+  queen_year: number | null;
 }
 
 export interface AvgInspection {

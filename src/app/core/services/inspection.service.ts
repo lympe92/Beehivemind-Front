@@ -27,4 +27,16 @@ export class InspectionService {
   getInspectionsOfBeehive(beehiveId: number): Observable<ApiResponse<Inspection[]>> {
     return this.request.getRequest<Inspection[]>(`inspections?beehive_id=${beehiveId}`);
   }
+
+  createInspection(data: Omit<Inspection, 'id' | 'beehive'> & { beehive_id: number }): Observable<ApiResponse<Inspection>> {
+    return this.request.postRequest<Inspection>('inspections', data);
+  }
+
+  updateInspection(id: number, data: Partial<Omit<Inspection, 'id' | 'beehive'>>): Observable<ApiResponse<Inspection>> {
+    return this.request.putRequest<Inspection>(`inspections/${id}`, data);
+  }
+
+  deleteInspection(id: number): Observable<ApiResponse<void>> {
+    return this.request.deleteRequest<void>(`inspections/${id}`);
+  }
 }
