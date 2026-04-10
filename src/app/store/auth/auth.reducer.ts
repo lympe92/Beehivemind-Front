@@ -5,7 +5,7 @@ import { initialAuthState } from './auth.state';
 export const authReducer = createReducer(
   initialAuthState,
 
-  on(AuthActions.login, (state) => ({
+  on(AuthActions.login, AuthActions.loginWithGoogle, (state) => ({
     ...state,
     loading: true,
     error: null,

@@ -23,6 +23,20 @@ export class AuthEffects {
     ),
   );
 
+  loginWithGoogle$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.loginWithGoogle),
+      exhaustMap(({ credential }) =>
+        this.authService.loginWithGoogle(credential).pipe(
+          map(({ user, token }) => AuthActions.loginSuccess({ user, token })),
+          catchError((err) =>
+            of(AuthActions.loginFailure({ error: err?.error?.message ?? 'Google sign-in failed' })),
+          ),
+        ),
+      ),
+    ),
+  );
+
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.logout),

@@ -39,6 +39,12 @@ export class AuthService {
       .pipe(map(() => void 0));
   }
 
+  loginWithGoogle(credential: string): Observable<{ user: User; token: string }> {
+    return this.request
+      .postRequest<{ token: string; user: User }>('user/auth/google', { credential })
+      .pipe(map((res) => ({ user: res.data.user, token: res.data.token })));
+  }
+
   logout(): Observable<void> {
     return this.request.postRequest('user/logout').pipe(map(() => void 0));
   }

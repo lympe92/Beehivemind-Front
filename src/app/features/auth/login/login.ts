@@ -1,4 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -9,6 +10,7 @@ import {
   selectAuthLoading,
   selectIsLoggedIn,
 } from '../../../store/auth/auth.selectors';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-auth-login',
@@ -21,6 +23,7 @@ export class LoginComponent implements OnInit {
   private store = inject(Store);
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
 
   loading$ = this.store.select(selectAuthLoading);
   error$ = this.store.select(selectAuthError);
@@ -34,11 +37,52 @@ export class LoginComponent implements OnInit {
     this.store.select(selectIsLoggedIn).subscribe((loggedIn) => {
       if (loggedIn) this.router.navigate(['/dashboard']);
     });
+
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadGoogleSignIn();
+    }
   }
 
   submit(): void {
     if (this.form.invalid) return;
     const { email, password } = this.form.value;
     this.store.dispatch(AuthActions.login({ email, password }));
+  }
+
+  private loadGoogleSignIn(): void {
+    if (document.getElementById('gsi-script')) {
+      this.initGsi();
+      return;
+    }
+    const script = document.createElement('script');
+    script.id = 'gsi-script';
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => this.initGsi();
+    document.head.appendChild(script);
+  }
+
+  private initGsi(): void {
+    const g = (window as any).google;
+    if (!g?.accounts?.id) return;
+
+    g.accounts.id.initialize({
+      client_id: environment.googleClientId,
+      callback: (response: { credential: string }) => {
+        this.store.dispatch(AuthActions.loginWithGoogle({ credential: response.credential }));
+      },
+    });
+
+    const btn = document.getElementById('google-signin-btn');
+    if (btn) {
+      g.accounts.id.renderButton(btn, {
+        theme: 'outline',
+        size: 'large',
+        width: 340,
+        text: 'signin_with',
+        shape: 'rectangular',
+      });
+    }
   }
 }

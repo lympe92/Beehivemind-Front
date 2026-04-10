@@ -127,6 +127,34 @@
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 16px;
+  color: #9ca3af;
+  font-size: 0.8rem;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+  }
+}
+
+.auth-google-btn {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+
+  // Let GIS render its own button — just center it
+  > div {
+    width: 100% !important;
+  }
+}
+
 .auth-info {
   background: #fffbeb;
   border: 1px solid #fde68a;
