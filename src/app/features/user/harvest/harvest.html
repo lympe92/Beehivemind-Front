@@ -1,1 +1,175 @@
-<p>harvest works!</p>
+<div class="harvest">
+
+  <!-- Filters -->
+  <div class="harvest__filters">
+    <div class="harvest__filter-group">
+      <label class="harvest__label">Apiary</label>
+      <select class="harvest__select" [(ngModel)]="selectedApiaryId" (ngModelChange)="onApiaryChange($event)" name="apiary">
+        <option [ngValue]="0">— Select —</option>
+        @for (apiary of apiaries(); track apiary.id) {
+          <option [ngValue]="apiary.id">{{ apiary.name }}</option>
+        }
+      </select>
+    </div>
+
+    @if (beehives().length) {
+      <div class="harvest__filter-group">
+        <label class="harvest__label">Beehive</label>
+        <select class="harvest__select" [(ngModel)]="selectedBeehiveId" (ngModelChange)="onBeehiveChange($event)" name="beehive">
+          <option [ngValue]="0">— All —</option>
+          @for (beehive of beehives(); track beehive.id) {
+            <option [ngValue]="beehive.id">{{ beehive.name }}</option>
+          }
+        </select>
+      </div>
+    }
+  </div>
+
+  <!-- Notification -->
+  @if (notification) {
+    <div class="harvest__notification harvest__notification--{{ notification.type }}">
+      <span>{{ notification.message }}</span>
+      <button class="harvest__notification-close" (click)="clearNotification()">×</button>
+    </div>
+  }
+
+  <!-- Card -->
+  <div class="harvest__card">
+    <div class="harvest__card-header">
+      <span>Harvest Data</span>
+      @if (canAdd) {
+        <button class="harvest__btn harvest__btn--primary" (click)="startAdd()">+ Add Record</button>
+      }
+    </div>
+
+    <div class="harvest__card-body">
+
+      <!-- Add form -->
+      @if (showAddForm) {
+        <div class="harvest__add-form">
+          <h4 class="harvest__add-form-title">New Record
+            @if (selectedBeehiveId === 0) {
+              <span class="harvest__add-form-hint">(will be created for all beehives in the selected apiary)</span>
+            }
+          </h4>
+          <div class="harvest__form-row">
+            <div class="harvest__form-group">
+              <label class="harvest__label">Date</label>
+              <input class="harvest__input" type="date" [(ngModel)]="newForm.date" name="new_date" />
+            </div>
+            <div class="harvest__form-group">
+              <label class="harvest__label">Type</label>
+              <select class="harvest__select" [(ngModel)]="newForm.honey_type" name="new_honey_type">
+                @for (ht of HARVEST_TYPES; track ht.value) {
+                  <option [ngValue]="ht.value">{{ ht.label }}</option>
+                }
+              </select>
+            </div>
+            @if (newForm.honey_type === 'honey') {
+              <div class="harvest__form-group harvest__form-group--wide">
+                <label class="harvest__label">Description</label>
+                <input class="harvest__input" type="text" [(ngModel)]="newForm.honey_description" name="new_desc" placeholder="e.g. thyme, wildflower..." />
+              </div>
+            }
+            <div class="harvest__form-group">
+              <label class="harvest__label">Total Quantity</label>
+              <input class="harvest__input" type="number" min="0" [(ngModel)]="newForm.food_quantity" name="new_qty" />
+            </div>
+            <div class="harvest__form-group">
+              <label class="harvest__label">Unit</label>
+              <select class="harvest__select" [(ngModel)]="newForm.unit" name="new_unit">
+                @for (u of HARVEST_UNITS; track u.value) {
+                  <option [ngValue]="u.value">{{ u.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="harvest__form-actions">
+            <button class="harvest__btn harvest__btn--primary" (click)="confirmAdd()">Save</button>
+            <button class="harvest__btn harvest__btn--ghost" (click)="cancelAdd()">Cancel</button>
+          </div>
+        </div>
+      }
+
+      <!-- Table -->
+      @if (harvest().length) {
+        <div class="harvest__table-wrap">
+          <table class="harvest__table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Total Quantity</th>
+                <th>Unit</th>
+                @if (selectedApiaryId !== 0 && !canEdit) { <th>Beehive</th> }
+                @if (canEdit || selectedApiaryId !== 0) { <th></th> }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of harvest(); track row.id) {
+                @if (editingId === row.id) {
+                  <tr class="harvest__row--editing">
+                    <td><input class="harvest__input" type="date" [(ngModel)]="editForm.date" name="edit_date" /></td>
+                    <td>
+                      <select class="harvest__select" [(ngModel)]="editForm.honey_type" name="edit_honey_type">
+                        @for (ht of HARVEST_TYPES; track ht.value) {
+                          <option [ngValue]="ht.value">{{ ht.label }}</option>
+                        }
+                      </select>
+                    </td>
+                    <td>
+                      @if (editForm.honey_type === 'honey') {
+                        <input class="harvest__input" type="text" [(ngModel)]="editForm.honey_description" name="edit_desc" placeholder="e.g. thyme, wildflower..." />
+                      } @else {
+                        <span class="harvest__muted">—</span>
+                      }
+                    </td>
+                    <td><input class="harvest__input harvest__input--sm" type="number" min="0" [(ngModel)]="editForm.food_quantity" name="edit_qty" /></td>
+                    <td>
+                      <select class="harvest__select" [(ngModel)]="editForm.unit" name="edit_unit">
+                        @for (u of HARVEST_UNITS; track u.value) {
+                          <option [ngValue]="u.value">{{ u.label }}</option>
+                        }
+                      </select>
+                    </td>
+                    @if (selectedApiaryId !== 0 && !canEdit) { <td>{{ row.beehive?.name ?? '—' }}</td> }
+                    <td class="harvest__actions">
+                      <button class="harvest__btn harvest__btn--primary harvest__btn--sm" (click)="confirmEdit()">Save</button>
+                      <button class="harvest__btn harvest__btn--ghost harvest__btn--sm" (click)="cancelEdit()">Cancel</button>
+                    </td>
+                  </tr>
+                } @else {
+                  <tr>
+                    <td>{{ row.date }}</td>
+                    <td>{{ row.honey_type }}</td>
+                    <td>{{ row.honey_description || '—' }}</td>
+                    <td>{{ row.food_quantity }}</td>
+                    <td>{{ row.unit }}</td>
+                    @if (selectedApiaryId !== 0 && !canEdit) { <td>{{ row.beehive?.name ?? '—' }}</td> }
+                    @if (canEdit) {
+                      <td class="harvest__actions">
+                        <button class="harvest__btn harvest__btn--ghost harvest__btn--sm" (click)="startEdit(row)">Edit</button>
+                        <button class="harvest__btn harvest__btn--danger harvest__btn--sm" (click)="deleteRow(row)">Delete</button>
+                      </td>
+                    } @else if (selectedApiaryId !== 0) {
+                      <td class="harvest__actions">
+                        <button class="harvest__btn harvest__btn--danger harvest__btn--sm" (click)="deleteRow(row)">Delete</button>
+                      </td>
+                    }
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else if (selectedApiaryId !== 0) {
+        <p class="harvest__empty">No harvest records found.</p>
+      } @else {
+        <p class="harvest__empty">Select an apiary to view harvest data.</p>
+      }
+
+    </div>
+  </div>
+
+</div>
