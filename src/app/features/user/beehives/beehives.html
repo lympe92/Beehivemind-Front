@@ -1,1 +1,89 @@
-<p>beehives works!</p>
+<div class="bh">
+
+  <!-- Filters + Bulk Create -->
+  <div class="bh__filters">
+    <div class="bh__filter-group">
+      <label class="bh__label">Apiary</label>
+      <select class="bh__select" [(ngModel)]="selectedApiaryId" (ngModelChange)="onApiaryChange($event)" name="apiary">
+        <option [ngValue]="0">— Select —</option>
+        @for (apiary of apiaries(); track apiary.id) {
+          <option [ngValue]="apiary.id">{{ apiary.name }}</option>
+        }
+      </select>
+    </div>
+
+    @if (selectedApiaryId !== 0) {
+      <div class="bh__filter-group">
+        <label class="bh__label">Beehives to Create</label>
+        <div class="bh__create-group">
+          <input class="bh__input bh__input--sm" type="number" min="1" [(ngModel)]="beehivesToCreate" name="count" placeholder="0" />
+          <button class="bh__btn bh__btn--primary bh__btn--sm" (click)="addBeehives()">Create</button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Notification -->
+  @if (notification) {
+    <div class="bh__notification bh__notification--{{ notification.type }}">
+      <span>{{ notification.message }}</span>
+      <button class="bh__notification-close" (click)="clearNotification()">×</button>
+    </div>
+  }
+
+  <!-- Card -->
+  <div class="bh__card">
+    <div class="bh__card-header">
+      <span>Beehives</span>
+    </div>
+
+    <div class="bh__card-body">
+
+      @if (beehives().length) {
+        <div class="bh__table-wrap">
+          <table class="bh__table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Queen Year</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of beehives(); track row.id; let i = $index) {
+                @if (editingId === row.id) {
+                  <tr class="bh__row--editing">
+                    <td class="bh__muted">{{ i + 1 }}</td>
+                    <td><input class="bh__input" [(ngModel)]="editForm.name" name="edit_name" placeholder="Beehive name" /></td>
+                    <td><input class="bh__input bh__input--sm" type="number" min="2000" [(ngModel)]="editForm.queen_year" name="edit_qy" placeholder="e.g. 2023" /></td>
+                    <td class="bh__actions">
+                      <button class="bh__btn bh__btn--primary bh__btn--sm" (click)="confirmEdit()">Save</button>
+                      <button class="bh__btn bh__btn--ghost bh__btn--sm" (click)="cancelEdit()">Cancel</button>
+                    </td>
+                  </tr>
+                } @else {
+                  <tr>
+                    <td class="bh__muted">{{ i + 1 }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.queen?.year ?? '—' }}</td>
+                    <td class="bh__actions">
+                      <button class="bh__btn bh__btn--ghost bh__btn--sm" (click)="startEdit(row)">Edit</button>
+                      <button class="bh__btn bh__btn--danger bh__btn--sm" (click)="deleteRow(row)">Delete</button>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else if (selectedApiaryId !== 0) {
+        <p class="bh__empty">No beehives yet. Use "Beehives to Create" to add them.</p>
+      } @else {
+        <p class="bh__empty">Select an apiary to manage its beehives.</p>
+      }
+
+    </div>
+  </div>
+
+</div>
