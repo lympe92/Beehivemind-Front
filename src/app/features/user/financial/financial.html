@@ -1,1 +1,68 @@
-<p>financial works!</p>
+<div class="financial">
+
+  <!-- CRUD tables -->
+  <div class="financial__row financial__row--2col">
+    <div class="financial__card">
+      <div class="financial__card-header">Cost Categories</div>
+      <div class="financial__card-body financial__card-body--scroll">
+        <app-cost-categories (categoriesChange)="onCategoriesChange($event)" />
+      </div>
+    </div>
+
+    <div class="financial__card">
+      <div class="financial__card-header">Costs</div>
+      <div class="financial__card-body financial__card-body--scroll">
+        <app-costs [costCategories]="costCategories()" (costsChange)="onCostsChange()" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly bar chart -->
+  <div class="financial__card">
+    <div class="financial__card-header">Income / Outgoing per Month</div>
+    <div class="financial__card-body">
+      @if (monthlyBarOptions(); as opts) {
+        <app-apex-chart [options]="opts" height="320" />
+      } @else {
+        <p class="financial__empty">No data available.</p>
+      }
+    </div>
+  </div>
+
+  <!-- Three pies -->
+  <div class="financial__row financial__row--3col">
+    <div class="financial__card">
+      <div class="financial__card-header">Income / Outgoing</div>
+      <div class="financial__card-body">
+        @if (summaryPieOptions(); as opts) {
+          <app-apex-chart [options]="opts" height="260" />
+        } @else {
+          <p class="financial__empty">No data available.</p>
+        }
+      </div>
+    </div>
+
+    <div class="financial__card">
+      <div class="financial__card-header">Income by Category</div>
+      <div class="financial__card-body">
+        @if (incomePieOptions(); as opts) {
+          <app-apex-chart [options]="opts" height="260" />
+        } @else {
+          <p class="financial__empty">No data available.</p>
+        }
+      </div>
+    </div>
+
+    <div class="financial__card">
+      <div class="financial__card-header">Outgoing by Category</div>
+      <div class="financial__card-body">
+        @if (outcomePieOptions(); as opts) {
+          <app-apex-chart [options]="opts" height="260" />
+        } @else {
+          <p class="financial__empty">No data available.</p>
+        }
+      </div>
+    </div>
+  </div>
+
+</div>

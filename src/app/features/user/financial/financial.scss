@@ -1,0 +1,62 @@
+$accent: #f59e0b;
+$bg-panel: #241a00;
+$border: #3d2e00;
+$text-muted: #a37f2e;
+$radius: 8px;
+
+.financial {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &__row {
+    display: grid;
+    gap: 20px;
+
+    &--2col {
+      grid-template-columns: 1fr 2fr;
+      @media (max-width: 900px) { grid-template-columns: 1fr; }
+    }
+
+    &--3col {
+      grid-template-columns: repeat(3, 1fr);
+      @media (max-width: 1024px) { grid-template-columns: 1fr 1fr; }
+      @media (max-width: 640px)  { grid-template-columns: 1fr; }
+    }
+  }
+
+  &__card {
+    background: $bg-panel;
+    border: 1px solid $border;
+    border-radius: $radius;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__card-header {
+    padding: 14px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $accent;
+    border-bottom: 1px solid $border;
+    flex-shrink: 0;
+  }
+
+  &__card-body {
+    padding: 16px 20px;
+    flex: 1;
+
+    &--scroll {
+      overflow-y: auto;
+      max-height: 420px;
+    }
+  }
+
+  &__empty {
+    color: $text-muted;
+    font-size: 0.875rem;
+    text-align: center;
+    padding: 24px 0;
+  }
+}

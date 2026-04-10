@@ -1,0 +1,77 @@
+@if (notification) {
+  <div class="fin-table__notif fin-table__notif--{{ notification.type }}">
+    <span>{{ notification.message }}</span>
+    <button (click)="clearNotification()">×</button>
+  </div>
+}
+
+<div class="fin-table__toolbar">
+  <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="startAdd()">+ Add</button>
+</div>
+
+@if (showAddForm) {
+  <div class="fin-table__inline-form">
+    <input class="fin-input" type="date" [(ngModel)]="newForm.date" name="nc_date" />
+    <input class="fin-input" placeholder="Name *" [(ngModel)]="newForm.name" name="nc_name" />
+    <select class="fin-select" [(ngModel)]="newForm.category_id" name="nc_cat">
+      <option [ngValue]="null">— Category —</option>
+      @for (cat of costCategories(); track cat.id) {
+        <option [ngValue]="cat.id">{{ cat.name }}</option>
+      }
+    </select>
+    <input class="fin-input fin-input--sm" type="number" min="0" step="0.01" placeholder="Amount" [(ngModel)]="newForm.amount" name="nc_amount" />
+    <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="confirmAdd()">Save</button>
+    <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="cancelAdd()">Cancel</button>
+  </div>
+}
+
+<div class="fin-table__wrap">
+  <table class="fin-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Amount</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of costs(); track row.id) {
+        @if (editingId === row.id) {
+          <tr class="fin-table__row--editing">
+            <td><input class="fin-input" type="date" [(ngModel)]="editForm.date" name="ec_date" /></td>
+            <td><input class="fin-input" [(ngModel)]="editForm.name" name="ec_name" /></td>
+            <td>
+              <select class="fin-select" [(ngModel)]="editForm.category_id" name="ec_cat">
+                <option [ngValue]="null">— Category —</option>
+                @for (cat of costCategories(); track cat.id) {
+                  <option [ngValue]="cat.id">{{ cat.name }}</option>
+                }
+              </select>
+            </td>
+            <td><input class="fin-input fin-input--sm" type="number" min="0" step="0.01" [(ngModel)]="editForm.amount" name="ec_amount" /></td>
+            <td class="fin-table__actions">
+              <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="confirmEdit()">Save</button>
+              <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="cancelEdit()">Cancel</button>
+            </td>
+          </tr>
+        } @else {
+          <tr>
+            <td>{{ row.date }}</td>
+            <td>{{ row.name }}</td>
+            <td class="fin-table__muted">{{ categoryName()(row.category_id) }}</td>
+            <td>{{ row.amount }}</td>
+            <td class="fin-table__actions">
+              <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="startEdit(row)">Edit</button>
+              <button class="fin-btn fin-btn--danger fin-btn--sm" (click)="deleteRow(row)">Delete</button>
+            </td>
+          </tr>
+        }
+      }
+      @empty {
+        <tr><td colspan="5" class="fin-table__empty">No costs yet.</td></tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,71 @@
+@if (notification) {
+  <div class="fin-table__notif fin-table__notif--{{ notification.type }}">
+    <span>{{ notification.message }}</span>
+    <button (click)="clearNotification()">×</button>
+  </div>
+}
+
+<div class="fin-table__toolbar">
+  <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="startAdd()">+ Add</button>
+</div>
+
+@if (showAddForm) {
+  <div class="fin-table__inline-form">
+    <input class="fin-input" placeholder="Name *" [(ngModel)]="newForm.name" name="nc_name" />
+    <input class="fin-input" placeholder="Description" [(ngModel)]="newForm.description" name="nc_desc" />
+    <select class="fin-select" [(ngModel)]="newForm.type" name="nc_type">
+      <option value="income">Income</option>
+      <option value="outcome">Outgoing</option>
+    </select>
+    <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="confirmAdd()">Save</button>
+    <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="cancelAdd()">Cancel</button>
+  </div>
+}
+
+<div class="fin-table__wrap">
+  <table class="fin-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Type</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of categories(); track row.id) {
+        @if (editingId === row.id) {
+          <tr class="fin-table__row--editing">
+            <td><input class="fin-input" [(ngModel)]="editForm.name" name="ec_name" /></td>
+            <td><input class="fin-input" [(ngModel)]="editForm.description" name="ec_desc" /></td>
+            <td>
+              <select class="fin-select" [(ngModel)]="editForm.type" name="ec_type">
+                <option value="income">Income</option>
+                <option value="outcome">Outgoing</option>
+              </select>
+            </td>
+            <td class="fin-table__actions">
+              <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="confirmEdit()">Save</button>
+              <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="cancelEdit()">Cancel</button>
+            </td>
+          </tr>
+        } @else {
+          <tr>
+            <td>{{ row.name }}</td>
+            <td class="fin-table__muted">{{ row.description }}</td>
+            <td>
+              <span class="fin-badge fin-badge--{{ row.type }}">{{ row.type }}</span>
+            </td>
+            <td class="fin-table__actions">
+              <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="startEdit(row)">Edit</button>
+              <button class="fin-btn fin-btn--danger fin-btn--sm" (click)="deleteRow(row)">Delete</button>
+            </td>
+          </tr>
+        }
+      }
+      @empty {
+        <tr><td colspan="4" class="fin-table__empty">No categories yet.</td></tr>
+      }
+    </tbody>
+  </table>
+</div>
