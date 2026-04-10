@@ -1,1 +1,84 @@
-<p>Profile</p>
+<div class="prof">
+
+  <!-- Notification -->
+  @if (notification) {
+    <div class="prof__notification prof__notification--{{ notification.type }}">
+      <span>{{ notification.message }}</span>
+      <button class="prof__notification-close" (click)="clearNotification()">×</button>
+    </div>
+  }
+
+  <div class="prof__grid">
+
+    <!-- Personal Info -->
+    <div class="prof__card">
+      <div class="prof__card-header">Personal Information</div>
+      <div class="prof__card-body">
+
+        @if (profile()) {
+          <div class="prof__email-row">
+            <span class="prof__label">Email</span>
+            <span class="prof__email">{{ profile()!.email }}</span>
+          </div>
+        }
+
+        <div class="prof__form-group">
+          <label class="prof__label">First Name *</label>
+          <input class="prof__input" [(ngModel)]="infoForm.name" name="name" placeholder="First name" />
+        </div>
+        <div class="prof__form-group">
+          <label class="prof__label">Last Name</label>
+          <input class="prof__input" [(ngModel)]="infoForm.surname" name="surname" placeholder="Last name" />
+        </div>
+        <div class="prof__form-group">
+          <label class="prof__label">Country</label>
+          <input class="prof__input" [(ngModel)]="infoForm.country" name="country" placeholder="e.g. Greece" />
+        </div>
+        <div class="prof__form-group">
+          <label class="prof__label">Preferred Unit</label>
+          <select class="prof__select" [(ngModel)]="infoForm.unit" name="unit">
+            @for (u of UNITS; track u.value) {
+              <option [ngValue]="u.value">{{ u.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="prof__form-actions">
+          <button class="prof__btn prof__btn--primary" (click)="saveInfo()" [disabled]="infoLoading">
+            {{ infoLoading ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Change Password -->
+    <div class="prof__card">
+      <div class="prof__card-header">Change Password</div>
+      <div class="prof__card-body">
+
+        <div class="prof__form-group">
+          <label class="prof__label">Current Password</label>
+          <input class="prof__input" type="password" [(ngModel)]="passwordForm.current_password" name="cur_pw" placeholder="Current password" />
+        </div>
+        <div class="prof__form-group">
+          <label class="prof__label">New Password</label>
+          <input class="prof__input" type="password" [(ngModel)]="passwordForm.new_password" name="new_pw" placeholder="Min. 8 characters" />
+        </div>
+        <div class="prof__form-group">
+          <label class="prof__label">Confirm New Password</label>
+          <input class="prof__input" type="password" [(ngModel)]="passwordForm.confirm_password" name="conf_pw" placeholder="Repeat new password" />
+        </div>
+
+        <div class="prof__form-actions">
+          <button class="prof__btn prof__btn--primary" (click)="savePassword()" [disabled]="passwordLoading">
+            {{ passwordLoading ? 'Saving...' : 'Change Password' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
