@@ -9,7 +9,6 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideStore, META_REDUCERS } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-
 import { routes } from './app.routes';
 import { appReducers, appEffects } from './store';
 import { authInterceptor } from './core/interceptors/auth.interceptor';

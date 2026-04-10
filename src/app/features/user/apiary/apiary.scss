@@ -1,0 +1,236 @@
+$accent: #f59e0b;
+$accent-hover: #d97706;
+$bg-dark: #1a1200;
+$bg-panel: #241a00;
+$bg-hover: #3d2e00;
+$border: #3d2e00;
+$text-primary: #fef3c7;
+$text-muted: #a37f2e;
+$danger: #ef4444;
+$success: #22c55e;
+$warning: #f59e0b;
+$radius: 8px;
+
+.apiary {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  // ── Notification ─────────────────────────────────────────
+  &__notif {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: $radius;
+    font-size: 0.875rem;
+    font-weight: 500;
+
+    &--error   { background: rgba($danger, 0.15); border: 1px solid rgba($danger, 0.4); color: #fca5a5; }
+    &--success { background: rgba($success, 0.15); border: 1px solid rgba($success, 0.4); color: #86efac; }
+    &--warning { background: rgba($warning, 0.15); border: 1px solid rgba($warning, 0.4); color: #fde68a; }
+
+    button {
+      background: none; border: none; cursor: pointer;
+      font-size: 1.1rem; color: inherit; opacity: 0.7;
+      &:hover { opacity: 1; }
+    }
+  }
+
+  // ── Layout ────────────────────────────────────────────────
+  &__layout {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 20px;
+    align-items: start;
+
+    @media (max-width: 960px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ── Card ─────────────────────────────────────────────────
+  &__card {
+    background: $bg-panel;
+    border: 1px solid $border;
+    border-radius: $radius;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    &--map {
+      height: 560px;
+    }
+  }
+
+  &__card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $accent;
+    border-bottom: 1px solid $border;
+    flex-shrink: 0;
+  }
+
+  &__card-body {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow-y: auto;
+  }
+
+  // ── Map ───────────────────────────────────────────────────
+  &__map-wrap {
+    flex: 1;
+    min-height: 0;
+
+    google-map {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  // ── Inline add form ───────────────────────────────────────
+  &__inline-form {
+    background: $bg-hover;
+    border: 1px solid $border;
+    border-radius: $radius;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__form-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__form-hint {
+    font-size: 0.8rem;
+    color: $text-muted;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__form-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  // ── Table ─────────────────────────────────────────────────
+  &__table-wrap {
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+
+    th {
+      padding: 9px 12px;
+      text-align: left;
+      font-weight: 600;
+      color: $text-muted;
+      border-bottom: 1px solid $border;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 10px 12px;
+      color: $text-primary;
+      border-bottom: 1px solid rgba($border, 0.6);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+  }
+
+  &__row {
+    cursor: pointer;
+    &:hover td { background: rgba($bg-hover, 0.6); }
+  }
+
+  &__row--editing td { background: rgba($accent, 0.05); }
+
+  &__actions {
+    display: flex;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  &__coords-cell {
+    font-size: 0.8rem;
+    font-family: monospace;
+  }
+
+  &__coords {
+    font-size: 0.8rem;
+    font-family: monospace;
+    color: $text-muted;
+
+    &--header {
+      font-size: 0.78rem;
+    }
+  }
+
+  &__muted { color: $text-muted; }
+
+  &__empty {
+    color: $text-muted;
+    font-size: 0.875rem;
+    text-align: center;
+    padding: 24px;
+  }
+
+  // ── Shared controls ───────────────────────────────────────
+  &__label {
+    font-size: 0.8rem;
+    color: $text-muted;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  &__input {
+    background: $bg-dark;
+    border: 1px solid $border;
+    border-radius: 6px;
+    color: $text-primary;
+    font-size: 0.875rem;
+    padding: 6px 10px;
+    flex: 1;
+    min-width: 0;
+    transition: border-color 0.15s;
+
+    &:focus { outline: none; border-color: $accent; }
+    &--sm { flex: 0 0 80px; }
+  }
+
+  // ── Buttons ───────────────────────────────────────────────
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+
+    &--primary { background: $accent; color: #1a1200; &:hover { background: $accent-hover; } }
+    &--ghost   { background: transparent; border: 1px solid $border; color: $text-muted; &:hover { background: $bg-hover; color: $text-primary; } }
+    &--danger  { background: transparent; border: 1px solid rgba($danger, 0.4); color: #fca5a5; &:hover { background: rgba($danger, 0.15); } }
+    &--sm      { padding: 4px 10px; font-size: 0.8rem; }
+  }
+}

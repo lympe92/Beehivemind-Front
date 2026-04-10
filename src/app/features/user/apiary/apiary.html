@@ -1,1 +1,125 @@
-<p>apiary works!</p>
+<div class="apiary">
+
+  <!-- Notification -->
+  @if (notification) {
+    <div class="apiary__notif apiary__notif--{{ notification.type }}">
+      <span>{{ notification.message }}</span>
+      <button (click)="clearNotification()">×</button>
+    </div>
+  }
+
+  <div class="apiary__layout">
+
+    <!-- Left: Table -->
+    <div class="apiary__card">
+      <div class="apiary__card-header">
+        <span>Apiaries</span>
+        <button class="apiary__btn apiary__btn--primary" (click)="startAdd()">+ Add</button>
+      </div>
+      <div class="apiary__card-body">
+
+        <!-- Add form -->
+        @if (showAddForm) {
+          <div class="apiary__inline-form">
+            <div class="apiary__form-group">
+              <label class="apiary__label">Name *</label>
+              <input class="apiary__input" [(ngModel)]="newForm.name" name="n_name" placeholder="Apiary name" />
+            </div>
+            <div class="apiary__form-group">
+              <label class="apiary__label">Hives</label>
+              <input class="apiary__input apiary__input--sm" type="number" min="0" [(ngModel)]="newForm.hivesNumber" name="n_hives" placeholder="0" />
+            </div>
+            <div class="apiary__form-hint">
+              📍 Click on the map to set location
+              @if (markerPosition) {
+                <span class="apiary__coords">{{ markerPosition.lat | number:'1.4-4' }}, {{ markerPosition.lng | number:'1.4-4' }}</span>
+              }
+            </div>
+            <div class="apiary__form-actions">
+              <button class="apiary__btn apiary__btn--primary apiary__btn--sm" (click)="confirmAdd()">Save</button>
+              <button class="apiary__btn apiary__btn--ghost apiary__btn--sm" (click)="cancelAdd()">Cancel</button>
+            </div>
+          </div>
+        }
+
+        <!-- Table -->
+        <div class="apiary__table-wrap">
+          <table class="apiary__table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Hives</th>
+                <th>Coordinates</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of apiaries(); track row.id) {
+                @if (editingId === row.id) {
+                  <tr class="apiary__row--editing">
+                    <td><input class="apiary__input" [(ngModel)]="editForm.name" name="e_name" /></td>
+                    <td><input class="apiary__input apiary__input--sm" type="number" min="0" [(ngModel)]="editForm.hivesNumber" name="e_hives" /></td>
+                    <td class="apiary__coords-cell">
+                      @if (markerPosition) {
+                        {{ markerPosition.lat | number:'1.4-4' }}, {{ markerPosition.lng | number:'1.4-4' }}
+                      } @else {
+                        <span class="apiary__muted">Click map to change</span>
+                      }
+                    </td>
+                    <td class="apiary__actions">
+                      <button class="apiary__btn apiary__btn--primary apiary__btn--sm" (click)="confirmEdit()">Save</button>
+                      <button class="apiary__btn apiary__btn--ghost apiary__btn--sm" (click)="cancelEdit()">Cancel</button>
+                    </td>
+                  </tr>
+                } @else {
+                  <tr class="apiary__row" (click)="onRowSelect(row)">
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.hivesNumber }}</td>
+                    <td class="apiary__coords-cell apiary__muted">{{ row.latitude | number:'1.4-4' }}, {{ row.longitude | number:'1.4-4' }}</td>
+                    <td class="apiary__actions">
+                      <button class="apiary__btn apiary__btn--ghost apiary__btn--sm" (click)="startEdit(row); $event.stopPropagation()">Edit</button>
+                      <button class="apiary__btn apiary__btn--danger apiary__btn--sm" (click)="deleteRow(row); $event.stopPropagation()">Delete</button>
+                    </td>
+                  </tr>
+                }
+              }
+              @empty {
+                <tr><td colspan="4" class="apiary__empty">No apiaries yet. Add one and set its location on the map.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right: Map -->
+    <div class="apiary__card apiary__card--map">
+      <div class="apiary__card-header">
+        <span>Location</span>
+        @if (markerPosition) {
+          <span class="apiary__coords apiary__coords--header">
+            {{ markerPosition.lat | number:'1.6-6' }}, {{ markerPosition.lng | number:'1.6-6' }}
+          </span>
+        }
+      </div>
+      <div class="apiary__map-wrap">
+        @if (mapsLoaded()) {
+          <google-map
+            width="100%"
+            height="100%"
+            [center]="mapCenter"
+            [zoom]="mapZoom"
+            [options]="mapOptions"
+            (mapClick)="onMapClick($event)">
+            @if (markerPosition) {
+              <map-marker [position]="markerPosition" />
+            }
+          </google-map>
+        }
+      </div>
+    </div>
+
+  </div>
+
+</div>

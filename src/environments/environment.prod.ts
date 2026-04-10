@@ -3,4 +3,5 @@ export const environment = {
   apiUrl: 'https://your-api-domain.com/api',
   appUrl: 'https://beehivemind.tech',
   appName: 'BeehiveMind',
+  googleMapsApiKey: 'YOUR_GOOGLE_MAPS_API_KEY',
 };
