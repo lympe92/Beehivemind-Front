@@ -19,4 +19,20 @@ export class ProfileService {
   changePassword(data: { current_password: string; new_password: string; new_password_confirmation: string }): Observable<ApiResponse<void>> {
     return this.request.putRequest<void>('user/change-password', data);
   }
+
+  setup2FA(): Observable<ApiResponse<{ secret: string; otpauth_url: string }>> {
+    return this.request.postRequest<{ secret: string; otpauth_url: string }>('user/2fa/setup');
+  }
+
+  confirm2FA(code: string): Observable<ApiResponse<{ backup_codes: string[] }>> {
+    return this.request.postRequest<{ backup_codes: string[] }>('user/2fa/confirm', { code });
+  }
+
+  disable2FA(password: string): Observable<ApiResponse<void>> {
+    return this.request.deleteRequest<void>('user/2fa', { password });
+  }
+
+  regenerateBackupCodes(): Observable<ApiResponse<{ backup_codes: string[] }>> {
+    return this.request.postRequest<{ backup_codes: string[] }>('user/2fa/backup-codes/regenerate');
+  }
 }

@@ -4,48 +4,48 @@
   <aside class="sidebar">
 
     <div class="sidebar__brand">
-      <span class="sidebar__logo">🐝</span>
+      <img class="sidebar__logo-full" src="assets/img/logotr.webp" alt="BeehiveMind" />
       @if (sidebarOpen()) {
-        <span class="sidebar__brand-name">BeehiveMind</span>
+        <span class="sidebar__brand-name">BEEHIVEMIND</span>
       }
     </div>
 
     <nav class="sidebar__nav">
-      <a routerLink="/dashboard" routerLinkActive="active" class="sidebar__link">
+      <a routerLink="/user/dashboard" routerLinkActive="active" class="sidebar__link">
         <span class="icon">📊</span>
         @if (sidebarOpen()) { <span>Dashboard</span> }
       </a>
 
       <div class="sidebar__divider"></div>
 
-      <a routerLink="/apiary" routerLinkActive="active" class="sidebar__link">
+      <a routerLink="/user/apiary" routerLinkActive="active" class="sidebar__link">
         <span class="icon">🏡</span>
         @if (sidebarOpen()) { <span>Apiaries</span> }
       </a>
 
-      <a routerLink="/beehives" routerLinkActive="active" class="sidebar__link">
+      <a routerLink="/user/beehives" routerLinkActive="active" class="sidebar__link">
         <span class="icon">🐝</span>
         @if (sidebarOpen()) { <span>Beehives</span> }
       </a>
 
-      <a routerLink="/inspections" routerLinkActive="active" class="sidebar__link">
+      <a routerLink="/user/inspections" routerLinkActive="active" class="sidebar__link">
         <span class="icon">🔍</span>
         @if (sidebarOpen()) { <span>Inspections</span> }
       </a>
 
-      <a routerLink="/feeding" routerLinkActive="active" class="sidebar__link">
+      <a routerLink="/user/feeding" routerLinkActive="active" class="sidebar__link">
         <span class="icon">🍯</span>
         @if (sidebarOpen()) { <span>Feeding</span> }
       </a>
 
-      <a routerLink="/harvest" routerLinkActive="active" class="sidebar__link">
+      <a routerLink="/user/harvest" routerLinkActive="active" class="sidebar__link">
         <span class="icon">⚗️</span>
         @if (sidebarOpen()) { <span>Harvest</span> }
       </a>
 
       <div class="sidebar__divider"></div>
 
-      <a routerLink="/financial" routerLinkActive="active" class="sidebar__link">
+      <a routerLink="/user/financial" routerLinkActive="active" class="sidebar__link">
         <span class="icon">💰</span>
         @if (sidebarOpen()) { <span>Financials</span> }
       </a>
@@ -53,7 +53,7 @@
 
     <div class="sidebar__footer">
       @if (user$ | async; as user) {
-        <a routerLink="/profile" class="sidebar__profile">
+        <a routerLink="/user/profile" class="sidebar__profile">
           <div class="sidebar__avatar">
             {{ user.name.charAt(0) }}{{ user.surname.charAt(0) }}
           </div>

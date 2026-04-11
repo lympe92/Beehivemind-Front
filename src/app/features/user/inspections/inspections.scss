@@ -1,15 +1,4 @@
-$accent: #f59e0b;
-$accent-hover: #d97706;
-$bg-dark: #1a1200;
-$bg-panel: #241a00;
-$bg-hover: #3d2e00;
-$border: #3d2e00;
-$text-primary: #fef3c7;
-$text-muted: #a37f2e;
-$danger: #ef4444;
-$success: #22c55e;
-$warning: #f59e0b;
-$radius: 8px;
+@use 'styles/user-theme' as *;
 
 .insp {
   display: flex;
@@ -256,7 +245,7 @@ $radius: 8px;
 
   &__select {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a37f2e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-image: $select-arrow;
     background-repeat: no-repeat;
     background-position: right 8px center;
     padding-right: 28px;
@@ -279,7 +268,7 @@ $radius: 8px;
 
     &--primary {
       background: $accent;
-      color: #1a1200;
+      color: $accent-fg;
       &:hover { background: $accent-hover; }
     }
 

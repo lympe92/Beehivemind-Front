@@ -1,0 +1,52 @@
+// ══════════════════════════════════════════════════════════════
+// User section theme — LIGHT
+// Edit variables here — changes apply across all user pages.
+// ══════════════════════════════════════════════════════════════
+
+// ── Grayscale palette (light → dark) ─────────────────────────
+$gray-50:  #fafafa;
+$gray-100: #f5f5f5;
+$gray-200: #e5e5e5;
+$gray-300: #d4d4d4;
+$gray-400: #a3a3a3;
+$gray-500: #737373;
+$gray-600: #525252;
+$gray-700: #404040;
+$gray-800: #262626;
+$gray-900: #171717;
+$gray-950: #0a0a0a;
+
+// ── Semantic mappings ─────────────────────────────────────────
+$accent:       $gray-900;   // #171717 — primary interactive colour
+$accent-hover: $gray-800;   // #262626 — hover state
+$accent-fg:    $gray-50;    // #fafafa — text on accent backgrounds
+
+$bg-dark:      $gray-950;   // #0a0a0a — page background
+$bg-panel:     #ffffff;     // white   — cards / sidebar
+$bg-hover:     $gray-200;   // #e5e5e5 — hover rows / inline forms
+
+$border:       $gray-200;   // #e5e5e5 — default border
+$text-primary: $gray-900;   // #171717 — body text
+$text-muted:   $gray-500;   // #737373 — secondary / labels
+
+// ── Semantic colours ─────────────────────────────────────────
+$danger:       #ef4444;
+$danger-hover: #dc2626;
+$success:      #22c55e;
+$warning:      #f59e0b;
+
+// ── Radius ───────────────────────────────────────────────────
+$radius:    8px;
+$radius-sm: 6px;
+
+// ── Spacing ──────────────────────────────────────────────────
+$padding-card-x:  20px;
+$padding-card-y:  14px;
+$padding-table-x: 14px;
+$padding-table-y: 11px;
+$padding-form-x:  20px;
+$gap-form:        14px;
+$gap-section:     20px;
+
+// ── Select arrow (SVG data-URI, fill = $text-muted #737373) ──
+$select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23737373' d='M6 8L1 3h10z'/%3E%3C/svg%3E");

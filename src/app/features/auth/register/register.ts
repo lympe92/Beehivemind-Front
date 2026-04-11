@@ -1,7 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { AuthService } from '../../../core/services/auth.service';
+import { AuthActions } from '../../../store/auth/auth.actions';
+import { selectIsLoggedIn } from '../../../store/auth/auth.selectors';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-auth-register',
@@ -10,13 +15,19 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   private authService = inject(AuthService);
+  private store = inject(Store);
+  private router = inject(Router);
   private fb = inject(FormBuilder);
+  private platformId = inject(PLATFORM_ID);
 
   loading = signal(false);
   error = signal<string | null>(null);
   success = signal(false);
+  registeredEmail = signal<string | null>(null);
+  resendLoading = signal(false);
+  resendMessage = signal<string | null>(null);
 
   form: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(55)]],
@@ -24,6 +35,16 @@ export class RegisterComponent {
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
+
+  ngOnInit(): void {
+    this.store.select(selectIsLoggedIn).subscribe((loggedIn) => {
+      if (loggedIn) this.router.navigate(['/dashboard']);
+    });
+
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadGoogleSignIn();
+    }
+  }
 
   submit(): void {
     if (this.form.invalid) return;
@@ -33,6 +54,7 @@ export class RegisterComponent {
     this.authService.register(this.form.value).subscribe({
       next: () => {
         this.loading.set(false);
+        this.registeredEmail.set(this.form.value.email);
         this.success.set(true);
       },
       error: (err) => {
@@ -40,5 +62,60 @@ export class RegisterComponent {
         this.error.set(err?.error?.message ?? 'Registration failed. Please try again.');
       },
     });
+  }
+
+  resendConfirmation(): void {
+    const email = this.registeredEmail();
+    if (!email || this.resendLoading()) return;
+    this.resendLoading.set(true);
+    this.resendMessage.set(null);
+
+    this.authService.resendConfirmation(email).subscribe({
+      next: () => {
+        this.resendLoading.set(false);
+        this.resendMessage.set('A new confirmation email has been sent.');
+      },
+      error: () => {
+        this.resendLoading.set(false);
+        this.resendMessage.set('Something went wrong. Please try again.');
+      },
+    });
+  }
+
+  private loadGoogleSignIn(): void {
+    if (document.getElementById('gsi-script')) {
+      this.initGsi();
+      return;
+    }
+    const script = document.createElement('script');
+    script.id = 'gsi-script';
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => this.initGsi();
+    document.head.appendChild(script);
+  }
+
+  private initGsi(): void {
+    const g = (window as any).google;
+    if (!g?.accounts?.id) return;
+
+    g.accounts.id.initialize({
+      client_id: environment.googleClientId,
+      callback: (response: { credential: string }) => {
+        this.store.dispatch(AuthActions.loginWithGoogle({ credential: response.credential }));
+      },
+    });
+
+    const btn = document.getElementById('google-signup-btn');
+    if (btn) {
+      g.accounts.id.renderButton(btn, {
+        theme: 'outline',
+        size: 'large',
+        width: 340,
+        text: 'signup_with',
+        shape: 'rectangular',
+      });
+    }
   }
 }

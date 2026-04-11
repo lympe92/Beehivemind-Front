@@ -1,8 +1,4 @@
-$accent: #f59e0b;
-$bg-panel: #241a00;
-$border: #3d2e00;
-$text-muted: #a37f2e;
-$radius: 8px;
+@use 'styles/user-theme' as *;
 
 .financial {
   display: flex;

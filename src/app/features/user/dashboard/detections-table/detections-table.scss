@@ -1,8 +1,4 @@
-$accent: #f59e0b;
-$bg-panel: #241a00;
-$border: #3d2e00;
-$text-primary: #fef3c7;
-$text-muted: #a37f2e;
+@use 'styles/user-theme' as *;
 
 .detections-table {
   overflow-x: auto;

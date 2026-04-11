@@ -18,3 +18,6 @@ export const selectIsSuperAdmin = createSelector(
   selectUserRole,
   (role) => role === 'superadmin',
 );
+
+export const selectTwoFactorToken = createSelector(selectAuthState, (state) => state.twoFactorToken);
+export const selectTwoFactorPending = createSelector(selectAuthState, (state) => state.twoFactorPending);

@@ -13,7 +13,7 @@ export const routes: Routes = [
   },
   // User pages (beekeeper)
   {
-    path: '',
+    path: 'user',
     loadComponent: () =>
       import('./layouts/user-layout/user-layout').then((m) => m.UserLayoutComponent),
     canActivate: [authGuard],

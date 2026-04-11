@@ -1,15 +1,4 @@
-$accent: #f59e0b;
-$accent-hover: #d97706;
-$bg-dark: #1a1200;
-$bg-panel: #241a00;
-$bg-hover: #3d2e00;
-$border: #3d2e00;
-$text-primary: #fef3c7;
-$text-muted: #a37f2e;
-$danger: #ef4444;
-$success: #22c55e;
-$warning: #f59e0b;
-$radius: 8px;
+@use 'styles/user-theme' as *;
 
 .apiary {
   display: flex;
@@ -228,7 +217,7 @@ $radius: 8px;
     transition: background 0.15s;
     white-space: nowrap;
 
-    &--primary { background: $accent; color: #1a1200; &:hover { background: $accent-hover; } }
+    &--primary { background: $accent; color: $accent-fg; &:hover { background: $accent-hover; } }
     &--ghost   { background: transparent; border: 1px solid $border; color: $text-muted; &:hover { background: $bg-hover; color: $text-primary; } }
     &--danger  { background: transparent; border: 1px solid rgba($danger, 0.4); color: #fca5a5; &:hover { background: rgba($danger, 0.15); } }
     &--sm      { padding: 4px 10px; font-size: 0.8rem; }

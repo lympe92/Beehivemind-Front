@@ -16,6 +16,8 @@ export interface AuthState {
   token: string | null;
   loading: boolean;
   error: string | null;
+  twoFactorToken: string | null;
+  twoFactorPending: 'verify' | 'setup' | null;
 }
 
 export const initialAuthState: AuthState = {
@@ -23,4 +25,6 @@ export const initialAuthState: AuthState = {
   token: null,
   loading: false,
   error: null,
+  twoFactorToken: null,
+  twoFactorPending: null,
 };

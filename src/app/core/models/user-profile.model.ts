@@ -9,4 +9,5 @@ export interface UserProfile {
   country_longitude: number | null;
   unit: string;
   show_hints: boolean;
+  two_factor_enabled: boolean;
 }

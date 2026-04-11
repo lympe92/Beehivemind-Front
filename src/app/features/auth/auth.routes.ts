@@ -19,4 +19,9 @@ export const authRoutes: Routes = [
     loadComponent: () =>
       import('./confirmation/confirmation').then((m) => m.ConfirmationComponent),
   },
+  {
+    path: '2fa',
+    loadComponent: () =>
+      import('./two-factor-verify/two-factor-verify').then((m) => m.TwoFactorVerifyComponent),
+  },
 ];

@@ -7,9 +7,23 @@ import { User } from '../../store/auth/auth.state';
 export class AuthService {
   private request = inject(RequestService);
 
-  login(email: string, password: string): Observable<{ user: User; token: string }> {
+  login(email: string, password: string): Observable<{
+    user?: User; token?: string;
+    requires_2fa?: boolean; twoFactorToken?: string;
+  }> {
     return this.request
-      .postRequest<{ token: string; user: User }>('user/login', { email, password })
+      .postRequest<{ token?: string; user?: User; requires_2fa?: boolean; two_factor_token?: string }>('user/login', { email, password })
+      .pipe(map((res) => ({
+        user: res.data.user,
+        token: res.data.token,
+        requires_2fa: res.data.requires_2fa,
+        twoFactorToken: res.data.two_factor_token,
+      })));
+  }
+
+  verify2FA(twoFactorToken: string, payload: { code?: string; backup_code?: string }): Observable<{ user: User; token: string }> {
+    return this.request
+      .postRequest<{ token: string; user: User }>('user/2fa/verify', { two_factor_token: twoFactorToken, ...payload })
       .pipe(map((res) => ({ user: res.data.user, token: res.data.token })));
   }
 
@@ -25,6 +39,10 @@ export class AuthService {
 
   confirmEmail(token: string): Observable<void> {
     return this.request.postRequest('user/confirm-email', { token }).pipe(map(() => void 0));
+  }
+
+  resendConfirmation(email: string): Observable<void> {
+    return this.request.postRequest('user/resend-confirmation', { email }).pipe(map(() => void 0));
   }
 
   requestPasswordReset(email: string): Observable<void> {

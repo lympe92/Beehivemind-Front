@@ -79,6 +79,103 @@
       </div>
     </div>
 
+    <!-- Two-Factor Authentication -->
+    <div class="prof__card prof__card--full">
+      <div class="prof__card-header">
+        <span>Two-Factor Authentication</span>
+        <span class="prof__tfa-badge" [class.prof__tfa-badge--on]="tfaEnabled()">
+          {{ tfaEnabled() ? 'Enabled' : 'Disabled' }}
+        </span>
+      </div>
+      <div class="prof__card-body">
+
+        <!-- Idle: not enabled -->
+        @if (tfaStep() === 'idle' && !tfaEnabled()) {
+          <p class="prof__tfa-desc">
+            Add an extra layer of security to your account. You'll need your phone to sign in.
+          </p>
+          <button class="prof__btn prof__btn--primary" (click)="startSetup2FA()" [disabled]="tfaLoading">
+            {{ tfaLoading ? 'Loading...' : 'Enable 2FA' }}
+          </button>
+        }
+
+        <!-- Idle: already enabled -->
+        @if (tfaStep() === 'idle' && tfaEnabled()) {
+          <p class="prof__tfa-desc">
+            Two-factor authentication is active. Your account is protected with an authenticator app.
+          </p>
+          <div class="prof__tfa-actions">
+            <button class="prof__btn prof__btn--ghost" (click)="regenerateBackupCodes()" [disabled]="tfaLoading">
+              {{ tfaLoading ? 'Loading...' : 'Regenerate Backup Codes' }}
+            </button>
+            <button class="prof__btn prof__btn--danger" (click)="startDisable2FA()">Disable 2FA</button>
+          </div>
+        }
+
+        <!-- Setup step: show QR -->
+        @if (tfaStep() === 'setup') {
+          <div class="prof__tfa-setup">
+            <div class="prof__tfa-steps">
+              <p class="prof__tfa-step-label">1. Scan this QR code with your authenticator app</p>
+              <canvas id="tfa-qr-canvas" class="prof__qr-canvas"></canvas>
+              <details class="prof__tfa-secret">
+                <summary>Can't scan? Enter manually</summary>
+                <code class="prof__tfa-secret-key">{{ tfaSecret }}</code>
+              </details>
+            </div>
+            <div class="prof__tfa-steps">
+              <p class="prof__tfa-step-label">2. Enter the 6-digit code to confirm</p>
+              <div class="prof__form-group">
+                <input class="prof__input prof__input--code" type="text" inputmode="numeric" maxlength="6"
+                       [(ngModel)]="tfaCode" name="tfa_code" placeholder="000000" autocomplete="one-time-code" />
+              </div>
+              <div class="prof__tfa-actions">
+                <button class="prof__btn prof__btn--primary" (click)="confirm2FA()" [disabled]="tfaLoading || tfaCode.length !== 6">
+                  {{ tfaLoading ? 'Verifying...' : 'Confirm & Activate' }}
+                </button>
+                <button class="prof__btn prof__btn--ghost" (click)="tfaStep.set('idle')">Cancel</button>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Backup codes -->
+        @if (tfaStep() === 'backup') {
+          <div class="prof__tfa-backup">
+            <p class="prof__tfa-backup-warn">
+              Save these backup codes in a safe place. Each code can only be used once.
+            </p>
+            <div class="prof__tfa-backup-grid">
+              @for (code of tfaBackupCodes(); track code) {
+                <code class="prof__backup-code">{{ code }}</code>
+              }
+            </div>
+            <button class="prof__btn prof__btn--primary" (click)="finishSetup()" style="margin-top: 16px;">
+              I've saved my codes
+            </button>
+          </div>
+        }
+
+        <!-- Disable confirmation -->
+        @if (tfaStep() === 'disable') {
+          <div class="prof__tfa-disable">
+            <p class="prof__tfa-desc">Enter your password to disable two-factor authentication.</p>
+            <div class="prof__form-group">
+              <label class="prof__label">Password</label>
+              <input class="prof__input" type="password" [(ngModel)]="tfaDisablePassword" name="dis_pw" placeholder="Your password" />
+            </div>
+            <div class="prof__tfa-actions">
+              <button class="prof__btn prof__btn--danger" (click)="disable2FA()" [disabled]="tfaLoading || !tfaDisablePassword">
+                {{ tfaLoading ? 'Disabling...' : 'Disable 2FA' }}
+              </button>
+              <button class="prof__btn prof__btn--ghost" (click)="cancelDisable2FA()">Cancel</button>
+            </div>
+          </div>
+        }
+
+      </div>
+    </div>
+
   </div>
 
 </div>

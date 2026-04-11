@@ -1,0 +1,59 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__header">
+      <h1>Two-Factor Authentication</h1>
+      <p>
+        @if (!useBackup) {
+          Enter the 6-digit code from your authenticator app
+        } @else {
+          Enter one of your backup codes
+        }
+      </p>
+    </div>
+
+    @if (error$ | async; as error) {
+      <div class="auth-form__error" style="margin-bottom: 16px;">{{ error }}</div>
+    }
+
+    <div class="auth-form">
+      @if (!useBackup) {
+        <div class="form-group">
+          <label>Authentication Code</label>
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="6"
+            [(ngModel)]="code"
+            name="code"
+            placeholder="000000"
+            class="tfa-code-input"
+            autocomplete="one-time-code" />
+        </div>
+      } @else {
+        <div class="form-group">
+          <label>Backup Code</label>
+          <input
+            type="text"
+            [(ngModel)]="backupCode"
+            name="backupCode"
+            placeholder="XXXX-XXXX"
+            autocomplete="off" />
+        </div>
+      }
+
+      <button
+        class="auth-btn"
+        (click)="submit()"
+        [disabled]="(loading$ | async) || (!useBackup && code.length !== 6) || (useBackup && !backupCode.trim())">
+        @if (loading$ | async) { Verifying... } @else { Verify }
+      </button>
+    </div>
+
+    <div class="tfa-footer">
+      <button class="tfa-link" (click)="toggleBackup()">
+        @if (!useBackup) { Use a backup code instead } @else { Use authenticator app }
+      </button>
+      <button class="tfa-link tfa-link--muted" (click)="backToLogin()">Back to login</button>
+    </div>
+  </div>
+</div>

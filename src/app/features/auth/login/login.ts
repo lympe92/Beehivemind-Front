@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.select(selectIsLoggedIn).subscribe((loggedIn) => {
-      if (loggedIn) this.router.navigate(['/dashboard']);
+      if (loggedIn) this.router.navigate(['/user/dashboard']);
     });
 
     if (isPlatformBrowser(this.platformId)) {
