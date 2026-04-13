@@ -51,6 +51,16 @@
           <input type="password" formControlName="password" placeholder="Min. 8 characters" autocomplete="new-password" />
         </div>
 
+        <div class="form-group">
+          <label>Country <span class="form-optional">(optional)</span></label>
+          <select (change)="onCountryChange($event)" class="form-select">
+            <option value="">Select your country</option>
+            @for (c of countries; track c.code) {
+              <option [value]="c.code">{{ c.name }}</option>
+            }
+          </select>
+        </div>
+
         <button type="submit" class="auth-btn" [disabled]="form.invalid || loading()">
           {{ loading() ? 'Creating account...' : 'Create Account' }}
         </button>

@@ -14,9 +14,17 @@ export class EmployeeAuthEffects {
       ofType(EmployeeAuthActions.login),
       exhaustMap(({ email, password }) =>
         this.employeeAuthService.login(email, password).pipe(
-          map(({ employee, token }) => EmployeeAuthActions.loginSuccess({ employee, token })),
+          map((res) => {
+            if (res.requires_2fa_setup) {
+              return EmployeeAuthActions.loginRequires2FASetup({ twoFactorToken: res.twoFactorToken! });
+            }
+            if (res.requires_2fa) {
+              return EmployeeAuthActions.loginRequires2FA({ twoFactorToken: res.twoFactorToken! });
+            }
+            return EmployeeAuthActions.loginSuccess({ employee: res.employee!, token: res.token! });
+          }),
           catchError((error) =>
-            of(EmployeeAuthActions.loginFailure({ error: error.message ?? 'Login failed' })),
+            of(EmployeeAuthActions.loginFailure({ error: error?.error?.message ?? 'Login failed' })),
           ),
         ),
       ),

@@ -1,0 +1,34 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__header">
+      <h1>One last step</h1>
+      <p>Where are your apiaries located?</p>
+    </div>
+
+    @if (error()) {
+      <div class="auth-form__error">{{ error() }}</div>
+    }
+
+    <div class="form-group">
+      <label>Country</label>
+      <select (change)="onCountryChange($event)" class="form-select">
+        <option value="">Select your country</option>
+        @for (c of countries; track c.code) {
+          <option [value]="c.code">{{ c.name }}</option>
+        }
+      </select>
+    </div>
+
+    <button
+      type="button"
+      class="auth-btn"
+      (click)="submit()"
+      [disabled]="!selectedCountry || loading()">
+      {{ loading() ? 'Saving...' : 'Continue' }}
+    </button>
+
+    <p class="auth-card__footer">
+      <button type="button" class="auth-link-btn" (click)="skip()">Skip for now</button>
+    </p>
+  </div>
+</div>

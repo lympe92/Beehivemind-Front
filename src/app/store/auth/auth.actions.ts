@@ -6,8 +6,9 @@ export const AuthActions = createActionGroup({
   events: {
     Login: props<{ email: string; password: string }>(),
     'Login Success': props<{ user: User; token: string }>(),
-    'Login Failure': props<{ error: string }>(),
+    'Login Failure': props<{ error: string; retryAfterMinutes?: number }>(),
     'Login With Google': props<{ credential: string }>(),
+    'Login Needs Country': props<{ user: User; token: string }>(),
 
     // 2FA during login
     'Login Requires 2FA': props<{ twoFactorToken: string }>(),

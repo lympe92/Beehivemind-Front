@@ -18,6 +18,9 @@ export interface AuthState {
   error: string | null;
   twoFactorToken: string | null;
   twoFactorPending: 'verify' | 'setup' | null;
+  pendingUser: User | null;
+  pendingToken: string | null;
+  retryAfterMinutes: number | null;
 }
 
 export const initialAuthState: AuthState = {
@@ -27,4 +30,7 @@ export const initialAuthState: AuthState = {
   error: null,
   twoFactorToken: null,
   twoFactorPending: null,
+  pendingUser: null,
+  pendingToken: null,
+  retryAfterMinutes: null,
 };

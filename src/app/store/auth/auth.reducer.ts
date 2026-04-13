@@ -5,6 +5,20 @@ import { initialAuthState } from './auth.state';
 export const authReducer = createReducer(
   initialAuthState,
 
+  on(AuthActions.loginNeedsCountry, (state, { user, token }) => ({
+    ...state,
+    loading: false,
+    error: null,
+    pendingUser: user,
+    pendingToken: token,
+  })),
+
+  on(AuthActions.loginSuccess, (state, { user, token }) => ({
+    ...state,
+    pendingUser: null,
+    pendingToken: null,
+  })),
+
   on(AuthActions.login, AuthActions.loginWithGoogle, (state) => ({
     ...state,
     loading: true,
@@ -21,10 +35,11 @@ export const authReducer = createReducer(
     twoFactorPending: null,
   })),
 
-  on(AuthActions.loginFailure, (state, { error }) => ({
+  on(AuthActions.loginFailure, (state, { error, retryAfterMinutes }) => ({
     ...state,
     loading: false,
     error,
+    retryAfterMinutes: retryAfterMinutes ?? null,
   })),
 
   on(AuthActions.loginRequires2FA, (state, { twoFactorToken }) => ({

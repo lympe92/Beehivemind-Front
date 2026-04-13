@@ -178,6 +178,19 @@
     border-radius: 8px;
     background: #fff;
     padding: 8px;
+    display: block;
+  }
+
+  &__qr-loading {
+    width: 216px;
+    height: 216px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f9fafb;
+    border-radius: 8px;
+    color: #9ca3af;
+    font-size: 0.85rem;
   }
 
   &__tfa-secret {

@@ -21,3 +21,7 @@ export const selectIsSuperAdmin = createSelector(
 
 export const selectTwoFactorToken = createSelector(selectAuthState, (state) => state.twoFactorToken);
 export const selectTwoFactorPending = createSelector(selectAuthState, (state) => state.twoFactorPending);
+
+export const selectPendingUser = createSelector(selectAuthState, (state) => state.pendingUser);
+export const selectPendingToken = createSelector(selectAuthState, (state) => state.pendingToken);
+export const selectRetryAfterMinutes = createSelector(selectAuthState, (state) => state.retryAfterMinutes);

@@ -20,6 +20,8 @@ export interface EmployeeAuthState {
   token: string | null;
   loading: boolean;
   error: string | null;
+  twoFactorToken: string | null;
+  twoFactorStep: 'setup' | 'verify' | null;
 }
 
 export const initialEmployeeAuthState: EmployeeAuthState = {
@@ -27,4 +29,6 @@ export const initialEmployeeAuthState: EmployeeAuthState = {
   token: null,
   loading: false,
   error: null,
+  twoFactorToken: null,
+  twoFactorStep: null,
 };

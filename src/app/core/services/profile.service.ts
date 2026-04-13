@@ -12,7 +12,7 @@ export class ProfileService {
     return this.request.getRequest<UserProfile>('user/profile');
   }
 
-  updateProfile(data: Partial<Pick<UserProfile, 'name' | 'surname' | 'country' | 'unit' | 'show_hints'>>): Observable<ApiResponse<UserProfile>> {
+  updateProfile(data: Partial<Pick<UserProfile, 'name' | 'surname' | 'country' | 'unit' | 'show_hints'>> & { country_latitude?: number | null; country_longitude?: number | null }): Observable<ApiResponse<UserProfile>> {
     return this.request.putRequest<UserProfile>('user/profile', data);
   }
 

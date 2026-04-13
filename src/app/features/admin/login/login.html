@@ -5,40 +5,117 @@
       <p>Admin Panel</p>
     </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="admin-login__form">
-      @if (error$ | async; as error) {
-        <div class="admin-login__error">{{ error }}</div>
-      }
-
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="employee@beehivemind.com"
-          autocomplete="email"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="••••••••"
-          autocomplete="current-password"
-        />
-      </div>
-
-      <button type="submit" [disabled]="form.invalid || (loading$ | async)">
-        @if (loading$ | async) {
-          Logging in...
-        } @else {
-          Log In
+    <!-- Step 1: Credentials -->
+    @if ((twoFactorStep$ | async) === null) {
+      <form [formGroup]="form" (ngSubmit)="submit()" class="admin-login__form">
+        @if (error$ | async; as error) {
+          @if (error) {
+            <div class="admin-login__error">{{ error }}</div>
+          }
         }
-      </button>
-    </form>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" type="email" formControlName="email"
+                 placeholder="employee@beehivemind.com" autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" formControlName="password"
+                 placeholder="••••••••" autocomplete="current-password" />
+        </div>
+
+        <button type="submit" [disabled]="form.invalid || (loading$ | async)">
+          @if (loading$ | async) { Logging in... } @else { Log In }
+        </button>
+      </form>
+    }
+
+    <!-- Step 2a: First-time 2FA Setup -->
+    @if ((twoFactorStep$ | async) === 'setup') {
+      <div class="admin-login__2fa">
+        <p class="admin-login__2fa-title">Set up Two-Factor Authentication</p>
+        <p class="admin-login__2fa-desc">
+          2FA is required for all admin accounts. Scan the QR code with your authenticator app.
+        </p>
+
+        @if (setupError) {
+          <div class="admin-login__error">{{ setupError }}</div>
+        }
+
+        @if (setupLoading && !setupQrDataUrl()) {
+          <div class="admin-login__qr-loading">Generating QR code…</div>
+        }
+
+        @if (setupQrDataUrl()) {
+          <img [src]="setupQrDataUrl()" alt="QR Code" class="admin-login__qr" />
+        }
+
+        @if (twoFactorToken$ | async; as token) {
+          <div class="form-group" style="margin-top: 16px;">
+            <label>Enter the 6-digit code to confirm</label>
+            <input type="text" inputmode="numeric" maxlength="6"
+                   [(ngModel)]="setupCode" name="setup_code"
+                   placeholder="000000" autocomplete="one-time-code"
+                   class="admin-login__code-input" />
+          </div>
+          <button class="admin-login__btn" (click)="confirmSetup(token)"
+                  [disabled]="setupLoading || setupCode.length !== 6">
+            {{ setupLoading ? 'Verifying…' : 'Activate 2FA & Sign In' }}
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Step 2b: Verify existing 2FA -->
+    @if ((twoFactorStep$ | async) === 'verify') {
+      <div class="admin-login__2fa">
+        <p class="admin-login__2fa-title">Two-Factor Authentication</p>
+        <p class="admin-login__2fa-desc">
+          Open your authenticator app and enter the 6-digit code.
+        </p>
+
+        @if (verifyError) {
+          <div class="admin-login__error">{{ verifyError }}</div>
+        }
+
+        @if (twoFactorToken$ | async; as token) {
+          @if (!showBackupInput) {
+            <div class="form-group">
+              <label>Authentication Code</label>
+              <input type="text" inputmode="numeric" maxlength="6"
+                     [(ngModel)]="verifyCode" name="verify_code"
+                     placeholder="000000" autocomplete="one-time-code"
+                     class="admin-login__code-input" />
+            </div>
+            <button class="admin-login__btn" (click)="verify(token)"
+                    [disabled]="verifyLoading || verifyCode.length !== 6">
+              {{ verifyLoading ? 'Verifying…' : 'Sign In' }}
+            </button>
+            <button type="button" class="admin-login__link-btn" (click)="showBackupInput = true">
+              Use a backup code instead
+            </button>
+          } @else {
+            <div class="form-group">
+              <label>Backup Code</label>
+              <input type="text" [(ngModel)]="backupCode" name="backup_code"
+                     placeholder="XXXX-XXXX" class="admin-login__code-input" />
+            </div>
+            <button class="admin-login__btn" (click)="verify(token)"
+                    [disabled]="verifyLoading || !backupCode">
+              {{ verifyLoading ? 'Verifying…' : 'Sign In with Backup Code' }}
+            </button>
+            <button type="button" class="admin-login__link-btn" (click)="showBackupInput = false">
+              Use authenticator app instead
+            </button>
+          }
+        }
+
+        <button type="button" class="admin-login__link-btn" style="margin-top: 8px;" (click)="backToCredentials()">
+          ← Back
+        </button>
+      </div>
+    }
   </div>
 </div>

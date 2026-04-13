@@ -32,7 +32,9 @@ export class AuthService {
     surname: string;
     email: string;
     password: string;
-    country?: string;
+    country?: string | null;
+    country_latitude?: number | null;
+    country_longitude?: number | null;
   }): Observable<void> {
     return this.request.postRequest('user/register', data).pipe(map(() => void 0));
   }
@@ -57,10 +59,18 @@ export class AuthService {
       .pipe(map(() => void 0));
   }
 
-  loginWithGoogle(credential: string): Observable<{ user: User; token: string }> {
+  loginWithGoogle(credential: string): Observable<{
+    user?: User; token?: string;
+    requires_2fa?: boolean; twoFactorToken?: string;
+  }> {
     return this.request
-      .postRequest<{ token: string; user: User }>('user/auth/google', { credential })
-      .pipe(map((res) => ({ user: res.data.user, token: res.data.token })));
+      .postRequest<{ token?: string; user?: User; requires_2fa?: boolean; two_factor_token?: string }>('user/auth/google', { credential })
+      .pipe(map((res) => ({
+        user: res.data.user,
+        token: res.data.token,
+        requires_2fa: res.data.requires_2fa,
+        twoFactorToken: res.data.two_factor_token,
+      })));
   }
 
   logout(): Observable<void> {

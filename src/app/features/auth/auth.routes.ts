@@ -24,4 +24,9 @@ export const authRoutes: Routes = [
     loadComponent: () =>
       import('./two-factor-verify/two-factor-verify').then((m) => m.TwoFactorVerifyComponent),
   },
+  {
+    path: 'complete-profile',
+    loadComponent: () =>
+      import('./complete-profile/complete-profile').then((m) => m.CompleteProfileComponent),
+  },
 ];

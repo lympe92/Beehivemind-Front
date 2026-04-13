@@ -9,6 +9,7 @@ import {
   selectAuthError,
   selectAuthLoading,
   selectIsLoggedIn,
+  selectRetryAfterMinutes,
 } from '../../../store/auth/auth.selectors';
 import { environment } from '../../../../environments/environment';
 
@@ -27,6 +28,7 @@ export class LoginComponent implements OnInit {
 
   loading$ = this.store.select(selectAuthLoading);
   error$ = this.store.select(selectAuthError);
+  retryAfterMinutes$ = this.store.select(selectRetryAfterMinutes);
 
   form: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],

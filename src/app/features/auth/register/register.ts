@@ -7,6 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { AuthActions } from '../../../store/auth/auth.actions';
 import { selectIsLoggedIn } from '../../../store/auth/auth.selectors';
 import { environment } from '../../../../environments/environment';
+import { COUNTRIES, Country } from '../../../core/data/countries';
 
 @Component({
   selector: 'app-auth-register',
@@ -29,11 +30,16 @@ export class RegisterComponent implements OnInit {
   resendLoading = signal(false);
   resendMessage = signal<string | null>(null);
 
+  countries: Country[] = COUNTRIES;
+
   form: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(55)]],
     surname: ['', [Validators.required, Validators.maxLength(55)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
+    country: [null],
+    country_latitude: [null],
+    country_longitude: [null],
   });
 
   ngOnInit(): void {
@@ -62,6 +68,20 @@ export class RegisterComponent implements OnInit {
         this.error.set(err?.error?.message ?? 'Registration failed. Please try again.');
       },
     });
+  }
+
+  onCountryChange(event: Event): void {
+    const code = (event.target as HTMLSelectElement).value;
+    const country = this.countries.find(c => c.code === code) ?? null;
+    if (country) {
+      this.form.patchValue({
+        country: country.name,
+        country_latitude: country.latitude,
+        country_longitude: country.longitude,
+      });
+    } else {
+      this.form.patchValue({ country: null, country_latitude: null, country_longitude: null });
+    }
   }
 
   resendConfirmation(): void {

@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import QRCode from 'qrcode';
 import { ProfileService } from '../../../core/services/profile.service';
 import {UserProfile} from '../../../core/models/user-profile.model';
 
@@ -47,6 +48,7 @@ export class ProfileComponent implements OnInit {
   tfaStep = signal<TfaStep>('idle');
   tfaSecret = '';
   tfaOtpauthUrl = '';
+  tfaQrDataUrl = signal<string>('');
   tfaCode = '';
   tfaBackupCodes = signal<string[]>([]);
   tfaDisablePassword = '';
@@ -138,9 +140,12 @@ export class ProfileComponent implements OnInit {
           this.tfaSecret = res.data.secret;
           this.tfaOtpauthUrl = res.data.otpauth_url;
           this.tfaCode = '';
+          this.tfaQrDataUrl.set('');
           this.tfaStep.set('setup');
           if (isPlatformBrowser(this.platformId)) {
-            setTimeout(() => this.renderQrCode(), 100);
+            QRCode.toDataURL(this.tfaOtpauthUrl, { width: 200, margin: 2 })
+              .then(url => this.tfaQrDataUrl.set(url))
+              .catch(() => this.notify('tfa', 'error', 'Failed to generate QR code.'));
           }
         }
       },
@@ -225,26 +230,6 @@ export class ProfileComponent implements OnInit {
 
   clearNotification(): void {
     this.notification = null;
-  }
-
-  private renderQrCode(): void {
-    const canvas = document.getElementById('tfa-qr-canvas') as HTMLCanvasElement;
-    if (!canvas) return;
-
-    const QRCode = (window as any).QRCode;
-    if (QRCode) {
-      QRCode.toCanvas(canvas, this.tfaOtpauthUrl, { width: 200, margin: 2 }, () => {});
-      return;
-    }
-
-    // Load qrcode library if not available
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
-    script.onload = () => {
-      const QR = (window as any).QRCode;
-      if (QR) QR.toCanvas(canvas, this.tfaOtpauthUrl, { width: 200, margin: 2 }, () => {});
-    };
-    document.head.appendChild(script);
   }
 
   private notify(section: 'info' | 'password' | 'tfa', type: NotificationType, message: string): void {

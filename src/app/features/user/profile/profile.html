@@ -117,7 +117,11 @@
           <div class="prof__tfa-setup">
             <div class="prof__tfa-steps">
               <p class="prof__tfa-step-label">1. Scan this QR code with your authenticator app</p>
-              <canvas id="tfa-qr-canvas" class="prof__qr-canvas"></canvas>
+              @if (tfaQrDataUrl()) {
+                <img [src]="tfaQrDataUrl()" alt="QR Code" class="prof__qr-canvas" />
+              } @else {
+                <div class="prof__qr-loading">Generating QR code…</div>
+              }
               <details class="prof__tfa-secret">
                 <summary>Can't scan? Enter manually</summary>
                 <code class="prof__tfa-secret-key">{{ tfaSecret }}</code>

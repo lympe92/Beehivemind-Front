@@ -23,7 +23,10 @@ export class AuthEffects {
             return AuthActions.loginSuccess({ user: res.user!, token: res.token! });
           }),
           catchError((err) =>
-            of(AuthActions.loginFailure({ error: err?.error?.message ?? 'Login failed' })),
+            of(AuthActions.loginFailure({
+              error: err?.error?.message ?? 'Login failed',
+              retryAfterMinutes: err?.error?.retry_after_minutes ?? undefined,
+            })),
           ),
         ),
       ),
@@ -35,13 +38,31 @@ export class AuthEffects {
       ofType(AuthActions.loginWithGoogle),
       exhaustMap(({ credential }) =>
         this.authService.loginWithGoogle(credential).pipe(
-          map(({ user, token }) => AuthActions.loginSuccess({ user, token })),
+          map((res) => {
+            if (res.requires_2fa) {
+              return AuthActions.loginRequires2FA({ twoFactorToken: res.twoFactorToken! });
+            }
+            const user = res.user!;
+            const token = res.token!;
+            return user.country
+              ? AuthActions.loginSuccess({ user, token })
+              : AuthActions.loginNeedsCountry({ user, token });
+          }),
           catchError((err) =>
             of(AuthActions.loginFailure({ error: err?.error?.message ?? 'Google sign-in failed' })),
           ),
         ),
       ),
     ),
+  );
+
+  loginNeedsCountry$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.loginNeedsCountry),
+        tap(() => this.router.navigate(['/auth/complete-profile'])),
+      ),
+    { dispatch: false },
   );
 
   loginRequires2FA$ = createEffect(

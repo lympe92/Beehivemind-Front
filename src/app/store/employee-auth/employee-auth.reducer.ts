@@ -17,6 +17,8 @@ export const employeeAuthReducer = createReducer(
     token,
     loading: false,
     error: null,
+    twoFactorToken: null,
+    twoFactorStep: null,
   })),
 
   on(EmployeeAuthActions.loginFailure, (state, { error }) => ({
@@ -24,6 +26,24 @@ export const employeeAuthReducer = createReducer(
     loading: false,
     error,
   })),
+
+  on(EmployeeAuthActions.loginRequires2FASetup, (state, { twoFactorToken }) => ({
+    ...state,
+    loading: false,
+    error: null,
+    twoFactorToken,
+    twoFactorStep: 'setup' as const,
+  })),
+
+  on(EmployeeAuthActions.loginRequires2FA, (state, { twoFactorToken }) => ({
+    ...state,
+    loading: false,
+    error: null,
+    twoFactorToken,
+    twoFactorStep: 'verify' as const,
+  })),
+
+  on(EmployeeAuthActions.resetLogin, () => initialEmployeeAuthState),
 
   on(EmployeeAuthActions.logoutSuccess, () => initialEmployeeAuthState),
 );
