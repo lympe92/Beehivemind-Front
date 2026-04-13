@@ -16,7 +16,7 @@ export class ProfileService {
     return this.request.putRequest<UserProfile>('user/profile', data);
   }
 
-  changePassword(data: { current_password: string; new_password: string; new_password_confirmation: string }): Observable<ApiResponse<void>> {
+  changePassword(data: { current_password?: string; new_password: string; new_password_confirmation: string }): Observable<ApiResponse<void>> {
     return this.request.putRequest<void>('user/change-password', data);
   }
 

@@ -10,4 +10,5 @@ export interface UserProfile {
   unit: string;
   show_hints: boolean;
   two_factor_enabled: boolean;
+  has_password: boolean;
 }

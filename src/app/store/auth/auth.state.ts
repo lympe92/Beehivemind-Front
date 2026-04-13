@@ -9,6 +9,8 @@ export interface User {
   country: string | null;
   unit: string;
   show_hints: boolean;
+  two_factor_enabled: boolean;
+  has_password: boolean;
 }
 
 export interface AuthState {

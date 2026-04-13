@@ -103,13 +103,14 @@ export class ProfileComponent implements OnInit {
   // ── Password ─────────────────────────────────────────────
 
   savePassword(): void {
-    if (!this.passwordForm.current_password) { this.notify('password', 'error', 'Enter your current password.'); return; }
+    const hasPassword = this.profile()?.has_password ?? true;
+    if (hasPassword && !this.passwordForm.current_password) { this.notify('password', 'error', 'Enter your current password.'); return; }
     if (this.passwordForm.new_password.length < 8) { this.notify('password', 'error', 'New password must be at least 8 characters.'); return; }
     if (this.passwordForm.new_password !== this.passwordForm.confirm_password) { this.notify('password', 'error', 'Passwords do not match.'); return; }
 
     this.passwordLoading = true;
     this.profileService.changePassword({
-      current_password: this.passwordForm.current_password,
+      current_password: this.passwordForm.current_password || undefined,
       new_password: this.passwordForm.new_password,
       new_password_confirmation: this.passwordForm.confirm_password,
     }).subscribe({
@@ -117,7 +118,9 @@ export class ProfileComponent implements OnInit {
         this.passwordLoading = false;
         if (res.success) {
           this.passwordForm = { current_password: '', new_password: '', confirm_password: '' };
-          this.notify('password', 'success', 'Password changed successfully.');
+          const current = this.profile();
+          if (current) this.profile.set({ ...current, has_password: true });
+          this.notify('password', 'success', hasPassword ? 'Password changed successfully.' : 'Password set successfully.');
         } else {
           this.notify('password', 'error', 'Something went wrong. Please try again.');
         }

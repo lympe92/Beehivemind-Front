@@ -54,13 +54,23 @@
 
     <!-- Change Password -->
     <div class="prof__card">
-      <div class="prof__card-header">Change Password</div>
+      <div class="prof__card-header">
+        {{ profile()?.has_password ? 'Change Password' : 'Set a Password' }}
+      </div>
       <div class="prof__card-body">
 
-        <div class="prof__form-group">
-          <label class="prof__label">Current Password</label>
-          <input class="prof__input" type="password" [(ngModel)]="passwordForm.current_password" name="cur_pw" placeholder="Current password" />
-        </div>
+        @if (!profile()?.has_password) {
+          <p class="prof__tfa-desc">
+            Your account uses Google sign-in. You can set a password to also log in with email.
+          </p>
+        }
+
+        @if (profile()?.has_password) {
+          <div class="prof__form-group">
+            <label class="prof__label">Current Password</label>
+            <input class="prof__input" type="password" [(ngModel)]="passwordForm.current_password" name="cur_pw" placeholder="Current password" />
+          </div>
+        }
         <div class="prof__form-group">
           <label class="prof__label">New Password</label>
           <input class="prof__input" type="password" [(ngModel)]="passwordForm.new_password" name="new_pw" placeholder="Min. 8 characters" />
@@ -72,7 +82,7 @@
 
         <div class="prof__form-actions">
           <button class="prof__btn prof__btn--primary" (click)="savePassword()" [disabled]="passwordLoading">
-            {{ passwordLoading ? 'Saving...' : 'Change Password' }}
+            {{ passwordLoading ? 'Saving...' : (profile()?.has_password ? 'Change Password' : 'Set Password') }}
           </button>
         </div>
 
