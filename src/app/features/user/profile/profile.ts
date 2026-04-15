@@ -1,21 +1,23 @@
-import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { Component, effect, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Store } from '@ngrx/store';
 import QRCode from 'qrcode';
-import { ProfileService } from '../../../core/services/profile.service';
-import {UserProfile} from '../../../core/models/user-profile.model';
-
-type NotificationType = 'error' | 'success';
-
-interface ProfileNotification {
-  section: 'info' | 'password' | 'tfa';
-  type: NotificationType;
-  message: string;
-}
+import { ProfileActions } from '../../../store/profile/profile.actions';
+import {
+  selectProfile,
+  selectProfileLoading,
+  selectProfileSaving,
+  selectTfaBackupCodes,
+  selectTfaSetupOtpauth,
+  selectTfaSetupSecret,
+} from '../../../store/profile/profile.selectors';
+import { ToastService } from '../../../shared/components/ui/toast/toast.service';
+import { LoaderComponent } from '../../../shared/components/ui/loader/loader';
 
 const UNITS = [
-  { value: 'kg',     label: 'Kg / Lt (Metric)' },
-  { value: 'libre',  label: 'Libre / Gallon (Imperial)' },
+  { value: 'kg',    label: 'Kg / Lt (Metric)' },
+  { value: 'libre', label: 'Libre / Gallon (Imperial)' },
 ];
 
 type TfaStep = 'idle' | 'setup' | 'backup' | 'disable';
@@ -23,165 +25,142 @@ type TfaStep = 'idle' | 'setup' | 'backup' | 'disable';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, LoaderComponent],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
 export class ProfileComponent implements OnInit {
-  private profileService = inject(ProfileService);
+  private store = inject(Store);
   private platformId = inject(PLATFORM_ID);
+  private toast = inject(ToastService);
 
   readonly UNITS = UNITS;
 
-  profile = signal<UserProfile | null>(null);
+  // Store selectors
+  readonly profile      = this.store.selectSignal(selectProfile);
+  readonly loading      = this.store.selectSignal(selectProfileLoading);
+  readonly saving       = this.store.selectSignal(selectProfileSaving);
+  readonly tfaSecret    = this.store.selectSignal(selectTfaSetupSecret);
+  readonly tfaOtpauth   = this.store.selectSignal(selectTfaSetupOtpauth);
+  readonly backupCodes  = this.store.selectSignal(selectTfaBackupCodes);
 
-  // Personal info form
+  // Personal info form — kept in sync with store when profile loads
   infoForm = { name: '', surname: '', country: '', unit: 'kg' };
-  infoLoading = false;
+  private infoFormOriginal = { name: '', surname: '', country: '', unit: 'kg' };
 
-  // Password form
+  get infoFormUnchanged(): boolean {
+    return (
+      this.infoForm.name === this.infoFormOriginal.name &&
+      this.infoForm.surname === this.infoFormOriginal.surname &&
+      this.infoForm.country === this.infoFormOriginal.country &&
+      this.infoForm.unit === this.infoFormOriginal.unit
+    );
+  }
+
+  // Password form (local UI state)
   passwordForm = { current_password: '', new_password: '', confirm_password: '' };
-  passwordLoading = false;
 
-  // 2FA state
-  tfaEnabled = signal(false);
+  // 2FA UI state (local — step, QR url)
   tfaStep = signal<TfaStep>('idle');
-  tfaSecret = '';
-  tfaOtpauthUrl = '';
   tfaQrDataUrl = signal<string>('');
   tfaCode = '';
-  tfaBackupCodes = signal<string[]>([]);
   tfaDisablePassword = '';
-  tfaLoading = false;
 
-  notification: ProfileNotification | null = null;
-  private notifTimers: Partial<Record<string, ReturnType<typeof setTimeout>>> = {};
-
-  ngOnInit(): void {
-    this.profileService.getProfile().subscribe(res => {
-      if (res.success) {
-        this.profile.set(res.data);
-        this.tfaEnabled.set(res.data.two_factor_enabled);
+  constructor() {
+    // When profile arrives from store, populate the form
+    effect(() => {
+      const p = this.profile();
+      if (p) {
         this.infoForm = {
-          name: res.data.name ?? '',
-          surname: res.data.surname ?? '',
-          country: res.data.country ?? '',
-          unit: res.data.unit ?? 'kg',
+          name: p.name ?? '',
+          surname: p.surname ?? '',
+          country: p.country ?? '',
+          unit: p.unit ?? 'kg',
         };
+        this.infoFormOriginal = { ...this.infoForm };
       }
     });
+
+    // When 2FA setup secret arrives, generate QR and move to setup step
+    effect(() => {
+      const otpauth = this.tfaOtpauth();
+      if (otpauth && isPlatformBrowser(this.platformId)) {
+        this.tfaStep.set('setup');
+        this.tfaQrDataUrl.set('');
+        QRCode.toDataURL(otpauth, { width: 200, margin: 2 })
+          .then(url => this.tfaQrDataUrl.set(url))
+          .catch(() => this.toast.error('Failed to generate QR code.'));
+      }
+    });
+
+    // When backup codes arrive (confirm or regenerate), move to backup step
+    effect(() => {
+      const codes = this.backupCodes();
+      if (codes.length > 0) {
+        this.tfaStep.set('backup');
+      }
+    });
+
+    // When 2FA is disabled (profile updates), go back to idle
+    effect(() => {
+      const p = this.profile();
+      if (p && !p.two_factor_enabled && this.tfaStep() === 'disable') {
+        this.tfaStep.set('idle');
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    this.store.dispatch(ProfileActions.loadProfile());
   }
 
   // ── Personal info ────────────────────────────────────────
 
   saveInfo(): void {
     if (!this.infoForm.name.trim()) {
-      this.notify('info', 'error', 'First name is required.');
+      this.toast.error('First name is required.');
       return;
     }
-
-    this.infoLoading = true;
-    this.profileService.updateProfile({
-      name: this.infoForm.name.trim(),
-      surname: this.infoForm.surname.trim(),
-      country: this.infoForm.country.trim() || null,
-      unit: this.infoForm.unit,
-    } as any).subscribe({
-      next: res => {
-        this.infoLoading = false;
-        if (res.success) {
-          this.profile.set(res.data);
-          this.notify('info', 'success', 'Profile updated successfully.');
-        } else {
-          this.notify('info', 'error', 'Something went wrong. Please try again.');
-        }
+    this.store.dispatch(ProfileActions.updateProfile({
+      data: {
+        name: this.infoForm.name.trim(),
+        surname: this.infoForm.surname.trim(),
+        country: (this.infoForm.country.trim() || null) as any,
+        unit: this.infoForm.unit,
       },
-      error: () => { this.infoLoading = false; this.notify('info', 'error', 'Something went wrong. Please try again.'); },
-    });
+    }));
   }
 
   // ── Password ─────────────────────────────────────────────
 
   savePassword(): void {
     const hasPassword = this.profile()?.has_password ?? true;
-    if (hasPassword && !this.passwordForm.current_password) { this.notify('password', 'error', 'Enter your current password.'); return; }
-    if (this.passwordForm.new_password.length < 8) { this.notify('password', 'error', 'New password must be at least 8 characters.'); return; }
-    if (this.passwordForm.new_password !== this.passwordForm.confirm_password) { this.notify('password', 'error', 'Passwords do not match.'); return; }
+    if (hasPassword && !this.passwordForm.current_password) { this.toast.error('Enter your current password.'); return; }
+    if (this.passwordForm.new_password.length < 8) { this.toast.error('New password must be at least 8 characters.'); return; }
+    if (this.passwordForm.new_password !== this.passwordForm.confirm_password) { this.toast.error('Passwords do not match.'); return; }
 
-    this.passwordLoading = true;
-    this.profileService.changePassword({
+    this.store.dispatch(ProfileActions.changePassword({
       current_password: this.passwordForm.current_password || undefined,
       new_password: this.passwordForm.new_password,
       new_password_confirmation: this.passwordForm.confirm_password,
-    }).subscribe({
-      next: res => {
-        this.passwordLoading = false;
-        if (res.success) {
-          this.passwordForm = { current_password: '', new_password: '', confirm_password: '' };
-          const current = this.profile();
-          if (current) this.profile.set({ ...current, has_password: true });
-          this.notify('password', 'success', hasPassword ? 'Password changed successfully.' : 'Password set successfully.');
-        } else {
-          this.notify('password', 'error', 'Something went wrong. Please try again.');
-        }
-      },
-      error: (err) => {
-        this.passwordLoading = false;
-        this.notify('password', 'error', err?.error?.message ?? 'Something went wrong. Please try again.');
-      },
-    });
+    }));
+    this.passwordForm = { current_password: '', new_password: '', confirm_password: '' };
   }
 
   // ── 2FA ──────────────────────────────────────────────────
 
   startSetup2FA(): void {
-    this.tfaLoading = true;
-    this.profileService.setup2FA().subscribe({
-      next: res => {
-        this.tfaLoading = false;
-        if (res.success) {
-          this.tfaSecret = res.data.secret;
-          this.tfaOtpauthUrl = res.data.otpauth_url;
-          this.tfaCode = '';
-          this.tfaQrDataUrl.set('');
-          this.tfaStep.set('setup');
-          if (isPlatformBrowser(this.platformId)) {
-            QRCode.toDataURL(this.tfaOtpauthUrl, { width: 200, margin: 2 })
-              .then(url => this.tfaQrDataUrl.set(url))
-              .catch(() => this.notify('tfa', 'error', 'Failed to generate QR code.'));
-          }
-        }
-      },
-      error: () => { this.tfaLoading = false; this.notify('tfa', 'error', 'Something went wrong. Please try again.'); },
-    });
+    this.store.dispatch(ProfileActions.setup2FA());
   }
 
   confirm2FA(): void {
-    if (this.tfaCode.length !== 6) { this.notify('tfa', 'error', 'Enter the 6-digit code.'); return; }
-
-    this.tfaLoading = true;
-    this.profileService.confirm2FA(this.tfaCode).subscribe({
-      next: res => {
-        this.tfaLoading = false;
-        if (res.success) {
-          this.tfaEnabled.set(true);
-          this.tfaBackupCodes.set(res.data.backup_codes);
-          this.tfaStep.set('backup');
-          this.notify('tfa', 'success', '2FA enabled successfully.');
-        } else {
-          this.notify('tfa', 'error', 'Invalid code. Please try again.');
-        }
-      },
-      error: (err) => {
-        this.tfaLoading = false;
-        this.notify('tfa', 'error', err?.error?.message ?? 'Invalid code.');
-      },
-    });
+    if (this.tfaCode.length !== 6) { this.toast.error('Enter the 6-digit code.'); return; }
+    this.store.dispatch(ProfileActions.confirm2FA({ code: this.tfaCode }));
+    this.tfaCode = '';
   }
 
   finishSetup(): void {
     this.tfaStep.set('idle');
-    this.tfaBackupCodes.set([]);
   }
 
   startDisable2FA(): void {
@@ -194,52 +173,12 @@ export class ProfileComponent implements OnInit {
   }
 
   disable2FA(): void {
-    if (!this.tfaDisablePassword) { this.notify('tfa', 'error', 'Enter your password to disable 2FA.'); return; }
-
-    this.tfaLoading = true;
-    this.profileService.disable2FA(this.tfaDisablePassword).subscribe({
-      next: res => {
-        this.tfaLoading = false;
-        if (res.success) {
-          this.tfaEnabled.set(false);
-          this.tfaStep.set('idle');
-          this.notify('tfa', 'success', '2FA disabled.');
-        } else {
-          this.notify('tfa', 'error', 'Something went wrong.');
-        }
-      },
-      error: (err) => {
-        this.tfaLoading = false;
-        this.notify('tfa', 'error', err?.error?.message ?? 'Incorrect password.');
-      },
-    });
+    if (!this.tfaDisablePassword) { this.toast.error('Enter your password to disable 2FA.'); return; }
+    this.store.dispatch(ProfileActions.disable2FA({ password: this.tfaDisablePassword }));
+    this.tfaDisablePassword = '';
   }
 
   regenerateBackupCodes(): void {
-    this.tfaLoading = true;
-    this.profileService.regenerateBackupCodes().subscribe({
-      next: res => {
-        this.tfaLoading = false;
-        if (res.success) {
-          this.tfaBackupCodes.set(res.data.backup_codes);
-          this.tfaStep.set('backup');
-        }
-      },
-      error: () => { this.tfaLoading = false; this.notify('tfa', 'error', 'Something went wrong.'); },
-    });
-  }
-
-  // ── Helpers ──────────────────────────────────────────────
-
-  clearNotification(): void {
-    this.notification = null;
-  }
-
-  private notify(section: 'info' | 'password' | 'tfa', type: NotificationType, message: string): void {
-    if (this.notifTimers[section]) clearTimeout(this.notifTimers[section]);
-    this.notification = { section, type, message };
-    if (type === 'success') {
-      this.notifTimers[section] = setTimeout(() => (this.notification = null), 5000);
-    }
+    this.store.dispatch(ProfileActions.regenerateBackupCodes());
   }
 }

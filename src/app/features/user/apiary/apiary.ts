@@ -3,6 +3,7 @@ import { DecimalPipe, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GoogleMap, MapMarker } from '@angular/google-maps';
 import { Apiary } from '../../../core/models/apiary.model';
+import { Metadata } from '../../../core/models/api-response.model';
 import { ApiaryService } from '../../../core/services/apiary.service';
 import { environment } from '../../../../environments/environment';
 
@@ -39,6 +40,9 @@ export class ApiaryComponent implements OnInit {
 
   // Data
   apiaries = signal<Apiary[]>([]);
+  meta     = signal<Metadata | null>(null);
+  page     = signal(1);
+  readonly perPage = 10;
 
   // Edit state
   editingId: number | null = null;
@@ -174,22 +178,46 @@ export class ApiaryComponent implements OnInit {
   // ── Private ──────────────────────────────────────────────
 
   private loadMapsScript(): void {
-    if (document.getElementById('google-maps-script')) {
+    // Script already loaded — Maps API is ready
+    if ((window as any).google?.maps?.importLibrary) {
       this.mapsLoaded.set(true);
       return;
     }
+
+    // Script tag already injected but not yet loaded — avoid duplicates
+    if (document.getElementById('google-maps-script')) return;
+
+    // Use `callback=` so Maps fires it only after the full API (incl. importLibrary) is ready.
+    // `loading=async` is deprecated and does NOT expose importLibrary via a plain script tag.
+    const callbackName = '__googleMapsReady';
+    (window as any)[callbackName] = () => {
+      delete (window as any)[callbackName];
+      // setTimeout defers the signal set to the next macrotask, preventing NG0100
+      // (ExpressionChangedAfterItHasBeenCheckedError caused by <google-map> setting
+      // tabIndex on its host during the same change-detection pass)
+      setTimeout(() => this.mapsLoaded.set(true));
+    };
+
     const script = document.createElement('script');
     script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&loading=async`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&callback=${callbackName}`;
     script.async = true;
     script.defer = true;
-    script.onload = () => this.mapsLoaded.set(true);
+    script.onerror = () => console.error('Google Maps failed to load');
     document.head.appendChild(script);
   }
 
+  goToPage(p: number): void {
+    this.page.set(p);
+    this.load();
+  }
+
   private load(): void {
-    this.apiaryService.getApiaries().subscribe(res => {
-      if (res.success) this.apiaries.set(res.data);
+    this.apiaryService.getApiaries(this.page(), this.perPage).subscribe(res => {
+      if (res.success) {
+        this.apiaries.set(res.data);
+        this.meta.set(res.meta ?? null);
+      }
     });
   }
 

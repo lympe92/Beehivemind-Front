@@ -1,7 +1,8 @@
 @use 'styles/user-theme' as *;
 
 .prof {
-  display: flex;
+  //display: flex;
+  height: 100%;
   flex-direction: column;
   gap: 20px;
 

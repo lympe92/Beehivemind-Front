@@ -90,6 +90,24 @@
           </table>
         </div>
 
+        <!-- Pagination -->
+        @if (meta() && meta()!.total_pages > 1) {
+          <div class="apiary__pagination">
+            <button class="apiary__btn apiary__btn--ghost apiary__btn--sm"
+              [disabled]="page() === 1"
+              (click)="goToPage(page() - 1)">‹ Prev</button>
+
+            <span class="apiary__pagination-info">
+              {{ page() }} / {{ meta()!.total_pages }}
+              <span class="apiary__muted">({{ meta()!.total }} total)</span>
+            </span>
+
+            <button class="apiary__btn apiary__btn--ghost apiary__btn--sm"
+              [disabled]="page() === meta()!.total_pages"
+              (click)="goToPage(page() + 1)">Next ›</button>
+          </div>
+        }
+
       </div>
     </div>
 
