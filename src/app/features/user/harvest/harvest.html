@@ -4,7 +4,7 @@
   <div class="harvest__filters">
     <div class="harvest__filter-group">
       <label class="harvest__label">Apiary</label>
-      <select class="harvest__select" [(ngModel)]="selectedApiaryId" (ngModelChange)="onApiaryChange($event)" name="apiary">
+      <select class="harvest__select" [ngModel]="selectedApiaryId()" (ngModelChange)="onApiaryChange($event)" name="apiary">
         <option [ngValue]="0">— Select —</option>
         @for (apiary of apiaries(); track apiary.id) {
           <option [ngValue]="apiary.id">{{ apiary.name }}</option>
@@ -15,7 +15,7 @@
     @if (beehives().length) {
       <div class="harvest__filter-group">
         <label class="harvest__label">Beehive</label>
-        <select class="harvest__select" [(ngModel)]="selectedBeehiveId" (ngModelChange)="onBeehiveChange($event)" name="beehive">
+        <select class="harvest__select" [ngModel]="selectedBeehiveId()" (ngModelChange)="onBeehiveChange($event)" name="beehive">
           <option [ngValue]="0">— All —</option>
           @for (beehive of beehives(); track beehive.id) {
             <option [ngValue]="beehive.id">{{ beehive.name }}</option>
@@ -48,7 +48,7 @@
       @if (showAddForm) {
         <div class="harvest__add-form">
           <h4 class="harvest__add-form-title">New Record
-            @if (selectedBeehiveId === 0) {
+            @if (selectedBeehiveId() === 0) {
               <span class="harvest__add-form-hint">(will be created for all beehives in the selected apiary)</span>
             }
           </h4>
@@ -102,8 +102,8 @@
                 <th>Description</th>
                 <th>Total Quantity</th>
                 <th>Unit</th>
-                @if (selectedApiaryId !== 0 && !canEdit) { <th>Beehive</th> }
-                @if (canEdit || selectedApiaryId !== 0) { <th></th> }
+                @if (selectedApiaryId() !== 0 && !canEdit) { <th>Beehive</th> }
+                @if (canEdit || selectedApiaryId() !== 0) { <th></th> }
               </tr>
             </thead>
             <tbody>
@@ -133,7 +133,7 @@
                         }
                       </select>
                     </td>
-                    @if (selectedApiaryId !== 0 && !canEdit) { <td>{{ row.beehive?.name ?? '—' }}</td> }
+                    @if (selectedApiaryId() !== 0 && !canEdit) { <td>{{ getBeehiveName(row.beehiveId) }}</td> }
                     <td class="harvest__actions">
                       <button class="harvest__btn harvest__btn--primary harvest__btn--sm" (click)="confirmEdit()">Save</button>
                       <button class="harvest__btn harvest__btn--ghost harvest__btn--sm" (click)="cancelEdit()">Cancel</button>
@@ -146,13 +146,13 @@
                     <td>{{ row.honey_description || '—' }}</td>
                     <td>{{ row.food_quantity }}</td>
                     <td>{{ row.unit }}</td>
-                    @if (selectedApiaryId !== 0 && !canEdit) { <td>{{ row.beehive?.name ?? '—' }}</td> }
+                    @if (selectedApiaryId() !== 0 && !canEdit) { <td>{{ getBeehiveName(row.beehiveId) }}</td> }
                     @if (canEdit) {
                       <td class="harvest__actions">
                         <button class="harvest__btn harvest__btn--ghost harvest__btn--sm" (click)="startEdit(row)">Edit</button>
                         <button class="harvest__btn harvest__btn--danger harvest__btn--sm" (click)="deleteRow(row)">Delete</button>
                       </td>
-                    } @else if (selectedApiaryId !== 0) {
+                    } @else if (selectedApiaryId() !== 0) {
                       <td class="harvest__actions">
                         <button class="harvest__btn harvest__btn--danger harvest__btn--sm" (click)="deleteRow(row)">Delete</button>
                       </td>
@@ -163,7 +163,7 @@
             </tbody>
           </table>
         </div>
-      } @else if (selectedApiaryId !== 0) {
+      } @else if (selectedApiaryId() !== 0) {
         <p class="harvest__empty">No harvest records found.</p>
       } @else {
         <p class="harvest__empty">Select an apiary to view harvest data.</p>

@@ -8,6 +8,17 @@ import { Apiary } from '../models/apiary.model';
 export class ApiaryService {
   private request = inject(RequestService);
 
+  getAllApiaries(): Observable<ApiResponse<Apiary[]>> {
+    return this.request.getRequest<any>('apiaries?per_page=all').pipe(
+      map(res => {
+        const raw: any[] = Array.isArray(res.data) ? res.data
+          : Array.isArray(res.data?.data) ? res.data.data
+          : [];
+        return { ...res, data: raw.map(a => this.fromApi(a)) };
+      }),
+    );
+  }
+
   getApiaries(page = 1, perPage = 10): Observable<ApiResponse<Apiary[]>> {
     return this.request.getRequest<any>(`apiaries?page=${page}&per_page=${perPage}`).pipe(
       map(res => {

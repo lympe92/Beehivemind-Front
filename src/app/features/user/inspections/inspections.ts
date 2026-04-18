@@ -1,11 +1,14 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Apiary } from '../../../core/models/apiary.model';
-import { Beehive } from '../../../core/models/beehive.model';
+import { Store } from '@ngrx/store';
 import { Inspection } from '../../../core/models/inspection.model';
-import { ApiaryService } from '../../../core/services/apiary.service';
-import { BeehiveService } from '../../../core/services/beehive.service';
 import { InspectionService } from '../../../core/services/inspection.service';
+import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
+import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
+import { BeehivesActions } from '../../../store/beehives/beehives.actions';
+import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
+import { InspectionsActions } from '../../../store/inspections/inspections.actions';
+import { selectAllInspections } from '../../../store/inspections/inspections.selectors';
 
 interface InspectionForm {
   date: string;
@@ -34,66 +37,54 @@ type NotificationType = 'error' | 'success' | 'warning';
   styleUrl: './inspections.scss',
 })
 export class InspectionsComponent implements OnInit {
-  private apiaryService = inject(ApiaryService);
-  private beehiveService = inject(BeehiveService);
+  private store = inject(Store);
   private inspectionService = inject(InspectionService);
 
-  // Data
-  apiaries = signal<Apiary[]>([]);
-  beehives = signal<Beehive[]>([]);
-  inspections = signal<Inspection[]>([]);
+  apiaries = this.store.selectSignal(selectAllApiaries);
+  private allBeehives = this.store.selectSignal(selectAllBeehives);
+  private allInspections = this.store.selectSignal(selectAllInspections);
 
-  // Selections
-  selectedApiaryId = 0;
-  selectedBeehiveId = 0;
+  beehives = computed(() =>
+    this.allBeehives().filter(b => b.apiaryId === this.selectedApiaryId())
+  );
 
-  // Edit state
+  inspections = computed(() => {
+    const beehiveId = this.selectedBeehiveId();
+    if (beehiveId === 0) return [];
+    return this.allInspections().filter(r => r.beehiveId === beehiveId);
+  });
+
+  selectedApiaryId = signal<number>(0);
+  selectedBeehiveId = signal<number>(0);
+
   editingId: number | null = null;
   editForm: InspectionForm = this.blank();
 
-  // Add state
   showAddForm = false;
   newForm: InspectionForm = this.blank();
 
-  // Notification
   notification: { type: NotificationType; message: string } | null = null;
   private notifTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
-    this.apiaryService.getApiaries().subscribe(res => {
-      if (res.success) this.apiaries.set(res.data);
-    });
+    this.store.dispatch(ApiariesActions.load());
+    this.store.dispatch(BeehivesActions.load());
+    this.store.dispatch(InspectionsActions.load());
   }
 
   // ── Filter handlers ──────────────────────────────────────
 
   onApiaryChange(apiaryId: number): void {
-    this.selectedApiaryId = apiaryId;
-    this.selectedBeehiveId = 0;
-    this.beehives.set([]);
-    this.inspections.set([]);
+    this.selectedApiaryId.set(apiaryId);
+    this.selectedBeehiveId.set(0);
     this.cancelEdit();
     this.cancelAdd();
-
-    if (apiaryId !== 0) {
-      this.beehiveService.getBeehivesOfApiary(apiaryId).subscribe(res => {
-        if (res.success) this.beehives.set(res.data);
-      });
-    }
   }
 
   onBeehiveChange(beehiveId: number): void {
-    this.selectedBeehiveId = beehiveId;
+    this.selectedBeehiveId.set(beehiveId);
     this.cancelEdit();
     this.cancelAdd();
-
-    if (beehiveId !== 0) {
-      this.inspectionService.getInspectionsOfBeehive(beehiveId).subscribe(res => {
-        if (res.success) this.inspections.set(res.data);
-      });
-    } else {
-      this.inspections.set([]);
-    }
   }
 
   // ── Add ──────────────────────────────────────────────────
@@ -113,7 +104,7 @@ export class InspectionsComponent implements OnInit {
 
     const duplicate = this.inspections().some(i => i.date === this.newForm.date);
     if (duplicate) {
-      const beehiveName = this.beehives().find(b => b.id === this.selectedBeehiveId)?.name ?? '';
+      const beehiveName = this.allBeehives().find(b => b.id === this.selectedBeehiveId())?.name ?? '';
       this.notify('warning',
         `A record for ${this.newForm.date} on beehive "${beehiveName}" already exists.`
       );
@@ -122,12 +113,12 @@ export class InspectionsComponent implements OnInit {
 
     this.inspectionService.createInspection({
       ...this.toPayload(this.newForm),
-      beehive_id: this.selectedBeehiveId,
+      beehive_id: this.selectedBeehiveId(),
     }).subscribe({
       next: res => {
         if (res.success) {
           this.showAddForm = false;
-          this.reloadData();
+          this.store.dispatch(InspectionsActions.reload());
           this.notify('success', 'Record created successfully.');
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -150,12 +141,12 @@ export class InspectionsComponent implements OnInit {
       honey: row.honey,
       opened_brood: row.opened_brood,
       closed_brood: row.closed_brood,
-      varroa: row.varroa === 1,
-      american_foulbrood: row.american_foulbrood === 1,
-      european_foulbrood: row.european_foulbrood === 1,
-      nosema: row.nosema === 1,
-      queen_exists: row.queen_exists === 1,
-      queen_cells: row.queen_cells === 1,
+      varroa: !!row.varroa,
+      american_foulbrood: !!row.american_foulbrood,
+      european_foulbrood: !!row.european_foulbrood,
+      nosema: !!row.nosema,
+      queen_exists: !!row.queen_exists,
+      queen_cells: !!row.queen_cells,
       queen_year: row.queen_year,
     };
   }
@@ -171,7 +162,7 @@ export class InspectionsComponent implements OnInit {
       next: res => {
         if (res.success) {
           this.editingId = null;
-          this.reloadData();
+          this.store.dispatch(InspectionsActions.reload());
           this.notify('success', 'Record updated successfully.');
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -184,13 +175,13 @@ export class InspectionsComponent implements OnInit {
   // ── Delete ───────────────────────────────────────────────
 
   deleteRow(row: Inspection): void {
-    const beehiveName = this.beehives().find(b => b.id === this.selectedBeehiveId)?.name ?? '';
+    const beehiveName = this.allBeehives().find(b => b.id === this.selectedBeehiveId())?.name ?? '';
     if (!confirm(`Delete inspection for beehive "${beehiveName}" on ${row.date}?`)) return;
 
     this.inspectionService.deleteInspection(row.id).subscribe({
       next: res => {
         if (res.success) {
-          this.reloadData();
+          this.store.dispatch(InspectionsActions.reload());
           this.notify('success', 'Record deleted.');
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -203,7 +194,7 @@ export class InspectionsComponent implements OnInit {
   // ── Helpers ──────────────────────────────────────────────
 
   get canAdd(): boolean {
-    return this.selectedBeehiveId !== 0;
+    return this.selectedBeehiveId() !== 0;
   }
 
   clearNotification(): void {
@@ -215,14 +206,6 @@ export class InspectionsComponent implements OnInit {
     this.notification = { type, message };
     if (type !== 'error') {
       this.notifTimer = setTimeout(() => (this.notification = null), 5000);
-    }
-  }
-
-  private reloadData(): void {
-    if (this.selectedBeehiveId !== 0) {
-      this.inspectionService.getInspectionsOfBeehive(this.selectedBeehiveId).subscribe(res => {
-        if (res.success) this.inspections.set(res.data);
-      });
     }
   }
 
@@ -271,7 +254,7 @@ export class InspectionsComponent implements OnInit {
       queen_exists: form.queen_exists ? 1 : 0,
       queen_cells: form.queen_cells ? 1 : 0,
       queen_year: form.queen_year ? Number(form.queen_year) : null,
-    } as Omit<Inspection, 'id' | 'beehive'>;
+    } as Omit<Inspection, 'id' | 'beehiveId'>;
   }
 
   private blank(): InspectionForm {

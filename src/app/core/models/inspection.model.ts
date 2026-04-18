@@ -1,9 +1,7 @@
-import { Beehive } from './beehive.model';
-
 export interface Inspection {
   id: number;
   date: string;
-  beehive: Beehive;
+  beehiveId: number;
   population: number;
   frame_space: number;
   pollen: number;

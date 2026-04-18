@@ -1,18 +1,12 @@
 <div class="bh">
 
   <!-- Filters + Bulk Create -->
-  <div class="bh__filters">
-    <div class="bh__filter-group">
-      <label class="bh__label">Apiary</label>
-      <select class="bh__select" [(ngModel)]="selectedApiaryId" (ngModelChange)="onApiaryChange($event)" name="apiary">
-        <option [ngValue]="0">— Select —</option>
-        @for (apiary of apiaries(); track apiary.id) {
-          <option [ngValue]="apiary.id">{{ apiary.name }}</option>
-        }
-      </select>
-    </div>
+  <app-filter-bar
+    [apiaries]="apiaries()"
+    [apiaryId]="selectedApiaryId()"
+    (apiaryIdChange)="onApiaryChange($event)">
 
-    @if (selectedApiaryId !== 0) {
+    @if (selectedApiaryId() !== 0) {
       <div class="bh__filter-group">
         <label class="bh__label">Beehives to Create</label>
         <div class="bh__create-group">
@@ -21,7 +15,8 @@
         </div>
       </div>
     }
-  </div>
+
+  </app-filter-bar>
 
   <!-- Notification -->
   @if (notification) {
@@ -77,10 +72,8 @@
             </tbody>
           </table>
         </div>
-      } @else if (selectedApiaryId !== 0) {
-        <p class="bh__empty">No beehives yet. Use "Beehives to Create" to add them.</p>
       } @else {
-        <p class="bh__empty">Select an apiary to manage its beehives.</p>
+        <p class="bh__empty">No beehives found.</p>
       }
 
     </div>

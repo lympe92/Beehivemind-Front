@@ -1,7 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Apiary } from '../../../core/models/apiary.model';
-import { Beehive } from '../../../core/models/beehive.model';
+import { Store } from '@ngrx/store';
 import {
   Feeding,
   FEEDING_TYPES,
@@ -11,9 +10,13 @@ import {
   FoodType,
   FeedingUnit,
 } from '../../../core/models/feeding.model';
-import { ApiaryService } from '../../../core/services/apiary.service';
-import { BeehiveService } from '../../../core/services/beehive.service';
 import { FeedingService } from '../../../core/services/feeding.service';
+import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
+import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
+import { BeehivesActions } from '../../../store/beehives/beehives.actions';
+import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
+import { FeedingActions } from '../../../store/feeding/feeding.actions';
+import { selectAllFeeding } from '../../../store/feeding/feeding.selectors';
 
 interface FeedingForm {
   date: string;
@@ -38,77 +41,65 @@ interface Notification {
   styleUrl: './feeding.scss',
 })
 export class FeedingComponent implements OnInit {
-  private apiaryService = inject(ApiaryService);
-  private beehiveService = inject(BeehiveService);
+  private store = inject(Store);
   private feedingService = inject(FeedingService);
 
   readonly FEEDING_TYPES = FEEDING_TYPES;
   readonly FOOD_TYPES = FOOD_TYPES;
   readonly FEEDING_UNITS = FEEDING_UNITS;
 
-  // Data
-  apiaries = signal<Apiary[]>([]);
-  beehives = signal<Beehive[]>([]);
-  feeding = signal<Feeding[]>([]);
+  apiaries = this.store.selectSignal(selectAllApiaries);
+  private allBeehives = this.store.selectSignal(selectAllBeehives);
+  private allFeeding = this.store.selectSignal(selectAllFeeding);
 
-  // Selections
-  selectedApiaryId = 0;
-  selectedBeehiveId = 0;
+  beehives = computed(() =>
+    this.allBeehives().filter(b => b.apiaryId === this.selectedApiaryId())
+  );
 
-  // Edit state
+  feeding = computed(() => {
+    const all = this.allFeeding();
+    const beehiveId = this.selectedBeehiveId();
+    const apiaryId = this.selectedApiaryId();
+
+    if (beehiveId !== 0) return all.filter(r => r.beehiveId === beehiveId);
+    if (apiaryId !== 0) {
+      const ids = new Set(this.allBeehives().filter(b => b.apiaryId === apiaryId).map(b => b.id));
+      return all.filter(r => ids.has(r.beehiveId));
+    }
+    return [];
+  });
+
+  selectedApiaryId = signal<number>(0);
+  selectedBeehiveId = signal<number>(0);
+
   editingId: number | null = null;
   editForm: FeedingForm = this.blankForm();
 
-  // Add state
   showAddForm = false;
   newForm: FeedingForm = this.blankForm();
 
-  // Notification
   notification: Notification | null = null;
   private notifTimer: ReturnType<typeof setTimeout> | null = null;
 
-  // ── Lifecycle ────────────────────────────────────────────
-
   ngOnInit(): void {
-    this.apiaryService.getApiaries().subscribe(res => {
-      if (res.success) this.apiaries.set(res.data);
-    });
+    this.store.dispatch(ApiariesActions.load());
+    this.store.dispatch(BeehivesActions.load());
+    this.store.dispatch(FeedingActions.load());
   }
 
   // ── Filter handlers ──────────────────────────────────────
 
   onApiaryChange(apiaryId: number): void {
-    this.selectedApiaryId = apiaryId;
-    this.selectedBeehiveId = 0;
-    this.beehives.set([]);
-    this.feeding.set([]);
+    this.selectedApiaryId.set(apiaryId);
+    this.selectedBeehiveId.set(0);
     this.cancelEdit();
     this.cancelAdd();
-
-    if (apiaryId !== 0) {
-      this.beehiveService.getBeehivesOfApiary(apiaryId).subscribe(res => {
-        if (res.success) this.beehives.set(res.data);
-      });
-      this.feedingService.getFeedingOfApiary(apiaryId).subscribe(res => {
-        if (res.success) this.feeding.set(res.data);
-      });
-    }
   }
 
   onBeehiveChange(beehiveId: number): void {
-    this.selectedBeehiveId = beehiveId;
+    this.selectedBeehiveId.set(beehiveId);
     this.cancelEdit();
     this.cancelAdd();
-
-    if (beehiveId !== 0) {
-      this.feedingService.getFeedingOfBeehive(beehiveId).subscribe(res => {
-        if (res.success) this.feeding.set(res.data);
-      });
-    } else if (this.selectedApiaryId !== 0) {
-      this.feedingService.getFeedingOfApiary(this.selectedApiaryId).subscribe(res => {
-        if (res.success) this.feeding.set(res.data);
-      });
-    }
   }
 
   // ── Add ──────────────────────────────────────────────────
@@ -126,11 +117,10 @@ export class FeedingComponent implements OnInit {
   confirmAdd(): void {
     if (!this.validateForm(this.newForm)) return;
 
-    // Duplicate date check per beehive
-    if (this.selectedBeehiveId !== 0) {
+    if (this.selectedBeehiveId() !== 0) {
       const duplicate = this.feeding().some(f => f.date === this.newForm.date);
       if (duplicate) {
-        const beehiveName = this.beehives().find(b => b.id === this.selectedBeehiveId)?.name ?? '';
+        const beehiveName = this.allBeehives().find(b => b.id === this.selectedBeehiveId())?.name ?? '';
         this.notify('warning',
           `A record for ${this.newForm.date}${beehiveName ? ` on beehive "${beehiveName}"` : ''} already exists. Edit that record instead.`
         );
@@ -141,16 +131,16 @@ export class FeedingComponent implements OnInit {
     const payload = {
       ...this.newForm,
       food_quantity: Number(this.newForm.food_quantity),
-      ...(this.selectedBeehiveId !== 0
-        ? { beehive_id: this.selectedBeehiveId }
-        : { apiary_id: this.selectedApiaryId }),
+      ...(this.selectedBeehiveId() !== 0
+        ? { beehive_id: this.selectedBeehiveId() }
+        : { apiary_id: this.selectedApiaryId() }),
     };
 
     this.feedingService.createFeeding(payload).subscribe({
       next: res => {
         if (res.success) {
           this.showAddForm = false;
-          this.reloadData();
+          this.store.dispatch(FeedingActions.reload());
           this.notify('success', 'Record created successfully.');
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -189,7 +179,7 @@ export class FeedingComponent implements OnInit {
       next: res => {
         if (res.success) {
           this.editingId = null;
-          this.reloadData();
+          this.store.dispatch(FeedingActions.reload());
           this.notify('success', 'Record updated successfully.');
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -202,7 +192,7 @@ export class FeedingComponent implements OnInit {
   // ── Delete ───────────────────────────────────────────────
 
   deleteRow(row: Feeding): void {
-    const beehiveName = row.beehive?.name ?? '';
+    const beehiveName = this.allBeehives().find(b => b.id === row.beehiveId)?.name ?? '';
     const confirmed = confirm(
       `Delete feeding record for${beehiveName ? ` beehive "${beehiveName}"` : ''} on ${row.date}?`
     );
@@ -211,7 +201,7 @@ export class FeedingComponent implements OnInit {
     this.feedingService.deleteFeeding(row.id).subscribe({
       next: res => {
         if (res.success) {
-          this.reloadData();
+          this.store.dispatch(FeedingActions.reload());
           this.notify('success', 'Record deleted.');
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -224,11 +214,11 @@ export class FeedingComponent implements OnInit {
   // ── Helpers ──────────────────────────────────────────────
 
   get canAdd(): boolean {
-    return this.selectedApiaryId !== 0;
+    return this.selectedApiaryId() !== 0;
   }
 
   get canEdit(): boolean {
-    return this.selectedBeehiveId !== 0;
+    return this.selectedBeehiveId() !== 0;
   }
 
   clearNotification(): void {
@@ -240,18 +230,6 @@ export class FeedingComponent implements OnInit {
     this.notification = { type, message };
     if (type !== 'error') {
       this.notifTimer = setTimeout(() => (this.notification = null), 5000);
-    }
-  }
-
-  private reloadData(): void {
-    if (this.selectedBeehiveId !== 0) {
-      this.feedingService.getFeedingOfBeehive(this.selectedBeehiveId).subscribe(res => {
-        if (res.success) this.feeding.set(res.data);
-      });
-    } else if (this.selectedApiaryId !== 0) {
-      this.feedingService.getFeedingOfApiary(this.selectedApiaryId).subscribe(res => {
-        if (res.success) this.feeding.set(res.data);
-      });
     }
   }
 

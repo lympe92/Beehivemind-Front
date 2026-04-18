@@ -5,5 +5,6 @@ export interface Queen {
 export interface Beehive {
   id: number;
   name: string;
+  apiaryId: number;
   queen: Queen | null;
 }

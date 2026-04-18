@@ -4,7 +4,7 @@
   <div class="feeding__filters">
     <div class="feeding__filter-group">
       <label class="feeding__label">Apiary</label>
-      <select class="feeding__select" [(ngModel)]="selectedApiaryId" (ngModelChange)="onApiaryChange($event)" name="apiary">
+      <select class="feeding__select" [ngModel]="selectedApiaryId()" (ngModelChange)="onApiaryChange($event)" name="apiary">
         <option [ngValue]="0">— Select —</option>
         @for (apiary of apiaries(); track apiary.id) {
           <option [ngValue]="apiary.id">{{ apiary.name }}</option>
@@ -15,7 +15,7 @@
     @if (beehives().length) {
       <div class="feeding__filter-group">
         <label class="feeding__label">Beehive</label>
-        <select class="feeding__select" [(ngModel)]="selectedBeehiveId" (ngModelChange)="onBeehiveChange($event)" name="beehive">
+        <select class="feeding__select" [ngModel]="selectedBeehiveId()" (ngModelChange)="onBeehiveChange($event)" name="beehive">
           <option [ngValue]="0">— All —</option>
           @for (beehive of beehives(); track beehive.id) {
             <option [ngValue]="beehive.id">{{ beehive.name }}</option>
@@ -48,7 +48,7 @@
       @if (showAddForm) {
         <div class="feeding__add-form">
           <h4 class="feeding__add-form-title">New Record
-            @if (selectedBeehiveId === 0) {
+            @if (selectedBeehiveId() === 0) {
               <span class="feeding__add-form-hint">(will be created for all beehives in the selected apiary)</span>
             }
           </h4>
@@ -158,7 +158,7 @@
             </tbody>
           </table>
         </div>
-      } @else if (selectedApiaryId !== 0) {
+      } @else if (selectedApiaryId() !== 0) {
         <p class="feeding__empty">No feeding records found.</p>
       } @else {
         <p class="feeding__empty">Select an apiary to view feeding data.</p>

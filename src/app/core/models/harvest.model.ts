@@ -8,7 +8,7 @@ export interface Harvest {
   honey_description: string;
   food_quantity: number;
   unit: HarvestUnit;
-  beehive?: { id: number; name: string };
+  beehiveId: number;
 }
 
 export const HARVEST_TYPES: { value: HarvestType; label: string }[] = [

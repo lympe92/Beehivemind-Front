@@ -4,7 +4,7 @@
   <div class="insp__filters">
     <div class="insp__filter-group">
       <label class="insp__label">Apiary</label>
-      <select class="insp__select" [(ngModel)]="selectedApiaryId" (ngModelChange)="onApiaryChange($event)" name="apiary">
+      <select class="insp__select" [ngModel]="selectedApiaryId()" (ngModelChange)="onApiaryChange($event)" name="apiary">
         <option [ngValue]="0">— Select —</option>
         @for (apiary of apiaries(); track apiary.id) {
           <option [ngValue]="apiary.id">{{ apiary.name }}</option>
@@ -15,7 +15,7 @@
     @if (beehives().length) {
       <div class="insp__filter-group">
         <label class="insp__label">Beehive</label>
-        <select class="insp__select" [(ngModel)]="selectedBeehiveId" (ngModelChange)="onBeehiveChange($event)" name="beehive">
+        <select class="insp__select" [ngModel]="selectedBeehiveId()" (ngModelChange)="onBeehiveChange($event)" name="beehive">
           <option [ngValue]="0">— Select —</option>
           @for (beehive of beehives(); track beehive.id) {
             <option [ngValue]="beehive.id">{{ beehive.name }}</option>
@@ -192,9 +192,9 @@
             </tbody>
           </table>
         </div>
-      } @else if (selectedBeehiveId !== 0) {
+      } @else if (selectedBeehiveId() !== 0) {
         <p class="insp__empty">No inspection records found for this beehive.</p>
-      } @else if (selectedApiaryId !== 0) {
+      } @else if (selectedApiaryId() !== 0) {
         <p class="insp__empty">Select a beehive to view its inspections.</p>
       } @else {
         <p class="insp__empty">Select an apiary and a beehive to view inspection data.</p>

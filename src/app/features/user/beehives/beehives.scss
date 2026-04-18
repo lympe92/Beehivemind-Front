@@ -5,18 +5,7 @@
   flex-direction: column;
   gap: 20px;
 
-  // ── Filters ──────────────────────────────────────────────
-  &__filters {
-    display: flex;
-    align-items: flex-end;
-    gap: 20px;
-    padding: 14px 20px;
-    background: $bg-panel;
-    border: 1px solid $border;
-    border-radius: $radius;
-    flex-wrap: wrap;
-  }
-
+  // ── Filter extras (projected into filter-bar) ────────────
   &__filter-group {
     display: flex;
     flex-direction: column;
@@ -144,7 +133,7 @@
 
   &__input,
   &__select {
-    background: $bg-dark;
+    background: $bg-hover;
     border: 1px solid $border;
     border-radius: 6px;
     color: $text-primary;

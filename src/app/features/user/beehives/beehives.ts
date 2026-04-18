@@ -1,9 +1,13 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Apiary } from '../../../core/models/apiary.model';
+import { Store } from '@ngrx/store';
 import { Beehive } from '../../../core/models/beehive.model';
-import { ApiaryService } from '../../../core/services/apiary.service';
 import { BeehiveService } from '../../../core/services/beehive.service';
+import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
+import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
+import { BeehivesActions } from '../../../store/beehives/beehives.actions';
+import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
+import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
 
 interface BeehiveForm {
   name: string;
@@ -15,65 +19,65 @@ type NotificationType = 'error' | 'success' | 'warning';
 @Component({
   selector: 'app-beehives',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, FilterBarComponent],
   templateUrl: './beehives.html',
   styleUrl: './beehives.scss',
 })
 export class BeehivesComponent implements OnInit {
-  private apiaryService = inject(ApiaryService);
+  private store = inject(Store);
   private beehiveService = inject(BeehiveService);
 
-  // Data
-  apiaries = signal<Apiary[]>([]);
-  beehives = signal<Beehive[]>([]);
+  // From store
+  apiaries = this.store.selectSignal(selectAllApiaries);
+  private allBeehives = this.store.selectSignal(selectAllBeehives);
 
-  // Selections
-  selectedApiaryId = 0;
+  selectedApiaryId = signal<number>(0);
 
-  // Bulk create
+  beehives = computed(() => {
+    const id = this.selectedApiaryId();
+    return id === 0
+      ? this.allBeehives()
+      : this.allBeehives().filter(b => b.apiaryId === id);
+  });
+
   beehivesToCreate: number | null = null;
-
-  // Edit state
   editingId: number | null = null;
   editForm: BeehiveForm = this.blank();
-
-  // Notification
   notification: { type: NotificationType; message: string } | null = null;
   private notifTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
-    this.apiaryService.getApiaries().subscribe(res => {
-      if (res.success) this.apiaries.set(res.data);
-    });
+    this.store.dispatch(ApiariesActions.load());
+    this.store.dispatch(BeehivesActions.load());
   }
 
-  // ── Apiary change ────────────────────────────────────────
+  // ── Apiary filter ─────────────────────────────────────────
 
   onApiaryChange(apiaryId: number): void {
-    this.selectedApiaryId = apiaryId;
-    this.beehives.set([]);
+    this.selectedApiaryId.set(apiaryId);
     this.cancelEdit();
     this.beehivesToCreate = null;
-
-    if (apiaryId !== 0) {
-      this.loadBeehives();
-    }
   }
 
   // ── Bulk create ──────────────────────────────────────────
 
   addBeehives(): void {
+    const apiaryId = this.selectedApiaryId();
+    if (apiaryId === 0) {
+      this.notify('error', 'Select an apiary first.');
+      return;
+    }
     const count = Number(this.beehivesToCreate);
     if (!count || count < 1 || !Number.isInteger(count)) {
       this.notify('error', 'Enter a valid number of beehives to create (≥ 1).');
       return;
     }
 
-    this.beehiveService.createBeehives(this.selectedApiaryId, count).subscribe({
+    this.beehiveService.createBeehives(apiaryId, count).subscribe({
       next: res => {
         if (res.success) {
           this.beehivesToCreate = null;
-          this.loadBeehives();
+          this.store.dispatch(BeehivesActions.reload());
           this.notify('success', `${count} beehive(s) created.`);
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -120,7 +124,7 @@ export class BeehivesComponent implements OnInit {
       next: res => {
         if (res.success) {
           this.editingId = null;
-          this.loadBeehives();
+          this.store.dispatch(BeehivesActions.reload());
           this.notify('success', 'Beehive updated.');
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -138,7 +142,7 @@ export class BeehivesComponent implements OnInit {
     this.beehiveService.deleteBeehive(row.id).subscribe({
       next: res => {
         if (res.success) {
-          this.loadBeehives();
+          this.store.dispatch(BeehivesActions.reload());
           this.notify('success', 'Beehive deleted.');
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -152,12 +156,6 @@ export class BeehivesComponent implements OnInit {
 
   clearNotification(): void {
     this.notification = null;
-  }
-
-  private loadBeehives(): void {
-    this.beehiveService.getBeehivesOfApiary(this.selectedApiaryId).subscribe(res => {
-      if (res.success) this.beehives.set(res.data);
-    });
   }
 
   private notify(type: NotificationType, message: string): void {

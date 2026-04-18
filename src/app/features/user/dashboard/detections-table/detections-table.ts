@@ -31,11 +31,11 @@ export class DetectionsTableComponent {
       const latestPerBeehive = this.latestPerBeehive(data);
 
       return {
-        no_queen: latestPerBeehive.filter(v => v.beehive.queen === null).length,
-        varroa: latestPerBeehive.filter(v => v.varroa === 1).length,
-        american_foulbrood: latestPerBeehive.filter(v => v.american_foulbrood === 1).length,
-        european_foulbrood: latestPerBeehive.filter(v => v.european_foulbrood === 1).length,
-        nosema: latestPerBeehive.filter(v => v.nosema === 1).length,
+        no_queen: latestPerBeehive.filter(v => !v.queen_exists).length,
+        varroa: latestPerBeehive.filter(v => !!v.varroa).length,
+        american_foulbrood: latestPerBeehive.filter(v => !!v.american_foulbrood).length,
+        european_foulbrood: latestPerBeehive.filter(v => !!v.european_foulbrood).length,
+        nosema: latestPerBeehive.filter(v => !!v.nosema).length,
       };
     } else {
       // Single beehive view: just the latest inspection
@@ -44,11 +44,11 @@ export class DetectionsTableComponent {
       );
 
       return {
-        no_queen: latest.beehive.queen === null ? 'Yes' : 'No',
-        varroa: latest.varroa ? 'Yes' : 'No',
-        american_foulbrood: latest.american_foulbrood ? 'Yes' : 'No',
-        european_foulbrood: latest.european_foulbrood ? 'Yes' : 'No',
-        nosema: latest.nosema ? 'Yes' : 'No',
+        no_queen: !latest.queen_exists ? 'Yes' : 'No',
+        varroa: !!latest.varroa ? 'Yes' : 'No',
+        american_foulbrood: !!latest.american_foulbrood ? 'Yes' : 'No',
+        european_foulbrood: !!latest.european_foulbrood ? 'Yes' : 'No',
+        nosema: !!latest.nosema ? 'Yes' : 'No',
       };
     }
   });
@@ -56,9 +56,9 @@ export class DetectionsTableComponent {
   private latestPerBeehive(data: Inspection[]): Inspection[] {
     const map = new Map<number, Inspection>();
     for (const insp of data) {
-      const existing = map.get(insp.beehive.id);
+      const existing = map.get(insp.beehiveId);
       if (!existing || new Date(insp.date) > new Date(existing.date)) {
-        map.set(insp.beehive.id, insp);
+        map.set(insp.beehiveId, insp);
       }
     }
     return [...map.values()];

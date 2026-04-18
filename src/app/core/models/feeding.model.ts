@@ -9,7 +9,7 @@ export interface Feeding {
   food_type: FoodType;
   food_quantity: number;
   unit: FeedingUnit;
-  beehive?: { id: number; name: string };
+  beehiveId: number;
 }
 
 export const FEEDING_TYPES: { value: FeedingType; label: string }[] = [

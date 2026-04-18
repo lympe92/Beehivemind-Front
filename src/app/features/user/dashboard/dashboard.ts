@@ -1,9 +1,14 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ApexOptions } from 'ngx-apexcharts';
-import { Apiary } from '../../../core/models/apiary.model';
 import { AvgInspection, Inspection } from '../../../core/models/inspection.model';
-import { ApiaryService } from '../../../core/services/apiary.service';
 import { InspectionService } from '../../../core/services/inspection.service';
+import { Store } from '@ngrx/store';
+import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
+import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
+import { BeehivesActions } from '../../../store/beehives/beehives.actions';
+import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
+import { InspectionsActions } from '../../../store/inspections/inspections.actions';
+import { selectAllInspections } from '../../../store/inspections/inspections.selectors';
 import { ChartBuilderService } from '../../../core/services/chart-builder.service';
 import { ApexChartComponent } from '../../../shared/components/ui/apex-chart/apex-chart';
 import { DashboardFiltersComponent } from './filters/filters';
@@ -17,20 +22,37 @@ import { DetectionsTableComponent, FilterLevel } from './detections-table/detect
   styleUrl: './dashboard.scss',
 })
 export class UserDashboardComponent implements OnInit {
-  private apiaryService = inject(ApiaryService);
+  private store = inject(Store);
   private inspectionService = inject(InspectionService);
   private chartBuilder = inject(ChartBuilderService);
 
-  apiaries = signal<Apiary[]>([]);
+  apiaries = this.store.selectSignal(selectAllApiaries);
+  private allBeehives = this.store.selectSignal(selectAllBeehives);
+  private allInspections = this.store.selectSignal(selectAllInspections);
 
   // chartInspections: avg (user/apiary) or raw (beehive) — drives line/bar/brood charts
   chartInspections = signal<AvgInspection[]>([]);
 
-  // rawInspections: raw per-inspection data — drives queens pie + detections table
-  rawInspections = signal<Inspection[]>([]);
-
   filterLevel = signal<FilterLevel>('user');
   selectedApiaryId = signal<number | null>(null);
+  selectedBeehiveId = signal<number | null>(null);
+
+  // rawInspections: computed from store, filtered by current level — drives queens pie + detections table
+  rawInspections = computed<Inspection[]>(() => {
+    const all = this.allInspections();
+    const level = this.filterLevel();
+    const apiaryId = this.selectedApiaryId();
+    const beehiveId = this.selectedBeehiveId();
+
+    if (level === 'beehive' && beehiveId !== null) {
+      return all.filter(r => r.beehiveId === beehiveId);
+    }
+    if (level === 'apiary' && apiaryId !== null) {
+      const ids = new Set(this.allBeehives().filter(b => b.apiaryId === apiaryId).map(b => b.id));
+      return all.filter(r => ids.has(r.beehiveId));
+    }
+    return all;
+  });
 
   // ── Computed chart options ──────────────────────────────
 
@@ -84,21 +106,18 @@ export class UserDashboardComponent implements OnInit {
     const raw = this.rawInspections();
     if (!raw.length) return null;
 
-    // Get the latest inspection per beehive
     const latestPerBeehive = new Map<number, Inspection>();
     for (const insp of raw) {
-      const existing = latestPerBeehive.get(insp.beehive.id);
+      const existing = latestPerBeehive.get(insp.beehiveId);
       if (!existing || new Date(insp.date) > new Date(existing.date)) {
-        latestPerBeehive.set(insp.beehive.id, insp);
+        latestPerBeehive.set(insp.beehiveId, insp);
       }
     }
 
-    // Count queens by year (dynamic — no hardcoded years)
     const yearCounts = new Map<number, number>();
     for (const insp of latestPerBeehive.values()) {
-      if (insp.beehive.queen) {
-        const year = insp.beehive.queen.year;
-        yearCounts.set(year, (yearCounts.get(year) ?? 0) + 1);
+      if (insp.queen_year) {
+        yearCounts.set(insp.queen_year, (yearCounts.get(insp.queen_year) ?? 0) + 1);
       }
     }
 
@@ -114,10 +133,10 @@ export class UserDashboardComponent implements OnInit {
   // ── Lifecycle ───────────────────────────────────────────
 
   ngOnInit(): void {
-    this.apiaryService.getApiaries().subscribe(res => {
-      if (res.success) this.apiaries.set(res.data);
-    });
-    this.loadUserData();
+    this.store.dispatch(ApiariesActions.load());
+    this.store.dispatch(BeehivesActions.load());
+    this.store.dispatch(InspectionsActions.load());
+    this.loadAvgData();
   }
 
   // ── Filter handlers ─────────────────────────────────────
@@ -126,50 +145,40 @@ export class UserDashboardComponent implements OnInit {
     if (apiaryId === 0) {
       this.filterLevel.set('user');
       this.selectedApiaryId.set(null);
-      this.loadUserData();
+      this.selectedBeehiveId.set(null);
+      this.loadAvgData();
     } else {
       this.filterLevel.set('apiary');
       this.selectedApiaryId.set(apiaryId);
-
+      this.selectedBeehiveId.set(null);
       this.inspectionService.getAvgInspectionsOfApiary(apiaryId).subscribe(res => {
         if (res.success) this.chartInspections.set(res.data);
-      });
-      this.inspectionService.getInspectionsOfApiary(apiaryId).subscribe(res => {
-        if (res.success) this.rawInspections.set(res.data);
       });
     }
   }
 
   onBeehiveChange(beehiveId: number): void {
     if (beehiveId === 0) {
-      // Back to apiary level
       this.filterLevel.set('apiary');
+      this.selectedBeehiveId.set(null);
       const apiaryId = this.selectedApiaryId()!;
       this.inspectionService.getAvgInspectionsOfApiary(apiaryId).subscribe(res => {
         if (res.success) this.chartInspections.set(res.data);
       });
-      this.inspectionService.getInspectionsOfApiary(apiaryId).subscribe(res => {
-        if (res.success) this.rawInspections.set(res.data);
-      });
     } else {
       this.filterLevel.set('beehive');
+      this.selectedBeehiveId.set(beehiveId);
       this.inspectionService.getInspectionsOfBeehive(beehiveId).subscribe(res => {
-        if (res.success) {
-          this.chartInspections.set(res.data);
-          this.rawInspections.set(res.data);
-        }
+        if (res.success) this.chartInspections.set(res.data);
       });
     }
   }
 
   // ── Private ─────────────────────────────────────────────
 
-  private loadUserData(): void {
+  private loadAvgData(): void {
     this.inspectionService.getAvgInspectionsOfUser().subscribe(res => {
       if (res.success) this.chartInspections.set(res.data);
-    });
-    this.inspectionService.getInspectionsOfUser().subscribe(res => {
-      if (res.success) this.rawInspections.set(res.data);
     });
   }
 }

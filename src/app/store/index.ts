@@ -4,11 +4,35 @@ import { employeeAuthReducer } from './employee-auth/employee-auth.reducer';
 import { EmployeeAuthEffects } from './employee-auth/employee-auth.effects';
 import { profileReducer } from './profile/profile.reducer';
 import { ProfileEffects } from './profile/profile.effects';
+import { apiariesReducer } from './apiaries/apiaries.reducer';
+import { ApiariesEffects } from './apiaries/apiaries.effects';
+import { beehivesReducer } from './beehives/beehives.reducer';
+import { BeehivesEffects } from './beehives/beehives.effects';
+import { inspectionsReducer } from './inspections/inspections.reducer';
+import { InspectionsEffects } from './inspections/inspections.effects';
+import { feedingReducer } from './feeding/feeding.reducer';
+import { FeedingEffects } from './feeding/feeding.effects';
+import { harvestReducer } from './harvest/harvest.reducer';
+import { HarvestEffects } from './harvest/harvest.effects';
 
 export const appReducers = {
   auth: authReducer,
   employeeAuth: employeeAuthReducer,
   profile: profileReducer,
+  apiaries: apiariesReducer,
+  beehives: beehivesReducer,
+  inspections: inspectionsReducer,
+  feeding: feedingReducer,
+  harvest: harvestReducer,
 };
 
-export const appEffects = [AuthEffects, EmployeeAuthEffects, ProfileEffects];
+export const appEffects = [
+  AuthEffects,
+  EmployeeAuthEffects,
+  ProfileEffects,
+  ApiariesEffects,
+  BeehivesEffects,
+  InspectionsEffects,
+  FeedingEffects,
+  HarvestEffects,
+];

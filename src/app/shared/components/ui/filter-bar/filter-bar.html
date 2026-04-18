@@ -1,0 +1,27 @@
+<div class="fb">
+
+  <div class="fb__group">
+    <label class="fb__label">Apiary</label>
+    <select class="fb__select" [ngModel]="apiaryId()" (ngModelChange)="apiaryId.set($event)" name="apiary">
+      <option [ngValue]="0">— All —</option>
+      @for (a of apiaries(); track a.id) {
+        <option [ngValue]="a.id">{{ a.name }}</option>
+      }
+    </select>
+  </div>
+
+  @if (beehives().length) {
+    <div class="fb__group">
+      <label class="fb__label">Beehive</label>
+      <select class="fb__select" [ngModel]="beehiveId()" (ngModelChange)="beehiveId.set($event)" name="beehive">
+        <option [ngValue]="0">— All —</option>
+        @for (b of beehives(); track b.id) {
+          <option [ngValue]="b.id">{{ b.name }}</option>
+        }
+      </select>
+    </div>
+  }
+
+  <ng-content />
+
+</div>

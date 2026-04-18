@@ -1,11 +1,14 @@
-import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { DecimalPipe, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Store } from '@ngrx/store';
 import { GoogleMap, MapMarker } from '@angular/google-maps';
 import { Apiary } from '../../../core/models/apiary.model';
-import { Metadata } from '../../../core/models/api-response.model';
 import { ApiaryService } from '../../../core/services/apiary.service';
 import { environment } from '../../../../environments/environment';
+import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
+import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
+import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 
 interface ApiaryForm {
   name: string;
@@ -22,6 +25,7 @@ type NotificationType = 'error' | 'success' | 'warning';
   styleUrl: './apiary.scss',
 })
 export class ApiaryComponent implements OnInit {
+  private store = inject(Store);
   private apiaryService = inject(ApiaryService);
   private platformId = inject(PLATFORM_ID);
 
@@ -38,11 +42,27 @@ export class ApiaryComponent implements OnInit {
     zoomControl: true,
   };
 
-  // Data
-  apiaries = signal<Apiary[]>([]);
-  meta     = signal<Metadata | null>(null);
+  // Pagination
   page     = signal(1);
   readonly perPage = 10;
+
+  // All apiaries from store, paginated client-side
+  private allApiaries = this.store.selectSignal(selectAllApiaries);
+
+  apiaries = computed(() => {
+    const start = (this.page() - 1) * this.perPage;
+    return this.allApiaries().slice(start, start + this.perPage);
+  });
+
+  meta = computed(() => {
+    const total = this.allApiaries().length;
+    return {
+      total,
+      total_pages: Math.ceil(total / this.perPage) || 1,
+      page: this.page(),
+      per_page: this.perPage,
+    };
+  });
 
   // Edit state
   editingId: number | null = null;
@@ -57,7 +77,7 @@ export class ApiaryComponent implements OnInit {
   private notifTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
-    this.load();
+    this.store.dispatch(ApiariesActions.load());
     if (this.isBrowser) {
       this.loadMapsScript();
     }
@@ -91,7 +111,7 @@ export class ApiaryComponent implements OnInit {
   confirmAdd(): void {
     if (!this.validate(this.newForm, true)) return;
 
-    const duplicate = this.apiaries().some(a => a.name === this.newForm.name);
+    const duplicate = this.allApiaries().some(a => a.name === this.newForm.name);
     if (duplicate) {
       this.notify('warning', `An apiary named "${this.newForm.name}" already exists.`);
       return;
@@ -106,7 +126,7 @@ export class ApiaryComponent implements OnInit {
       next: res => {
         if (res.success) {
           this.showAddForm = false;
-          this.load();
+          this.reload();
           this.notify('success', 'Apiary created.');
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -143,7 +163,7 @@ export class ApiaryComponent implements OnInit {
       next: res => {
         if (res.success) {
           this.editingId = null;
-          this.load();
+          this.reload();
           this.notify('success', 'Apiary updated.');
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -161,7 +181,7 @@ export class ApiaryComponent implements OnInit {
     this.apiaryService.deleteApiary(apiary.id).subscribe({
       next: res => {
         if (res.success) {
-          this.load();
+          this.reload();
           this.notify('success', 'Apiary deleted.');
         } else {
           this.notify('error', 'Something went wrong. Please try again.');
@@ -171,30 +191,32 @@ export class ApiaryComponent implements OnInit {
     });
   }
 
+  goToPage(p: number): void {
+    this.page.set(p);
+  }
+
   clearNotification(): void {
     this.notification = null;
   }
 
   // ── Private ──────────────────────────────────────────────
 
+  private reload(): void {
+    this.store.dispatch(ApiariesActions.reload());
+    this.store.dispatch(BeehivesActions.reload());
+  }
+
   private loadMapsScript(): void {
-    // Script already loaded — Maps API is ready
     if ((window as any).google?.maps?.importLibrary) {
       this.mapsLoaded.set(true);
       return;
     }
 
-    // Script tag already injected but not yet loaded — avoid duplicates
     if (document.getElementById('google-maps-script')) return;
 
-    // Use `callback=` so Maps fires it only after the full API (incl. importLibrary) is ready.
-    // `loading=async` is deprecated and does NOT expose importLibrary via a plain script tag.
     const callbackName = '__googleMapsReady';
     (window as any)[callbackName] = () => {
       delete (window as any)[callbackName];
-      // setTimeout defers the signal set to the next macrotask, preventing NG0100
-      // (ExpressionChangedAfterItHasBeenCheckedError caused by <google-map> setting
-      // tabIndex on its host during the same change-detection pass)
       setTimeout(() => this.mapsLoaded.set(true));
     };
 
@@ -205,20 +227,6 @@ export class ApiaryComponent implements OnInit {
     script.defer = true;
     script.onerror = () => console.error('Google Maps failed to load');
     document.head.appendChild(script);
-  }
-
-  goToPage(p: number): void {
-    this.page.set(p);
-    this.load();
-  }
-
-  private load(): void {
-    this.apiaryService.getApiaries(this.page(), this.perPage).subscribe(res => {
-      if (res.success) {
-        this.apiaries.set(res.data);
-        this.meta.set(res.meta ?? null);
-      }
-    });
   }
 
   private validate(form: ApiaryForm, requireLocation: boolean): boolean {

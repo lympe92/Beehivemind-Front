@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { RequestService } from './request.service';
 import { ApiResponse } from '../models/api-response.model';
 import { Harvest } from '../models/harvest.model';
@@ -8,27 +9,51 @@ import { Harvest } from '../models/harvest.model';
 export class HarvestService {
   private request = inject(RequestService);
 
+  getAllHarvest(): Observable<ApiResponse<Harvest[]>> {
+    return this.request.getRequest<any[]>('harvest').pipe(
+      map(res => ({ ...res, data: res.data.map(this.fromApi) }))
+    );
+  }
+
   getHarvestOfApiary(apiaryId: number): Observable<ApiResponse<Harvest[]>> {
-    return this.request.getRequest<Harvest[]>(`harvest?apiary_id=${apiaryId}`);
+    return this.request.getRequest<any[]>(`harvest/apiary/${apiaryId}`).pipe(
+      map(res => ({ ...res, data: res.data.map(this.fromApi) }))
+    );
   }
 
   getHarvestOfBeehive(beehiveId: number): Observable<ApiResponse<Harvest[]>> {
-    return this.request.getRequest<Harvest[]>(`harvest?beehive_id=${beehiveId}`);
+    return this.request.getRequest<any[]>(`harvest/beehive/${beehiveId}`).pipe(
+      map(res => ({ ...res, data: res.data.map(this.fromApi) }))
+    );
   }
 
-  createHarvest(data: Omit<Harvest, 'id' | 'beehive'> & { beehive_id?: number; apiary_id?: number }): Observable<ApiResponse<Harvest[]>> {
-    return this.request.postRequest<Harvest[]>('harvest', data);
+  createHarvest(data: Omit<Harvest, 'id' | 'beehiveId'> & { beehive_id?: number; apiary_id?: number }): Observable<ApiResponse<Harvest[]>> {
+    const { apiary_id, ...rest } = data;
+    if (apiary_id) {
+      return this.request.postRequest<Harvest[]>(`records/apiary/${apiary_id}`, { ...rest, type: 'harvest' });
+    }
+    return this.request.postRequest<Harvest[]>('records', { ...rest, type: 'harvest' });
   }
 
-  updateHarvest(id: number, data: Partial<Omit<Harvest, 'id' | 'beehive'>>): Observable<ApiResponse<Harvest>> {
-    return this.request.putRequest<Harvest>(`harvest/${id}`, data);
+  updateHarvest(id: number, data: Partial<Omit<Harvest, 'id' | 'beehiveId'>>): Observable<ApiResponse<Harvest>> {
+    return this.request.putRequest<Harvest>(`records/${id}`, data);
   }
 
   deleteHarvest(id: number): Observable<ApiResponse<void>> {
-    return this.request.deleteRequest<void>(`harvest/${id}`);
+    return this.request.deleteRequest<void>(`records/${id}`);
   }
 
   deleteHarvestByApiaryAndDate(apiaryId: number, date: string): Observable<ApiResponse<void>> {
-    return this.request.deleteRequest<void>(`harvest?apiary_id=${apiaryId}&date=${date}`);
+    return this.request.deleteRequest<void>(`records/apiary/${apiaryId}/${date}`);
   }
+
+  private fromApi = (r: any): Harvest => ({
+    id: r.id,
+    date: r.date,
+    honey_type: r.honey_type,
+    honey_description: r.honey_description ?? '',
+    food_quantity: r.food_quantity,
+    unit: r.unit,
+    beehiveId: r.beehive_id,
+  });
 }
