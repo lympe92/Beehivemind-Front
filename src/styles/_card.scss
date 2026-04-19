@@ -1,0 +1,14 @@
+// =============================================================================
+// CARD — Global CSS custom properties
+// Defined here so consumers can override at any scope in the DOM tree.
+// The CardComponent reads these via var(--card-*).
+// =============================================================================
+
+.card {
+  --card-bg:          #ffffff;
+  --card-border:      #e5e5e5;
+  --card-radius:      8px;
+  --card-shadow:      0 1px 3px rgba(0, 0, 0, 0.08);
+  --card-title-color: #737373;
+  --card-title-size:  0.9rem;
+}

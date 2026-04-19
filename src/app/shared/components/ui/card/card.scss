@@ -1,0 +1,52 @@
+:host {
+  display: block;
+}
+
+.card {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--card-border, #e5e5e5);
+  border-radius: var(--card-radius, 8px);
+  box-shadow: var(--card-shadow, 0 1px 3px rgba(0, 0, 0, 0.08));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--card-border, #e5e5e5);
+    flex-shrink: 0;
+    gap: 12px;
+  }
+
+  &__title {
+    font-size: var(--card-title-size, 0.9rem);
+    font-weight: 600;
+    color: var(--card-title-color, #737373);
+  }
+
+  &__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+  }
+
+  &--flush &__body {
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 20px;
+    border-top: 1px solid var(--card-border, #e5e5e5);
+    flex-shrink: 0;
+  }
+}

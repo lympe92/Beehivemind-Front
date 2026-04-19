@@ -5,28 +5,6 @@
   flex-direction: column;
   gap: 16px;
 
-  // ── Notification ─────────────────────────────────────────
-  &__notif {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 16px;
-    border-radius: $radius;
-    font-size: 0.875rem;
-    font-weight: 500;
-
-    &--error   { background: rgba($danger, 0.15); border: 1px solid rgba($danger, 0.4); color: #fca5a5; }
-    &--success { background: rgba($success, 0.15); border: 1px solid rgba($success, 0.4); color: #86efac; }
-    &--warning { background: rgba($warning, 0.15); border: 1px solid rgba($warning, 0.4); color: #fde68a; }
-
-    button {
-      background: none; border: none; cursor: pointer;
-      font-size: 1.1rem; color: inherit; opacity: 0.7;
-      &:hover { opacity: 1; }
-    }
-  }
-
   // ── Layout ────────────────────────────────────────────────
   &__layout {
     display: grid;
@@ -39,41 +17,12 @@
     }
   }
 
-  // ── Card ─────────────────────────────────────────────────
-  &__card {
-    background: $bg-panel;
-    border: 1px solid $border;
-    border-radius: $radius;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-
-    &--map {
-      height: 560px;
-    }
+  // ── Map card ──────────────────────────────────────────────
+  &__map-card {
+    --card-title-color: #{$text-muted};
   }
 
-  &__card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: $accent;
-    border-bottom: 1px solid $border;
-    flex-shrink: 0;
-  }
-
-  &__card-body {
-    padding: 16px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    overflow-y: auto;
-  }
-
-  // ── Map ───────────────────────────────────────────────────
+  // ── Map body ──────────────────────────────────────────────
   &__map-wrap {
     flex: 1;
     min-height: 0;
@@ -85,110 +34,18 @@
     }
   }
 
-  // ── Inline add form ───────────────────────────────────────
-  &__inline-form {
-    background: $bg-hover;
-    border: 1px solid $border;
-    border-radius: $radius;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  &__form-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  &__form-hint {
-    font-size: 0.8rem;
-    color: $text-muted;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  &__form-actions {
-    display: flex;
-    gap: 8px;
-  }
-
-  // ── Table ─────────────────────────────────────────────────
-  &__table-wrap {
-    overflow-x: auto;
-  }
-
-  &__table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.875rem;
-
-    th {
-      padding: 9px 12px;
-      text-align: left;
-      font-weight: 600;
-      color: $text-muted;
-      border-bottom: 1px solid $border;
-      white-space: nowrap;
-    }
-
-    td {
-      padding: 10px 12px;
-      color: $text-primary;
-      border-bottom: 1px solid rgba($border, 0.6);
-      vertical-align: middle;
-    }
-
-    tr:last-child td { border-bottom: none; }
-  }
-
-  &__row {
-    cursor: pointer;
-    &:hover td { background: rgba($bg-hover, 0.6); }
-  }
-
-  &__row--editing td { background: rgba($accent, 0.05); }
-
-  &__actions {
-    display: flex;
-    gap: 6px;
-    white-space: nowrap;
-  }
-
-  &__coords-cell {
-    font-size: 0.8rem;
-    font-family: monospace;
-  }
-
+  // ── Coords display ────────────────────────────────────────
   &__coords {
     font-size: 0.8rem;
     font-family: monospace;
     color: $text-muted;
 
-    &--header {
-      font-size: 0.78rem;
-    }
+    &--header { font-size: 0.78rem; }
   }
 
   &__muted { color: $text-muted; }
 
-  &__empty {
-    color: $text-muted;
-    font-size: 0.875rem;
-    text-align: center;
-    padding: 24px;
-  }
-
-  // ── Shared controls ───────────────────────────────────────
-  &__label {
-    font-size: 0.8rem;
-    color: $text-muted;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
+  // ── Inline edit inputs ────────────────────────────────────
   &__input {
     background: $bg-hover;
     border: 1px solid $border;

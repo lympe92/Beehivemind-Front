@@ -10,18 +10,24 @@ import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { selectAllApiaries, selectApiariesLoading } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { DataTableComponent, ColumnDef, TablePagination } from '../../../shared/components/ui/data-table/data-table';
+import { ToastService } from '../../../shared/components/ui/toast/toast.service';
+import { ModalService } from '../../../core/modal/modal.service';
+import { CardComponent } from '../../../shared/components/ui/card/card';
+import {
+  AddApiaryModalComponent,
+  AddApiaryModalData,
+  AddApiaryModalResult,
+} from './add-apiary-modal/add-apiary-modal';
 
 interface ApiaryForm {
   name: string;
   hivesNumber: number | null;
 }
 
-type NotificationType = 'error' | 'success' | 'warning';
-
 @Component({
   selector: 'app-apiary',
   standalone: true,
-  imports: [FormsModule, GoogleMap, MapMarker, DecimalPipe, DataTableComponent],
+  imports: [FormsModule, GoogleMap, MapMarker, DecimalPipe, DataTableComponent, CardComponent],
   templateUrl: './apiary.html',
   styleUrl: './apiary.scss',
 })
@@ -29,11 +35,12 @@ export class ApiaryComponent implements OnInit {
   private store = inject(Store);
   private apiaryService = inject(ApiaryService);
   private platformId = inject(PLATFORM_ID);
+  private toast = inject(ToastService);
+  private modal = inject(ModalService);
 
   readonly isBrowser = isPlatformBrowser(this.platformId);
   mapsLoaded = signal(false);
 
-  // Map state
   mapCenter: google.maps.LatLngLiteral = { lat: 37.9838, lng: 23.7275 };
   mapZoom = 6;
   markerPosition: google.maps.LatLngLiteral | null = null;
@@ -49,11 +56,9 @@ export class ApiaryComponent implements OnInit {
     { key: 'coords', label: 'Coordinates' },
   ];
 
-  // Pagination
-  page     = signal(1);
+  page = signal(1);
   readonly perPage = 10;
 
-  // All apiaries from store, paginated client-side
   private allApiaries = this.store.selectSignal(selectAllApiaries);
   loading = this.store.selectSignal(selectApiariesLoading);
 
@@ -78,17 +83,8 @@ export class ApiaryComponent implements OnInit {
     return { page: this.page(), totalPages: m.total_pages, total: m.total };
   }
 
-  // Edit state
   editingId: number | null = null;
   editForm: ApiaryForm = this.blank();
-
-  // Add state
-  showAddForm = false;
-  newForm: ApiaryForm = this.blank();
-
-  // Notification
-  notification: { type: NotificationType; message: string } | null = null;
-  private notifTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
@@ -112,48 +108,37 @@ export class ApiaryComponent implements OnInit {
 
   // ── Add ──────────────────────────────────────────────────
 
-  startAdd(): void {
-    this.cancelEdit();
-    this.newForm = this.blank();
-    this.showAddForm = true;
-  }
+  async startAdd(): Promise<void> {
+    const result = await this.modal.open<AddApiaryModalResult, AddApiaryModalData>(
+      AddApiaryModalComponent,
+      {
+        type: 'center',
+        width: '640px',
+        data: {
+          mapsLoaded: this.mapsLoaded(),
+          existingNames: this.allApiaries().map(a => a.name),
+        },
+      },
+    );
 
-  cancelAdd(): void {
-    this.showAddForm = false;
-  }
+    if (!result) return;
 
-  confirmAdd(): void {
-    if (!this.validate(this.newForm, true)) return;
-
-    const duplicate = this.allApiaries().some(a => a.name === this.newForm.name);
-    if (duplicate) {
-      this.notify('warning', `An apiary named "${this.newForm.name}" already exists.`);
-      return;
-    }
-
-    this.apiaryService.createApiary({
-      name: this.newForm.name,
-      hivesNumber: Number(this.newForm.hivesNumber),
-      latitude: this.markerPosition!.lat,
-      longitude: this.markerPosition!.lng,
-    }).subscribe({
+    this.apiaryService.createApiary(result).subscribe({
       next: res => {
         if (res.success) {
-          this.showAddForm = false;
           this.reload();
-          this.notify('success', 'Apiary created.');
+          this.toast.success('Apiary created.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
   // ── Edit ─────────────────────────────────────────────────
 
   startEdit(apiary: Apiary): void {
-    this.cancelAdd();
     this.editingId = apiary.id;
     this.editForm = { name: apiary.name, hivesNumber: apiary.hivesNumber };
     this.markerPosition = { lat: apiary.latitude, lng: apiary.longitude };
@@ -166,7 +151,11 @@ export class ApiaryComponent implements OnInit {
   }
 
   confirmEdit(): void {
-    if (this.editingId === null || !this.validate(this.editForm, false)) return;
+    if (this.editingId === null) return;
+    if (!this.editForm.name?.trim()) {
+      this.toast.error('Name is required.');
+      return;
+    }
 
     this.apiaryService.updateApiary(this.editingId, {
       name: this.editForm.name,
@@ -178,39 +167,41 @@ export class ApiaryComponent implements OnInit {
         if (res.success) {
           this.editingId = null;
           this.reload();
-          this.notify('success', 'Apiary updated.');
+          this.toast.success('Apiary updated.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
   // ── Delete ───────────────────────────────────────────────
 
-  deleteRow(apiary: Apiary): void {
-    if (!confirm(`Delete apiary "${apiary.name}"? All beehive data will be lost!`)) return;
+  async deleteRow(apiary: Apiary): Promise<void> {
+    const confirmed = await this.modal.confirm({
+      title: 'Delete Apiary',
+      message: `Delete "${apiary.name}"? All beehive data will be lost.`,
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!confirmed) return;
 
     this.apiaryService.deleteApiary(apiary.id).subscribe({
       next: res => {
         if (res.success) {
           this.reload();
-          this.notify('success', 'Apiary deleted.');
+          this.toast.success('Apiary deleted.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
   goToPage(p: number): void {
     this.page.set(p);
-  }
-
-  clearNotification(): void {
-    this.notification = null;
   }
 
   // ── Private ──────────────────────────────────────────────
@@ -241,26 +232,6 @@ export class ApiaryComponent implements OnInit {
     script.defer = true;
     script.onerror = () => console.error('Google Maps failed to load');
     document.head.appendChild(script);
-  }
-
-  private validate(form: ApiaryForm, requireLocation: boolean): boolean {
-    if (!form.name?.trim()) {
-      this.notify('error', 'Name is required.');
-      return false;
-    }
-    if (requireLocation && !this.markerPosition) {
-      this.notify('error', 'Please select a location on the map.');
-      return false;
-    }
-    return true;
-  }
-
-  private notify(type: NotificationType, message: string): void {
-    if (this.notifTimer) clearTimeout(this.notifTimer);
-    this.notification = { type, message };
-    if (type !== 'error') {
-      this.notifTimer = setTimeout(() => (this.notification = null), 5000);
-    }
   }
 
   private blank(): ApiaryForm {

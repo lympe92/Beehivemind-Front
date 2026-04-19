@@ -1,0 +1,18 @@
+<div class="card" [class.card--flush]="flush()" [style.height]="height() || null">
+  @if (title()) {
+    <div class="card__header">
+      <span class="card__title">{{ title() }}</span>
+      <ng-content select="[card-header-end]" />
+    </div>
+  }
+
+  <div class="card__body">
+    <ng-content />
+  </div>
+
+  @if (footerTpl) {
+    <div class="card__footer">
+      <ng-container [ngTemplateOutlet]="footerTpl" />
+    </div>
+  }
+</div>
