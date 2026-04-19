@@ -97,6 +97,7 @@
       <app-data-table
         [columns]="columns"
         [rows]="feeding()"
+        [loading]="loading()"
         [editingId]="editingId"
         [showActions]="canEdit"
         emptyMessage="No feeding records found.">

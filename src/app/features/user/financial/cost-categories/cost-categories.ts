@@ -29,6 +29,7 @@ export class CostCategoriesComponent implements OnInit {
   ];
 
   categories = signal<CostCategory[]>([]);
+  loading = signal(false);
 
   editingId: number | null = null;
   editForm: CategoryForm = this.blank();
@@ -115,11 +116,13 @@ export class CostCategoriesComponent implements OnInit {
   }
 
   private load(): void {
+    this.loading.set(true);
     this.categoryService.getCategories().subscribe(res => {
       if (res.success) {
         this.categories.set(res.data);
         this.categoriesChange.emit(res.data);
       }
+      this.loading.set(false);
     });
   }
 

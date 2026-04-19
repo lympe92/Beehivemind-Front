@@ -33,6 +33,7 @@ export class CostsComponent implements OnInit {
   ];
 
   costs = signal<Cost[]>([]);
+  loading = signal(false);
 
   editingId: number | null = null;
   editForm: CostForm = this.blank();
@@ -137,8 +138,10 @@ export class CostsComponent implements OnInit {
   }
 
   private load(): void {
+    this.loading.set(true);
     this.costService.getCosts().subscribe(res => {
       if (res.success) this.costs.set(res.data);
+      this.loading.set(false);
     });
   }
 

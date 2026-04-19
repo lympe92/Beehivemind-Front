@@ -6,7 +6,7 @@ import { BeehiveService } from '../../../core/services/beehive.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
-import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
+import { selectAllBeehives, selectBeehivesLoading } from '../../../store/beehives/beehives.selectors';
 import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 
@@ -31,6 +31,7 @@ export class BeehivesComponent implements OnInit {
   // From store
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);
+  loading = this.store.selectSignal(selectBeehivesLoading);
 
   selectedApiaryId = signal<number>(0);
 

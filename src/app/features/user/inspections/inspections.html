@@ -124,6 +124,7 @@
       <app-data-table
         [columns]="columns"
         [rows]="inspections()"
+        [loading]="loading()"
         [editingId]="editingId"
         [showActions]="true"
         emptyMessage="No inspection records found.">

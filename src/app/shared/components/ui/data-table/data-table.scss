@@ -60,6 +60,25 @@
   font-size: 0.875rem;
 }
 
+.dt__loading {
+  text-align: center;
+  padding: 24px 0;
+}
+
+.dt__spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--dt-border);
+  border-top-color: var(--dt-text-muted);
+  border-radius: 50%;
+  animation: dt-spin 0.7s linear infinite;
+}
+
+@keyframes dt-spin {
+  to { transform: rotate(360deg); }
+}
+
 .dt__muted {
   color: var(--dt-text-muted);
 }

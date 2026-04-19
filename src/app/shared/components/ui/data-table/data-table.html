@@ -46,9 +46,17 @@
           </tr>
         }
       } @empty {
-        <tr>
-          <td [attr.colspan]="totalCols" class="dt__empty">{{ emptyMessage }}</td>
-        </tr>
+        @if (loading) {
+          <tr>
+            <td [attr.colspan]="totalCols" class="dt__loading">
+              <span class="dt__spinner"></span>
+            </td>
+          </tr>
+        } @else {
+          <tr>
+            <td [attr.colspan]="totalCols" class="dt__empty">{{ emptyMessage }}</td>
+          </tr>
+        }
       }
     </tbody>
   </table>

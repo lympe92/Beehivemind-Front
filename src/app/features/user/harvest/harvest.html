@@ -95,6 +95,7 @@
       <app-data-table
         [columns]="columns()"
         [rows]="harvest()"
+        [loading]="loading()"
         [editingId]="editingId"
         [showActions]="canEdit || selectedApiaryId() !== 0"
         emptyMessage="No harvest records found.">

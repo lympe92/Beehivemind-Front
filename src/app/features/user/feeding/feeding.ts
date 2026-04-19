@@ -16,7 +16,7 @@ import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
 import { FeedingActions } from '../../../store/feeding/feeding.actions';
-import { selectAllFeeding } from '../../../store/feeding/feeding.selectors';
+import { selectAllFeeding, selectFeedingLoading } from '../../../store/feeding/feeding.selectors';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 
 interface FeedingForm {
@@ -60,6 +60,7 @@ export class FeedingComponent implements OnInit {
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);
   private allFeeding = this.store.selectSignal(selectAllFeeding);
+  loading = this.store.selectSignal(selectFeedingLoading);
 
   beehives = computed(() =>
     this.allBeehives().filter(b => b.apiaryId === this.selectedApiaryId())

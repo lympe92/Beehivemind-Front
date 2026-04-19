@@ -14,7 +14,7 @@ import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
 import { HarvestActions } from '../../../store/harvest/harvest.actions';
-import { selectAllHarvest } from '../../../store/harvest/harvest.selectors';
+import { selectAllHarvest, selectHarvestLoading } from '../../../store/harvest/harvest.selectors';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 
 interface HarvestForm {
@@ -58,6 +58,7 @@ export class HarvestComponent implements OnInit {
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);
   private allHarvest = this.store.selectSignal(selectAllHarvest);
+  loading = this.store.selectSignal(selectHarvestLoading);
 
   beehives = computed(() =>
     this.allBeehives().filter(b => b.apiaryId === this.selectedApiaryId())

@@ -29,6 +29,7 @@ export class DataTableComponent {
   @Input({ required: true }) rows: any[] = [];
   @Input() editingId: number | null = null;
   @Input() pagination: TablePagination | null = null;
+  @Input() loading = false;
   @Input() emptyMessage = 'No records found.';
   @Input() showActions = true;
   @Input() clickableRows = false;

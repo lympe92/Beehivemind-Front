@@ -7,7 +7,7 @@ import { Apiary } from '../../../core/models/apiary.model';
 import { ApiaryService } from '../../../core/services/apiary.service';
 import { environment } from '../../../../environments/environment';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
-import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
+import { selectAllApiaries, selectApiariesLoading } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { DataTableComponent, ColumnDef, TablePagination } from '../../../shared/components/ui/data-table/data-table';
 
@@ -55,6 +55,7 @@ export class ApiaryComponent implements OnInit {
 
   // All apiaries from store, paginated client-side
   private allApiaries = this.store.selectSignal(selectAllApiaries);
+  loading = this.store.selectSignal(selectApiariesLoading);
 
   apiaries = computed(() => {
     const start = (this.page() - 1) * this.perPage;
