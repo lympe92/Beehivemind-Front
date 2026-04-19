@@ -1,0 +1,16 @@
+<app-modal-shell [title]="data.title || 'Confirm'" (close)="cancel()">
+  <p class="confirm__message">{{ data.message }}</p>
+
+  <ng-template #footer>
+    <button class="confirm__btn confirm__btn--cancel" (click)="cancel()">
+      {{ data.cancelLabel || 'Cancel' }}
+    </button>
+    <button
+      class="confirm__btn"
+      [class.confirm__btn--danger]="data.danger"
+      [class.confirm__btn--primary]="!data.danger"
+      (click)="confirm()">
+      {{ data.confirmLabel || 'Confirm' }}
+    </button>
+  </ng-template>
+</app-modal-shell>

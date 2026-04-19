@@ -1,0 +1,104 @@
+// =============================================================================
+// MODAL GLOBAL STYLES
+// CDK renders overlays at <body> level — must be global, not component-scoped
+// =============================================================================
+
+// ── Backdrop ─────────────────────────────────────────────────────────────────
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  animation: modal-backdrop-in 0.2s ease;
+}
+
+@keyframes modal-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ── Base panel ───────────────────────────────────────────────────────────────
+
+.modal-panel {
+  outline: none;
+  overflow: hidden;
+
+  // User layout theme vars (defaults)
+  --modal-bg:         #ffffff;
+  --modal-border:     #e5e5e5;
+  --modal-text:       #171717;
+  --modal-text-muted: #737373;
+  --modal-hover:      #e5e5e5;
+}
+
+// ── Center ───────────────────────────────────────────────────────────────────
+
+.modal-panel--center {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: modal-center-in 0.2s ease;
+}
+
+@keyframes modal-center-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+
+// ── Drawer (slide from right) ─────────────────────────────────────────────────
+
+.modal-panel--drawer {
+  position: fixed !important;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: min(480px, 100vw);
+  border-radius: 12px 0 0 12px;
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
+  animation: modal-drawer-in 0.25s ease;
+}
+
+@keyframes modal-drawer-in {
+  from { opacity: 0; transform: translateX(100%); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+// ── Confirm ───────────────────────────────────────────────────────────────────
+
+.modal-panel--confirm {
+  width: min(400px, calc(100vw - 32px));
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: modal-center-in 0.18s ease;
+}
+
+// ── CDK overlay container positioning ────────────────────────────────────────
+
+.cdk-overlay-container {
+  position: fixed;
+  z-index: 1000;
+}
+
+.cdk-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+}
+
+.cdk-global-overlay-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  .modal-panel--drawer {
+    align-self: stretch;
+    pointer-events: auto;
+    margin-left: auto;
+  }
+
+  .modal-panel--center,
+  .modal-panel--confirm {
+    pointer-events: auto;
+  }
+}

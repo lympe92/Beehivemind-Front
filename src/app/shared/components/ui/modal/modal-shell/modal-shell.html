@@ -1,0 +1,23 @@
+<div class="mshell">
+  <div class="mshell__header">
+    <div class="mshell__titles">
+      @if (title()) {
+        <h2 class="mshell__title">{{ title() }}</h2>
+      }
+      @if (subtitle()) {
+        <p class="mshell__subtitle">{{ subtitle() }}</p>
+      }
+    </div>
+    <button class="mshell__close" (click)="close.emit()" aria-label="Close">✕</button>
+  </div>
+
+  <div class="mshell__body">
+    <ng-content />
+  </div>
+
+  @if (footerTpl) {
+    <div class="mshell__footer">
+      <ng-container [ngTemplateOutlet]="footerTpl" />
+    </div>
+  }
+</div>

@@ -1,0 +1,33 @@
+.confirm__message {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--modal-text-muted, #525252);
+  line-height: 1.5;
+}
+
+.confirm__btn {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 8px 18px;
+  transition: opacity 0.15s;
+
+  &--cancel {
+    background: var(--modal-hover, #e5e5e5);
+    color: var(--modal-text, #171717);
+  }
+
+  &--primary {
+    background: #171717;
+    color: #ffffff;
+  }
+
+  &--danger {
+    background: #ef4444;
+    color: #ffffff;
+  }
+
+  &:hover { opacity: 0.85; }
+}
