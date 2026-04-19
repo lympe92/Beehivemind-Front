@@ -1,19 +1,25 @@
-@if (isBrowser) {
+@if (loading()) {
+  <div class="apex-skeleton" [style.height]="skeletonHeight()"></div>
+} @else if (isBrowser && mergedOptions(); as opts) {
   <apx-chart
-    [series]="mergedOptions().series!"
-    [chart]="mergedOptions().chart!"
-    [xaxis]="mergedOptions().xaxis!"
-    [yaxis]="mergedOptions().yaxis!"
-    [title]="mergedOptions().title!"
-    [labels]="mergedOptions().labels!"
-    [legend]="mergedOptions().legend!"
-    [dataLabels]="mergedOptions().dataLabels!"
-    [colors]="mergedOptions().colors!"
-    [tooltip]="mergedOptions().tooltip!"
-    [plotOptions]="mergedOptions().plotOptions!"
-    [stroke]="mergedOptions().stroke!"
-    [fill]="mergedOptions().fill!"
-    [grid]="mergedOptions().grid!"
-    [responsive]="mergedOptions().responsive!"
+    [series]="opts.series!"
+    [chart]="opts.chart!"
+    [xaxis]="opts.xaxis!"
+    [yaxis]="opts.yaxis!"
+    [title]="opts.title!"
+    [labels]="opts.labels!"
+    [legend]="opts.legend!"
+    [dataLabels]="opts.dataLabels!"
+    [colors]="opts.colors!"
+    [tooltip]="opts.tooltip!"
+    [plotOptions]="opts.plotOptions!"
+    [stroke]="opts.stroke!"
+    [fill]="opts.fill!"
+    [grid]="opts.grid!"
+    [responsive]="opts.responsive!"
   />
+} @else {
+  <div class="apex-empty" [style.height]="skeletonHeight()">
+    <span>{{ emptyMessage() }}</span>
+  </div>
 }

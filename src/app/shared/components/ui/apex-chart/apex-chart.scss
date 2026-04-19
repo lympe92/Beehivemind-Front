@@ -1,0 +1,26 @@
+.apex-skeleton {
+  width: 100%;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--dt-border, #e5e5e5) 25%,
+    var(--dt-bg-hover, rgba(229,229,229,0.5)) 50%,
+    var(--dt-border, #e5e5e5) 75%
+  );
+  background-size: 200% 100%;
+  animation: apex-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes apex-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.apex-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dt-text-muted, #737373);
+  font-size: 0.875rem;
+  width: 100%;
+}

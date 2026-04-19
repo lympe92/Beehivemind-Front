@@ -13,11 +13,7 @@
     <div class="dashboard__card">
       <div class="dashboard__card-header">Variables over Time</div>
       <div class="dashboard__card-body">
-        @if (variablesLineOptions(); as opts) {
-          <app-apex-chart [options]="opts" height="300" />
-        } @else {
-          <p class="dashboard__empty">No data available.</p>
-        }
+        <app-apex-chart [options]="variablesLineOptions()" [loading]="chartLoading()" height="300" />
       </div>
     </div>
   </div>
@@ -27,11 +23,7 @@
     <div class="dashboard__card">
       <div class="dashboard__card-header">Population and Frames over Time</div>
       <div class="dashboard__card-body">
-        @if (populationLineOptions(); as opts) {
-          <app-apex-chart [options]="opts" height="300" />
-        } @else {
-          <p class="dashboard__empty">No data available.</p>
-        }
+        <app-apex-chart [options]="populationLineOptions()" [loading]="chartLoading()" height="300" />
       </div>
     </div>
   </div>
@@ -41,33 +33,21 @@
     <div class="dashboard__card">
       <div class="dashboard__card-header">Last Inspection</div>
       <div class="dashboard__card-body">
-        @if (lastInspectionBarOptions(); as opts) {
-          <app-apex-chart [options]="opts" height="280" />
-        } @else {
-          <p class="dashboard__empty">No data available.</p>
-        }
+        <app-apex-chart [options]="lastInspectionBarOptions()" [loading]="chartLoading()" height="280" />
       </div>
     </div>
 
     <div class="dashboard__card">
       <div class="dashboard__card-header">Queens Ages</div>
       <div class="dashboard__card-body">
-        @if (queensPieOptions(); as opts) {
-          <app-apex-chart [options]="opts" height="280" />
-        } @else {
-          <p class="dashboard__empty">No data available.</p>
-        }
+        <app-apex-chart [options]="queensPieOptions()" [loading]="chartLoading()" height="280" />
       </div>
     </div>
 
     <div class="dashboard__card">
       <div class="dashboard__card-header">Ratio Opened / Closed Brood</div>
       <div class="dashboard__card-body">
-        @if (broodPieOptions(); as opts) {
-          <app-apex-chart [options]="opts" height="280" />
-        } @else {
-          <p class="dashboard__empty">No data available.</p>
-        }
+        <app-apex-chart [options]="broodPieOptions()" [loading]="chartLoading()" height="280" />
       </div>
     </div>
   </div>

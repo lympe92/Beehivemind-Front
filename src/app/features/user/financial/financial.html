@@ -21,11 +21,7 @@
   <div class="financial__card">
     <div class="financial__card-header">Income / Outgoing per Month</div>
     <div class="financial__card-body">
-      @if (monthlyBarOptions(); as opts) {
-        <app-apex-chart [options]="opts" height="320" />
-      } @else {
-        <p class="financial__empty">No data available.</p>
-      }
+      <app-apex-chart [options]="monthlyBarOptions()" [loading]="chartsLoading()" height="320" />
     </div>
   </div>
 
@@ -34,33 +30,21 @@
     <div class="financial__card">
       <div class="financial__card-header">Income / Outgoing</div>
       <div class="financial__card-body">
-        @if (summaryPieOptions(); as opts) {
-          <app-apex-chart [options]="opts" height="260" />
-        } @else {
-          <p class="financial__empty">No data available.</p>
-        }
+        <app-apex-chart [options]="summaryPieOptions()" [loading]="chartsLoading()" height="260" />
       </div>
     </div>
 
     <div class="financial__card">
       <div class="financial__card-header">Income by Category</div>
       <div class="financial__card-body">
-        @if (incomePieOptions(); as opts) {
-          <app-apex-chart [options]="opts" height="260" />
-        } @else {
-          <p class="financial__empty">No data available.</p>
-        }
+        <app-apex-chart [options]="incomePieOptions()" [loading]="chartsLoading()" height="260" />
       </div>
     </div>
 
     <div class="financial__card">
       <div class="financial__card-header">Outgoing by Category</div>
       <div class="financial__card-body">
-        @if (outcomePieOptions(); as opts) {
-          <app-apex-chart [options]="opts" height="260" />
-        } @else {
-          <p class="financial__empty">No data available.</p>
-        }
+        <app-apex-chart [options]="outcomePieOptions()" [loading]="chartsLoading()" height="260" />
       </div>
     </div>
   </div>

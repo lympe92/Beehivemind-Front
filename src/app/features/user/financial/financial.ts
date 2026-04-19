@@ -27,6 +27,7 @@ export class FinancialComponent implements OnInit {
   costCategories = signal<CostCategory[]>([]);
 
   // Chart data
+  chartsLoading = signal(true);
   monthlyCosts = signal<MonthlyCost[]>([]);
   yearSum = signal<YearCostSum[]>([]);
   incomeCosts = signal<CostByCategory[]>([]);
@@ -103,17 +104,13 @@ export class FinancialComponent implements OnInit {
   // ── Private ──────────────────────────────────────────────
 
   private loadCharts(): void {
-    this.costService.getMonthlyCosts().subscribe(res => {
-      if (res.success) this.monthlyCosts.set(res.data);
-    });
-    this.costService.getYearCostSum().subscribe(res => {
-      if (res.success) this.yearSum.set(res.data);
-    });
-    this.costService.getIncomeCostsByCategory().subscribe(res => {
-      if (res.success) this.incomeCosts.set(res.data);
-    });
-    this.costService.getOutcomeCostsByCategory().subscribe(res => {
-      if (res.success) this.outcomeCosts.set(res.data);
-    });
+    this.chartsLoading.set(true);
+    let pending = 4;
+    const done = () => { if (--pending === 0) this.chartsLoading.set(false); };
+
+    this.costService.getMonthlyCosts().subscribe({ next: res => { if (res.success) this.monthlyCosts.set(res.data); done(); }, error: done });
+    this.costService.getYearCostSum().subscribe({ next: res => { if (res.success) this.yearSum.set(res.data); done(); }, error: done });
+    this.costService.getIncomeCostsByCategory().subscribe({ next: res => { if (res.success) this.incomeCosts.set(res.data); done(); }, error: done });
+    this.costService.getOutcomeCostsByCategory().subscribe({ next: res => { if (res.success) this.outcomeCosts.set(res.data); done(); }, error: done });
   }
 }

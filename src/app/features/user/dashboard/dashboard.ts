@@ -32,6 +32,7 @@ export class UserDashboardComponent implements OnInit {
 
   // chartInspections: avg (user/apiary) or raw (beehive) — drives line/bar/brood charts
   chartInspections = signal<AvgInspection[]>([]);
+  chartLoading = signal(true);
 
   filterLevel = signal<FilterLevel>('user');
   selectedApiaryId = signal<number | null>(null);
@@ -151,8 +152,10 @@ export class UserDashboardComponent implements OnInit {
       this.filterLevel.set('apiary');
       this.selectedApiaryId.set(apiaryId);
       this.selectedBeehiveId.set(null);
+      this.chartLoading.set(true);
       this.inspectionService.getAvgInspectionsOfApiary(apiaryId).subscribe(res => {
         if (res.success) this.chartInspections.set(res.data);
+        this.chartLoading.set(false);
       });
     }
   }
@@ -162,14 +165,18 @@ export class UserDashboardComponent implements OnInit {
       this.filterLevel.set('apiary');
       this.selectedBeehiveId.set(null);
       const apiaryId = this.selectedApiaryId()!;
+      this.chartLoading.set(true);
       this.inspectionService.getAvgInspectionsOfApiary(apiaryId).subscribe(res => {
         if (res.success) this.chartInspections.set(res.data);
+        this.chartLoading.set(false);
       });
     } else {
       this.filterLevel.set('beehive');
       this.selectedBeehiveId.set(beehiveId);
+      this.chartLoading.set(true);
       this.inspectionService.getInspectionsOfBeehive(beehiveId).subscribe(res => {
         if (res.success) this.chartInspections.set(res.data);
+        this.chartLoading.set(false);
       });
     }
   }
@@ -177,8 +184,10 @@ export class UserDashboardComponent implements OnInit {
   // ── Private ─────────────────────────────────────────────
 
   private loadAvgData(): void {
+    this.chartLoading.set(true);
     this.inspectionService.getAvgInspectionsOfUser().subscribe(res => {
       if (res.success) this.chartInspections.set(res.data);
+      this.chartLoading.set(false);
     });
   }
 }
