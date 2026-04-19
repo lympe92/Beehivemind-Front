@@ -1,0 +1,72 @@
+<div class="dt__wrap">
+  <table class="dt__table">
+    <thead>
+      <tr>
+        @for (col of columns; track col.key) {
+          <th [style.width]="col.width || null">{{ col.label }}</th>
+        }
+        @if (actionsTpl && showActions) {
+          <th class="dt__th--actions"></th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows; track row.id; let idx = $index) {
+        @if (editingId === row.id && editRowTpl) {
+          <tr class="dt__row--editing">
+            <ng-container
+              [ngTemplateOutlet]="editRowTpl"
+              [ngTemplateOutletContext]="{ $implicit: row, index: idx }">
+            </ng-container>
+          </tr>
+        } @else {
+          <tr
+            [class.dt__row--clickable]="clickableRows"
+            (click)="clickableRows && rowClick.emit(row)">
+            @for (col of columns; track col.key) {
+              <td>
+                @if (cellTpl) {
+                  <ng-container
+                    [ngTemplateOutlet]="cellTpl"
+                    [ngTemplateOutletContext]="{ $implicit: row, col: col, index: idx }">
+                  </ng-container>
+                } @else {
+                  {{ row[col.key] ?? '—' }}
+                }
+              </td>
+            }
+            @if (actionsTpl && showActions) {
+              <td class="dt__actions">
+                <ng-container
+                  [ngTemplateOutlet]="actionsTpl"
+                  [ngTemplateOutletContext]="{ $implicit: row }">
+                </ng-container>
+              </td>
+            }
+          </tr>
+        }
+      } @empty {
+        <tr>
+          <td [attr.colspan]="totalCols" class="dt__empty">{{ emptyMessage }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (pagination && pagination.totalPages > 1) {
+  <div class="dt__pagination">
+    <button
+      class="dt__page-btn"
+      [disabled]="pagination.page === 1"
+      (click)="pageChange.emit(pagination.page - 1)">‹ Prev</button>
+    <span class="dt__page-info">
+      {{ pagination.page }} / {{ pagination.totalPages }}
+      <span class="dt__page-muted">({{ pagination.total }} total)</span>
+    </span>
+    <button
+      class="dt__page-btn"
+      [disabled]="pagination.page === pagination.totalPages"
+      (click)="pageChange.emit(pagination.page + 1)">Next ›</button>
+  </div>
+}

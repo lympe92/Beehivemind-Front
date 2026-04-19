@@ -9,6 +9,7 @@ import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
 import { InspectionsActions } from '../../../store/inspections/inspections.actions';
 import { selectAllInspections } from '../../../store/inspections/inspections.selectors';
+import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 
 interface InspectionForm {
   date: string;
@@ -32,13 +33,30 @@ type NotificationType = 'error' | 'success' | 'warning';
 @Component({
   selector: 'app-inspections',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DataTableComponent],
   templateUrl: './inspections.html',
   styleUrl: './inspections.scss',
 })
 export class InspectionsComponent implements OnInit {
   private store = inject(Store);
   private inspectionService = inject(InspectionService);
+
+  readonly columns: ColumnDef[] = [
+    { key: 'date', label: 'Date' },
+    { key: 'frame_space', label: 'Frames' },
+    { key: 'population', label: 'Population' },
+    { key: 'pollen', label: 'Pollen' },
+    { key: 'honey', label: 'Honey' },
+    { key: 'opened_brood', label: 'Egg' },
+    { key: 'closed_brood', label: 'Closed Brood' },
+    { key: 'varroa', label: 'Varroa' },
+    { key: 'american_foulbrood', label: 'AFB' },
+    { key: 'european_foulbrood', label: 'EFB' },
+    { key: 'nosema', label: 'Nosema' },
+    { key: 'queen_exists', label: 'Queen Seen' },
+    { key: 'queen_cells', label: 'Queen Cells' },
+    { key: 'queen_year', label: 'Queen Year' },
+  ];
 
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);

@@ -29,46 +29,29 @@
       <div class="state-msg state-msg--error">{{ error() }}</div>
     } @else {
       <div class="table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr>
-              @for (col of cfg.displayColumns; track col) {
-                <th>{{ col }}</th>
-              }
-              <th class="actions-col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (row of rows(); track row.id) {
-              <tr>
-                @for (col of cfg.displayColumns; track col) {
-                  <td [title]="row[col]">{{ formatCell(row[col]) }}</td>
-                }
-                <td class="actions">
-                  @if (!cfg.noEdit) {
-                    <button class="btn btn--sm btn--secondary" (click)="openEdit(row)">Edit</button>
-                  }
-                  @if (modelKey() === 'tokens') {
-                    <button class="btn btn--sm btn--warn" (click)="confirmDelete(row.id)">Revoke</button>
-                  } @else {
-                    <button class="btn btn--sm btn--danger" (click)="confirmDelete(row.id)">Delete</button>
-                  }
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td [attr.colspan]="cfg.displayColumns.length + 1" class="empty">No records found</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+        <app-data-table
+          [columns]="tableColumns()"
+          [rows]="rows()"
+          [pagination]="tablePagination()"
+          (pageChange)="goToPage($event)"
+          emptyMessage="No records found.">
 
-      <!-- Pagination -->
-      <div class="pagination">
-        <button class="btn btn--sm btn--secondary" [disabled]="page() <= 1" (click)="prevPage()">← Prev</button>
-        <span>Page {{ page() }} of {{ lastPage() }}</span>
-        <button class="btn btn--sm btn--secondary" [disabled]="page() >= lastPage()" (click)="nextPage()">Next →</button>
+          <ng-template #cellTpl let-row let-col="col">
+            <span [title]="formatCell(row[col.key])">{{ formatCell(row[col.key]) }}</span>
+          </ng-template>
+
+          <ng-template #actionsTpl let-row>
+            @if (!cfg.noEdit) {
+              <button class="btn btn--sm btn--secondary" (click)="openEdit(row)">Edit</button>
+            }
+            @if (modelKey() === 'tokens') {
+              <button class="btn btn--sm btn--warn" (click)="confirmDelete(row.id)">Revoke</button>
+            } @else {
+              <button class="btn btn--sm btn--danger" (click)="confirmDelete(row.id)">Delete</button>
+            }
+          </ng-template>
+
+        </app-data-table>
       </div>
     }
   } @else {

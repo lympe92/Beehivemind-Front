@@ -8,6 +8,7 @@ import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
 import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
+import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 
 interface BeehiveForm {
   name: string;
@@ -19,7 +20,7 @@ type NotificationType = 'error' | 'success' | 'warning';
 @Component({
   selector: 'app-beehives',
   standalone: true,
-  imports: [FormsModule, FilterBarComponent],
+  imports: [FormsModule, FilterBarComponent, DataTableComponent],
   templateUrl: './beehives.html',
   styleUrl: './beehives.scss',
 })
@@ -39,6 +40,12 @@ export class BeehivesComponent implements OnInit {
       ? this.allBeehives()
       : this.allBeehives().filter(b => b.apiaryId === id);
   });
+
+  readonly columns: ColumnDef[] = [
+    { key: '_idx', label: '#', width: '48px' },
+    { key: 'name', label: 'Name' },
+    { key: 'queen_year', label: 'Queen Year' },
+  ];
 
   beehivesToCreate: number | null = null;
   editingId: number | null = null;

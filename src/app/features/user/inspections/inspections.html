@@ -121,80 +121,65 @@
       }
 
       <!-- Table -->
-      @if (inspections().length) {
-        <div class="insp__table-wrap">
-          <table class="insp__table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Frames</th>
-                <th>Population</th>
-                <th>Pollen</th>
-                <th>Honey</th>
-                <th>Egg</th>
-                <th>Closed Brood</th>
-                <th>Varroa</th>
-                <th>AFB</th>
-                <th>EFB</th>
-                <th>Nosema</th>
-                <th>Queen Seen</th>
-                <th>Queen Cells</th>
-                <th>Queen Year</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (row of inspections(); track row.id) {
-                @if (editingId === row.id) {
-                  <tr class="insp__row--editing">
-                    <td><input class="insp__input insp__input--sm" type="date" [(ngModel)]="editForm.date" name="ed_date" /></td>
-                    <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.frame_space" name="ed_fs" /></td>
-                    <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.population" name="ed_pop" /></td>
-                    <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.pollen" name="ed_pol" /></td>
-                    <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.honey" name="ed_hon" /></td>
-                    <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.opened_brood" name="ed_ob" /></td>
-                    <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.closed_brood" name="ed_cb" /></td>
-                    <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.varroa" name="ed_var" /></td>
-                    <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.american_foulbrood" name="ed_afb" /></td>
-                    <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.european_foulbrood" name="ed_efb" /></td>
-                    <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.nosema" name="ed_nos" /></td>
-                    <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.queen_exists" name="ed_qe" /></td>
-                    <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.queen_cells" name="ed_qc" /></td>
-                    <td><input class="insp__input insp__input--sm" type="number" min="2000" [(ngModel)]="editForm.queen_year" name="ed_qy" /></td>
-                    <td class="insp__actions">
-                      <button class="insp__btn insp__btn--primary insp__btn--sm" (click)="confirmEdit()">Save</button>
-                      <button class="insp__btn insp__btn--ghost insp__btn--sm" (click)="cancelEdit()">Cancel</button>
-                    </td>
-                  </tr>
-                } @else {
-                  <tr>
-                    <td>{{ row.date }}</td>
-                    <td>{{ row.frame_space }}</td>
-                    <td>{{ row.population }}</td>
-                    <td>{{ row.pollen }}</td>
-                    <td>{{ row.honey }}</td>
-                    <td>{{ row.opened_brood }}</td>
-                    <td>{{ row.closed_brood }}</td>
-                    <td class="insp__bool" [class.insp__bool--yes]="row.varroa">{{ row.varroa ? 'Yes' : 'No' }}</td>
-                    <td class="insp__bool" [class.insp__bool--yes]="row.american_foulbrood">{{ row.american_foulbrood ? 'Yes' : 'No' }}</td>
-                    <td class="insp__bool" [class.insp__bool--yes]="row.european_foulbrood">{{ row.european_foulbrood ? 'Yes' : 'No' }}</td>
-                    <td class="insp__bool" [class.insp__bool--yes]="row.nosema">{{ row.nosema ? 'Yes' : 'No' }}</td>
-                    <td class="insp__bool" [class.insp__bool--yes]="row.queen_exists">{{ row.queen_exists ? 'Yes' : 'No' }}</td>
-                    <td class="insp__bool" [class.insp__bool--yes]="row.queen_cells">{{ row.queen_cells ? 'Yes' : 'No' }}</td>
-                    <td>{{ row.queen_year ?? '—' }}</td>
-                    <td class="insp__actions">
-                      <button class="insp__btn insp__btn--ghost insp__btn--sm" (click)="startEdit(row)">Edit</button>
-                      <button class="insp__btn insp__btn--danger insp__btn--sm" (click)="deleteRow(row)">Delete</button>
-                    </td>
-                  </tr>
-                }
-              }
-            </tbody>
-          </table>
-        </div>
-      } @else {
-        <p class="insp__empty">No inspection records found.</p>
-      }
+      <app-data-table
+        [columns]="columns"
+        [rows]="inspections()"
+        [editingId]="editingId"
+        [showActions]="true"
+        emptyMessage="No inspection records found.">
+
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('varroa') {
+              <span class="insp__bool" [class.insp__bool--yes]="row.varroa">{{ row.varroa ? 'Yes' : 'No' }}</span>
+            }
+            @case ('american_foulbrood') {
+              <span class="insp__bool" [class.insp__bool--yes]="row.american_foulbrood">{{ row.american_foulbrood ? 'Yes' : 'No' }}</span>
+            }
+            @case ('european_foulbrood') {
+              <span class="insp__bool" [class.insp__bool--yes]="row.european_foulbrood">{{ row.european_foulbrood ? 'Yes' : 'No' }}</span>
+            }
+            @case ('nosema') {
+              <span class="insp__bool" [class.insp__bool--yes]="row.nosema">{{ row.nosema ? 'Yes' : 'No' }}</span>
+            }
+            @case ('queen_exists') {
+              <span class="insp__bool" [class.insp__bool--yes]="row.queen_exists">{{ row.queen_exists ? 'Yes' : 'No' }}</span>
+            }
+            @case ('queen_cells') {
+              <span class="insp__bool" [class.insp__bool--yes]="row.queen_cells">{{ row.queen_cells ? 'Yes' : 'No' }}</span>
+            }
+            @case ('queen_year') { {{ row.queen_year ?? '—' }} }
+            @default { {{ row[col.key] ?? '—' }} }
+          }
+        </ng-template>
+
+        <ng-template #editRowTpl let-row>
+          <td><input class="insp__input insp__input--sm" type="date" [(ngModel)]="editForm.date" name="ed_date" /></td>
+          <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.frame_space" name="ed_fs" /></td>
+          <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.population" name="ed_pop" /></td>
+          <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.pollen" name="ed_pol" /></td>
+          <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.honey" name="ed_hon" /></td>
+          <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.opened_brood" name="ed_ob" /></td>
+          <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.closed_brood" name="ed_cb" /></td>
+          <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.varroa" name="ed_var" /></td>
+          <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.american_foulbrood" name="ed_afb" /></td>
+          <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.european_foulbrood" name="ed_efb" /></td>
+          <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.nosema" name="ed_nos" /></td>
+          <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.queen_exists" name="ed_qe" /></td>
+          <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.queen_cells" name="ed_qc" /></td>
+          <td><input class="insp__input insp__input--sm" type="number" min="2000" [(ngModel)]="editForm.queen_year" name="ed_qy" /></td>
+          <td class="dt__actions">
+            <button class="insp__btn insp__btn--primary insp__btn--sm" (click)="confirmEdit()">Save</button>
+            <button class="insp__btn insp__btn--ghost insp__btn--sm" (click)="cancelEdit()">Cancel</button>
+          </td>
+        </ng-template>
+
+        <ng-template #actionsTpl let-row>
+          <button class="insp__btn insp__btn--ghost insp__btn--sm" (click)="startEdit(row)">Edit</button>
+          <button class="insp__btn insp__btn--danger insp__btn--sm" (click)="deleteRow(row)">Delete</button>
+        </ng-template>
+
+      </app-data-table>
 
     </div>
   </div>

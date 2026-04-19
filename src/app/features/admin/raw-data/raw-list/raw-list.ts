@@ -3,11 +3,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RequestService } from '../../../../core/services/request.service';
 import { ModelConfig, RAW_MODELS } from '../raw-data.models';
+import { DataTableComponent, ColumnDef, TablePagination } from '../../../../shared/components/ui/data-table/data-table';
 
 @Component({
   selector: 'app-raw-list',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, DataTableComponent],
   templateUrl: './raw-list.html',
   styleUrl: './raw-list.scss',
 })
@@ -23,6 +24,17 @@ export class RawListComponent implements OnInit {
     return this.isEditing()
       ? cfg.fields.filter((f) => !f.createOnly)
       : cfg.fields;
+  });
+
+  tableColumns = computed<ColumnDef[]>(() => {
+    const cfg = this.config();
+    return cfg ? cfg.displayColumns.map(k => ({ key: k, label: k })) : [];
+  });
+
+  tablePagination = computed<TablePagination | null>(() => {
+    const lp = this.lastPage();
+    if (lp <= 1) return null;
+    return { page: this.page(), totalPages: lp, total: this.total() };
   });
 
   rows = signal<any[]>([]);
@@ -80,12 +92,9 @@ export class RawListComponent implements OnInit {
     this.loadData();
   }
 
-  prevPage(): void {
-    if (this.page() > 1) { this.page.update((p) => p - 1); this.loadData(); }
-  }
-
-  nextPage(): void {
-    if (this.page() < this.lastPage()) { this.page.update((p) => p + 1); this.loadData(); }
+  goToPage(page: number): void {
+    this.page.set(page);
+    this.loadData();
   }
 
   openCreate(): void {
@@ -150,7 +159,6 @@ export class RawListComponent implements OnInit {
     const id = this.deleteConfirmId();
     if (!cfg || id === null) return;
 
-    // Tokens use revoke endpoint
     const isToken = this.modelKey() === 'tokens';
     const req = isToken
       ? this.request.postRequest(`admin/raw/tokens/${id}/revoke`, {})

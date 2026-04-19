@@ -1,9 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SlicePipe } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RequestService } from '../../../core/services/request.service';
 import { Store } from '@ngrx/store';
-import { selectIsAtLeastAdmin, selectIsAtLeastModerator } from '../../../store/employee-auth/employee-auth.selectors';
-import {AsyncPipe, SlicePipe} from '@angular/common';
+import { selectIsAtLeastModerator } from '../../../store/employee-auth/employee-auth.selectors';
+import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 
 interface AdminUser {
   id: number;
@@ -24,7 +26,7 @@ interface PaginatedResponse<T> {
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [FormsModule, AsyncPipe, SlicePipe],
+  imports: [FormsModule, SlicePipe, DataTableComponent],
   templateUrl: './user-management.html',
   styleUrl: './user-management.scss',
 })
@@ -32,8 +34,7 @@ export class UserManagementComponent implements OnInit {
   private request = inject(RequestService);
   private store = inject(Store);
 
-  isAtLeastModerator$ = this.store.select(selectIsAtLeastModerator);
-  isAtLeastAdmin$ = this.store.select(selectIsAtLeastAdmin);
+  isAtLeastModerator = toSignal(this.store.select(selectIsAtLeastModerator), { initialValue: false });
 
   users = signal<AdminUser[]>([]);
   loading = signal(true);
@@ -44,6 +45,15 @@ export class UserManagementComponent implements OnInit {
   search = '';
   statusFilter = '';
   planFilter = '';
+
+  readonly columns: ColumnDef[] = [
+    { key: 'name', label: 'Name' },
+    { key: 'email', label: 'Email' },
+    { key: 'plan', label: 'Plan' },
+    { key: 'status', label: 'Status' },
+    { key: 'email_verified', label: 'Verified' },
+    { key: 'created_at', label: 'Joined' },
+  ];
 
   ngOnInit(): void {
     this.loadUsers();

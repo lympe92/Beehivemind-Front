@@ -10,33 +10,26 @@
     <div class="state-msg state-msg--error">{{ error() }}</div>
   } @else {
     <div class="table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Joined</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (emp of employees(); track emp.id) {
-            <tr>
-              <td>{{ emp.name }} {{ emp.surname }}</td>
-              <td>{{ emp.email }}</td>
-              <td><span class="badge badge--{{ emp.role }}">{{ emp.role }}</span></td>
-              <td>{{ emp.created_at | slice:0:10 }}</td>
-              <td class="actions">
-                <button class="btn btn--sm btn--secondary" (click)="openEdit(emp)">Edit</button>
-                <button class="btn btn--sm btn--danger" (click)="deleteEmployee(emp.id)">Delete</button>
-              </td>
-            </tr>
-          } @empty {
-            <tr><td colspan="5" class="empty">No employees found</td></tr>
+      <app-data-table
+        [columns]="columns"
+        [rows]="employees()"
+        emptyMessage="No employees found.">
+
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('name') { {{ row.name }} {{ row.surname }} }
+            @case ('role') { <span class="badge badge--{{ row.role }}">{{ row.role }}</span> }
+            @case ('created_at') { {{ row.created_at | slice:0:10 }} }
+            @default { {{ row[col.key] ?? '—' }} }
           }
-        </tbody>
-      </table>
+        </ng-template>
+
+        <ng-template #actionsTpl let-row>
+          <button class="btn btn--sm btn--secondary" (click)="openEdit(row)">Edit</button>
+          <button class="btn btn--sm btn--danger" (click)="deleteEmployee(row.id)">Delete</button>
+        </ng-template>
+
+      </app-data-table>
     </div>
   }
 

@@ -33,49 +33,37 @@
     <div class="state-msg state-msg--error">{{ error() }}</div>
   } @else {
     <div class="table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Plan</th>
-            <th>Status</th>
-            <th>Verified</th>
-            <th>Joined</th>
-            @if (isAtLeastModerator$ | async) {
-              <th>Actions</th>
-            }
-          </tr>
-        </thead>
-        <tbody>
-          @for (user of users(); track user.id) {
-            <tr>
-              <td>{{ user.name }} {{ user.surname }}</td>
-              <td>{{ user.email }}</td>
-              <td><span class="badge badge--plan badge--{{ user.plan }}">{{ user.plan }}</span></td>
-              <td><span class="badge badge--status badge--{{ user.status }}">{{ user.status }}</span></td>
-              <td>{{ user.email_verified ? '✓' : '—' }}</td>
-              <td>{{ user.created_at | slice:0:10 }}</td>
-              @if (isAtLeastModerator$ | async) {
-                <td class="actions">
-                  @if (!user.email_verified) {
-                    <button class="btn btn--sm btn--info" (click)="forceConfirm(user.id)" title="Force confirm email">✓ Confirm</button>
-                  }
-                  @if (user.status !== 'active') {
-                    <button class="btn btn--sm btn--success" (click)="updateStatus(user.id, 'active')">Activate</button>
-                  }
-                  @if (user.status === 'active') {
-                    <button class="btn btn--sm btn--warn" (click)="updateStatus(user.id, 'suspended')">Suspend</button>
-                    <button class="btn btn--sm btn--danger" (click)="updateStatus(user.id, 'banned')">Ban</button>
-                  }
-                </td>
-              }
-            </tr>
-          } @empty {
-            <tr><td [attr.colspan]="(isAtLeastModerator$ | async) ? 7 : 6" class="empty">No users found</td></tr>
+      <app-data-table
+        [columns]="columns"
+        [rows]="users()"
+        [showActions]="isAtLeastModerator()"
+        emptyMessage="No users found.">
+
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('name') { {{ row.name }} {{ row.surname }} }
+            @case ('plan') { <span class="badge badge--plan badge--{{ row.plan }}">{{ row.plan }}</span> }
+            @case ('status') { <span class="badge badge--status badge--{{ row.status }}">{{ row.status }}</span> }
+            @case ('email_verified') { {{ row.email_verified ? '✓' : '—' }} }
+            @case ('created_at') { {{ row.created_at | slice:0:10 }} }
+            @default { {{ row[col.key] ?? '—' }} }
           }
-        </tbody>
-      </table>
+        </ng-template>
+
+        <ng-template #actionsTpl let-row>
+          @if (!row.email_verified) {
+            <button class="btn btn--sm btn--info" (click)="forceConfirm(row.id)" title="Force confirm email">✓ Confirm</button>
+          }
+          @if (row.status !== 'active') {
+            <button class="btn btn--sm btn--success" (click)="updateStatus(row.id, 'active')">Activate</button>
+          }
+          @if (row.status === 'active') {
+            <button class="btn btn--sm btn--warn" (click)="updateStatus(row.id, 'suspended')">Suspend</button>
+            <button class="btn btn--sm btn--danger" (click)="updateStatus(row.id, 'banned')">Ban</button>
+          }
+        </ng-template>
+
+      </app-data-table>
     </div>
   }
 </div>

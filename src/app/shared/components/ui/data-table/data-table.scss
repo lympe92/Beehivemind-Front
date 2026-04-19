@@ -1,0 +1,104 @@
+.dt__wrap {
+  overflow-x: auto;
+}
+
+.dt__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--dt-text-muted);
+    background: var(--dt-th-bg, transparent);
+    border-bottom: 1px solid var(--dt-border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 11px 14px;
+    color: var(--dt-text-primary);
+    border-bottom: 1px solid var(--dt-border-soft);
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover:not(.dt__row--editing) td {
+    background: var(--dt-bg-hover);
+  }
+}
+
+.dt__th--actions {
+  width: 1%;
+}
+
+.dt__row--editing td {
+  background: var(--dt-edit-bg, rgba(0,0,0,0.04)) !important;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.dt__row--clickable {
+  cursor: pointer;
+}
+
+.dt__actions {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.dt__empty {
+  text-align: center;
+  color: var(--dt-text-muted);
+  padding: 24px 0;
+  font-size: 0.875rem;
+}
+
+.dt__muted {
+  color: var(--dt-text-muted);
+}
+
+.dt__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 14px;
+  border-top: 1px solid var(--dt-border);
+}
+
+.dt__page-btn {
+  background: transparent;
+  border: 1px solid var(--dt-border);
+  border-radius: 6px;
+  color: var(--dt-text-muted);
+  font-size: 0.875rem;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover:not(:disabled) {
+    background: var(--dt-bg-hover);
+    color: var(--dt-text-primary);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}
+
+.dt__page-info {
+  font-size: 0.875rem;
+  color: var(--dt-text-primary);
+}
+
+.dt__page-muted {
+  color: var(--dt-text-muted);
+}

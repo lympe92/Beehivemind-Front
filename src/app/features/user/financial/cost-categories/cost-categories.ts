@@ -2,6 +2,7 @@ import { Component, inject, OnInit, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CostCategory, CostType } from '../../../../core/models/cost-category.model';
 import { CostCategoryService } from '../../../../core/services/cost-category.service';
+import { DataTableComponent, ColumnDef } from '../../../../shared/components/ui/data-table/data-table';
 
 interface CategoryForm {
   name: string;
@@ -12,7 +13,7 @@ interface CategoryForm {
 @Component({
   selector: 'app-cost-categories',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DataTableComponent],
   templateUrl: './cost-categories.html',
   styleUrl: './cost-categories.scss',
 })
@@ -20,6 +21,12 @@ export class CostCategoriesComponent implements OnInit {
   private categoryService = inject(CostCategoryService);
 
   readonly categoriesChange = output<CostCategory[]>();
+
+  readonly columns: ColumnDef[] = [
+    { key: 'name', label: 'Name' },
+    { key: 'description', label: 'Description' },
+    { key: 'type', label: 'Type' },
+  ];
 
   categories = signal<CostCategory[]>([]);
 

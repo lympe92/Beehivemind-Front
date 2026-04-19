@@ -1,8 +1,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SlicePipe } from '@angular/common';
 import { RequestService } from '../../../core/services/request.service';
 import { EmployeeRole } from '../../../store/employee-auth/employee-auth.state';
-import {SlicePipe} from '@angular/common';
+import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 
 interface AdminEmployee {
   id: number;
@@ -16,7 +17,7 @@ interface AdminEmployee {
 @Component({
   selector: 'app-employee-management',
   standalone: true,
-  imports: [FormsModule, SlicePipe],
+  imports: [FormsModule, SlicePipe, DataTableComponent],
   templateUrl: './employee-management.html',
   styleUrl: './employee-management.scss',
 })
@@ -40,6 +41,13 @@ export class EmployeeManagementComponent implements OnInit {
   };
 
   roles: EmployeeRole[] = ['support', 'moderator', 'admin', 'superadmin'];
+
+  readonly columns: ColumnDef[] = [
+    { key: 'name', label: 'Name' },
+    { key: 'email', label: 'Email' },
+    { key: 'role', label: 'Role' },
+    { key: 'created_at', label: 'Joined' },
+  ];
 
   ngOnInit(): void {
     this.loadEmployees();

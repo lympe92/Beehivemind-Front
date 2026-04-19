@@ -1,7 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SlicePipe } from '@angular/common';
 import { RequestService } from '../../../core/services/request.service';
-import {SlicePipe} from '@angular/common';
+import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 
 interface Coupon {
   id: number;
@@ -20,7 +21,7 @@ interface Coupon {
 @Component({
   selector: 'app-coupons',
   standalone: true,
-  imports: [FormsModule, SlicePipe],
+  imports: [FormsModule, SlicePipe, DataTableComponent],
   templateUrl: './coupons.html',
   styleUrl: './coupons.scss',
 })
@@ -44,6 +45,15 @@ export class CouponsComponent implements OnInit {
     expires_at: '',
     is_active: true,
   };
+
+  readonly columns: ColumnDef[] = [
+    { key: 'code', label: 'Code' },
+    { key: 'type', label: 'Type' },
+    { key: 'value', label: 'Value' },
+    { key: 'uses', label: 'Uses' },
+    { key: 'expires_at', label: 'Expires' },
+    { key: 'is_usable', label: 'Status' },
+  ];
 
   ngOnInit(): void {
     this.loadCoupons();

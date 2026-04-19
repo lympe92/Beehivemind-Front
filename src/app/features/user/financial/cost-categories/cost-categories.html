@@ -22,50 +22,38 @@
   </div>
 }
 
-<div class="fin-table__wrap">
-  <table class="fin-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Type</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (row of categories(); track row.id) {
-        @if (editingId === row.id) {
-          <tr class="fin-table__row--editing">
-            <td><input class="fin-input" [(ngModel)]="editForm.name" name="ec_name" /></td>
-            <td><input class="fin-input" [(ngModel)]="editForm.description" name="ec_desc" /></td>
-            <td>
-              <select class="fin-select" [(ngModel)]="editForm.type" name="ec_type">
-                <option value="income">Income</option>
-                <option value="outcome">Outgoing</option>
-              </select>
-            </td>
-            <td class="fin-table__actions">
-              <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="confirmEdit()">Save</button>
-              <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="cancelEdit()">Cancel</button>
-            </td>
-          </tr>
-        } @else {
-          <tr>
-            <td>{{ row.name }}</td>
-            <td class="fin-table__muted">{{ row.description }}</td>
-            <td>
-              <span class="fin-badge fin-badge--{{ row.type }}">{{ row.type }}</span>
-            </td>
-            <td class="fin-table__actions">
-              <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="startEdit(row)">Edit</button>
-              <button class="fin-btn fin-btn--danger fin-btn--sm" (click)="deleteRow(row)">Delete</button>
-            </td>
-          </tr>
-        }
-      }
-      @empty {
-        <tr><td colspan="4" class="fin-table__empty">No categories yet.</td></tr>
-      }
-    </tbody>
-  </table>
-</div>
+<app-data-table
+  [columns]="columns"
+  [rows]="categories()"
+  [editingId]="editingId"
+  emptyMessage="No categories yet.">
+
+  <ng-template #cellTpl let-row let-col="col">
+    @switch (col.key) {
+      @case ('description') { <span class="dt__muted">{{ row.description }}</span> }
+      @case ('type') { <span class="fin-badge fin-badge--{{ row.type }}">{{ row.type }}</span> }
+      @default { {{ row[col.key] ?? '—' }} }
+    }
+  </ng-template>
+
+  <ng-template #editRowTpl let-row>
+    <td><input class="fin-input" [(ngModel)]="editForm.name" name="ec_name" /></td>
+    <td><input class="fin-input" [(ngModel)]="editForm.description" name="ec_desc" /></td>
+    <td>
+      <select class="fin-select" [(ngModel)]="editForm.type" name="ec_type">
+        <option value="income">Income</option>
+        <option value="outcome">Outgoing</option>
+      </select>
+    </td>
+    <td class="dt__actions">
+      <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="confirmEdit()">Save</button>
+      <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="cancelEdit()">Cancel</button>
+    </td>
+  </ng-template>
+
+  <ng-template #actionsTpl let-row>
+    <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="startEdit(row)">Edit</button>
+    <button class="fin-btn fin-btn--danger fin-btn--sm" (click)="deleteRow(row)">Delete</button>
+  </ng-template>
+
+</app-data-table>

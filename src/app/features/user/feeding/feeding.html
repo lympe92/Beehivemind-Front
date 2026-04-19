@@ -94,73 +94,49 @@
       }
 
       <!-- Table -->
-      @if (feeding().length) {
-        <div class="feeding__table-wrap">
-          <table class="feeding__table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Feeding Type</th>
-                <th>Food Type</th>
-                <th>Qty / Beehive</th>
-                <th>Unit</th>
-                @if (canEdit) { <th></th> }
-              </tr>
-            </thead>
-            <tbody>
-              @for (row of feeding(); track row.id) {
-                @if (editingId === row.id) {
-                  <tr class="feeding__row--editing">
-                    <td><input class="feeding__input" type="date" [(ngModel)]="editForm.date" name="edit_date" /></td>
-                    <td>
-                      <select class="feeding__select" [(ngModel)]="editForm.feeding_type" name="edit_feeding_type">
-                        @for (ft of FEEDING_TYPES; track ft.value) {
-                          <option [ngValue]="ft.value">{{ ft.label }}</option>
-                        }
-                      </select>
-                    </td>
-                    <td>
-                      <select class="feeding__select" [(ngModel)]="editForm.food_type" name="edit_food_type">
-                        @for (ft of FOOD_TYPES; track ft.value) {
-                          <option [ngValue]="ft.value">{{ ft.label }}</option>
-                        }
-                      </select>
-                    </td>
-                    <td><input class="feeding__input feeding__input--sm" type="number" min="0" [(ngModel)]="editForm.food_quantity" name="edit_qty" /></td>
-                    <td>
-                      <select class="feeding__select" [(ngModel)]="editForm.unit" name="edit_unit">
-                        @for (u of FEEDING_UNITS; track u.value) {
-                          <option [ngValue]="u.value">{{ u.label }}</option>
-                        }
-                      </select>
-                    </td>
-                    <td class="feeding__actions">
-                      <button class="feeding__btn feeding__btn--primary feeding__btn--sm" (click)="confirmEdit()">Save</button>
-                      <button class="feeding__btn feeding__btn--ghost feeding__btn--sm" (click)="cancelEdit()">Cancel</button>
-                    </td>
-                  </tr>
-                } @else {
-                  <tr>
-                    <td>{{ row.date }}</td>
-                    <td>{{ row.feeding_type }}</td>
-                    <td>{{ row.food_type }}</td>
-                    <td>{{ row.food_quantity }}</td>
-                    <td>{{ row.unit }}</td>
-                    @if (canEdit) {
-                      <td class="feeding__actions">
-                        <button class="feeding__btn feeding__btn--ghost feeding__btn--sm" (click)="startEdit(row)">Edit</button>
-                        <button class="feeding__btn feeding__btn--danger feeding__btn--sm" (click)="deleteRow(row)">Delete</button>
-                      </td>
-                    }
-                  </tr>
-                }
+      <app-data-table
+        [columns]="columns"
+        [rows]="feeding()"
+        [editingId]="editingId"
+        [showActions]="canEdit"
+        emptyMessage="No feeding records found.">
+
+        <ng-template #editRowTpl let-row>
+          <td><input class="feeding__input" type="date" [(ngModel)]="editForm.date" name="edit_date" /></td>
+          <td>
+            <select class="feeding__select" [(ngModel)]="editForm.feeding_type" name="edit_feeding_type">
+              @for (ft of FEEDING_TYPES; track ft.value) {
+                <option [ngValue]="ft.value">{{ ft.label }}</option>
               }
-            </tbody>
-          </table>
-        </div>
-      } @else {
-        <p class="feeding__empty">No feeding records found.</p>
-      }
+            </select>
+          </td>
+          <td>
+            <select class="feeding__select" [(ngModel)]="editForm.food_type" name="edit_food_type">
+              @for (ft of FOOD_TYPES; track ft.value) {
+                <option [ngValue]="ft.value">{{ ft.label }}</option>
+              }
+            </select>
+          </td>
+          <td><input class="feeding__input feeding__input--sm" type="number" min="0" [(ngModel)]="editForm.food_quantity" name="edit_qty" /></td>
+          <td>
+            <select class="feeding__select" [(ngModel)]="editForm.unit" name="edit_unit">
+              @for (u of FEEDING_UNITS; track u.value) {
+                <option [ngValue]="u.value">{{ u.label }}</option>
+              }
+            </select>
+          </td>
+          <td class="dt__actions">
+            <button class="feeding__btn feeding__btn--primary feeding__btn--sm" (click)="confirmEdit()">Save</button>
+            <button class="feeding__btn feeding__btn--ghost feeding__btn--sm" (click)="cancelEdit()">Cancel</button>
+          </td>
+        </ng-template>
+
+        <ng-template #actionsTpl let-row>
+          <button class="feeding__btn feeding__btn--ghost feeding__btn--sm" (click)="startEdit(row)">Edit</button>
+          <button class="feeding__btn feeding__btn--danger feeding__btn--sm" (click)="deleteRow(row)">Delete</button>
+        </ng-template>
+
+      </app-data-table>
 
     </div>
   </div>

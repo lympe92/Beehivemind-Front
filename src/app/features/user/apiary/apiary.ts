@@ -9,6 +9,7 @@ import { environment } from '../../../../environments/environment';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
+import { DataTableComponent, ColumnDef, TablePagination } from '../../../shared/components/ui/data-table/data-table';
 
 interface ApiaryForm {
   name: string;
@@ -20,7 +21,7 @@ type NotificationType = 'error' | 'success' | 'warning';
 @Component({
   selector: 'app-apiary',
   standalone: true,
-  imports: [FormsModule, GoogleMap, MapMarker, DecimalPipe],
+  imports: [FormsModule, GoogleMap, MapMarker, DecimalPipe, DataTableComponent],
   templateUrl: './apiary.html',
   styleUrl: './apiary.scss',
 })
@@ -41,6 +42,12 @@ export class ApiaryComponent implements OnInit {
     disableDefaultUI: false,
     zoomControl: true,
   };
+
+  readonly columns: ColumnDef[] = [
+    { key: 'name', label: 'Name' },
+    { key: 'hivesNumber', label: 'Hives', width: '80px' },
+    { key: 'coords', label: 'Coordinates' },
+  ];
 
   // Pagination
   page     = signal(1);
@@ -63,6 +70,12 @@ export class ApiaryComponent implements OnInit {
       per_page: this.perPage,
     };
   });
+
+  get tablePagination(): TablePagination | null {
+    const m = this.meta();
+    if (m.total_pages <= 1) return null;
+    return { page: this.page(), totalPages: m.total_pages, total: m.total };
+  }
 
   // Edit state
   editingId: number | null = null;

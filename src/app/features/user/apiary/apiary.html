@@ -43,70 +43,47 @@
         }
 
         <!-- Table -->
-        <div class="apiary__table-wrap">
-          <table class="apiary__table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Hives</th>
-                <th>Coordinates</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (row of apiaries(); track row.id) {
-                @if (editingId === row.id) {
-                  <tr class="apiary__row--editing">
-                    <td><input class="apiary__input" [(ngModel)]="editForm.name" name="e_name" /></td>
-                    <td><input class="apiary__input apiary__input--sm" type="number" min="0" [(ngModel)]="editForm.hivesNumber" name="e_hives" /></td>
-                    <td class="apiary__coords-cell">
-                      @if (markerPosition) {
-                        {{ markerPosition.lat | number:'1.4-4' }}, {{ markerPosition.lng | number:'1.4-4' }}
-                      } @else {
-                        <span class="apiary__muted">Click map to change</span>
-                      }
-                    </td>
-                    <td class="apiary__actions">
-                      <button class="apiary__btn apiary__btn--primary apiary__btn--sm" (click)="confirmEdit()">Save</button>
-                      <button class="apiary__btn apiary__btn--ghost apiary__btn--sm" (click)="cancelEdit()">Cancel</button>
-                    </td>
-                  </tr>
-                } @else {
-                  <tr class="apiary__row" (click)="onRowSelect(row)">
-                    <td>{{ row.name }}</td>
-                    <td>{{ row.hivesNumber }}</td>
-                    <td class="apiary__coords-cell apiary__muted">{{ row.latitude | number:'1.4-4' }}, {{ row.longitude | number:'1.4-4' }}</td>
-                    <td class="apiary__actions">
-                      <button class="apiary__btn apiary__btn--ghost apiary__btn--sm" (click)="startEdit(row); $event.stopPropagation()">Edit</button>
-                      <button class="apiary__btn apiary__btn--danger apiary__btn--sm" (click)="deleteRow(row); $event.stopPropagation()">Delete</button>
-                    </td>
-                  </tr>
-                }
+        <app-data-table
+          [columns]="columns"
+          [rows]="apiaries()"
+          [editingId]="editingId"
+          [pagination]="tablePagination"
+          [clickableRows]="true"
+          (pageChange)="goToPage($event)"
+          (rowClick)="onRowSelect($event)"
+          emptyMessage="No apiaries yet. Add one and set its location on the map.">
+
+          <ng-template #cellTpl let-row let-col="col">
+            @switch (col.key) {
+              @case ('coords') {
+                <span class="apiary__muted">{{ row.latitude | number:'1.4-4' }}, {{ row.longitude | number:'1.4-4' }}</span>
               }
-              @empty {
-                <tr><td colspan="4" class="apiary__empty">No apiaries yet. Add one and set its location on the map.</td></tr>
+              @default { {{ row[col.key] ?? '—' }} }
+            }
+          </ng-template>
+
+          <ng-template #editRowTpl let-row>
+            <td><input class="apiary__input" [(ngModel)]="editForm.name" name="e_name" /></td>
+            <td><input class="apiary__input apiary__input--sm" type="number" min="0" [(ngModel)]="editForm.hivesNumber" name="e_hives" /></td>
+            <td>
+              @if (markerPosition) {
+                {{ markerPosition.lat | number:'1.4-4' }}, {{ markerPosition.lng | number:'1.4-4' }}
+              } @else {
+                <span class="apiary__muted">Click map to change</span>
               }
-            </tbody>
-          </table>
-        </div>
+            </td>
+            <td class="dt__actions">
+              <button class="apiary__btn apiary__btn--primary apiary__btn--sm" (click)="confirmEdit()">Save</button>
+              <button class="apiary__btn apiary__btn--ghost apiary__btn--sm" (click)="cancelEdit()">Cancel</button>
+            </td>
+          </ng-template>
 
-        <!-- Pagination -->
-        @if (meta() && meta()!.total_pages > 1) {
-          <div class="apiary__pagination">
-            <button class="apiary__btn apiary__btn--ghost apiary__btn--sm"
-              [disabled]="page() === 1"
-              (click)="goToPage(page() - 1)">‹ Prev</button>
+          <ng-template #actionsTpl let-row>
+            <button class="apiary__btn apiary__btn--ghost apiary__btn--sm" (click)="startEdit(row); $event.stopPropagation()">Edit</button>
+            <button class="apiary__btn apiary__btn--danger apiary__btn--sm" (click)="deleteRow(row); $event.stopPropagation()">Delete</button>
+          </ng-template>
 
-            <span class="apiary__pagination-info">
-              {{ page() }} / {{ meta()!.total_pages }}
-              <span class="apiary__muted">({{ meta()!.total }} total)</span>
-            </span>
-
-            <button class="apiary__btn apiary__btn--ghost apiary__btn--sm"
-              [disabled]="page() === meta()!.total_pages"
-              (click)="goToPage(page() + 1)">Next ›</button>
-          </div>
-        }
+        </app-data-table>
 
       </div>
     </div>

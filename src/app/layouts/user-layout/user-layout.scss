@@ -21,6 +21,14 @@ $content-bg:     #ffffff;   // content (white)
   overflow: hidden;
   background: $shell-bg;
   color: $text-primary;
+
+  --dt-text-primary: #171717;
+  --dt-text-muted: #737373;
+  --dt-border: #e5e5e5;
+  --dt-border-soft: rgba(229, 229, 229, 0.6);
+  --dt-bg-hover: rgba(229, 229, 229, 0.5);
+  --dt-th-bg: transparent;
+  --dt-edit-bg: rgba(23, 23, 23, 0.05);
 }
 
 // ── Sidebar ────────────────────────────────────────────

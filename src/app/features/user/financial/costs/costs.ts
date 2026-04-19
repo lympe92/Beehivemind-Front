@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Cost } from '../../../../core/models/cost.model';
 import { CostCategory } from '../../../../core/models/cost-category.model';
 import { CostService } from '../../../../core/services/cost.service';
+import { DataTableComponent, ColumnDef } from '../../../../shared/components/ui/data-table/data-table';
 
 interface CostForm {
   date: string;
@@ -14,7 +15,7 @@ interface CostForm {
 @Component({
   selector: 'app-costs',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DataTableComponent],
   templateUrl: './costs.html',
   styleUrl: './costs.scss',
 })
@@ -23,6 +24,13 @@ export class CostsComponent implements OnInit {
 
   readonly costCategories = input<CostCategory[]>([]);
   readonly costsChange = output<void>();
+
+  readonly columns: ColumnDef[] = [
+    { key: 'date', label: 'Date' },
+    { key: 'name', label: 'Name' },
+    { key: 'category', label: 'Category' },
+    { key: 'amount', label: 'Amount' },
+  ];
 
   costs = signal<Cost[]>([]);
 

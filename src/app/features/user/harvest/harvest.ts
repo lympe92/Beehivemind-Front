@@ -15,6 +15,7 @@ import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
 import { HarvestActions } from '../../../store/harvest/harvest.actions';
 import { selectAllHarvest } from '../../../store/harvest/harvest.selectors';
+import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 
 interface HarvestForm {
   date: string;
@@ -29,7 +30,7 @@ type NotificationType = 'error' | 'success' | 'warning';
 @Component({
   selector: 'app-harvest',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DataTableComponent],
   templateUrl: './harvest.html',
   styleUrl: './harvest.scss',
 })
@@ -39,6 +40,20 @@ export class HarvestComponent implements OnInit {
 
   readonly HARVEST_TYPES = HARVEST_TYPES;
   readonly HARVEST_UNITS = HARVEST_UNITS;
+
+  columns = computed<ColumnDef[]>(() => {
+    const base: ColumnDef[] = [
+      { key: 'date', label: 'Date' },
+      { key: 'honey_type', label: 'Type' },
+      { key: 'honey_description', label: 'Description' },
+      { key: 'food_quantity', label: 'Total Quantity' },
+      { key: 'unit', label: 'Unit' },
+    ];
+    if (this.selectedApiaryId() !== 0 && !this.canEdit) {
+      return [...base, { key: 'beehiveId', label: 'Beehive' }];
+    }
+    return base;
+  });
 
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);

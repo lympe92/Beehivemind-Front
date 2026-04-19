@@ -26,36 +26,6 @@
     border: 1px solid #334155;
   }
 
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.875rem;
-
-    th {
-      background: #1e293b;
-      color: #94a3b8;
-      font-weight: 600;
-      padding: 12px 14px;
-      text-align: left;
-      border-bottom: 1px solid #334155;
-    }
-
-    td {
-      padding: 12px 14px;
-      border-bottom: 1px solid #1e293b;
-      color: #f1f5f9;
-    }
-
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(255,255,255,0.02); }
-
-    .empty {
-      text-align: center;
-      color: #64748b;
-      padding: 40px;
-    }
-  }
-
   .badge {
     display: inline-block;
     border-radius: 4px;
@@ -69,8 +39,6 @@
     &--admin      { background: rgba(245,158,11,0.15);  color: #f59e0b; }
     &--superadmin { background: rgba(239,68,68,0.15);   color: #f87171; }
   }
-
-  .actions { display: flex; gap: 6px; }
 
   .btn {
     border: none;

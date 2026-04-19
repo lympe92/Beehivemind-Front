@@ -62,59 +62,17 @@
     overflow-x: auto;
     border-radius: 8px;
     border: 1px solid #334155;
-    margin-bottom: 16px;
-  }
 
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.8rem;
+    .dt__table {
+      font-size: 0.8rem;
 
-    th {
-      background: #1e293b;
-      color: #64748b;
-      font-weight: 600;
-      padding: 10px 12px;
-      text-align: left;
-      border-bottom: 1px solid #334155;
-      white-space: nowrap;
+      td {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
-
-    .actions-col { width: 120px; }
-
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #0f172a;
-      color: #cbd5e1;
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(255,255,255,0.02); }
-
-    .empty {
-      text-align: center;
-      color: #475569;
-      padding: 32px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 4px;
-      white-space: nowrap;
-    }
-  }
-
-  .pagination {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    justify-content: flex-end;
-    font-size: 0.875rem;
-    color: #94a3b8;
   }
 
   .btn {

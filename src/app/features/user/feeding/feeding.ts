@@ -17,6 +17,7 @@ import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
 import { FeedingActions } from '../../../store/feeding/feeding.actions';
 import { selectAllFeeding } from '../../../store/feeding/feeding.selectors';
+import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 
 interface FeedingForm {
   date: string;
@@ -36,7 +37,7 @@ interface Notification {
 @Component({
   selector: 'app-feeding',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DataTableComponent],
   templateUrl: './feeding.html',
   styleUrl: './feeding.scss',
 })
@@ -47,6 +48,14 @@ export class FeedingComponent implements OnInit {
   readonly FEEDING_TYPES = FEEDING_TYPES;
   readonly FOOD_TYPES = FOOD_TYPES;
   readonly FEEDING_UNITS = FEEDING_UNITS;
+
+  readonly columns: ColumnDef[] = [
+    { key: 'date', label: 'Date' },
+    { key: 'feeding_type', label: 'Feeding Type' },
+    { key: 'food_type', label: 'Food Type' },
+    { key: 'food_quantity', label: 'Qty / Beehive' },
+    { key: 'unit', label: 'Unit' },
+  ];
 
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);
