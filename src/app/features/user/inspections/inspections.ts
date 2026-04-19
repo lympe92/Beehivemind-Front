@@ -49,9 +49,16 @@ export class InspectionsComponent implements OnInit {
   );
 
   inspections = computed(() => {
+    const all = this.allInspections();
     const beehiveId = this.selectedBeehiveId();
-    if (beehiveId === 0) return [];
-    return this.allInspections().filter(r => r.beehiveId === beehiveId);
+    const apiaryId = this.selectedApiaryId();
+
+    if (beehiveId !== 0) return all.filter(r => r.beehiveId === beehiveId);
+    if (apiaryId !== 0) {
+      const ids = new Set(this.allBeehives().filter(b => b.apiaryId === apiaryId).map(b => b.id));
+      return all.filter(r => ids.has(r.beehiveId));
+    }
+    return all;
   });
 
   selectedApiaryId = signal<number>(0);

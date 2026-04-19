@@ -25,18 +25,18 @@ export class CostService {
   }
 
   getMonthlyCosts(): Observable<ApiResponse<MonthlyCost[]>> {
-    return this.request.getRequest<MonthlyCost[]>('costs/monthly');
+    return this.request.getRequest<MonthlyCost[]>('costs/stats/monthly');
   }
 
   getYearCostSum(): Observable<ApiResponse<YearCostSum[]>> {
-    return this.request.getRequest<YearCostSum[]>('costs/year-sum');
+    return this.request.getRequest<YearCostSum[]>('costs/stats/yearly');
   }
 
   getIncomeCostsByCategory(): Observable<ApiResponse<CostByCategory[]>> {
-    return this.request.getRequest<CostByCategory[]>('costs/income-by-category');
+    return this.request.getRequest<CostByCategory[]>('costs/stats/by-category/income');
   }
 
   getOutcomeCostsByCategory(): Observable<ApiResponse<CostByCategory[]>> {
-    return this.request.getRequest<CostByCategory[]>('costs/outcome-by-category');
+    return this.request.getRequest<CostByCategory[]>('costs/stats/by-category/outcome');
   }
 }

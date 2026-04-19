@@ -41,8 +41,8 @@ export class FinancialComponent implements OnInit {
     const income = Array<number>(12).fill(0);
     const outcome = Array<number>(12).fill(0);
     for (const item of data) {
-      if (item.type === 'income') income[item.month - 1] = item.amount;
-      else outcome[item.month - 1] = item.amount;
+      if (item.type === 'income') income[item.month - 1] = Number(item.amount);
+      else outcome[item.month - 1] = Number(item.amount);
     }
 
     return this.chartBuilder.bar({
@@ -57,8 +57,9 @@ export class FinancialComponent implements OnInit {
   summaryPieOptions = computed<ApexOptions | null>(() => {
     const data = this.yearSum();
     if (!data.length) return null;
-    const income = data.find(c => c.type === 'income')?.amount ?? 0;
-    const outcome = data.find(c => c.type === 'outcome')?.amount ?? 0;
+    const income = data.filter(c => c.type === 'income').reduce((s, c) => s + Number(c.amount), 0);
+    const outcome = data.filter(c => c.type === 'outcome').reduce((s, c) => s + Number(c.amount), 0);
+    if (!income && !outcome) return null;
     return this.chartBuilder.pie({ values: [income, outcome], labels: ['Income', 'Outgoing'] });
   });
 
@@ -66,7 +67,7 @@ export class FinancialComponent implements OnInit {
     const data = this.incomeCosts();
     if (!data.length) return null;
     return this.chartBuilder.pie({
-      values: data.map(c => c.amount),
+      values: data.map(c => Number(c.amount)),
       labels: data.map(c => c.category),
     });
   });
@@ -75,7 +76,7 @@ export class FinancialComponent implements OnInit {
     const data = this.outcomeCosts();
     if (!data.length) return null;
     return this.chartBuilder.pie({
-      values: data.map(c => c.amount),
+      values: data.map(c => Number(c.amount)),
       labels: data.map(c => c.category),
     });
   });

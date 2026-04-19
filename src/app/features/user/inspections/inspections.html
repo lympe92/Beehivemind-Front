@@ -192,12 +192,8 @@
             </tbody>
           </table>
         </div>
-      } @else if (selectedBeehiveId() !== 0) {
-        <p class="insp__empty">No inspection records found for this beehive.</p>
-      } @else if (selectedApiaryId() !== 0) {
-        <p class="insp__empty">Select a beehive to view its inspections.</p>
       } @else {
-        <p class="insp__empty">Select an apiary and a beehive to view inspection data.</p>
+        <p class="insp__empty">No inspection records found.</p>
       }
 
     </div>

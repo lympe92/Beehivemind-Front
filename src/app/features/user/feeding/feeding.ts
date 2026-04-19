@@ -66,7 +66,7 @@ export class FeedingComponent implements OnInit {
       const ids = new Set(this.allBeehives().filter(b => b.apiaryId === apiaryId).map(b => b.id));
       return all.filter(r => ids.has(r.beehiveId));
     }
-    return [];
+    return all;
   });
 
   selectedApiaryId = signal<number>(0);
