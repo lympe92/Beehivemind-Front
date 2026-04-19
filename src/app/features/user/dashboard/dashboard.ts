@@ -11,13 +11,23 @@ import { InspectionsActions } from '../../../store/inspections/inspections.actio
 import { selectAllInspections } from '../../../store/inspections/inspections.selectors';
 import { ChartBuilderService } from '../../../core/services/chart-builder.service';
 import { ApexChartComponent } from '../../../shared/components/ui/apex-chart/apex-chart';
-import { DashboardFiltersComponent } from './filters/filters';
-import { DetectionsTableComponent, FilterLevel } from './detections-table/detections-table';
+import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
+import { CardComponent } from '../../../shared/components/ui/card/card';
+
+export type FilterLevel = 'user' | 'apiary' | 'beehive';
+
+interface DetectionRow {
+  no_queen: number | string;
+  varroa: number | string;
+  american_foulbrood: number | string;
+  european_foulbrood: number | string;
+  nosema: number | string;
+}
 
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
-  imports: [ApexChartComponent, DashboardFiltersComponent, DetectionsTableComponent],
+  imports: [ApexChartComponent, FilterBarComponent, CardComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -30,7 +40,6 @@ export class UserDashboardComponent implements OnInit {
   private allBeehives = this.store.selectSignal(selectAllBeehives);
   private allInspections = this.store.selectSignal(selectAllInspections);
 
-  // chartInspections: avg (user/apiary) or raw (beehive) — drives line/bar/brood charts
   chartInspections = signal<AvgInspection[]>([]);
   chartLoading = signal(true);
 
@@ -38,7 +47,12 @@ export class UserDashboardComponent implements OnInit {
   selectedApiaryId = signal<number | null>(null);
   selectedBeehiveId = signal<number | null>(null);
 
-  // rawInspections: computed from store, filtered by current level — drives queens pie + detections table
+  filteredBeehives = computed(() => {
+    const apiaryId = this.selectedApiaryId();
+    if (!apiaryId) return [];
+    return this.allBeehives().filter(b => b.apiaryId === apiaryId);
+  });
+
   rawInspections = computed<Inspection[]>(() => {
     const all = this.allInspections();
     const level = this.filterLevel();
@@ -55,6 +69,33 @@ export class UserDashboardComponent implements OnInit {
     return all;
   });
 
+  detections = computed<DetectionRow | null>(() => {
+    const data = this.rawInspections();
+    if (!data.length) return null;
+
+    if (this.filterLevel() !== 'beehive') {
+      const latest = this.latestPerBeehive(data);
+      return {
+        no_queen:           latest.filter(v => !v.queen_exists).length,
+        varroa:             latest.filter(v => !!v.varroa).length,
+        american_foulbrood: latest.filter(v => !!v.american_foulbrood).length,
+        european_foulbrood: latest.filter(v => !!v.european_foulbrood).length,
+        nosema:             latest.filter(v => !!v.nosema).length,
+      };
+    }
+
+    const latest = data.reduce((prev, curr) =>
+      new Date(curr.date) > new Date(prev.date) ? curr : prev
+    );
+    return {
+      no_queen:           !latest.queen_exists      ? 'Yes' : 'No',
+      varroa:             !!latest.varroa           ? 'Yes' : 'No',
+      american_foulbrood: !!latest.american_foulbrood ? 'Yes' : 'No',
+      european_foulbrood: !!latest.european_foulbrood ? 'Yes' : 'No',
+      nosema:             !!latest.nosema           ? 'Yes' : 'No',
+    };
+  });
+
   // ── Computed chart options ──────────────────────────────
 
   variablesLineOptions = computed<ApexOptions | null>(() => {
@@ -62,9 +103,9 @@ export class UserDashboardComponent implements OnInit {
     if (!data.length) return null;
     return this.chartBuilder.line({
       series: [
-        { name: 'Pollen', data: data.map(v => v.pollen) },
-        { name: 'Honey', data: data.map(v => v.honey) },
-        { name: 'Open Brood', data: data.map(v => v.opened_brood) },
+        { name: 'Pollen',       data: data.map(v => v.pollen) },
+        { name: 'Honey',        data: data.map(v => v.honey) },
+        { name: 'Open Brood',   data: data.map(v => v.opened_brood) },
         { name: 'Closed Brood', data: data.map(v => v.closed_brood) },
       ],
       categories: data.map(v => v.date),
@@ -77,7 +118,7 @@ export class UserDashboardComponent implements OnInit {
     return this.chartBuilder.line({
       series: [
         { name: 'Population', data: data.map(v => v.population) },
-        { name: 'Frames', data: data.map(v => v.frame_space) },
+        { name: 'Frames',     data: data.map(v => v.frame_space) },
       ],
       categories: data.map(v => v.date),
     });
@@ -107,21 +148,12 @@ export class UserDashboardComponent implements OnInit {
     const raw = this.rawInspections();
     if (!raw.length) return null;
 
-    const latestPerBeehive = new Map<number, Inspection>();
-    for (const insp of raw) {
-      const existing = latestPerBeehive.get(insp.beehiveId);
-      if (!existing || new Date(insp.date) > new Date(existing.date)) {
-        latestPerBeehive.set(insp.beehiveId, insp);
-      }
-    }
-
     const yearCounts = new Map<number, number>();
-    for (const insp of latestPerBeehive.values()) {
+    for (const insp of this.latestPerBeehive(raw)) {
       if (insp.queen_year) {
         yearCounts.set(insp.queen_year, (yearCounts.get(insp.queen_year) ?? 0) + 1);
       }
     }
-
     if (!yearCounts.size) return null;
 
     const sorted = [...yearCounts.entries()].sort(([a], [b]) => a - b);
@@ -189,5 +221,16 @@ export class UserDashboardComponent implements OnInit {
       if (res.success) this.chartInspections.set(res.data);
       this.chartLoading.set(false);
     });
+  }
+
+  private latestPerBeehive(data: Inspection[]): Inspection[] {
+    const map = new Map<number, Inspection>();
+    for (const insp of data) {
+      const existing = map.get(insp.beehiveId);
+      if (!existing || new Date(insp.date) > new Date(existing.date)) {
+        map.set(insp.beehiveId, insp);
+      }
+    }
+    return [...map.values()];
   }
 }

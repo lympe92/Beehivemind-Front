@@ -18,55 +18,39 @@
 
   </app-filter-bar>
 
-  <!-- Notification -->
-  @if (notification) {
-    <div class="bh__notification bh__notification--{{ notification.type }}">
-      <span>{{ notification.message }}</span>
-      <button class="bh__notification-close" (click)="clearNotification()">×</button>
-    </div>
-  }
+  <!-- Beehives table -->
+  <app-card title="Beehives">
+    <app-data-table
+      [columns]="columns"
+      [rows]="beehives()"
+      [loading]="loading()"
+      [editingId]="editingId"
+      emptyMessage="No beehives found.">
 
-  <!-- Card -->
-  <div class="bh__card">
-    <div class="bh__card-header">
-      <span>Beehives</span>
-    </div>
+      <ng-template #cellTpl let-row let-col="col" let-i="index">
+        @switch (col.key) {
+          @case ('_idx') { <span class="dt__muted">{{ i + 1 }}</span> }
+          @case ('queen_year') { {{ row.queen?.year ?? '—' }} }
+          @default { {{ row[col.key] ?? '—' }} }
+        }
+      </ng-template>
 
-    <div class="bh__card-body">
+      <ng-template #editRowTpl let-row let-i="index">
+        <td class="dt__muted">{{ i + 1 }}</td>
+        <td><input class="bh__input" [(ngModel)]="editForm.name" name="edit_name" placeholder="Beehive name" /></td>
+        <td><input class="bh__input bh__input--sm" type="number" min="2000" [(ngModel)]="editForm.queen_year" name="edit_qy" placeholder="e.g. 2023" /></td>
+        <td class="dt__actions">
+          <button class="bh__btn bh__btn--primary bh__btn--sm" (click)="confirmEdit()">Save</button>
+          <button class="bh__btn bh__btn--ghost bh__btn--sm" (click)="cancelEdit()">Cancel</button>
+        </td>
+      </ng-template>
 
-      <app-data-table
-        [columns]="columns"
-        [rows]="beehives()"
-        [loading]="loading()"
-        [editingId]="editingId"
-        emptyMessage="No beehives found.">
+      <ng-template #actionsTpl let-row>
+        <button class="bh__btn bh__btn--ghost bh__btn--sm" (click)="startEdit(row)">Edit</button>
+        <button class="bh__btn bh__btn--danger bh__btn--sm" (click)="deleteRow(row)">Delete</button>
+      </ng-template>
 
-        <ng-template #cellTpl let-row let-col="col" let-i="index">
-          @switch (col.key) {
-            @case ('_idx') { <span class="dt__muted">{{ i + 1 }}</span> }
-            @case ('queen_year') { {{ row.queen?.year ?? '—' }} }
-            @default { {{ row[col.key] ?? '—' }} }
-          }
-        </ng-template>
-
-        <ng-template #editRowTpl let-row let-i="index">
-          <td class="dt__muted">{{ i + 1 }}</td>
-          <td><input class="bh__input" [(ngModel)]="editForm.name" name="edit_name" placeholder="Beehive name" /></td>
-          <td><input class="bh__input bh__input--sm" type="number" min="2000" [(ngModel)]="editForm.queen_year" name="edit_qy" placeholder="e.g. 2023" /></td>
-          <td class="dt__actions">
-            <button class="bh__btn bh__btn--primary bh__btn--sm" (click)="confirmEdit()">Save</button>
-            <button class="bh__btn bh__btn--ghost bh__btn--sm" (click)="cancelEdit()">Cancel</button>
-          </td>
-        </ng-template>
-
-        <ng-template #actionsTpl let-row>
-          <button class="bh__btn bh__btn--ghost bh__btn--sm" (click)="startEdit(row)">Edit</button>
-          <button class="bh__btn bh__btn--danger bh__btn--sm" (click)="deleteRow(row)">Delete</button>
-        </ng-template>
-
-      </app-data-table>
-
-    </div>
-  </div>
+    </app-data-table>
+  </app-card>
 
 </div>

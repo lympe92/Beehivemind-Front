@@ -1,67 +1,67 @@
 <div class="dashboard">
 
   <!-- Filters -->
-  <div class="dashboard__row">
-    <app-dashboard-filters
-      [apiaries]="apiaries()"
-      (apiaryChange)="onApiaryChange($event)"
-      (beehiveChange)="onBeehiveChange($event)" />
-  </div>
+  <app-filter-bar
+    [apiaries]="apiaries()"
+    [beehives]="filteredBeehives()"
+    [apiaryId]="selectedApiaryId() ?? 0"
+    (apiaryIdChange)="onApiaryChange($event)"
+    [beehiveId]="selectedBeehiveId() ?? 0"
+    (beehiveIdChange)="onBeehiveChange($event)" />
 
   <!-- Variables over Time -->
-  <div class="dashboard__row">
-    <div class="dashboard__card">
-      <div class="dashboard__card-header">Variables over Time</div>
-      <div class="dashboard__card-body">
-        <app-apex-chart [options]="variablesLineOptions()" [loading]="chartLoading()" height="300" />
-      </div>
-    </div>
-  </div>
+  <app-card title="Variables over Time">
+    <app-apex-chart [options]="variablesLineOptions()" [loading]="chartLoading()" height="300" />
+  </app-card>
 
   <!-- Population and Frames over Time -->
-  <div class="dashboard__row">
-    <div class="dashboard__card">
-      <div class="dashboard__card-header">Population and Frames over Time</div>
-      <div class="dashboard__card-body">
-        <app-apex-chart [options]="populationLineOptions()" [loading]="chartLoading()" height="300" />
-      </div>
-    </div>
-  </div>
+  <app-card title="Population and Frames over Time">
+    <app-apex-chart [options]="populationLineOptions()" [loading]="chartLoading()" height="300" />
+  </app-card>
 
   <!-- Last Inspection / Queens Ages / Brood Ratio -->
-  <div class="dashboard__row dashboard__row--3col">
-    <div class="dashboard__card">
-      <div class="dashboard__card-header">Last Inspection</div>
-      <div class="dashboard__card-body">
-        <app-apex-chart [options]="lastInspectionBarOptions()" [loading]="chartLoading()" height="280" />
-      </div>
-    </div>
+  <div class="dashboard__row--3col">
+    <app-card title="Last Inspection">
+      <app-apex-chart [options]="lastInspectionBarOptions()" [loading]="chartLoading()" height="280" />
+    </app-card>
 
-    <div class="dashboard__card">
-      <div class="dashboard__card-header">Queens Ages</div>
-      <div class="dashboard__card-body">
-        <app-apex-chart [options]="queensPieOptions()" [loading]="chartLoading()" height="280" />
-      </div>
-    </div>
+    <app-card title="Queens Ages">
+      <app-apex-chart [options]="queensPieOptions()" [loading]="chartLoading()" height="280" />
+    </app-card>
 
-    <div class="dashboard__card">
-      <div class="dashboard__card-header">Ratio Opened / Closed Brood</div>
-      <div class="dashboard__card-body">
-        <app-apex-chart [options]="broodPieOptions()" [loading]="chartLoading()" height="280" />
-      </div>
-    </div>
+    <app-card title="Ratio Opened / Closed Brood">
+      <app-apex-chart [options]="broodPieOptions()" [loading]="chartLoading()" height="280" />
+    </app-card>
   </div>
 
   <!-- Detections -->
-  <div class="dashboard__row">
-    <div class="dashboard__card">
-      <div class="dashboard__card-header">Detections</div>
-      <div class="dashboard__card-body">
-        <app-detections-table
-          [inspections]="rawInspections()"
-          [filterLevel]="filterLevel()" />
+  <app-card title="Detections">
+    @if (detections(); as row) {
+      <div class="dashboard__detections">
+        <table class="dashboard__detections-table">
+          <thead>
+            <tr>
+              <th>No Queen</th>
+              <th>Varroa</th>
+              <th>American Foulbrood</th>
+              <th>European Foulbrood</th>
+              <th>Nosema</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ row.no_queen }}</td>
+              <td>{{ row.varroa }}</td>
+              <td>{{ row.american_foulbrood }}</td>
+              <td>{{ row.european_foulbrood }}</td>
+              <td>{{ row.nosema }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
-  </div>
+    } @else {
+      <p class="dashboard__detections-empty">No data available.</p>
+    }
+  </app-card>
 
 </div>
