@@ -1,0 +1,17 @@
+@if (mapsLoaded()) {
+  <google-map
+    width="100%"
+    height="100%"
+    [center]="center()"
+    [zoom]="zoom()"
+    [options]="mapOptions"
+    (mapClick)="onMapClick($event)">
+    @if (marker()) {
+      <map-marker [position]="marker()!" />
+    }
+  </google-map>
+} @else {
+  <div class="map-picker__placeholder">
+    <span>Loading map…</span>
+  </div>
+}

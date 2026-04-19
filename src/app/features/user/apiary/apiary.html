@@ -59,19 +59,11 @@
       }
 
       <div class="apiary__map-wrap">
-        @if (mapsLoaded()) {
-          <google-map
-            width="100%"
-            height="100%"
-            [center]="mapCenter"
-            [zoom]="mapZoom"
-            [options]="mapOptions"
-            (mapClick)="onMapClick($event)">
-            @if (markerPosition) {
-              <map-marker [position]="markerPosition" />
-            }
-          </google-map>
-        }
+        <app-map-picker
+          [center]="mapCenter"
+          [zoom]="mapZoom"
+          [marker]="markerPosition"
+          (markerChange)="markerPosition = $event" />
       </div>
     </app-card>
 

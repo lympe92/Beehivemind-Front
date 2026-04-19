@@ -1,11 +1,9 @@
-import { Component, computed, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
-import { DecimalPipe, isPlatformBrowser } from '@angular/common';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { GoogleMap, MapMarker } from '@angular/google-maps';
 import { Apiary } from '../../../core/models/apiary.model';
 import { ApiaryService } from '../../../core/services/apiary.service';
-import { environment } from '../../../../environments/environment';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { selectAllApiaries, selectApiariesLoading } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
@@ -13,6 +11,7 @@ import { DataTableComponent, ColumnDef, TablePagination } from '../../../shared/
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
+import { MapPickerComponent } from '../../../shared/components/ui/map-picker/map-picker';
 import {
   AddApiaryModalComponent,
   AddApiaryModalData,
@@ -27,28 +26,19 @@ interface ApiaryForm {
 @Component({
   selector: 'app-apiary',
   standalone: true,
-  imports: [FormsModule, GoogleMap, MapMarker, DecimalPipe, DataTableComponent, CardComponent],
+  imports: [FormsModule, DecimalPipe, DataTableComponent, CardComponent, MapPickerComponent],
   templateUrl: './apiary.html',
   styleUrl: './apiary.scss',
 })
 export class ApiaryComponent implements OnInit {
   private store = inject(Store);
   private apiaryService = inject(ApiaryService);
-  private platformId = inject(PLATFORM_ID);
   private toast = inject(ToastService);
   private modal = inject(ModalService);
-
-  readonly isBrowser = isPlatformBrowser(this.platformId);
-  mapsLoaded = signal(false);
 
   mapCenter: google.maps.LatLngLiteral = { lat: 37.9838, lng: 23.7275 };
   mapZoom = 6;
   markerPosition: google.maps.LatLngLiteral | null = null;
-  mapOptions: google.maps.MapOptions = {
-    mapTypeId: 'roadmap',
-    disableDefaultUI: false,
-    zoomControl: true,
-  };
 
   readonly columns: ColumnDef[] = [
     { key: 'name', label: 'Name' },
@@ -88,17 +78,9 @@ export class ApiaryComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
-    if (this.isBrowser) {
-      this.loadMapsScript();
-    }
   }
 
   // ── Map ──────────────────────────────────────────────────
-
-  onMapClick(event: google.maps.MapMouseEvent): void {
-    if (!event.latLng) return;
-    this.markerPosition = { lat: event.latLng.lat(), lng: event.latLng.lng() };
-  }
 
   onRowSelect(apiary: Apiary): void {
     this.mapCenter = { lat: apiary.latitude, lng: apiary.longitude };
@@ -115,7 +97,6 @@ export class ApiaryComponent implements OnInit {
         type: 'center',
         width: '640px',
         data: {
-          mapsLoaded: this.mapsLoaded(),
           existingNames: this.allApiaries().map(a => a.name),
         },
       },
@@ -209,29 +190,6 @@ export class ApiaryComponent implements OnInit {
   private reload(): void {
     this.store.dispatch(ApiariesActions.reload());
     this.store.dispatch(BeehivesActions.reload());
-  }
-
-  private loadMapsScript(): void {
-    if ((window as any).google?.maps?.importLibrary) {
-      this.mapsLoaded.set(true);
-      return;
-    }
-
-    if (document.getElementById('google-maps-script')) return;
-
-    const callbackName = '__googleMapsReady';
-    (window as any)[callbackName] = () => {
-      delete (window as any)[callbackName];
-      setTimeout(() => this.mapsLoaded.set(true));
-    };
-
-    const script = document.createElement('script');
-    script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&callback=${callbackName}`;
-    script.async = true;
-    script.defer = true;
-    script.onerror = () => console.error('Google Maps failed to load');
-    document.head.appendChild(script);
   }
 
   private blank(): ApiaryForm {

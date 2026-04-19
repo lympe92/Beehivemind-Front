@@ -69,24 +69,6 @@
     border-radius: $radius;
     overflow: hidden;
     border: 1px solid $border;
-
-    google-map {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-  }
-
-  &__map-placeholder {
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: $bg-hover;
-    border-radius: $radius;
-    border: 1px solid $border;
-    color: $text-muted;
-    font-size: 0.875rem;
   }
 
   &__btn {

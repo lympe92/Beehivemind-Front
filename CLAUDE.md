@@ -185,6 +185,7 @@ Reusable panel/card UI component. CSS custom properties are defined globally in 
 - `<ng-template #cardFooter>` — projected into a footer bar
 
 ### CSS custom properties (override at any scope)
+
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `--card-bg` | `#ffffff` | Background |
@@ -193,3 +194,64 @@ Reusable panel/card UI component. CSS custom properties are defined globally in 
 | `--card-shadow` | `0 1px 3px rgba(0,0,0,.08)` | Box shadow |
 | `--card-title-color` | `#737373` | Header title color |
 | `--card-title-size` | `0.9rem` | Header title font size |
+
+---
+
+## Map Picker Component
+
+### Overview
+Reusable Google Maps component that wraps script loading, marker display, and click-to-place interaction. A singleton `GoogleMapsLoaderService` loads the script once globally — any number of `MapPickerComponent` instances share the same loaded state.
+
+### Key files
+| File | Role |
+|------|------|
+| `src/app/core/services/google-maps-loader.service.ts` | Loads Maps script once; exposes `mapsLoaded` signal |
+| `src/app/shared/components/ui/map-picker/map-picker.ts` | `MapPickerComponent` |
+| `src/app/shared/components/ui/map-picker/map-picker.html` | Template (map or loading placeholder) |
+| `src/app/shared/components/ui/map-picker/map-picker.scss` | `:host { display: block; width/height: 100% }` |
+
+### Usage
+
+```html
+<!-- Fills its container; parent controls size -->
+<div class="my-map-wrapper">
+  <app-map-picker
+    [marker]="markerPosition"
+    (markerChange)="markerPosition = $event" />
+</div>
+
+<!-- With explicit center + zoom (e.g. pan to selected row) -->
+<app-map-picker
+  [center]="mapCenter"
+  [zoom]="mapZoom"
+  [marker]="markerPosition"
+  (markerChange)="markerPosition = $event" />
+
+<!-- Read-only (no click-to-place) -->
+<app-map-picker [marker]="location" [interactive]="false" />
+```
+
+The component calls `GoogleMapsLoaderService.load()` on `ngOnInit`. **Never** call `loadMapsScript` manually or manage `mapsLoaded` in parent components.
+
+### Inputs
+| Input | Type | Default | Description |
+|-------|------|---------|-------------|
+| `center` | `LatLngLiteral` | Athens `{37.9838, 23.7275}` | Map center |
+| `zoom` | number | `6` | Map zoom level |
+| `marker` | `LatLngLiteral \| null` | `null` | Marker position (parent-controlled) |
+| `interactive` | boolean | `true` | Whether clicks emit `markerChange` |
+
+### Outputs
+| Output | Type | Description |
+|--------|------|-------------|
+| `markerChange` | `LatLngLiteral` | Emits on map click (only when `interactive=true`) |
+
+### Sizing
+The component host is `display: block; width: 100%; height: 100%` — size it from the parent:
+```scss
+.my-map-wrapper {
+  height: 300px;          // or flex: 1, etc.
+  border-radius: 8px;
+  overflow: hidden;
+}
+```
