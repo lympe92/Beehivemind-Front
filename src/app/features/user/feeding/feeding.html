@@ -1,145 +1,111 @@
 <div class="feeding">
 
-  <!-- Filters -->
-  <div class="feeding__filters">
-    <div class="feeding__filter-group">
-      <label class="feeding__label">Apiary</label>
-      <select class="feeding__select" [ngModel]="selectedApiaryId()" (ngModelChange)="onApiaryChange($event)" name="apiary">
-        <option [ngValue]="0">— Select —</option>
-        @for (apiary of apiaries(); track apiary.id) {
-          <option [ngValue]="apiary.id">{{ apiary.name }}</option>
-        }
-      </select>
-    </div>
+  <app-filter-bar
+    [apiaries]="apiaries()"
+    [beehives]="beehives()"
+    [apiaryId]="selectedApiaryId()"
+    (apiaryIdChange)="onApiaryChange($event)"
+    [beehiveId]="selectedBeehiveId()"
+    (beehiveIdChange)="onBeehiveChange($event)" />
 
-    @if (beehives().length) {
-      <div class="feeding__filter-group">
-        <label class="feeding__label">Beehive</label>
-        <select class="feeding__select" [ngModel]="selectedBeehiveId()" (ngModelChange)="onBeehiveChange($event)" name="beehive">
-          <option [ngValue]="0">— All —</option>
-          @for (beehive of beehives(); track beehive.id) {
-            <option [ngValue]="beehive.id">{{ beehive.name }}</option>
-          }
-        </select>
-      </div>
+  <app-card title="Feeding Data">
+    @if (canAdd) {
+      <button card-header-end class="feeding__btn feeding__btn--primary" (click)="startAdd()">+ Add Record</button>
     }
-  </div>
 
-  <!-- Notification -->
-  @if (notification) {
-    <div class="feeding__notification feeding__notification--{{ notification.type }}">
-      <span>{{ notification.message }}</span>
-      <button class="feeding__notification-close" (click)="clearNotification()">×</button>
-    </div>
-  }
-
-  <!-- Card -->
-  <div class="feeding__card">
-    <div class="feeding__card-header">
-      <span>Feeding Data</span>
-      @if (canAdd) {
-        <button class="feeding__btn feeding__btn--primary" (click)="startAdd()">+ Add Record</button>
-      }
-    </div>
-
-    <div class="feeding__card-body">
-
-      <!-- Add form -->
-      @if (showAddForm) {
-        <div class="feeding__add-form">
-          <h4 class="feeding__add-form-title">New Record
-            @if (selectedBeehiveId() === 0) {
-              <span class="feeding__add-form-hint">(will be created for all beehives in the selected apiary)</span>
-            }
-          </h4>
-          <div class="feeding__form-row">
-            <div class="feeding__form-group">
-              <label class="feeding__label">Date</label>
-              <input class="feeding__input" type="date" [(ngModel)]="newForm.date" name="new_date" />
-            </div>
-            <div class="feeding__form-group">
-              <label class="feeding__label">Feeding Type</label>
-              <select class="feeding__select" [(ngModel)]="newForm.feeding_type" name="new_feeding_type">
-                @for (ft of FEEDING_TYPES; track ft.value) {
-                  <option [ngValue]="ft.value">{{ ft.label }}</option>
-                }
-              </select>
-            </div>
-            <div class="feeding__form-group">
-              <label class="feeding__label">Food Type</label>
-              <select class="feeding__select" [(ngModel)]="newForm.food_type" name="new_food_type">
-                @for (ft of FOOD_TYPES; track ft.value) {
-                  <option [ngValue]="ft.value">{{ ft.label }}</option>
-                }
-              </select>
-            </div>
-            <div class="feeding__form-group">
-              <label class="feeding__label">Qty / Beehive</label>
-              <input class="feeding__input" type="number" min="0" [(ngModel)]="newForm.food_quantity" name="new_qty" />
-            </div>
-            <div class="feeding__form-group">
-              <label class="feeding__label">Unit</label>
-              <select class="feeding__select" [(ngModel)]="newForm.unit" name="new_unit">
-                @for (u of FEEDING_UNITS; track u.value) {
-                  <option [ngValue]="u.value">{{ u.label }}</option>
-                }
-              </select>
-            </div>
+    @if (showAddForm) {
+      <div class="feeding__add-form">
+        <h4 class="feeding__add-form-title">New Record
+          @if (selectedBeehiveId() === 0) {
+            <span class="feeding__add-form-hint">(will be created for all beehives in the selected apiary)</span>
+          }
+        </h4>
+        <div class="feeding__form-row">
+          <div class="feeding__form-group">
+            <label class="feeding__label">Date</label>
+            <input class="feeding__input" type="date" [(ngModel)]="newForm.date" name="new_date" />
           </div>
-          <div class="feeding__form-actions">
-            <button class="feeding__btn feeding__btn--primary" (click)="confirmAdd()">Save</button>
-            <button class="feeding__btn feeding__btn--ghost" (click)="cancelAdd()">Cancel</button>
-          </div>
-        </div>
-      }
-
-      <!-- Table -->
-      <app-data-table
-        [columns]="columns"
-        [rows]="feeding()"
-        [loading]="loading()"
-        [editingId]="editingId"
-        [showActions]="canEdit"
-        emptyMessage="No feeding records found.">
-
-        <ng-template #editRowTpl let-row>
-          <td><input class="feeding__input" type="date" [(ngModel)]="editForm.date" name="edit_date" /></td>
-          <td>
-            <select class="feeding__select" [(ngModel)]="editForm.feeding_type" name="edit_feeding_type">
+          <div class="feeding__form-group">
+            <label class="feeding__label">Feeding Type</label>
+            <select class="feeding__select" [(ngModel)]="newForm.feeding_type" name="new_feeding_type">
               @for (ft of FEEDING_TYPES; track ft.value) {
                 <option [ngValue]="ft.value">{{ ft.label }}</option>
               }
             </select>
-          </td>
-          <td>
-            <select class="feeding__select" [(ngModel)]="editForm.food_type" name="edit_food_type">
+          </div>
+          <div class="feeding__form-group">
+            <label class="feeding__label">Food Type</label>
+            <select class="feeding__select" [(ngModel)]="newForm.food_type" name="new_food_type">
               @for (ft of FOOD_TYPES; track ft.value) {
                 <option [ngValue]="ft.value">{{ ft.label }}</option>
               }
             </select>
-          </td>
-          <td><input class="feeding__input feeding__input--sm" type="number" min="0" [(ngModel)]="editForm.food_quantity" name="edit_qty" /></td>
-          <td>
-            <select class="feeding__select" [(ngModel)]="editForm.unit" name="edit_unit">
+          </div>
+          <div class="feeding__form-group">
+            <label class="feeding__label">Qty / Beehive</label>
+            <input class="feeding__input" type="number" min="0" [(ngModel)]="newForm.food_quantity" name="new_qty" />
+          </div>
+          <div class="feeding__form-group">
+            <label class="feeding__label">Unit</label>
+            <select class="feeding__select" [(ngModel)]="newForm.unit" name="new_unit">
               @for (u of FEEDING_UNITS; track u.value) {
                 <option [ngValue]="u.value">{{ u.label }}</option>
               }
             </select>
-          </td>
-          <td class="dt__actions">
-            <button class="feeding__btn feeding__btn--primary feeding__btn--sm" (click)="confirmEdit()">Save</button>
-            <button class="feeding__btn feeding__btn--ghost feeding__btn--sm" (click)="cancelEdit()">Cancel</button>
-          </td>
-        </ng-template>
+          </div>
+        </div>
+        <div class="feeding__form-actions">
+          <button class="feeding__btn feeding__btn--primary" (click)="confirmAdd()">Save</button>
+          <button class="feeding__btn feeding__btn--ghost" (click)="cancelAdd()">Cancel</button>
+        </div>
+      </div>
+    }
 
-        <ng-template #actionsTpl let-row>
-          <button class="feeding__btn feeding__btn--ghost feeding__btn--sm" (click)="startEdit(row)">Edit</button>
-          <button class="feeding__btn feeding__btn--danger feeding__btn--sm" (click)="deleteRow(row)">Delete</button>
-        </ng-template>
+    <app-data-table
+      [columns]="columns"
+      [rows]="feeding()"
+      [loading]="loading()"
+      [editingId]="editingId"
+      [showActions]="canEdit"
+      emptyMessage="No feeding records found.">
 
-      </app-data-table>
+      <ng-template #editRowTpl let-row>
+        <td><input class="feeding__input" type="date" [(ngModel)]="editForm.date" name="edit_date" /></td>
+        <td>
+          <select class="feeding__select" [(ngModel)]="editForm.feeding_type" name="edit_feeding_type">
+            @for (ft of FEEDING_TYPES; track ft.value) {
+              <option [ngValue]="ft.value">{{ ft.label }}</option>
+            }
+          </select>
+        </td>
+        <td>
+          <select class="feeding__select" [(ngModel)]="editForm.food_type" name="edit_food_type">
+            @for (ft of FOOD_TYPES; track ft.value) {
+              <option [ngValue]="ft.value">{{ ft.label }}</option>
+            }
+          </select>
+        </td>
+        <td><input class="feeding__input feeding__input--sm" type="number" min="0" [(ngModel)]="editForm.food_quantity" name="edit_qty" /></td>
+        <td>
+          <select class="feeding__select" [(ngModel)]="editForm.unit" name="edit_unit">
+            @for (u of FEEDING_UNITS; track u.value) {
+              <option [ngValue]="u.value">{{ u.label }}</option>
+            }
+          </select>
+        </td>
+        <td class="dt__actions">
+          <button class="feeding__btn feeding__btn--primary feeding__btn--sm" (click)="confirmEdit()">Save</button>
+          <button class="feeding__btn feeding__btn--ghost feeding__btn--sm" (click)="cancelEdit()">Cancel</button>
+        </td>
+      </ng-template>
 
-    </div>
-  </div>
+      <ng-template #actionsTpl let-row>
+        <button class="feeding__btn feeding__btn--ghost feeding__btn--sm" (click)="startEdit(row)">Edit</button>
+        <button class="feeding__btn feeding__btn--danger feeding__btn--sm" (click)="deleteRow(row)">Delete</button>
+      </ng-template>
+
+    </app-data-table>
+
+  </app-card>
 
 </div>

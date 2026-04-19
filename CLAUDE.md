@@ -88,7 +88,7 @@ export class MyModalComponent {
 ```
 
 ### Creating a new modal — checklist
-1. Create component in `src/app/shared/components/ui/modal/<name>/` (shared) or feature folder (feature-specific)
+1. Create component in `src/app/shared/components/ui/modal/<name>/` — always, even for domain-specific modals (they may be reused from other pages)
 2. Use `ModalShellComponent` in the template
 3. Inject `DialogRef` and `MODAL_DATA` as needed
 4. Open it via `ModalService.open(MyModalComponent, { type, data })`

@@ -2,51 +2,37 @@
 
   <!-- CRUD tables -->
   <div class="financial__row financial__row--2col">
-    <div class="financial__card">
-      <div class="financial__card-header">Cost Categories</div>
-      <div class="financial__card-body financial__card-body--scroll">
+    <app-card title="Cost Categories">
+      <div class="financial__scroll-body">
         <app-cost-categories (categoriesChange)="onCategoriesChange($event)" />
       </div>
-    </div>
+    </app-card>
 
-    <div class="financial__card">
-      <div class="financial__card-header">Costs</div>
-      <div class="financial__card-body financial__card-body--scroll">
+    <app-card title="Costs">
+      <div class="financial__scroll-body">
         <app-costs [costCategories]="costCategories()" (costsChange)="onCostsChange()" />
       </div>
-    </div>
+    </app-card>
   </div>
 
   <!-- Monthly bar chart -->
-  <div class="financial__card">
-    <div class="financial__card-header">Income / Outgoing per Month</div>
-    <div class="financial__card-body">
-      <app-apex-chart [options]="monthlyBarOptions()" [loading]="chartsLoading()" height="320" />
-    </div>
-  </div>
+  <app-card title="Income / Outgoing per Month">
+    <app-apex-chart [options]="monthlyBarOptions()" [loading]="chartsLoading()" height="320" />
+  </app-card>
 
   <!-- Three pies -->
   <div class="financial__row financial__row--3col">
-    <div class="financial__card">
-      <div class="financial__card-header">Income / Outgoing</div>
-      <div class="financial__card-body">
-        <app-apex-chart [options]="summaryPieOptions()" [loading]="chartsLoading()" height="260" />
-      </div>
-    </div>
+    <app-card title="Income / Outgoing">
+      <app-apex-chart [options]="summaryPieOptions()" [loading]="chartsLoading()" height="260" />
+    </app-card>
 
-    <div class="financial__card">
-      <div class="financial__card-header">Income by Category</div>
-      <div class="financial__card-body">
-        <app-apex-chart [options]="incomePieOptions()" [loading]="chartsLoading()" height="260" />
-      </div>
-    </div>
+    <app-card title="Income by Category">
+      <app-apex-chart [options]="incomePieOptions()" [loading]="chartsLoading()" height="260" />
+    </app-card>
 
-    <div class="financial__card">
-      <div class="financial__card-header">Outgoing by Category</div>
-      <div class="financial__card-body">
-        <app-apex-chart [options]="outcomePieOptions()" [loading]="chartsLoading()" height="260" />
-      </div>
-    </div>
+    <app-card title="Outgoing by Category">
+      <app-apex-chart [options]="outcomePieOptions()" [loading]="chartsLoading()" height="260" />
+    </app-card>
   </div>
 
 </div>

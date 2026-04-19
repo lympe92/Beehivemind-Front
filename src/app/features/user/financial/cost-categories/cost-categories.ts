@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { CostCategory, CostType } from '../../../../core/models/cost-category.model';
 import { CostCategoryService } from '../../../../core/services/cost-category.service';
 import { DataTableComponent, ColumnDef } from '../../../../shared/components/ui/data-table/data-table';
+import { ToastService } from '../../../../shared/components/ui/toast/toast.service';
+import { ModalService } from '../../../../core/modal/modal.service';
 
 interface CategoryForm {
   name: string;
@@ -19,6 +21,8 @@ interface CategoryForm {
 })
 export class CostCategoriesComponent implements OnInit {
   private categoryService = inject(CostCategoryService);
+  private toast = inject(ToastService);
+  private modal = inject(ModalService);
 
   readonly categoriesChange = output<CostCategory[]>();
 
@@ -36,9 +40,6 @@ export class CostCategoriesComponent implements OnInit {
 
   showAddForm = false;
   newForm: CategoryForm = this.blank();
-
-  notification: { type: 'error' | 'success'; message: string } | null = null;
-  private notifTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
     this.load();
@@ -61,12 +62,12 @@ export class CostCategoriesComponent implements OnInit {
         if (res.success) {
           this.showAddForm = false;
           this.load();
-          this.notify('success', 'Category created.');
+          this.toast.success('Category created.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
@@ -87,32 +88,35 @@ export class CostCategoriesComponent implements OnInit {
         if (res.success) {
           this.editingId = null;
           this.load();
-          this.notify('success', 'Category updated.');
+          this.toast.success('Category updated.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
-  deleteRow(row: CostCategory): void {
-    if (!confirm(`Delete category "${row.name}"?`)) return;
+  async deleteRow(row: CostCategory): Promise<void> {
+    const confirmed = await this.modal.confirm({
+      title: 'Delete Category',
+      message: `Delete category "${row.name}"?`,
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!confirmed) return;
+
     this.categoryService.deleteCategory(row.id).subscribe({
       next: res => {
         if (res.success) {
           this.load();
-          this.notify('success', 'Category deleted.');
+          this.toast.success('Category deleted.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
-  }
-
-  clearNotification(): void {
-    this.notification = null;
   }
 
   private load(): void {
@@ -128,18 +132,10 @@ export class CostCategoriesComponent implements OnInit {
 
   private validate(form: CategoryForm): boolean {
     if (!form.name.trim()) {
-      this.notify('error', 'Name is required.');
+      this.toast.error('Name is required.');
       return false;
     }
     return true;
-  }
-
-  private notify(type: 'error' | 'success', message: string): void {
-    if (this.notifTimer) clearTimeout(this.notifTimer);
-    this.notification = { type, message };
-    if (type === 'success') {
-      this.notifTimer = setTimeout(() => (this.notification = null), 4000);
-    }
   }
 
   private blank(): CategoryForm {

@@ -2,9 +2,9 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { DialogRef } from '@angular/cdk/dialog';
-import { MODAL_DATA } from '../../../../core/modal/modal.types';
-import { ModalShellComponent } from '../../../../shared/components/ui/modal/modal-shell/modal-shell';
-import { MapPickerComponent } from '../../../../shared/components/ui/map-picker/map-picker';
+import { MODAL_DATA } from '../../../../../core/modal/modal.types';
+import { ModalShellComponent } from '../modal-shell/modal-shell';
+import { MapPickerComponent } from '../../map-picker/map-picker';
 
 export interface AddApiaryModalData {
   existingNames: string[];

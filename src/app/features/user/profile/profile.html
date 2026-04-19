@@ -7,95 +7,79 @@
     <div class="prof__grid">
 
       <!-- Personal Info -->
-      <div class="prof__card">
-        <div class="prof__card-header">Personal Information</div>
-        <div class="prof__card-body">
+      <app-card title="Personal Information">
+        @if (profile()) {
+          <div class="prof__email-row">
+            <span class="prof__label">Email</span>
+            <span class="prof__email">{{ profile()!.email }}</span>
+          </div>
+        }
 
-          @if (profile()) {
-            <div class="prof__email-row">
-              <span class="prof__label">Email</span>
-              <span class="prof__email">{{ profile()!.email }}</span>
-            </div>
-          }
-
-          <div class="prof__form-group">
-            <label class="prof__label">First Name *</label>
-            <input class="prof__input" [(ngModel)]="infoForm.name" name="name" placeholder="First name" />
-          </div>
-          <div class="prof__form-group">
-            <label class="prof__label">Last Name</label>
-            <input class="prof__input" [(ngModel)]="infoForm.surname" name="surname" placeholder="Last name" />
-          </div>
-          <div class="prof__form-group">
-            <label class="prof__label">Country</label>
-            <input class="prof__input" [(ngModel)]="infoForm.country" name="country" placeholder="e.g. Greece" />
-          </div>
-          <div class="prof__form-group">
-            <label class="prof__label">Preferred Unit</label>
-            <select class="prof__select" [(ngModel)]="infoForm.unit" name="unit">
-              @for (u of UNITS; track u.value) {
-                <option [ngValue]="u.value">{{ u.label }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="prof__form-actions">
-            <button class="prof__btn prof__btn--primary" (click)="saveInfo()" [disabled]="saving() || infoFormUnchanged">
-              {{ saving() ? 'Saving...' : 'Save Changes' }}
-            </button>
-          </div>
-
+        <div class="prof__form-group">
+          <label class="prof__label">First Name *</label>
+          <input class="prof__input" [(ngModel)]="infoForm.name" name="name" placeholder="First name" />
         </div>
-      </div>
+        <div class="prof__form-group">
+          <label class="prof__label">Last Name</label>
+          <input class="prof__input" [(ngModel)]="infoForm.surname" name="surname" placeholder="Last name" />
+        </div>
+        <div class="prof__form-group">
+          <label class="prof__label">Country</label>
+          <input class="prof__input" [(ngModel)]="infoForm.country" name="country" placeholder="e.g. Greece" />
+        </div>
+        <div class="prof__form-group">
+          <label class="prof__label">Preferred Unit</label>
+          <select class="prof__select" [(ngModel)]="infoForm.unit" name="unit">
+            @for (u of UNITS; track u.value) {
+              <option [ngValue]="u.value">{{ u.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="prof__form-actions">
+          <button class="prof__btn prof__btn--primary" (click)="saveInfo()" [disabled]="saving() || infoFormUnchanged">
+            {{ saving() ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      </app-card>
 
       <!-- Change Password -->
-      <div class="prof__card">
-        <div class="prof__card-header">
-          {{ profile()?.has_password ? 'Change Password' : 'Set a Password' }}
-        </div>
-        <div class="prof__card-body">
+      <app-card [title]="profile()?.has_password ? 'Change Password' : 'Set a Password'">
+        @if (!profile()?.has_password) {
+          <p class="prof__tfa-desc">
+            Your account uses Google sign-in. You can set a password to also log in with email.
+          </p>
+        }
 
-          @if (!profile()?.has_password) {
-            <p class="prof__tfa-desc">
-              Your account uses Google sign-in. You can set a password to also log in with email.
-            </p>
-          }
-
-          @if (profile()?.has_password) {
-            <div class="prof__form-group">
-              <label class="prof__label">Current Password</label>
-              <input class="prof__input" type="password" [(ngModel)]="passwordForm.current_password" name="cur_pw" placeholder="Current password" />
-            </div>
-          }
+        @if (profile()?.has_password) {
           <div class="prof__form-group">
-            <label class="prof__label">New Password</label>
-            <input class="prof__input" type="password" [(ngModel)]="passwordForm.new_password" name="new_pw" placeholder="Min. 8 characters" />
+            <label class="prof__label">Current Password</label>
+            <input class="prof__input" type="password" [(ngModel)]="passwordForm.current_password" name="cur_pw" placeholder="Current password" />
           </div>
-          <div class="prof__form-group">
-            <label class="prof__label">Confirm New Password</label>
-            <input class="prof__input" type="password" [(ngModel)]="passwordForm.confirm_password" name="conf_pw" placeholder="Repeat new password" />
-          </div>
-
-          <div class="prof__form-actions">
-            <button class="prof__btn prof__btn--primary" (click)="savePassword()" [disabled]="saving()">
-              {{ saving() ? 'Saving...' : (profile()?.has_password ? 'Change Password' : 'Set Password') }}
-            </button>
-          </div>
-
+        }
+        <div class="prof__form-group">
+          <label class="prof__label">New Password</label>
+          <input class="prof__input" type="password" [(ngModel)]="passwordForm.new_password" name="new_pw" placeholder="Min. 8 characters" />
         </div>
-      </div>
+        <div class="prof__form-group">
+          <label class="prof__label">Confirm New Password</label>
+          <input class="prof__input" type="password" [(ngModel)]="passwordForm.confirm_password" name="conf_pw" placeholder="Repeat new password" />
+        </div>
+
+        <div class="prof__form-actions">
+          <button class="prof__btn prof__btn--primary" (click)="savePassword()" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : (profile()?.has_password ? 'Change Password' : 'Set Password') }}
+          </button>
+        </div>
+      </app-card>
 
       <!-- Two-Factor Authentication -->
-      <div class="prof__card prof__card--full">
-        <div class="prof__card-header">
-          <span>Two-Factor Authentication</span>
-          <span class="prof__tfa-badge" [class.prof__tfa-badge--on]="profile()?.two_factor_enabled">
+      <div class="prof__full">
+        <app-card title="Two-Factor Authentication">
+          <span card-header-end class="prof__tfa-badge" [class.prof__tfa-badge--on]="profile()?.two_factor_enabled">
             {{ profile()?.two_factor_enabled ? 'Enabled' : 'Disabled' }}
           </span>
-        </div>
-        <div class="prof__card-body">
 
-          <!-- Idle: not enabled -->
           @if (tfaStep() === 'idle' && !profile()?.two_factor_enabled) {
             <p class="prof__tfa-desc">
               Add an extra layer of security to your account. You'll need your phone to sign in.
@@ -105,7 +89,6 @@
             </button>
           }
 
-          <!-- Idle: already enabled -->
           @if (tfaStep() === 'idle' && profile()?.two_factor_enabled) {
             <p class="prof__tfa-desc">
               Two-factor authentication is active. Your account is protected with an authenticator app.
@@ -118,7 +101,6 @@
             </div>
           }
 
-          <!-- Setup step: show QR -->
           @if (tfaStep() === 'setup') {
             <div class="prof__tfa-setup">
               <div class="prof__tfa-steps">
@@ -149,7 +131,6 @@
             </div>
           }
 
-          <!-- Backup codes -->
           @if (tfaStep() === 'backup') {
             <div class="prof__tfa-backup">
               <p class="prof__tfa-backup-warn">
@@ -166,7 +147,6 @@
             </div>
           }
 
-          <!-- Disable confirmation -->
           @if (tfaStep() === 'disable') {
             <div class="prof__tfa-disable">
               <p class="prof__tfa-desc">Enter your password to disable two-factor authentication.</p>
@@ -183,7 +163,7 @@
             </div>
           }
 
-        </div>
+        </app-card>
       </div>
 
     </div>

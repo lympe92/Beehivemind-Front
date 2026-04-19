@@ -6,6 +6,7 @@ import { CostCategoryService } from '../../../core/services/cost-category.servic
 import { CostService } from '../../../core/services/cost.service';
 import { ChartBuilderService } from '../../../core/services/chart-builder.service';
 import { ApexChartComponent } from '../../../shared/components/ui/apex-chart/apex-chart';
+import { CardComponent } from '../../../shared/components/ui/card/card';
 import { CostCategoriesComponent } from './cost-categories/cost-categories';
 import { CostsComponent } from './costs/costs';
 
@@ -14,7 +15,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 @Component({
   selector: 'app-financial',
   standalone: true,
-  imports: [ApexChartComponent, CostCategoriesComponent, CostsComponent],
+  imports: [ApexChartComponent, CardComponent, CostCategoriesComponent, CostsComponent],
   templateUrl: './financial.html',
   styleUrl: './financial.scss',
 })

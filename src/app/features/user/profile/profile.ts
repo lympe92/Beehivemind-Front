@@ -14,6 +14,7 @@ import {
 } from '../../../store/profile/profile.selectors';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { LoaderComponent } from '../../../shared/components/ui/loader/loader';
+import { CardComponent } from '../../../shared/components/ui/card/card';
 
 const UNITS = [
   { value: 'kg',    label: 'Kg / Lt (Metric)' },
@@ -25,7 +26,7 @@ type TfaStep = 'idle' | 'setup' | 'backup' | 'disable';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [FormsModule, LoaderComponent],
+  imports: [FormsModule, LoaderComponent, CardComponent],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })

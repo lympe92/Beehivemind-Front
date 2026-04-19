@@ -10,6 +10,10 @@ import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
 import { InspectionsActions } from '../../../store/inspections/inspections.actions';
 import { selectAllInspections, selectInspectionsLoading } from '../../../store/inspections/inspections.selectors';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
+import { ToastService } from '../../../shared/components/ui/toast/toast.service';
+import { ModalService } from '../../../core/modal/modal.service';
+import { CardComponent } from '../../../shared/components/ui/card/card';
+import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
 
 interface InspectionForm {
   date: string;
@@ -28,18 +32,18 @@ interface InspectionForm {
   queen_year: number | null;
 }
 
-type NotificationType = 'error' | 'success' | 'warning';
-
 @Component({
   selector: 'app-inspections',
   standalone: true,
-  imports: [FormsModule, DataTableComponent],
+  imports: [FormsModule, DataTableComponent, CardComponent, FilterBarComponent],
   templateUrl: './inspections.html',
   styleUrl: './inspections.scss',
 })
 export class InspectionsComponent implements OnInit {
   private store = inject(Store);
   private inspectionService = inject(InspectionService);
+  private toast = inject(ToastService);
+  private modal = inject(ModalService);
 
   readonly columns: ColumnDef[] = [
     { key: 'date', label: 'Date' },
@@ -89,9 +93,6 @@ export class InspectionsComponent implements OnInit {
   showAddForm = false;
   newForm: InspectionForm = this.blank();
 
-  notification: { type: NotificationType; message: string } | null = null;
-  private notifTimer: ReturnType<typeof setTimeout> | null = null;
-
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
     this.store.dispatch(BeehivesActions.load());
@@ -131,7 +132,7 @@ export class InspectionsComponent implements OnInit {
     const duplicate = this.inspections().some(i => i.date === this.newForm.date);
     if (duplicate) {
       const beehiveName = this.allBeehives().find(b => b.id === this.selectedBeehiveId())?.name ?? '';
-      this.notify('warning',
+      this.toast.warning(
         `A record for ${this.newForm.date} on beehive "${beehiveName}" already exists.`
       );
       return;
@@ -145,12 +146,12 @@ export class InspectionsComponent implements OnInit {
         if (res.success) {
           this.showAddForm = false;
           this.store.dispatch(InspectionsActions.reload());
-          this.notify('success', 'Record created successfully.');
+          this.toast.success('Record created successfully.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
@@ -189,31 +190,37 @@ export class InspectionsComponent implements OnInit {
         if (res.success) {
           this.editingId = null;
           this.store.dispatch(InspectionsActions.reload());
-          this.notify('success', 'Record updated successfully.');
+          this.toast.success('Record updated successfully.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
   // ── Delete ───────────────────────────────────────────────
 
-  deleteRow(row: Inspection): void {
+  async deleteRow(row: Inspection): Promise<void> {
     const beehiveName = this.allBeehives().find(b => b.id === this.selectedBeehiveId())?.name ?? '';
-    if (!confirm(`Delete inspection for beehive "${beehiveName}" on ${row.date}?`)) return;
+    const confirmed = await this.modal.confirm({
+      title: 'Delete Record',
+      message: `Delete inspection for beehive "${beehiveName}" on ${row.date}?`,
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!confirmed) return;
 
     this.inspectionService.deleteInspection(row.id).subscribe({
       next: res => {
         if (res.success) {
           this.store.dispatch(InspectionsActions.reload());
-          this.notify('success', 'Record deleted.');
+          this.toast.success('Record deleted.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
@@ -223,41 +230,29 @@ export class InspectionsComponent implements OnInit {
     return this.selectedBeehiveId() !== 0;
   }
 
-  clearNotification(): void {
-    this.notification = null;
-  }
-
-  private notify(type: NotificationType, message: string): void {
-    if (this.notifTimer) clearTimeout(this.notifTimer);
-    this.notification = { type, message };
-    if (type !== 'error') {
-      this.notifTimer = setTimeout(() => (this.notification = null), 5000);
-    }
-  }
-
   private validate(form: InspectionForm): boolean {
     if (!form.date || isNaN(new Date(form.date).getTime())) {
-      this.notify('error', 'Date must be a valid date (yyyy-mm-dd).');
+      this.toast.error('Date must be a valid date (yyyy-mm-dd).');
       return false;
     }
     if (form.frame_space === null || isNaN(Number(form.frame_space)) || !Number.isInteger(Number(form.frame_space)) || Number(form.frame_space) < 0) {
-      this.notify('error', 'Frames must be a non-negative integer.');
+      this.toast.error('Frames must be a non-negative integer.');
       return false;
     }
     if (form.population === null || isNaN(Number(form.population)) || !Number.isInteger(Number(form.population)) || Number(form.population) < 0) {
-      this.notify('error', 'Population must be a non-negative integer.');
+      this.toast.error('Population must be a non-negative integer.');
       return false;
     }
     for (const field of ['pollen', 'honey', 'opened_brood', 'closed_brood'] as const) {
       if (form[field] === null || isNaN(Number(form[field])) || Number(form[field]) < 0) {
-        this.notify('error', `${field.replace('_', ' ')} must be a valid non-negative number.`);
+        this.toast.error(`${field.replace('_', ' ')} must be a valid non-negative number.`);
         return false;
       }
     }
     if (form.queen_year !== null && form.queen_year !== undefined) {
       const yr = Number(form.queen_year);
       if (isNaN(yr) || yr < 2000) {
-        this.notify('error', 'Queen Year must be a number ≥ 2000, or leave it empty.');
+        this.toast.error('Queen Year must be a number ≥ 2000, or leave it empty.');
         return false;
       }
     }

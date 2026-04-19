@@ -18,6 +18,10 @@ import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
 import { FeedingActions } from '../../../store/feeding/feeding.actions';
 import { selectAllFeeding, selectFeedingLoading } from '../../../store/feeding/feeding.selectors';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
+import { ToastService } from '../../../shared/components/ui/toast/toast.service';
+import { ModalService } from '../../../core/modal/modal.service';
+import { CardComponent } from '../../../shared/components/ui/card/card';
+import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
 
 interface FeedingForm {
   date: string;
@@ -27,23 +31,18 @@ interface FeedingForm {
   unit: FeedingUnit;
 }
 
-type NotificationType = 'error' | 'success' | 'warning';
-
-interface Notification {
-  type: NotificationType;
-  message: string;
-}
-
 @Component({
   selector: 'app-feeding',
   standalone: true,
-  imports: [FormsModule, DataTableComponent],
+  imports: [FormsModule, DataTableComponent, CardComponent, FilterBarComponent],
   templateUrl: './feeding.html',
   styleUrl: './feeding.scss',
 })
 export class FeedingComponent implements OnInit {
   private store = inject(Store);
   private feedingService = inject(FeedingService);
+  private toast = inject(ToastService);
+  private modal = inject(ModalService);
 
   readonly FEEDING_TYPES = FEEDING_TYPES;
   readonly FOOD_TYPES = FOOD_TYPES;
@@ -88,9 +87,6 @@ export class FeedingComponent implements OnInit {
   showAddForm = false;
   newForm: FeedingForm = this.blankForm();
 
-  notification: Notification | null = null;
-  private notifTimer: ReturnType<typeof setTimeout> | null = null;
-
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
     this.store.dispatch(BeehivesActions.load());
@@ -131,7 +127,7 @@ export class FeedingComponent implements OnInit {
       const duplicate = this.feeding().some(f => f.date === this.newForm.date);
       if (duplicate) {
         const beehiveName = this.allBeehives().find(b => b.id === this.selectedBeehiveId())?.name ?? '';
-        this.notify('warning',
+        this.toast.warning(
           `A record for ${this.newForm.date}${beehiveName ? ` on beehive "${beehiveName}"` : ''} already exists. Edit that record instead.`
         );
         return;
@@ -151,12 +147,12 @@ export class FeedingComponent implements OnInit {
         if (res.success) {
           this.showAddForm = false;
           this.store.dispatch(FeedingActions.reload());
-          this.notify('success', 'Record created successfully.');
+          this.toast.success('Record created successfully.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
@@ -190,34 +186,37 @@ export class FeedingComponent implements OnInit {
         if (res.success) {
           this.editingId = null;
           this.store.dispatch(FeedingActions.reload());
-          this.notify('success', 'Record updated successfully.');
+          this.toast.success('Record updated successfully.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
   // ── Delete ───────────────────────────────────────────────
 
-  deleteRow(row: Feeding): void {
+  async deleteRow(row: Feeding): Promise<void> {
     const beehiveName = this.allBeehives().find(b => b.id === row.beehiveId)?.name ?? '';
-    const confirmed = confirm(
-      `Delete feeding record for${beehiveName ? ` beehive "${beehiveName}"` : ''} on ${row.date}?`
-    );
+    const confirmed = await this.modal.confirm({
+      title: 'Delete Record',
+      message: `Delete feeding record${beehiveName ? ` for beehive "${beehiveName}"` : ''} on ${row.date}?`,
+      confirmLabel: 'Delete',
+      danger: true,
+    });
     if (!confirmed) return;
 
     this.feedingService.deleteFeeding(row.id).subscribe({
       next: res => {
         if (res.success) {
           this.store.dispatch(FeedingActions.reload());
-          this.notify('success', 'Record deleted.');
+          this.toast.success('Record deleted.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
@@ -231,25 +230,13 @@ export class FeedingComponent implements OnInit {
     return this.selectedBeehiveId() !== 0;
   }
 
-  clearNotification(): void {
-    this.notification = null;
-  }
-
-  private notify(type: NotificationType, message: string): void {
-    if (this.notifTimer) clearTimeout(this.notifTimer);
-    this.notification = { type, message };
-    if (type !== 'error') {
-      this.notifTimer = setTimeout(() => (this.notification = null), 5000);
-    }
-  }
-
   private validateForm(form: FeedingForm): boolean {
     if (!form.date || isNaN(new Date(form.date).getTime())) {
-      this.notify('error', 'Date must be a valid date (yyyy-mm-dd).');
+      this.toast.error('Date must be a valid date (yyyy-mm-dd).');
       return false;
     }
     if (form.food_quantity === null || isNaN(Number(form.food_quantity)) || Number(form.food_quantity) < 0) {
-      this.notify('error', 'Quantity must be a valid positive number.');
+      this.toast.error('Quantity must be a valid positive number.');
       return false;
     }
     return true;

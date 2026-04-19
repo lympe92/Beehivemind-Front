@@ -4,6 +4,8 @@ import { Cost } from '../../../../core/models/cost.model';
 import { CostCategory } from '../../../../core/models/cost-category.model';
 import { CostService } from '../../../../core/services/cost.service';
 import { DataTableComponent, ColumnDef } from '../../../../shared/components/ui/data-table/data-table';
+import { ToastService } from '../../../../shared/components/ui/toast/toast.service';
+import { ModalService } from '../../../../core/modal/modal.service';
 
 interface CostForm {
   date: string;
@@ -21,6 +23,8 @@ interface CostForm {
 })
 export class CostsComponent implements OnInit {
   private costService = inject(CostService);
+  private toast = inject(ToastService);
+  private modal = inject(ModalService);
 
   readonly costCategories = input<CostCategory[]>([]);
   readonly costsChange = output<void>();
@@ -40,9 +44,6 @@ export class CostsComponent implements OnInit {
 
   showAddForm = false;
   newForm: CostForm = this.blank();
-
-  notification: { type: 'error' | 'success'; message: string } | null = null;
-  private notifTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly categoryName = computed(() => {
     const map = new Map(this.costCategories().map(c => [c.id, c.name]));
@@ -76,12 +77,12 @@ export class CostsComponent implements OnInit {
           this.showAddForm = false;
           this.load();
           this.costsChange.emit();
-          this.notify('success', 'Cost created.');
+          this.toast.success('Cost created.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
@@ -108,33 +109,36 @@ export class CostsComponent implements OnInit {
           this.editingId = null;
           this.load();
           this.costsChange.emit();
-          this.notify('success', 'Cost updated.');
+          this.toast.success('Cost updated.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
-  deleteRow(row: Cost): void {
-    if (!confirm(`Delete cost "${row.name}" on ${row.date}?`)) return;
+  async deleteRow(row: Cost): Promise<void> {
+    const confirmed = await this.modal.confirm({
+      title: 'Delete Cost',
+      message: `Delete cost "${row.name}" on ${row.date}?`,
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!confirmed) return;
+
     this.costService.deleteCost(row.id).subscribe({
       next: res => {
         if (res.success) {
           this.load();
           this.costsChange.emit();
-          this.notify('success', 'Cost deleted.');
+          this.toast.success('Cost deleted.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
-  }
-
-  clearNotification(): void {
-    this.notification = null;
   }
 
   private load(): void {
@@ -147,30 +151,22 @@ export class CostsComponent implements OnInit {
 
   private validate(form: CostForm): boolean {
     if (!form.date || isNaN(new Date(form.date).getTime())) {
-      this.notify('error', 'A valid date is required.');
+      this.toast.error('A valid date is required.');
       return false;
     }
     if (!form.name.trim()) {
-      this.notify('error', 'Name is required.');
+      this.toast.error('Name is required.');
       return false;
     }
     if (!form.category_id) {
-      this.notify('error', 'Please select a category.');
+      this.toast.error('Please select a category.');
       return false;
     }
     if (form.amount === null || isNaN(Number(form.amount)) || Number(form.amount) < 0) {
-      this.notify('error', 'Amount must be a valid positive number.');
+      this.toast.error('Amount must be a valid positive number.');
       return false;
     }
     return true;
-  }
-
-  private notify(type: 'error' | 'success', message: string): void {
-    if (this.notifTimer) clearTimeout(this.notifTimer);
-    this.notification = { type, message };
-    if (type === 'success') {
-      this.notifTimer = setTimeout(() => (this.notification = null), 4000);
-    }
   }
 
   private blank(): CostForm {

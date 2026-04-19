@@ -16,6 +16,10 @@ import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
 import { HarvestActions } from '../../../store/harvest/harvest.actions';
 import { selectAllHarvest, selectHarvestLoading } from '../../../store/harvest/harvest.selectors';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
+import { ToastService } from '../../../shared/components/ui/toast/toast.service';
+import { ModalService } from '../../../core/modal/modal.service';
+import { CardComponent } from '../../../shared/components/ui/card/card';
+import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
 
 interface HarvestForm {
   date: string;
@@ -25,18 +29,18 @@ interface HarvestForm {
   unit: HarvestUnit;
 }
 
-type NotificationType = 'error' | 'success' | 'warning';
-
 @Component({
   selector: 'app-harvest',
   standalone: true,
-  imports: [FormsModule, DataTableComponent],
+  imports: [FormsModule, DataTableComponent, CardComponent, FilterBarComponent],
   templateUrl: './harvest.html',
   styleUrl: './harvest.scss',
 })
 export class HarvestComponent implements OnInit {
   private store = inject(Store);
   private harvestService = inject(HarvestService);
+  private toast = inject(ToastService);
+  private modal = inject(ModalService);
 
   readonly HARVEST_TYPES = HARVEST_TYPES;
   readonly HARVEST_UNITS = HARVEST_UNITS;
@@ -86,9 +90,6 @@ export class HarvestComponent implements OnInit {
   showAddForm = false;
   newForm: HarvestForm = this.blank();
 
-  notification: { type: NotificationType; message: string } | null = null;
-  private notifTimer: ReturnType<typeof setTimeout> | null = null;
-
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
     this.store.dispatch(BeehivesActions.load());
@@ -129,7 +130,7 @@ export class HarvestComponent implements OnInit {
       const duplicate = this.harvest().some(h => h.date === this.newForm.date);
       if (duplicate) {
         const beehiveName = this.allBeehives().find(b => b.id === this.selectedBeehiveId())?.name ?? '';
-        this.notify('warning',
+        this.toast.warning(
           `A record for ${this.newForm.date} on beehive "${beehiveName}" already exists.`
         );
         return;
@@ -150,12 +151,12 @@ export class HarvestComponent implements OnInit {
         if (res.success) {
           this.showAddForm = false;
           this.store.dispatch(HarvestActions.reload());
-          this.notify('success', 'Record created successfully.');
+          this.toast.success('Record created successfully.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
@@ -189,41 +190,51 @@ export class HarvestComponent implements OnInit {
         if (res.success) {
           this.editingId = null;
           this.store.dispatch(HarvestActions.reload());
-          this.notify('success', 'Record updated successfully.');
+          this.toast.success('Record updated successfully.');
         } else {
-          this.notify('error', 'Something went wrong. Please try again.');
+          this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.notify('error', 'Something went wrong. Please try again.'),
+      error: () => this.toast.error('Something went wrong. Please try again.'),
     });
   }
 
   // ── Delete ───────────────────────────────────────────────
 
-  deleteRow(row: Harvest): void {
+  async deleteRow(row: Harvest): Promise<void> {
     if (this.selectedBeehiveId() !== 0) {
       const beehiveName = this.allBeehives().find(b => b.id === row.beehiveId)?.name ?? '';
-      if (!confirm(`Delete harvest record for beehive "${beehiveName}" on ${row.date}?`)) return;
+      const confirmed = await this.modal.confirm({
+        title: 'Delete Record',
+        message: `Delete harvest record for beehive "${beehiveName}" on ${row.date}?`,
+        confirmLabel: 'Delete',
+        danger: true,
+      });
+      if (!confirmed) return;
 
       this.harvestService.deleteHarvest(row.id).subscribe({
         next: res => {
-          if (res.success) { this.store.dispatch(HarvestActions.reload()); this.notify('success', 'Record deleted.'); }
-          else this.notify('error', 'Something went wrong. Please try again.');
+          if (res.success) { this.store.dispatch(HarvestActions.reload()); this.toast.success('Record deleted.'); }
+          else this.toast.error('Something went wrong. Please try again.');
         },
-        error: () => this.notify('error', 'Something went wrong. Please try again.'),
+        error: () => this.toast.error('Something went wrong. Please try again.'),
       });
     } else {
       const apiaryName = this.apiaries().find(a => a.id === this.selectedApiaryId())?.name ?? '';
-      if (!confirm(
-        `Delete ALL harvest records for apiary "${apiaryName}" on ${row.date}?\nWARNING: This will delete records for all beehives of this apiary on that date!`
-      )) return;
+      const confirmed = await this.modal.confirm({
+        title: 'Delete Records',
+        message: `Delete ALL harvest records for apiary "${apiaryName}" on ${row.date}? This will delete records for all beehives on that date.`,
+        confirmLabel: 'Delete All',
+        danger: true,
+      });
+      if (!confirmed) return;
 
       this.harvestService.deleteHarvestByApiaryAndDate(this.selectedApiaryId(), row.date).subscribe({
         next: res => {
-          if (res.success) { this.store.dispatch(HarvestActions.reload()); this.notify('success', 'Records deleted.'); }
-          else this.notify('error', 'Something went wrong. Please try again.');
+          if (res.success) { this.store.dispatch(HarvestActions.reload()); this.toast.success('Records deleted.'); }
+          else this.toast.error('Something went wrong. Please try again.');
         },
-        error: () => this.notify('error', 'Something went wrong. Please try again.'),
+        error: () => this.toast.error('Something went wrong. Please try again.'),
       });
     }
   }
@@ -242,25 +253,13 @@ export class HarvestComponent implements OnInit {
     return this.allBeehives().find(b => b.id === beehiveId)?.name ?? '—';
   }
 
-  clearNotification(): void {
-    this.notification = null;
-  }
-
-  private notify(type: NotificationType, message: string): void {
-    if (this.notifTimer) clearTimeout(this.notifTimer);
-    this.notification = { type, message };
-    if (type !== 'error') {
-      this.notifTimer = setTimeout(() => (this.notification = null), 5000);
-    }
-  }
-
   private validate(form: HarvestForm): boolean {
     if (!form.date || isNaN(new Date(form.date).getTime())) {
-      this.notify('error', 'Date must be a valid date (yyyy-mm-dd).');
+      this.toast.error('Date must be a valid date (yyyy-mm-dd).');
       return false;
     }
     if (form.food_quantity === null || isNaN(Number(form.food_quantity)) || Number(form.food_quantity) < 0) {
-      this.notify('error', 'Quantity must be a valid positive number.');
+      this.toast.error('Quantity must be a valid positive number.');
       return false;
     }
     return true;

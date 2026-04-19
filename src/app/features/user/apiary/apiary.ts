@@ -16,7 +16,7 @@ import {
   AddApiaryModalComponent,
   AddApiaryModalData,
   AddApiaryModalResult,
-} from './add-apiary-modal/add-apiary-modal';
+} from '../../../shared/components/ui/modal/add-apiary-modal/add-apiary-modal';
 
 interface ApiaryForm {
   name: string;
