@@ -9,88 +9,12 @@
     (beehiveIdChange)="onBeehiveChange($event)" />
 
   <app-card title="Inspection Data">
-    @if (canAdd) {
-      <button card-header-end class="insp__btn insp__btn--primary" (click)="startAdd()">+ Add Record</button>
-    }
-
-    @if (showAddForm) {
-      <div class="insp__add-form">
-        <h4 class="insp__add-form-title">New Inspection</h4>
-
-        <div class="insp__form-row">
-          <div class="insp__form-group">
-            <label class="insp__label">Date</label>
-            <input class="insp__input" type="date" [(ngModel)]="newForm.date" name="new_date" />
-          </div>
-          <div class="insp__form-group">
-            <label class="insp__label">Frames</label>
-            <input class="insp__input" type="number" min="0" [(ngModel)]="newForm.frame_space" name="new_frames" />
-          </div>
-          <div class="insp__form-group">
-            <label class="insp__label">Population</label>
-            <input class="insp__input" type="number" min="0" [(ngModel)]="newForm.population" name="new_pop" />
-          </div>
-          <div class="insp__form-group">
-            <label class="insp__label">Pollen</label>
-            <input class="insp__input" type="number" min="0" [(ngModel)]="newForm.pollen" name="new_pollen" />
-          </div>
-          <div class="insp__form-group">
-            <label class="insp__label">Honey</label>
-            <input class="insp__input" type="number" min="0" [(ngModel)]="newForm.honey" name="new_honey" />
-          </div>
-          <div class="insp__form-group">
-            <label class="insp__label">Egg (open brood)</label>
-            <input class="insp__input" type="number" min="0" [(ngModel)]="newForm.opened_brood" name="new_ob" />
-          </div>
-          <div class="insp__form-group">
-            <label class="insp__label">Closed Brood</label>
-            <input class="insp__input" type="number" min="0" [(ngModel)]="newForm.closed_brood" name="new_cb" />
-          </div>
-        </div>
-
-        <div class="insp__form-row insp__form-row--checks">
-          <label class="insp__check">
-            <input type="checkbox" [(ngModel)]="newForm.varroa" name="new_varroa" />
-            <span>Varroa</span>
-          </label>
-          <label class="insp__check">
-            <input type="checkbox" [(ngModel)]="newForm.american_foulbrood" name="new_afb" />
-            <span>Amer. Foulbrood</span>
-          </label>
-          <label class="insp__check">
-            <input type="checkbox" [(ngModel)]="newForm.european_foulbrood" name="new_efb" />
-            <span>Eur. Foulbrood</span>
-          </label>
-          <label class="insp__check">
-            <input type="checkbox" [(ngModel)]="newForm.nosema" name="new_nosema" />
-            <span>Nosema</span>
-          </label>
-          <label class="insp__check">
-            <input type="checkbox" [(ngModel)]="newForm.queen_exists" name="new_qe" />
-            <span>Queen Seen</span>
-          </label>
-          <label class="insp__check">
-            <input type="checkbox" [(ngModel)]="newForm.queen_cells" name="new_qc" />
-            <span>Queen Cells</span>
-          </label>
-          <div class="insp__form-group insp__form-group--inline">
-            <label class="insp__label">Queen Year</label>
-            <input class="insp__input insp__input--sm" type="number" min="2000" [(ngModel)]="newForm.queen_year" name="new_qy" placeholder="e.g. 2023" />
-          </div>
-        </div>
-
-        <div class="insp__form-actions">
-          <button class="insp__btn insp__btn--primary" (click)="confirmAdd()">Save</button>
-          <button class="insp__btn insp__btn--ghost" (click)="cancelAdd()">Cancel</button>
-        </div>
-      </div>
-    }
+    <button card-header-end class="insp__btn insp__btn--primary" (click)="startAdd()">+ Add Record</button>
 
     <app-data-table
       [columns]="columns"
       [rows]="inspections()"
       [loading]="loading()"
-      [editingId]="editingId"
       [showActions]="true"
       emptyMessage="No inspection records found.">
 
@@ -117,27 +41,6 @@
           @case ('queen_year') { {{ row.queen_year ?? '—' }} }
           @default { {{ row[col.key] ?? '—' }} }
         }
-      </ng-template>
-
-      <ng-template #editRowTpl let-row>
-        <td><input class="insp__input insp__input--sm" type="date" [(ngModel)]="editForm.date" name="ed_date" /></td>
-        <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.frame_space" name="ed_fs" /></td>
-        <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.population" name="ed_pop" /></td>
-        <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.pollen" name="ed_pol" /></td>
-        <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.honey" name="ed_hon" /></td>
-        <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.opened_brood" name="ed_ob" /></td>
-        <td><input class="insp__input insp__input--sm" type="number" min="0" [(ngModel)]="editForm.closed_brood" name="ed_cb" /></td>
-        <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.varroa" name="ed_var" /></td>
-        <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.american_foulbrood" name="ed_afb" /></td>
-        <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.european_foulbrood" name="ed_efb" /></td>
-        <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.nosema" name="ed_nos" /></td>
-        <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.queen_exists" name="ed_qe" /></td>
-        <td class="insp__check-cell"><input type="checkbox" [(ngModel)]="editForm.queen_cells" name="ed_qc" /></td>
-        <td><input class="insp__input insp__input--sm" type="number" min="2000" [(ngModel)]="editForm.queen_year" name="ed_qy" /></td>
-        <td class="dt__actions">
-          <button class="insp__btn insp__btn--primary insp__btn--sm" (click)="confirmEdit()">Save</button>
-          <button class="insp__btn insp__btn--ghost insp__btn--sm" (click)="cancelEdit()">Cancel</button>
-        </td>
       </ng-template>
 
       <ng-template #actionsTpl let-row>

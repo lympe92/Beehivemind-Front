@@ -1,0 +1,114 @@
+<app-modal-shell [title]="title" (close)="cancel()">
+
+  <div class="add-insp">
+
+    @if (error()) {
+      <p class="add-insp__error">{{ error() }}</p>
+    }
+
+    <!-- Apiary + Beehive selectors (add mode only) -->
+    @if (!isEditMode) {
+      <div class="add-insp__selectors">
+        <div class="add-insp__field">
+          <label class="add-insp__label">Apiary *</label>
+          <select
+            class="add-insp__select"
+            [ngModel]="selectedApiaryId()"
+            (ngModelChange)="onApiaryChange($event)"
+            name="apiary">
+            <option [value]="0">— Select apiary —</option>
+            @for (a of data.apiaries; track a.id) {
+              <option [value]="a.id">{{ a.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="add-insp__field">
+          <label class="add-insp__label">Beehive *</label>
+          <select
+            class="add-insp__select"
+            [ngModel]="selectedBeehiveId()"
+            (ngModelChange)="selectedBeehiveId.set($event)"
+            name="beehive"
+            [disabled]="selectedApiaryId() === 0">
+            <option [value]="0">— Select beehive —</option>
+            @for (b of beehives(); track b.id) {
+              <option [value]="b.id">{{ b.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    }
+
+    <!-- Numeric fields -->
+    <div class="add-insp__form-row">
+      <div class="add-insp__field add-insp__field--col">
+        <label class="add-insp__label">Date *</label>
+        <input class="add-insp__input" type="date" [(ngModel)]="date" name="date" />
+      </div>
+      <div class="add-insp__field add-insp__field--col">
+        <label class="add-insp__label">Frames</label>
+        <input class="add-insp__input" type="number" min="0" [(ngModel)]="frame_space" name="frames" />
+      </div>
+      <div class="add-insp__field add-insp__field--col">
+        <label class="add-insp__label">Population</label>
+        <input class="add-insp__input" type="number" min="0" [(ngModel)]="population" name="population" />
+      </div>
+      <div class="add-insp__field add-insp__field--col">
+        <label class="add-insp__label">Pollen</label>
+        <input class="add-insp__input" type="number" min="0" [(ngModel)]="pollen" name="pollen" />
+      </div>
+      <div class="add-insp__field add-insp__field--col">
+        <label class="add-insp__label">Honey</label>
+        <input class="add-insp__input" type="number" min="0" [(ngModel)]="honey" name="honey" />
+      </div>
+      <div class="add-insp__field add-insp__field--col">
+        <label class="add-insp__label">Egg</label>
+        <input class="add-insp__input" type="number" min="0" [(ngModel)]="opened_brood" name="opened_brood" />
+      </div>
+      <div class="add-insp__field add-insp__field--col">
+        <label class="add-insp__label">Closed Brood</label>
+        <input class="add-insp__input" type="number" min="0" [(ngModel)]="closed_brood" name="closed_brood" />
+      </div>
+    </div>
+
+    <!-- Checkboxes -->
+    <div class="add-insp__checks">
+      <label class="add-insp__check">
+        <input type="checkbox" [(ngModel)]="varroa" name="varroa" />
+        <span>Varroa</span>
+      </label>
+      <label class="add-insp__check">
+        <input type="checkbox" [(ngModel)]="american_foulbrood" name="afb" />
+        <span>Amer. Foulbrood</span>
+      </label>
+      <label class="add-insp__check">
+        <input type="checkbox" [(ngModel)]="european_foulbrood" name="efb" />
+        <span>Eur. Foulbrood</span>
+      </label>
+      <label class="add-insp__check">
+        <input type="checkbox" [(ngModel)]="nosema" name="nosema" />
+        <span>Nosema</span>
+      </label>
+      <label class="add-insp__check">
+        <input type="checkbox" [(ngModel)]="queen_exists" name="queen_exists" />
+        <span>Queen Seen</span>
+      </label>
+      <label class="add-insp__check">
+        <input type="checkbox" [(ngModel)]="queen_cells" name="queen_cells" />
+        <span>Queen Cells</span>
+      </label>
+      <div class="add-insp__field add-insp__field--inline">
+        <label class="add-insp__label">Queen Year</label>
+        <input class="add-insp__input add-insp__input--sm" type="number" min="2000" [(ngModel)]="queen_year" name="queen_year" placeholder="e.g. 2023" />
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template #footer>
+    <button class="add-insp__btn add-insp__btn--ghost" (click)="cancel()">Cancel</button>
+    <button class="add-insp__btn add-insp__btn--primary" (click)="save()">Save</button>
+  </ng-template>
+
+</app-modal-shell>

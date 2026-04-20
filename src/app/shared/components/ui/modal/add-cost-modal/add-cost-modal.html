@@ -1,0 +1,41 @@
+<app-modal-shell [title]="title" (close)="cancel()">
+
+  <div class="add-cost">
+
+    @if (error()) {
+      <p class="add-cost__error">{{ error() }}</p>
+    }
+
+    <div class="add-cost__field">
+      <label class="add-cost__label">Date *</label>
+      <input class="add-cost__input" type="date" [(ngModel)]="date" name="date" />
+    </div>
+
+    <div class="add-cost__field">
+      <label class="add-cost__label">Name *</label>
+      <input class="add-cost__input" [(ngModel)]="name" name="name" placeholder="Cost name" />
+    </div>
+
+    <div class="add-cost__field">
+      <label class="add-cost__label">Category *</label>
+      <select class="add-cost__select" [(ngModel)]="category_id" name="category_id">
+        <option [ngValue]="null">— Select category —</option>
+        @for (cat of data.costCategories; track cat.id) {
+          <option [ngValue]="cat.id">{{ cat.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="add-cost__field">
+      <label class="add-cost__label">Amount *</label>
+      <input class="add-cost__input" type="number" min="0" step="0.01" [(ngModel)]="amount" name="amount" placeholder="0.00" />
+    </div>
+
+  </div>
+
+  <ng-template #footer>
+    <button class="add-cost__btn add-cost__btn--ghost" (click)="cancel()">Cancel</button>
+    <button class="add-cost__btn add-cost__btn--primary" (click)="save()">Save</button>
+  </ng-template>
+
+</app-modal-shell>

@@ -2,24 +2,11 @@
   <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="startAdd()">+ Add</button>
 </div>
 
-@if (showAddForm) {
-  <div class="fin-table__inline-form">
-    <input class="fin-input" placeholder="Name *" [(ngModel)]="newForm.name" name="nc_name" />
-    <input class="fin-input" placeholder="Description" [(ngModel)]="newForm.description" name="nc_desc" />
-    <select class="fin-select" [(ngModel)]="newForm.type" name="nc_type">
-      <option value="income">Income</option>
-      <option value="outcome">Outgoing</option>
-    </select>
-    <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="confirmAdd()">Save</button>
-    <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="cancelAdd()">Cancel</button>
-  </div>
-}
-
 <app-data-table
   [columns]="columns"
   [rows]="categories()"
   [loading]="loading()"
-  [editingId]="editingId"
+  [showActions]="true"
   emptyMessage="No categories yet.">
 
   <ng-template #cellTpl let-row let-col="col">
@@ -28,21 +15,6 @@
       @case ('type') { <span class="fin-badge fin-badge--{{ row.type }}">{{ row.type }}</span> }
       @default { {{ row[col.key] ?? '—' }} }
     }
-  </ng-template>
-
-  <ng-template #editRowTpl let-row>
-    <td><input class="fin-input" [(ngModel)]="editForm.name" name="ec_name" /></td>
-    <td><input class="fin-input" [(ngModel)]="editForm.description" name="ec_desc" /></td>
-    <td>
-      <select class="fin-select" [(ngModel)]="editForm.type" name="ec_type">
-        <option value="income">Income</option>
-        <option value="outcome">Outgoing</option>
-      </select>
-    </td>
-    <td class="dt__actions">
-      <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="confirmEdit()">Save</button>
-      <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="cancelEdit()">Cancel</button>
-    </td>
   </ng-template>
 
   <ng-template #actionsTpl let-row>

@@ -5,57 +5,6 @@
   flex-direction: column;
   gap: 20px;
 
-  // ── Add form ─────────────────────────────────────────────
-  &__add-form {
-    background: $bg-hover;
-    border: 1px solid $border;
-    border-radius: $radius;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  &__add-form-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: $text-primary;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  &__add-form-hint {
-    font-size: 0.8rem;
-    font-weight: 400;
-    color: $text-muted;
-  }
-
-  &__form-row {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-
-  &__form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    flex: 1;
-    min-width: 130px;
-
-    &--wide {
-      min-width: 200px;
-      flex: 2;
-    }
-  }
-
-  &__form-actions {
-    display: flex;
-    gap: 10px;
-  }
-
   // ── Shared form controls ─────────────────────────────────
   &__label {
     font-size: 0.8rem;

@@ -2,27 +2,11 @@
   <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="startAdd()">+ Add</button>
 </div>
 
-@if (showAddForm) {
-  <div class="fin-table__inline-form">
-    <input class="fin-input" type="date" [(ngModel)]="newForm.date" name="nc_date" />
-    <input class="fin-input" placeholder="Name *" [(ngModel)]="newForm.name" name="nc_name" />
-    <select class="fin-select" [(ngModel)]="newForm.category_id" name="nc_cat">
-      <option [ngValue]="null">— Category —</option>
-      @for (cat of costCategories(); track cat.id) {
-        <option [ngValue]="cat.id">{{ cat.name }}</option>
-      }
-    </select>
-    <input class="fin-input fin-input--sm" type="number" min="0" step="0.01" placeholder="Amount" [(ngModel)]="newForm.amount" name="nc_amount" />
-    <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="confirmAdd()">Save</button>
-    <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="cancelAdd()">Cancel</button>
-  </div>
-}
-
 <app-data-table
   [columns]="columns"
   [rows]="costs()"
   [loading]="loading()"
-  [editingId]="editingId"
+  [showActions]="true"
   emptyMessage="No costs yet.">
 
   <ng-template #cellTpl let-row let-col="col">
@@ -30,24 +14,6 @@
       @case ('category') { <span class="dt__muted">{{ categoryName()(row.category_id) }}</span> }
       @default { {{ row[col.key] ?? '—' }} }
     }
-  </ng-template>
-
-  <ng-template #editRowTpl let-row>
-    <td><input class="fin-input" type="date" [(ngModel)]="editForm.date" name="ec_date" /></td>
-    <td><input class="fin-input" [(ngModel)]="editForm.name" name="ec_name" /></td>
-    <td>
-      <select class="fin-select" [(ngModel)]="editForm.category_id" name="ec_cat">
-        <option [ngValue]="null">— Category —</option>
-        @for (cat of costCategories(); track cat.id) {
-          <option [ngValue]="cat.id">{{ cat.name }}</option>
-        }
-      </select>
-    </td>
-    <td><input class="fin-input fin-input--sm" type="number" min="0" step="0.01" [(ngModel)]="editForm.amount" name="ec_amount" /></td>
-    <td class="dt__actions">
-      <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="confirmEdit()">Save</button>
-      <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="cancelEdit()">Cancel</button>
-    </td>
   </ng-template>
 
   <ng-template #actionsTpl let-row>

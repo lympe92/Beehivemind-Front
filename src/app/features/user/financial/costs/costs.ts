@@ -1,23 +1,20 @@
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Cost } from '../../../../core/models/cost.model';
 import { CostCategory } from '../../../../core/models/cost-category.model';
 import { CostService } from '../../../../core/services/cost.service';
 import { DataTableComponent, ColumnDef } from '../../../../shared/components/ui/data-table/data-table';
 import { ToastService } from '../../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../../core/modal/modal.service';
-
-interface CostForm {
-  date: string;
-  name: string;
-  category_id: number | null;
-  amount: number | null;
-}
+import {
+  AddCostModalComponent,
+  AddCostModalData,
+  AddCostModalResult,
+} from '../../../../shared/components/ui/modal/add-cost-modal/add-cost-modal';
 
 @Component({
   selector: 'app-costs',
   standalone: true,
-  imports: [FormsModule, DataTableComponent],
+  imports: [DataTableComponent],
   templateUrl: './costs.html',
   styleUrl: './costs.scss',
 })
@@ -39,12 +36,6 @@ export class CostsComponent implements OnInit {
   costs = signal<Cost[]>([]);
   loading = signal(false);
 
-  editingId: number | null = null;
-  editForm: CostForm = this.blank();
-
-  showAddForm = false;
-  newForm: CostForm = this.blank();
-
   readonly categoryName = computed(() => {
     const map = new Map(this.costCategories().map(c => [c.id, c.name]));
     return (id: number) => map.get(id) ?? '—';
@@ -54,27 +45,20 @@ export class CostsComponent implements OnInit {
     this.load();
   }
 
-  startAdd(): void {
-    this.cancelEdit();
-    this.newForm = this.blank();
-    this.showAddForm = true;
-  }
+  async startAdd(): Promise<void> {
+    const result = await this.modal.open<AddCostModalResult, AddCostModalData>(
+      AddCostModalComponent,
+      {
+        type: 'center',
+        width: '440px',
+        data: { costCategories: this.costCategories() },
+      },
+    );
+    if (!result) return;
 
-  cancelAdd(): void {
-    this.showAddForm = false;
-  }
-
-  confirmAdd(): void {
-    if (!this.validate(this.newForm)) return;
-    this.costService.createCost({
-      date: this.newForm.date,
-      name: this.newForm.name,
-      category_id: this.newForm.category_id!,
-      amount: Number(this.newForm.amount),
-    }).subscribe({
+    this.costService.createCost(result).subscribe({
       next: res => {
         if (res.success) {
-          this.showAddForm = false;
           this.load();
           this.costsChange.emit();
           this.toast.success('Cost created.');
@@ -86,27 +70,20 @@ export class CostsComponent implements OnInit {
     });
   }
 
-  startEdit(row: Cost): void {
-    this.cancelAdd();
-    this.editingId = row.id;
-    this.editForm = { date: row.date, name: row.name, category_id: row.category_id, amount: row.amount };
-  }
+  async startEdit(row: Cost): Promise<void> {
+    const result = await this.modal.open<AddCostModalResult, AddCostModalData>(
+      AddCostModalComponent,
+      {
+        type: 'center',
+        width: '440px',
+        data: { costCategories: this.costCategories(), editRow: row },
+      },
+    );
+    if (!result) return;
 
-  cancelEdit(): void {
-    this.editingId = null;
-  }
-
-  confirmEdit(): void {
-    if (this.editingId === null || !this.validate(this.editForm)) return;
-    this.costService.updateCost(this.editingId, {
-      date: this.editForm.date,
-      name: this.editForm.name,
-      category_id: this.editForm.category_id!,
-      amount: Number(this.editForm.amount),
-    }).subscribe({
+    this.costService.updateCost(row.id, result).subscribe({
       next: res => {
         if (res.success) {
-          this.editingId = null;
           this.load();
           this.costsChange.emit();
           this.toast.success('Cost updated.');
@@ -147,34 +124,5 @@ export class CostsComponent implements OnInit {
       if (res.success) this.costs.set(res.data);
       this.loading.set(false);
     });
-  }
-
-  private validate(form: CostForm): boolean {
-    if (!form.date || isNaN(new Date(form.date).getTime())) {
-      this.toast.error('A valid date is required.');
-      return false;
-    }
-    if (!form.name.trim()) {
-      this.toast.error('Name is required.');
-      return false;
-    }
-    if (!form.category_id) {
-      this.toast.error('Please select a category.');
-      return false;
-    }
-    if (form.amount === null || isNaN(Number(form.amount)) || Number(form.amount) < 0) {
-      this.toast.error('Amount must be a valid positive number.');
-      return false;
-    }
-    return true;
-  }
-
-  private blank(): CostForm {
-    return {
-      date: new Date().toISOString().split('T')[0],
-      name: '',
-      category_id: null,
-      amount: null,
-    };
   }
 }

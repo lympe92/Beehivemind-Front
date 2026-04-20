@@ -1,15 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import {
-  Feeding,
-  FEEDING_TYPES,
-  FOOD_TYPES,
-  FEEDING_UNITS,
-  FeedingType,
-  FoodType,
-  FeedingUnit,
-} from '../../../core/models/feeding.model';
+import { Feeding } from '../../../core/models/feeding.model';
 import { FeedingService } from '../../../core/services/feeding.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
@@ -22,19 +13,16 @@ import { ToastService } from '../../../shared/components/ui/toast/toast.service'
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
 import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
-
-interface FeedingForm {
-  date: string;
-  feeding_type: FeedingType;
-  food_type: FoodType;
-  food_quantity: number | null;
-  unit: FeedingUnit;
-}
+import {
+  AddFeedingModalComponent,
+  AddFeedingModalData,
+  AddFeedingModalResult,
+} from '../../../shared/components/ui/modal/add-feeding-modal/add-feeding-modal';
 
 @Component({
   selector: 'app-feeding',
   standalone: true,
-  imports: [FormsModule, DataTableComponent, CardComponent, FilterBarComponent],
+  imports: [DataTableComponent, CardComponent, FilterBarComponent],
   templateUrl: './feeding.html',
   styleUrl: './feeding.scss',
 })
@@ -43,10 +31,6 @@ export class FeedingComponent implements OnInit {
   private feedingService = inject(FeedingService);
   private toast = inject(ToastService);
   private modal = inject(ModalService);
-
-  readonly FEEDING_TYPES = FEEDING_TYPES;
-  readonly FOOD_TYPES = FOOD_TYPES;
-  readonly FEEDING_UNITS = FEEDING_UNITS;
 
   readonly columns: ColumnDef[] = [
     { key: 'date', label: 'Date' },
@@ -81,12 +65,6 @@ export class FeedingComponent implements OnInit {
   selectedApiaryId = signal<number>(0);
   selectedBeehiveId = signal<number>(0);
 
-  editingId: number | null = null;
-  editForm: FeedingForm = this.blankForm();
-
-  showAddForm = false;
-  newForm: FeedingForm = this.blankForm();
-
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
     this.store.dispatch(BeehivesActions.load());
@@ -98,54 +76,45 @@ export class FeedingComponent implements OnInit {
   onApiaryChange(apiaryId: number): void {
     this.selectedApiaryId.set(apiaryId);
     this.selectedBeehiveId.set(0);
-    this.cancelEdit();
-    this.cancelAdd();
   }
 
   onBeehiveChange(beehiveId: number): void {
     this.selectedBeehiveId.set(beehiveId);
-    this.cancelEdit();
-    this.cancelAdd();
   }
 
   // ── Add ──────────────────────────────────────────────────
 
-  startAdd(): void {
-    this.cancelEdit();
-    this.newForm = this.blankForm();
-    this.showAddForm = true;
-  }
+  async startAdd(): Promise<void> {
+    const result = await this.modal.open<AddFeedingModalResult, AddFeedingModalData>(
+      AddFeedingModalComponent,
+      {
+        type: 'center',
+        width: '640px',
+        data: {
+          apiaries: this.apiaries(),
+          allBeehives: this.allBeehives(),
+          preselectedApiaryId: this.selectedApiaryId(),
+          preselectedBeehiveId: this.selectedBeehiveId(),
+        },
+      },
+    );
 
-  cancelAdd(): void {
-    this.showAddForm = false;
-  }
+    if (!result) return;
 
-  confirmAdd(): void {
-    if (!this.validateForm(this.newForm)) return;
-
-    if (this.selectedBeehiveId() !== 0) {
-      const duplicate = this.feeding().some(f => f.date === this.newForm.date);
+    if (result.beehive_id) {
+      const duplicate = this.allFeeding().some(
+        f => f.beehiveId === result.beehive_id && f.date === result.date
+      );
       if (duplicate) {
-        const beehiveName = this.allBeehives().find(b => b.id === this.selectedBeehiveId())?.name ?? '';
-        this.toast.warning(
-          `A record for ${this.newForm.date}${beehiveName ? ` on beehive "${beehiveName}"` : ''} already exists. Edit that record instead.`
-        );
+        const beehiveName = this.allBeehives().find(b => b.id === result.beehive_id)?.name ?? '';
+        this.toast.warning(`A record for ${result.date} on beehive "${beehiveName}" already exists. Edit that record instead.`);
         return;
       }
     }
 
-    const payload = {
-      ...this.newForm,
-      food_quantity: Number(this.newForm.food_quantity),
-      ...(this.selectedBeehiveId() !== 0
-        ? { beehive_id: this.selectedBeehiveId() }
-        : { apiary_id: this.selectedApiaryId() }),
-    };
-
-    this.feedingService.createFeeding(payload).subscribe({
+    this.feedingService.createFeeding(result).subscribe({
       next: res => {
         if (res.success) {
-          this.showAddForm = false;
           this.store.dispatch(FeedingActions.reload());
           this.toast.success('Record created successfully.');
         } else {
@@ -158,33 +127,27 @@ export class FeedingComponent implements OnInit {
 
   // ── Edit ─────────────────────────────────────────────────
 
-  startEdit(row: Feeding): void {
-    this.cancelAdd();
-    this.editingId = row.id;
-    this.editForm = {
-      date: row.date,
-      feeding_type: row.feeding_type,
-      food_type: row.food_type,
-      food_quantity: row.food_quantity,
-      unit: row.unit,
-    };
-  }
+  async startEdit(row: Feeding): Promise<void> {
+    const result = await this.modal.open<AddFeedingModalResult, AddFeedingModalData>(
+      AddFeedingModalComponent,
+      {
+        type: 'center',
+        width: '640px',
+        data: {
+          apiaries: this.apiaries(),
+          allBeehives: this.allBeehives(),
+          preselectedApiaryId: 0,
+          preselectedBeehiveId: 0,
+          editRow: row,
+        },
+      },
+    );
+    if (!result) return;
 
-  cancelEdit(): void {
-    this.editingId = null;
-  }
-
-  confirmEdit(): void {
-    if (this.editingId === null) return;
-    if (!this.validateForm(this.editForm)) return;
-
-    this.feedingService.updateFeeding(this.editingId, {
-      ...this.editForm,
-      food_quantity: Number(this.editForm.food_quantity),
-    }).subscribe({
+    const { beehive_id, ...payload } = result;
+    this.feedingService.updateFeeding(row.id, payload).subscribe({
       next: res => {
         if (res.success) {
-          this.editingId = null;
           this.store.dispatch(FeedingActions.reload());
           this.toast.success('Record updated successfully.');
         } else {
@@ -218,37 +181,5 @@ export class FeedingComponent implements OnInit {
       },
       error: () => this.toast.error('Something went wrong. Please try again.'),
     });
-  }
-
-  // ── Helpers ──────────────────────────────────────────────
-
-  get canAdd(): boolean {
-    return this.selectedApiaryId() !== 0;
-  }
-
-  get canEdit(): boolean {
-    return this.selectedBeehiveId() !== 0;
-  }
-
-  private validateForm(form: FeedingForm): boolean {
-    if (!form.date || isNaN(new Date(form.date).getTime())) {
-      this.toast.error('Date must be a valid date (yyyy-mm-dd).');
-      return false;
-    }
-    if (form.food_quantity === null || isNaN(Number(form.food_quantity)) || Number(form.food_quantity) < 0) {
-      this.toast.error('Quantity must be a valid positive number.');
-      return false;
-    }
-    return true;
-  }
-
-  private blankForm(): FeedingForm {
-    return {
-      date: new Date().toISOString().split('T')[0],
-      feeding_type: 'stimulation',
-      food_type: 'sugar syrup',
-      food_quantity: null,
-      unit: 'kg',
-    };
   }
 }

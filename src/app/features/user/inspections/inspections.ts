@@ -1,5 +1,4 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Inspection } from '../../../core/models/inspection.model';
 import { InspectionService } from '../../../core/services/inspection.service';
@@ -14,28 +13,16 @@ import { ToastService } from '../../../shared/components/ui/toast/toast.service'
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
 import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
-
-interface InspectionForm {
-  date: string;
-  frame_space: number | null;
-  population: number | null;
-  pollen: number | null;
-  honey: number | null;
-  opened_brood: number | null;
-  closed_brood: number | null;
-  varroa: boolean;
-  american_foulbrood: boolean;
-  european_foulbrood: boolean;
-  nosema: boolean;
-  queen_exists: boolean;
-  queen_cells: boolean;
-  queen_year: number | null;
-}
+import {
+  AddInspectionModalComponent,
+  AddInspectionModalData,
+  AddInspectionModalResult,
+} from '../../../shared/components/ui/modal/add-inspection-modal/add-inspection-modal';
 
 @Component({
   selector: 'app-inspections',
   standalone: true,
-  imports: [FormsModule, DataTableComponent, CardComponent, FilterBarComponent],
+  imports: [DataTableComponent, CardComponent, FilterBarComponent],
   templateUrl: './inspections.html',
   styleUrl: './inspections.scss',
 })
@@ -87,12 +74,6 @@ export class InspectionsComponent implements OnInit {
   selectedApiaryId = signal<number>(0);
   selectedBeehiveId = signal<number>(0);
 
-  editingId: number | null = null;
-  editForm: InspectionForm = this.blank();
-
-  showAddForm = false;
-  newForm: InspectionForm = this.blank();
-
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
     this.store.dispatch(BeehivesActions.load());
@@ -104,47 +85,43 @@ export class InspectionsComponent implements OnInit {
   onApiaryChange(apiaryId: number): void {
     this.selectedApiaryId.set(apiaryId);
     this.selectedBeehiveId.set(0);
-    this.cancelEdit();
-    this.cancelAdd();
   }
 
   onBeehiveChange(beehiveId: number): void {
     this.selectedBeehiveId.set(beehiveId);
-    this.cancelEdit();
-    this.cancelAdd();
   }
 
   // ── Add ──────────────────────────────────────────────────
 
-  startAdd(): void {
-    this.cancelEdit();
-    this.newForm = this.blank();
-    this.showAddForm = true;
-  }
+  async startAdd(): Promise<void> {
+    const result = await this.modal.open<AddInspectionModalResult, AddInspectionModalData>(
+      AddInspectionModalComponent,
+      {
+        type: 'center',
+        width: '640px',
+        data: {
+          apiaries: this.apiaries(),
+          allBeehives: this.allBeehives(),
+          preselectedApiaryId: this.selectedApiaryId(),
+          preselectedBeehiveId: this.selectedBeehiveId(),
+        },
+      },
+    );
 
-  cancelAdd(): void {
-    this.showAddForm = false;
-  }
+    if (!result) return;
 
-  confirmAdd(): void {
-    if (!this.validate(this.newForm)) return;
-
-    const duplicate = this.inspections().some(i => i.date === this.newForm.date);
+    const duplicate = this.allInspections().some(
+      i => i.beehiveId === result.beehive_id && i.date === result.date
+    );
     if (duplicate) {
-      const beehiveName = this.allBeehives().find(b => b.id === this.selectedBeehiveId())?.name ?? '';
-      this.toast.warning(
-        `A record for ${this.newForm.date} on beehive "${beehiveName}" already exists.`
-      );
+      const beehiveName = this.allBeehives().find(b => b.id === result.beehive_id)?.name ?? '';
+      this.toast.warning(`A record for ${result.date} on beehive "${beehiveName}" already exists.`);
       return;
     }
 
-    this.inspectionService.createInspection({
-      ...this.toPayload(this.newForm),
-      beehive_id: this.selectedBeehiveId(),
-    }).subscribe({
+    this.inspectionService.createInspection(result).subscribe({
       next: res => {
         if (res.success) {
-          this.showAddForm = false;
           this.store.dispatch(InspectionsActions.reload());
           this.toast.success('Record created successfully.');
         } else {
@@ -157,38 +134,27 @@ export class InspectionsComponent implements OnInit {
 
   // ── Edit ─────────────────────────────────────────────────
 
-  startEdit(row: Inspection): void {
-    this.cancelAdd();
-    this.editingId = row.id;
-    this.editForm = {
-      date: row.date,
-      frame_space: row.frame_space,
-      population: row.population,
-      pollen: row.pollen,
-      honey: row.honey,
-      opened_brood: row.opened_brood,
-      closed_brood: row.closed_brood,
-      varroa: !!row.varroa,
-      american_foulbrood: !!row.american_foulbrood,
-      european_foulbrood: !!row.european_foulbrood,
-      nosema: !!row.nosema,
-      queen_exists: !!row.queen_exists,
-      queen_cells: !!row.queen_cells,
-      queen_year: row.queen_year,
-    };
-  }
+  async startEdit(row: Inspection): Promise<void> {
+    const result = await this.modal.open<AddInspectionModalResult, AddInspectionModalData>(
+      AddInspectionModalComponent,
+      {
+        type: 'center',
+        width: '640px',
+        data: {
+          apiaries: this.apiaries(),
+          allBeehives: this.allBeehives(),
+          preselectedApiaryId: 0,
+          preselectedBeehiveId: 0,
+          editRow: row,
+        },
+      },
+    );
+    if (!result) return;
 
-  cancelEdit(): void {
-    this.editingId = null;
-  }
-
-  confirmEdit(): void {
-    if (this.editingId === null || !this.validate(this.editForm)) return;
-
-    this.inspectionService.updateInspection(this.editingId, this.toPayload(this.editForm)).subscribe({
+    const { beehive_id, ...payload } = result;
+    this.inspectionService.updateInspection(row.id, payload).subscribe({
       next: res => {
         if (res.success) {
-          this.editingId = null;
           this.store.dispatch(InspectionsActions.reload());
           this.toast.success('Record updated successfully.');
         } else {
@@ -202,7 +168,7 @@ export class InspectionsComponent implements OnInit {
   // ── Delete ───────────────────────────────────────────────
 
   async deleteRow(row: Inspection): Promise<void> {
-    const beehiveName = this.allBeehives().find(b => b.id === this.selectedBeehiveId())?.name ?? '';
+    const beehiveName = this.allBeehives().find(b => b.id === row.beehiveId)?.name ?? '';
     const confirmed = await this.modal.confirm({
       title: 'Delete Record',
       message: `Delete inspection for beehive "${beehiveName}" on ${row.date}?`,
@@ -222,78 +188,5 @@ export class InspectionsComponent implements OnInit {
       },
       error: () => this.toast.error('Something went wrong. Please try again.'),
     });
-  }
-
-  // ── Helpers ──────────────────────────────────────────────
-
-  get canAdd(): boolean {
-    return this.selectedBeehiveId() !== 0;
-  }
-
-  private validate(form: InspectionForm): boolean {
-    if (!form.date || isNaN(new Date(form.date).getTime())) {
-      this.toast.error('Date must be a valid date (yyyy-mm-dd).');
-      return false;
-    }
-    if (form.frame_space === null || isNaN(Number(form.frame_space)) || !Number.isInteger(Number(form.frame_space)) || Number(form.frame_space) < 0) {
-      this.toast.error('Frames must be a non-negative integer.');
-      return false;
-    }
-    if (form.population === null || isNaN(Number(form.population)) || !Number.isInteger(Number(form.population)) || Number(form.population) < 0) {
-      this.toast.error('Population must be a non-negative integer.');
-      return false;
-    }
-    for (const field of ['pollen', 'honey', 'opened_brood', 'closed_brood'] as const) {
-      if (form[field] === null || isNaN(Number(form[field])) || Number(form[field]) < 0) {
-        this.toast.error(`${field.replace('_', ' ')} must be a valid non-negative number.`);
-        return false;
-      }
-    }
-    if (form.queen_year !== null && form.queen_year !== undefined) {
-      const yr = Number(form.queen_year);
-      if (isNaN(yr) || yr < 2000) {
-        this.toast.error('Queen Year must be a number ≥ 2000, or leave it empty.');
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private toPayload(form: InspectionForm) {
-    return {
-      date: form.date,
-      frame_space: Number(form.frame_space) || 0,
-      population: Number(form.population) || 0,
-      pollen: Number(form.pollen) || 0,
-      honey: Number(form.honey) || 0,
-      opened_brood: Number(form.opened_brood) || 0,
-      closed_brood: Number(form.closed_brood) || 0,
-      varroa: form.varroa ? 1 : 0,
-      american_foulbrood: form.american_foulbrood ? 1 : 0,
-      european_foulbrood: form.european_foulbrood ? 1 : 0,
-      nosema: form.nosema ? 1 : 0,
-      queen_exists: form.queen_exists ? 1 : 0,
-      queen_cells: form.queen_cells ? 1 : 0,
-      queen_year: form.queen_year ? Number(form.queen_year) : null,
-    } as Omit<Inspection, 'id' | 'beehiveId'>;
-  }
-
-  private blank(): InspectionForm {
-    return {
-      date: new Date().toISOString().split('T')[0],
-      frame_space: null,
-      population: null,
-      pollen: null,
-      honey: null,
-      opened_brood: null,
-      closed_brood: null,
-      varroa: false,
-      american_foulbrood: false,
-      european_foulbrood: false,
-      nosema: false,
-      queen_exists: true,
-      queen_cells: false,
-      queen_year: null,
-    };
   }
 }

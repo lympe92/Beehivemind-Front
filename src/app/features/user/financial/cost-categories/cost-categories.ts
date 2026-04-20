@@ -1,21 +1,19 @@
 import { Component, inject, OnInit, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CostCategory, CostType } from '../../../../core/models/cost-category.model';
+import { CostCategory } from '../../../../core/models/cost-category.model';
 import { CostCategoryService } from '../../../../core/services/cost-category.service';
 import { DataTableComponent, ColumnDef } from '../../../../shared/components/ui/data-table/data-table';
 import { ToastService } from '../../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../../core/modal/modal.service';
-
-interface CategoryForm {
-  name: string;
-  description: string;
-  type: CostType;
-}
+import {
+  AddCostCategoryModalComponent,
+  AddCostCategoryModalData,
+  AddCostCategoryModalResult,
+} from '../../../../shared/components/ui/modal/add-cost-category-modal/add-cost-category-modal';
 
 @Component({
   selector: 'app-cost-categories',
   standalone: true,
-  imports: [FormsModule, DataTableComponent],
+  imports: [DataTableComponent],
   templateUrl: './cost-categories.html',
   styleUrl: './cost-categories.scss',
 })
@@ -35,32 +33,20 @@ export class CostCategoriesComponent implements OnInit {
   categories = signal<CostCategory[]>([]);
   loading = signal(false);
 
-  editingId: number | null = null;
-  editForm: CategoryForm = this.blank();
-
-  showAddForm = false;
-  newForm: CategoryForm = this.blank();
-
   ngOnInit(): void {
     this.load();
   }
 
-  startAdd(): void {
-    this.cancelEdit();
-    this.newForm = this.blank();
-    this.showAddForm = true;
-  }
+  async startAdd(): Promise<void> {
+    const result = await this.modal.open<AddCostCategoryModalResult>(
+      AddCostCategoryModalComponent,
+      { type: 'center', width: '440px' },
+    );
+    if (!result) return;
 
-  cancelAdd(): void {
-    this.showAddForm = false;
-  }
-
-  confirmAdd(): void {
-    if (!this.validate(this.newForm)) return;
-    this.categoryService.createCategory(this.newForm).subscribe({
+    this.categoryService.createCategory(result).subscribe({
       next: res => {
         if (res.success) {
-          this.showAddForm = false;
           this.load();
           this.toast.success('Category created.');
         } else {
@@ -71,22 +57,20 @@ export class CostCategoriesComponent implements OnInit {
     });
   }
 
-  startEdit(row: CostCategory): void {
-    this.cancelAdd();
-    this.editingId = row.id;
-    this.editForm = { name: row.name, description: row.description, type: row.type };
-  }
+  async startEdit(row: CostCategory): Promise<void> {
+    const result = await this.modal.open<AddCostCategoryModalResult, AddCostCategoryModalData>(
+      AddCostCategoryModalComponent,
+      {
+        type: 'center',
+        width: '440px',
+        data: { editRow: row },
+      },
+    );
+    if (!result) return;
 
-  cancelEdit(): void {
-    this.editingId = null;
-  }
-
-  confirmEdit(): void {
-    if (this.editingId === null || !this.validate(this.editForm)) return;
-    this.categoryService.updateCategory(this.editingId, this.editForm).subscribe({
+    this.categoryService.updateCategory(row.id, result).subscribe({
       next: res => {
         if (res.success) {
-          this.editingId = null;
           this.load();
           this.toast.success('Category updated.');
         } else {
@@ -128,17 +112,5 @@ export class CostCategoriesComponent implements OnInit {
       }
       this.loading.set(false);
     });
-  }
-
-  private validate(form: CategoryForm): boolean {
-    if (!form.name.trim()) {
-      this.toast.error('Name is required.');
-      return false;
-    }
-    return true;
-  }
-
-  private blank(): CategoryForm {
-    return { name: '', description: '', type: 'income' };
   }
 }

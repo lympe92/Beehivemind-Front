@@ -1,0 +1,75 @@
+@use 'styles/user-theme' as *;
+
+.add-cat {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  &__error {
+    background: rgba($danger, 0.1);
+    border: 1px solid rgba($danger, 0.3);
+    color: $danger;
+    padding: 8px 12px;
+    border-radius: $radius-sm;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    color: $text-muted;
+  }
+
+  &__input {
+    background: $bg-hover;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    color: $text-primary;
+    font-size: 0.875rem;
+    padding: 6px 10px;
+    width: 100%;
+    transition: border-color 0.15s;
+
+    &:focus { outline: none; border-color: $accent; }
+  }
+
+  &__select {
+    background: $bg-hover;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    color: $text-primary;
+    font-size: 0.875rem;
+    padding: 6px 10px;
+    width: 100%;
+    appearance: none;
+    background-image: $select-arrow;
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+
+    &:focus { outline: none; border-color: $accent; }
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 16px;
+    border-radius: $radius-sm;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &--primary { background: $accent; color: $accent-fg; &:hover { background: $accent-hover; } }
+    &--ghost { background: transparent; border: 1px solid $border; color: $text-muted; &:hover { background: $bg-hover; color: $text-primary; } }
+  }
+}

@@ -1,0 +1,128 @@
+@use 'styles/user-theme' as *;
+
+.add-insp {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__error {
+    background: rgba($danger, 0.1);
+    border: 1px solid rgba($danger, 0.3);
+    color: $danger;
+    padding: 8px 12px;
+    border-radius: $radius-sm;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+  &__selectors {
+    display: flex;
+    gap: 12px;
+  }
+
+  &__form-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 20px;
+    align-items: center;
+  }
+
+  &__field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+
+    &--col {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+      min-width: 90px;
+    }
+
+    &--inline {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      flex: none;
+    }
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    color: $text-muted;
+    white-space: nowrap;
+  }
+
+  &__input {
+    background: $bg-hover;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    color: $text-primary;
+    font-size: 0.875rem;
+    padding: 6px 10px;
+    width: 100%;
+    transition: border-color 0.15s;
+
+    &:focus { outline: none; border-color: $accent; }
+    &--sm { width: 80px; }
+  }
+
+  &__select {
+    background: $bg-hover;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    color: $text-primary;
+    font-size: 0.875rem;
+    padding: 6px 10px;
+    flex: 1;
+    appearance: none;
+    background-image: $select-arrow;
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+
+    &:focus { outline: none; border-color: $accent; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: $text-primary;
+    cursor: pointer;
+    white-space: nowrap;
+
+    input[type='checkbox'] {
+      width: 15px;
+      height: 15px;
+      accent-color: $accent;
+      cursor: pointer;
+    }
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 16px;
+    border-radius: $radius-sm;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &--primary { background: $accent; color: $accent-fg; &:hover { background: $accent-hover; } }
+    &--ghost { background: transparent; border: 1px solid $border; color: $text-muted; &:hover { background: $bg-hover; color: $text-primary; } }
+  }
+}
