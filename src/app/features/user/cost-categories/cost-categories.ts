@@ -1,14 +1,14 @@
 import { Component, inject, OnInit, output, signal } from '@angular/core';
-import { CostCategory } from '../../../../core/models/cost-category.model';
-import { CostCategoryService } from '../../../../core/services/cost-category.service';
-import { DataTableComponent, ColumnDef } from '../../../../shared/components/ui/data-table/data-table';
-import { ToastService } from '../../../../shared/components/ui/toast/toast.service';
-import { ModalService } from '../../../../core/modal/modal.service';
+import { CostCategory } from '../../../core/models/cost-category.model';
+import { CostCategoryService } from '../../../core/services/cost-category.service';
+import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
+import { ToastService } from '../../../shared/components/ui/toast/toast.service';
+import { ModalService } from '../../../core/modal/modal.service';
 import {
   AddCostCategoryModalComponent,
   AddCostCategoryModalData,
   AddCostCategoryModalResult,
-} from '../../../../shared/components/ui/modal/add-cost-category-modal/add-cost-category-modal';
+} from '../../../shared/components/ui/modal/add-cost-category-modal/add-cost-category-modal';
 
 @Component({
   selector: 'app-cost-categories',

@@ -1,15 +1,15 @@
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
-import { Cost } from '../../../../core/models/cost.model';
-import { CostCategory } from '../../../../core/models/cost-category.model';
-import { CostService } from '../../../../core/services/cost.service';
-import { DataTableComponent, ColumnDef } from '../../../../shared/components/ui/data-table/data-table';
-import { ToastService } from '../../../../shared/components/ui/toast/toast.service';
-import { ModalService } from '../../../../core/modal/modal.service';
+import { Cost } from '../../../core/models/cost.model';
+import { CostCategory } from '../../../core/models/cost-category.model';
+import { CostService } from '../../../core/services/cost.service';
+import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
+import { ToastService } from '../../../shared/components/ui/toast/toast.service';
+import { ModalService } from '../../../core/modal/modal.service';
 import {
   AddCostModalComponent,
   AddCostModalData,
   AddCostModalResult,
-} from '../../../../shared/components/ui/modal/add-cost-modal/add-cost-modal';
+} from '../../../shared/components/ui/modal/add-cost-modal/add-cost-modal';
 
 @Component({
   selector: 'app-costs',
