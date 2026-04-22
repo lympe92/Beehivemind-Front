@@ -1,0 +1,16 @@
+<div class="form-group">
+  <div class="toggle-row" [class.disabled]="disabled" (click)="toggle()">
+    <div class="toggle-track" [class.checked]="checked" [class.invalid]="isFieldValid()">
+      <div class="toggle-thumb"></div>
+    </div>
+    @if (label) {
+      <span class="toggle-label">{{ label }}{{ isRequired ? ' *' : '' }}</span>
+    }
+  </div>
+  @if (hint) {
+    <p class="toggle-hint">{{ hint }}</p>
+  }
+  <app-form-errors
+    [errors]="saFormControlName?.valid === false && saFormControlName?.touched ? (saFormControlName?.control?.errors ?? null) : null"
+  />
+</div>

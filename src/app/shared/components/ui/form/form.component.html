@@ -1,0 +1,58 @@
+<form [formGroup]="form" class="form-container" [class.loading]="loading">
+  @for (field of fields; track field.name) {
+    <div [ngClass]="field.size" class="field-wrap">
+      @if (field.type === 'text' || field.type === 'number' || field.type === 'email' || field.type === 'password' || field.type === 'date') {
+        <app-form-input
+          [label]="field.label"
+          [inputType]="field.type"
+          [formControlName]="field.name"
+        />
+      }
+      @if (field.type === 'textarea') {
+        <app-form-textarea
+          [label]="field.label"
+          [formControlName]="field.name"
+        />
+      }
+      @if (field.type === 'select') {
+        <app-form-select
+          [formControlName]="field.name"
+          [label]="field.label"
+          [options]="field.options | async"
+          [isMultiple]="!!field.isMultiple"
+        />
+      }
+      @if (field.type === 'radio') {
+        <app-form-radio
+          [label]="field.label"
+          [options]="(field.options | async) ?? []"
+          [formControlName]="field.name"
+        />
+      }
+      @if (field.type === 'checkbox') {
+        <app-form-checkboxes
+          [label]="field.label"
+          [options]="(field.options | async) ?? []"
+          [formControlName]="field.name"
+        />
+      }
+      @if (field.type === 'range') {
+        <app-form-range
+          [label]="field.label"
+          [formControlName]="field.name"
+        />
+      }
+      @if (field.type === 'toggle') {
+        <app-form-toggle
+          [label]="field.label"
+          [formControlName]="field.name"
+        />
+      }
+    </div>
+  }
+  <div class="button-container">
+    <app-button variant="primary" type="submit" (click)="submit()">
+      {{ submitLabel }}
+    </app-button>
+  </div>
+</form>

@@ -1,0 +1,37 @@
+.input-container {
+  position: relative;
+
+  &.has-icon input {
+    padding-right: 2.5rem;
+  }
+}
+
+.input-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+.eye-icon {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--color-neutral-400, #9ca3af);
+
+  &:hover {
+    color: var(--color-neutral-600, #4b5563);
+  }
+}
+
+.no-spinners::-webkit-outer-spin-button,
+.no-spinners::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinners[type='number'] {
+  appearance: textfield;
+}

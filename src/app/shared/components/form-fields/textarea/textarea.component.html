@@ -1,0 +1,18 @@
+<div class="form-group">
+  @if (label) {
+    <label class="form-label">{{ label }}{{ isRequired ? ' *' : '' }}</label>
+  }
+  <textarea
+    class="form-control"
+    [class.invalid]="isFieldValid()"
+    [class.filled]="value"
+    [placeholder]="placeholder"
+    [value]="value"
+    [disabled]="disabled"
+    (input)="onInput($event)"
+    (blur)="onTouched()"
+  ></textarea>
+  <app-form-errors
+    [errors]="saFormControlName?.valid === false && saFormControlName?.touched ? (saFormControlName?.control?.errors ?? null) : null"
+  />
+</div>

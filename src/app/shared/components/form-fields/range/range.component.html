@@ -1,0 +1,40 @@
+<div class="form-group">
+  @if (label) {
+    <label class="form-label">{{ label }}{{ isRequired ? ' *' : '' }}</label>
+  }
+  <div class="range-container" [formGroup]="rangeForm">
+    <div class="range-inputs">
+      <app-form-input
+        formControlName="minValue"
+        inputType="number"
+        placeholder="Min"
+      />
+      <app-form-input
+        formControlName="maxValue"
+        inputType="number"
+        placeholder="Max"
+      />
+    </div>
+    <div class="slider-track">
+      <input
+        type="range"
+        [min]="min" [max]="max" [step]="step"
+        [ngModel]="rangeForm.value.minValue"
+        (ngModelChange)="rangeForm.patchValue({ minValue: $event })"
+        [ngModelOptions]="{ standalone: true }"
+        class="thumb thumb-min"
+      />
+      <input
+        type="range"
+        [min]="min" [max]="max" [step]="step"
+        [ngModel]="rangeForm.value.maxValue"
+        (ngModelChange)="rangeForm.patchValue({ maxValue: $event })"
+        [ngModelOptions]="{ standalone: true }"
+        class="thumb thumb-max"
+      />
+    </div>
+  </div>
+  <app-form-errors
+    [errors]="saFormControlName?.valid === false && saFormControlName?.touched ? (saFormControlName?.control?.errors ?? null) : null"
+  />
+</div>

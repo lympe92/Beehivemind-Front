@@ -1,0 +1,27 @@
+<div class="radio-group" [class.column]="direction === 'column'">
+  @if (label) {
+    <label class="radio-group__label">{{ label }}{{ isRequired ? ' *' : '' }}</label>
+  }
+  @for (option of options; track option.returnValue; let i = $index) {
+    <div class="radio-group__option" (click)="onUpdateValue(option.returnValue)">
+      <input
+        type="radio"
+        tabindex="-1"
+        [checked]="value != null && value === option.returnValue"
+        [disabled]="disabled"
+        (click)="$event.stopPropagation()"
+      />
+      <span
+        class="radio-group__option--inner"
+        [class.invalid]="isFieldValid()"
+        tabindex="0"
+        (keydown.enter)="onUpdateValue(option.returnValue)"
+        (keydown.space)="onUpdateValue(option.returnValue); $event.preventDefault()"
+      ></span>
+      <label class="radio-group__option--label">{{ option.displayValue }}</label>
+    </div>
+  }
+</div>
+<app-form-errors
+  [errors]="saFormControlName?.valid === false && saFormControlName?.touched ? (saFormControlName?.control?.errors ?? null) : null"
+/>

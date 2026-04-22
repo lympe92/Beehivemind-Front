@@ -1,0 +1,38 @@
+.form-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  row-gap: 1.55rem;
+  column-gap: 1.87rem;
+
+  &.loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .full {
+    width: 100%;
+  }
+
+  .half {
+    width: calc(50% - 1.435rem);
+  }
+
+  .third {
+    width: calc(33.33% - 1.435rem);
+  }
+
+  .two-thirds {
+    width: calc(66.66% - 1.435rem);
+  }
+
+  .field-wrap {
+    min-width: 0;
+  }
+
+  .button-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+}

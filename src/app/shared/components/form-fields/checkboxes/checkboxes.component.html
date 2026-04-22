@@ -1,0 +1,34 @@
+<div class="form-group checkbox-group">
+  @if (label) {
+    <label class="checkbox-group__label">{{ label }}{{ isRequired ? ' *' : '' }}</label>
+  }
+  <div class="checkbox-group__options" [class.row]="direction === 'row'">
+    @for (option of options; track option.returnValue; let i = $index) {
+      <div class="checkbox-group__option">
+        <input
+          [id]="'checkbox-' + option.displayValue + i"
+          type="checkbox"
+          tabindex="-1"
+          [checked]="isChecked(option.returnValue)"
+          [disabled]="disabled"
+        />
+        <span
+          class="checkbox-group__option--inner"
+          [class.invalid]="isFieldValid()"
+          tabindex="0"
+          (click)="onToggleOption(option.returnValue)"
+          (keydown.enter)="onToggleOption(option.returnValue)"
+          (keydown.space)="onToggleOption(option.returnValue); $event.preventDefault()"
+        ></span>
+        <label
+          [for]="'checkbox-' + option.displayValue + i"
+          class="checkbox-group__option--label"
+          (click)="onToggleOption(option.returnValue)"
+        >{{ option.displayValue }}</label>
+      </div>
+    }
+  </div>
+  <app-form-errors
+    [errors]="saFormControlName?.valid === false && saFormControlName?.touched ? (saFormControlName?.control?.errors ?? null) : null"
+  />
+</div>

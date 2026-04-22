@@ -6,6 +6,21 @@
 
 ---
 
+## Form System
+
+Schema-driven dynamic forms with reactive validation, conditional fields, and ControlValueAccessor-based field components.
+
+**Full documentation:** [`src/app/shared/components/ui/form/CLAUDE.md`](src/app/shared/components/ui/form/CLAUDE.md)
+
+Quick summary:
+- Define `DynamicField[]` config → `FormManagementService` builds the `FormGroup`
+- Render with `<app-form [fields]="..." (submitForm)="..."/>`
+- Typical pattern: open a modal → modal contains `<app-form>` → `dialogRef.close(formValue)` on submit
+- Validators live in `validators.config.ts` (sync, async, cross-field)
+- Add new field types by implementing `ControlValueAccessor` + registering in `form.component.html`
+
+---
+
 ## Modal System
 
 ### Overview
