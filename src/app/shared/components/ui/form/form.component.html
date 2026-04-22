@@ -18,21 +18,22 @@
         <app-form-select
           [formControlName]="field.name"
           [label]="field.label"
-          [options]="field.options | async"
+          [options]="field.options"
+          [cascadeFrom]="field.cascadeFrom"
           [isMultiple]="!!field.isMultiple"
         />
       }
       @if (field.type === 'radio') {
         <app-form-radio
           [label]="field.label"
-          [options]="(field.options | async) ?? []"
+          [options]="($any(field.options) | async) ?? []"
           [formControlName]="field.name"
         />
       }
       @if (field.type === 'checkbox') {
         <app-form-checkboxes
           [label]="field.label"
-          [options]="(field.options | async) ?? []"
+          [options]="($any(field.options) | async) ?? []"
           [formControlName]="field.name"
         />
       }
@@ -44,6 +45,12 @@
       }
       @if (field.type === 'toggle') {
         <app-form-toggle
+          [label]="field.label"
+          [formControlName]="field.name"
+        />
+      }
+      @if (field.type === 'map') {
+        <app-form-map
           [label]="field.label"
           [formControlName]="field.name"
         />

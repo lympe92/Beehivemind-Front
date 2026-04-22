@@ -1,0 +1,17 @@
+.map-wrap {
+  height: 300px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: border-color 0.15s;
+
+  &.invalid {
+    border-color: var(--color-error, #ef4444);
+  }
+
+  app-map-picker {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}

@@ -1,0 +1,15 @@
+<div class="form-group">
+  @if (label) {
+    <label class="form-label">{{ label }}{{ isRequired ? ' *' : '' }}</label>
+  }
+  <div class="map-wrap" [class.invalid]="isFieldValid()">
+    <app-map-picker
+      [marker]="marker"
+      [interactive]="!disabled"
+      (markerChange)="onMarkerChange($event)"
+    />
+  </div>
+  <app-form-errors
+    [errors]="saFormControlName?.valid === false && saFormControlName?.touched ? (saFormControlName?.control?.errors ?? null) : null"
+  />
+</div>

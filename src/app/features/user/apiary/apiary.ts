@@ -12,11 +12,8 @@ import { ToastService } from '../../../shared/components/ui/toast/toast.service'
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
 import { MapPickerComponent } from '../../../shared/components/ui/map-picker/map-picker';
-import {
-  AddApiaryModalComponent,
-  AddApiaryModalData,
-  AddApiaryModalResult,
-} from '../../../shared/components/ui/modal/add-apiary-modal/add-apiary-modal';
+import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
+import { syncValidators } from '../../../shared/components/ui/form/validators.config';
 
 interface ApiaryForm {
   name: string;
@@ -91,20 +88,54 @@ export class ApiaryComponent implements OnInit {
   // ── Add ──────────────────────────────────────────────────
 
   async startAdd(): Promise<void> {
-    const result = await this.modal.open<AddApiaryModalResult, AddApiaryModalData>(
-      AddApiaryModalComponent,
-      {
-        type: 'center',
-        width: '640px',
-        data: {
-          existingNames: this.allApiaries().map(a => a.name),
-        },
+    const existingNames = this.allApiaries().map(a => a.name);
+
+    const value = await this.modal.open<any>(FormModalComponent, {
+      type: 'center',
+      width: '640px',
+      data: {
+        title: 'Add Apiary',
+        fields: [
+          {
+            name: 'name',
+            type: 'text',
+            label: 'Name',
+            size: 'full',
+            value: '',
+            syncValidators: [syncValidators.required()],
+          },
+          {
+            name: 'hivesNumber',
+            type: 'number',
+            label: 'Hives',
+            size: 'half',
+            value: null,
+          },
+          {
+            name: 'location',
+            type: 'map',
+            label: 'Location (click map to set)',
+            size: 'full',
+            value: null,
+            syncValidators: [syncValidators.required()],
+          },
+        ],
       },
-    );
+    });
 
-    if (!result) return;
+    if (!value) return;
 
-    this.apiaryService.createApiary(result).subscribe({
+    if (existingNames.includes(value.name.trim())) {
+      this.toast.warning(`An apiary named "${value.name.trim()}" already exists.`);
+      return;
+    }
+
+    this.apiaryService.createApiary({
+      name: value.name.trim(),
+      hivesNumber: Number(value.hivesNumber) || 0,
+      latitude: value.location.lat,
+      longitude: value.location.lng,
+    }).subscribe({
       next: res => {
         if (res.success) {
           this.reload();

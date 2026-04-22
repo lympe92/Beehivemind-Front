@@ -1,15 +1,13 @@
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
+import { of } from 'rxjs';
 import { Cost } from '../../../core/models/cost.model';
 import { CostCategory } from '../../../core/models/cost-category.model';
 import { CostService } from '../../../core/services/cost.service';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
-import {
-  AddCostModalComponent,
-  AddCostModalData,
-  AddCostModalResult,
-} from '../../../shared/components/ui/modal/add-cost-modal/add-cost-modal';
+import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
+import { syncValidators } from '../../../shared/components/ui/form/validators.config';
 
 @Component({
   selector: 'app-costs',
@@ -46,17 +44,59 @@ export class CostsComponent implements OnInit {
   }
 
   async startAdd(): Promise<void> {
-    const result = await this.modal.open<AddCostModalResult, AddCostModalData>(
-      AddCostModalComponent,
-      {
-        type: 'center',
-        width: '440px',
-        data: { costCategories: this.costCategories() },
+    const value = await this.modal.open<any>(FormModalComponent, {
+      type: 'center',
+      width: '440px',
+      data: {
+        title: 'Add Cost',
+        fields: [
+          {
+            name: 'date',
+            type: 'date',
+            label: 'Date',
+            size: 'half',
+            value: new Date().toISOString().split('T')[0],
+            syncValidators: [syncValidators.required()],
+          },
+          {
+            name: 'name',
+            type: 'text',
+            label: 'Name',
+            size: 'half',
+            value: '',
+            syncValidators: [syncValidators.required()],
+          },
+          {
+            name: 'category_id',
+            type: 'select',
+            label: 'Category',
+            size: 'half',
+            value: null,
+            syncValidators: [syncValidators.required()],
+            options: of(this.costCategories().map(cat => ({
+              displayValue: cat.name,
+              returnValue: cat.id,
+            }))),
+          },
+          {
+            name: 'amount',
+            type: 'number',
+            label: 'Amount',
+            size: 'half',
+            value: null,
+            syncValidators: [syncValidators.required(), syncValidators.rangeNumber({ min: 0, max: 9_999_999 })],
+          },
+        ],
       },
-    );
-    if (!result) return;
+    });
+    if (!value) return;
 
-    this.costService.createCost(result).subscribe({
+    this.costService.createCost({
+      date: value.date,
+      name: value.name.trim(),
+      category_id: Number(value.category_id),
+      amount: Number(value.amount),
+    }).subscribe({
       next: res => {
         if (res.success) {
           this.load();
@@ -71,17 +111,59 @@ export class CostsComponent implements OnInit {
   }
 
   async startEdit(row: Cost): Promise<void> {
-    const result = await this.modal.open<AddCostModalResult, AddCostModalData>(
-      AddCostModalComponent,
-      {
-        type: 'center',
-        width: '440px',
-        data: { costCategories: this.costCategories(), editRow: row },
+    const value = await this.modal.open<any>(FormModalComponent, {
+      type: 'center',
+      width: '440px',
+      data: {
+        title: 'Edit Cost',
+        fields: [
+          {
+            name: 'date',
+            type: 'date',
+            label: 'Date',
+            size: 'half',
+            value: row.date,
+            syncValidators: [syncValidators.required()],
+          },
+          {
+            name: 'name',
+            type: 'text',
+            label: 'Name',
+            size: 'half',
+            value: row.name,
+            syncValidators: [syncValidators.required()],
+          },
+          {
+            name: 'category_id',
+            type: 'select',
+            label: 'Category',
+            size: 'half',
+            value: row.category_id,
+            syncValidators: [syncValidators.required()],
+            options: of(this.costCategories().map(cat => ({
+              displayValue: cat.name,
+              returnValue: cat.id,
+            }))),
+          },
+          {
+            name: 'amount',
+            type: 'number',
+            label: 'Amount',
+            size: 'half',
+            value: row.amount,
+            syncValidators: [syncValidators.required(), syncValidators.rangeNumber({ min: 0, max: 9_999_999 })],
+          },
+        ],
       },
-    );
-    if (!result) return;
+    });
+    if (!value) return;
 
-    this.costService.updateCost(row.id, result).subscribe({
+    this.costService.updateCost(row.id, {
+      date: value.date,
+      name: value.name.trim(),
+      category_id: Number(value.category_id),
+      amount: Number(value.amount),
+    }).subscribe({
       next: res => {
         if (res.success) {
           this.load();

@@ -8,15 +8,13 @@ Schema-driven reactive form system. Define fields as a config array → get a fu
 
 | File | Role |
 |------|------|
-| `src/app/core/models/form.model.ts` | `DynamicField` interface — field config shape |
+| `src/app/core/models/form.model.ts` | `DynamicField`, `FieldCondition` interfaces |
 | `src/app/core/models/form-fields.model.ts` | `FieldOption` — option shape for select/radio/checkbox |
-| `src/app/core/models/validators.model.ts` | `ValidatorConfig`, `SyncValidators` types |
 | `src/app/core/directives/dynamic-field.directive.ts` | `SAFormControlNameDirective` — bridges CVA components with reactive forms |
 | `src/app/core/services/forms-management.service.ts` | `FormManagementService` — builds `FormGroup`, handles conditions |
-| `src/app/core/services/form-fields.service.ts` | Helpers for select field option handling |
 | `src/app/shared/components/ui/form/form.component.ts` | `FormComponent` — renders fields + submit button |
-| `src/app/shared/components/ui/form/validators.config.ts` | All validator factories (sync, async, cross-field) |
-| `src/app/shared/components/form-fields/` | Individual field components (input, textarea, select, radio, checkboxes, range, errors) |
+| `src/app/shared/components/ui/form/validators.config.ts` | Validator factories: `syncValidators`, `asyncValidators`, `crossFieldValidators` |
+| `src/app/shared/components/form-fields/` | Individual field components |
 
 ---
 
@@ -24,6 +22,8 @@ Schema-driven reactive form system. Define fields as a config array → get a fu
 
 ```ts
 import { DynamicField } from 'src/app/core/models/form.model';
+import { syncValidators } from 'src/app/shared/components/ui/form/validators.config';
+import { of } from 'rxjs';
 
 const fields: DynamicField[] = [
   {
@@ -31,10 +31,10 @@ const fields: DynamicField[] = [
     type: 'email',           // field component to render
     label: 'Email',
     size: 'full',            // 'full' | 'half' | 'third' | 'two-thirds'
-    defaultValue: '',
-    validators: [
-      { type: 'required' },
-      { type: 'email' },
+    value: '',               // initial value (was `defaultValue` in older version)
+    syncValidators: [
+      syncValidators.required(),
+      syncValidators.email(),
     ],
   },
   {
@@ -42,21 +42,47 @@ const fields: DynamicField[] = [
     type: 'number',
     label: 'Age',
     size: 'half',
-    defaultValue: null,
-    validators: [{ type: 'rangeNumber', params: { min: 18, max: 120 } }],
+    value: null,
+    syncValidators: [syncValidators.rangeNumber({ min: 18, max: 120 })],
   },
   {
     name: 'role',
     type: 'select',
     label: 'Role',
     size: 'half',
-    options: of([                          // Observable<FieldOption[]>
+    value: null,
+    options: of([                         // Observable<FieldOption[]>
       { displayValue: 'Admin', returnValue: 'admin' },
       { displayValue: 'User',  returnValue: 'user'  },
     ]),
     isMultiple: false,
   },
 ];
+```
+
+### DynamicField interface
+
+```ts
+interface DynamicField {
+  name: string;
+  type: 'text' | 'number' | 'email' | 'password' | 'date' | 'textarea'
+      | 'select' | 'radio' | 'checkbox' | 'range' | 'toggle' | 'map';
+  label: string;
+  size: 'full' | 'half' | 'third' | 'two-thirds';
+  value?: any;                                           // initial form value
+  syncValidators?: ValidatorFn[];                        // array of sync validator functions
+  asyncValidators?: AsyncValidatorFn[];                  // array of async validator functions
+  placeholder?: string;
+  isMultiple?: boolean;                                  // select: allow multiple selection
+  options?: Observable<FieldOption[]>
+          | ((value: any) => Observable<FieldOption[]>); // function form = cascading select
+  cascadeFrom?: string;                                  // control name to watch for cascading
+  conditions?: {
+    disabled?: FieldCondition[];   // implemented
+    visible?: FieldCondition[];    // defined but NOT yet implemented
+    required?: FieldCondition[];   // defined but NOT yet implemented
+  };
+}
 ```
 
 ### Field types
@@ -73,6 +99,8 @@ const fields: DynamicField[] = [
 | `radio` | `app-form-radio` |
 | `checkbox` | `app-form-checkboxes` |
 | `range` | `app-form-range` |
+| `toggle` | `app-form-toggle` — boolean on/off switch |
+| `map` | `app-form-map` — Google Maps picker, value is `LatLngLiteral \| null` |
 
 ---
 
@@ -92,6 +120,7 @@ const fields: DynamicField[] = [
 ```ts
 onSubmit(value: Record<string, any>): void {
   // value contains all field values keyed by field.name
+  // only called when form.valid is true
 }
 ```
 
@@ -115,10 +144,10 @@ async openMyModal(): Promise<void> {
 ```ts
 // MyFormModalComponent
 export class MyFormModalComponent {
-  private dialogRef = inject(DialogRef<any>);
+  protected dialogRef = inject(DialogRef<any>);
   readonly data = inject<MyDataType>(MODAL_DATA);
 
-  fields: DynamicField[] = [ /* ... */ ];
+  readonly fields: DynamicField[] = [ /* ... */ ];
 
   onSubmit(value: any): void {
     this.dialogRef.close(value);   // passes form value back to caller
@@ -129,7 +158,7 @@ export class MyFormModalComponent {
 ```html
 <!-- MyFormModalComponent template -->
 <app-modal-shell title="My Form" (close)="dialogRef.close()">
-  <app-form [fields]="fields" (submitForm)="onSubmit($event)" />
+  <app-form [fields]="fields" submitLabel="Save" (submitForm)="onSubmit($event)" />
 </app-modal-shell>
 ```
 
@@ -137,61 +166,108 @@ export class MyFormModalComponent {
 
 ## Available validators
 
-Defined in `validators.config.ts`, referenced via `ValidatorConfig` in `DynamicField.validators`.
+Import from `src/app/shared/components/ui/form/validators.config.ts`. Call the factory to get the validator function.
 
-### Sync validators
+### syncValidators
 
-| `type` | `params` | Description |
-|--------|----------|-------------|
-| `required` | — | Field must have a value |
-| `email` | — | Valid email format |
-| `minLength` | `min: number` | Minimum character count |
-| `maxLength` | `max: number` | Maximum character count |
-| `number` | — | Value must be a number |
-| `rangeNumber` | `{ min, max }` | Value within numeric range |
+| Factory | Usage | Description |
+|---------|-------|-------------|
+| `required` | `syncValidators.required()` | Field must have a value |
+| `email` | `syncValidators.email()` | Valid email format |
+| `minLength` | `syncValidators.minLength(3)` | Minimum character count |
+| `maxLength` | `syncValidators.maxLength(100)` | Maximum character count |
+| `number` | `syncValidators.number()` | Value must be a number type |
+| `rangeNumber` | `syncValidators.rangeNumber({ min, max })` | Value within numeric range — passes if null |
 
-### Async validators
+### asyncValidators
 
-| `type` | `params` | Description |
-|--------|----------|-------------|
-| `apiValidator` | `{ urlPath, mapperRes }` | Hits `GET /api/{urlPath}/{value}`, validates via `mapperRes` |
+| Factory | Usage | Description |
+|---------|-------|-------------|
+| `apiValidator` | `asyncValidators.apiValidator(http, '/path', res => !!res.ok)` | Hits `GET /api/{path}/{value}`, validates via mapper |
 
-### Cross-field validators
+### crossFieldValidators
 
-Applied to a field that depends on another field's value in the same form.
+Applied to a field that depends on another field's value.
 
-| `type` | `params` | Description |
-|--------|----------|-------------|
-| `lessThan` | `maxFieldName` | This value < other field |
-| `lessThanOrEqual` | `maxFieldName` | This value ≤ other field |
-| `greaterThan` | `minFieldName` | This value > other field |
-| `greaterThanOrEqual` | `minFieldName` | This value ≥ other field |
-| `equalTo` | `targetFieldName` | Must equal other field |
-| `notEqualTo` | `targetFieldName` | Must differ from other field |
-| `notEmpty` | `targetFieldName` | Other field must be valid + non-empty |
+| Factory | Usage | Description |
+|---------|-------|-------------|
+| `lessThan` | `crossFieldValidators.lessThan('maxField')` | value < other field |
+| `lessThanOrEqual` | `crossFieldValidators.lessThanOrEqual('maxField')` | value ≤ other field |
+| `greaterThan` | `crossFieldValidators.greaterThan('minField')` | value > other field |
+| `greaterThanOrEqual` | `crossFieldValidators.greaterThanOrEqual('minField')` | value ≥ other field |
+| `equalTo` | `crossFieldValidators.equalTo('targetField')` | Must equal other field |
+| `notEqualTo` | `crossFieldValidators.notEqualTo('targetField')` | Must differ from other field |
+| `notEmpty` | `crossFieldValidators.notEmpty('targetField')` | Other field must be valid + non-empty |
+
+---
+
+## Cascading selects
+
+When a select's options depend on another field's value, pass `options` as a function and `cascadeFrom` as the controlling field name. The field updates its options automatically whenever the source changes.
+
+```ts
+{
+  name: 'apiary_id',
+  type: 'select',
+  label: 'Apiary',
+  size: 'half',
+  value: null,
+  syncValidators: [syncValidators.required()],
+  options: of(apiaries.map(a => ({ displayValue: a.name, returnValue: a.id }))),
+},
+{
+  name: 'beehive_id',
+  type: 'select',
+  label: 'Beehive',
+  size: 'half',
+  value: null,
+  cascadeFrom: 'apiary_id',
+  options: (apiaryId: number) => of(
+    beehives
+      .filter(b => b.apiaryId === apiaryId)
+      .map(b => ({ displayValue: b.name, returnValue: b.id })),
+  ),
+},
+```
 
 ---
 
 ## Conditional fields
 
-A field can be shown/disabled based on another field's value via `conditions`.
+A field can be disabled/enabled based on another field's value via `conditions.disabled`. Only the `disabled` category is currently implemented in `FormManagementService`.
 
 ```ts
 {
-  name: 'source_beekeeper',
-  type: 'text',
-  label: 'Beekeeper name',
-  conditions: [
-    {
-      dependsOn: 'source',      // watch this control
-      value: 'purchased',       // when it equals this
-      action: 'show',           // 'show' | 'disable'
-    },
-  ],
+  name: 'beehive_id',
+  type: 'select',
+  label: 'Beehive',
+  conditions: {
+    disabled: [
+      {
+        triggerField: 'apiary_id',     // watch this control
+        triggerValue: null,            // when it equals this value
+        operator: 'equals',            // comparison operator
+        targetFields: ['beehive_id'],  // fields affected
+        action: 'disable',
+      },
+    ],
+  },
 }
 ```
 
-`FormManagementService.disableFieldsIfNeeded()` evaluates conditions on every `valueChanges` emission. The `FormComponent` wires this automatically — no extra setup needed.
+### FieldCondition shape
+
+```ts
+interface FieldCondition {
+  triggerField: string;
+  triggerValue: any;
+  operator?: 'equals' | 'notEquals' | 'greaterThan' | 'greaterThanOrEqual'
+           | 'lessThan' | 'lessThanOrEqual' | 'includes' | 'notIncludes'
+           | 'empty' | 'notEmpty' | 'custom';
+  targetFields: string[];
+  action: 'disable' | 'enable' | 'show' | 'hide' | 'clear';
+}
+```
 
 ---
 
@@ -203,7 +279,7 @@ Used by `select`, `radio`, and `checkbox` fields.
 interface FieldOption {
   displayValue: string;             // label shown in UI
   dropdownDisplayValue?: string;    // override label inside dropdown
-  returnValue: any;                 // value written to FormControl
+  returnValue: any;                 // value written to FormControl (type preserved)
   searchableValues?: string[];      // extra strings for search matching
 }
 ```
@@ -212,7 +288,7 @@ interface FieldOption {
 
 ## SAFormControlNameDirective
 
-Internal directive (`src/app/core/directives/dynamic-field.directive.ts`). Applied via `hostDirectives` on every field component — do not use it directly. It extends Angular's `FormControlName` to expose the parent `FormGroupDirective` to ControlValueAccessor-based custom components.
+Internal directive (`src/app/core/directives/dynamic-field.directive.ts`). Applied via `hostDirectives` on every field component — do not use it directly.
 
 ---
 

@@ -1,6 +1,15 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { Feeding } from '../../../core/models/feeding.model';
+import {
+  Feeding,
+  FEEDING_TYPES,
+  FOOD_TYPES,
+  FEEDING_UNITS,
+  FeedingType,
+  FoodType,
+  FeedingUnit,
+} from '../../../core/models/feeding.model';
 import { FeedingService } from '../../../core/services/feeding.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
@@ -13,11 +22,8 @@ import { ToastService } from '../../../shared/components/ui/toast/toast.service'
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
 import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
-import {
-  AddFeedingModalComponent,
-  AddFeedingModalData,
-  AddFeedingModalResult,
-} from '../../../shared/components/ui/modal/add-feeding-modal/add-feeding-modal';
+import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
+import { syncValidators } from '../../../shared/components/ui/form/validators.config';
 
 @Component({
   selector: 'app-feeding',
@@ -85,34 +91,114 @@ export class FeedingComponent implements OnInit {
   // ── Add ──────────────────────────────────────────────────
 
   async startAdd(): Promise<void> {
-    const result = await this.modal.open<AddFeedingModalResult, AddFeedingModalData>(
-      AddFeedingModalComponent,
-      {
-        type: 'center',
-        width: '640px',
-        data: {
-          apiaries: this.apiaries(),
-          allBeehives: this.allBeehives(),
-          preselectedApiaryId: this.selectedApiaryId(),
-          preselectedBeehiveId: this.selectedBeehiveId(),
-        },
+    const apiaries = this.apiaries();
+    const allBeehives = this.allBeehives();
+
+    const value = await this.modal.open<any>(FormModalComponent, {
+      type: 'center',
+      width: '640px',
+      data: {
+        title: 'Add Feeding Record',
+        fields: [
+          {
+            name: 'apiary_id',
+            type: 'select',
+            label: 'Apiary',
+            size: 'half',
+            value: this.selectedApiaryId() || null,
+            syncValidators: [syncValidators.required()],
+            options: of(apiaries.map(a => ({ displayValue: a.name, returnValue: a.id }))),
+          },
+          {
+            name: 'beehive_id',
+            type: 'select',
+            label: 'Beehive',
+            size: 'half',
+            value: this.selectedBeehiveId() || null,
+            cascadeFrom: 'apiary_id',
+            options: (apiaryId: number) => of([
+              { displayValue: '— All beehives —', returnValue: null },
+              ...allBeehives
+                .filter(b => b.apiaryId === apiaryId)
+                .map(b => ({ displayValue: b.name, returnValue: b.id })),
+            ]),
+          },
+          {
+            name: 'date',
+            type: 'date',
+            label: 'Date',
+            size: 'half',
+            value: new Date().toISOString().split('T')[0],
+            syncValidators: [syncValidators.required()],
+          },
+          {
+            name: 'feeding_type',
+            type: 'select',
+            label: 'Feeding Type',
+            size: 'half',
+            value: 'stimulation',
+            syncValidators: [syncValidators.required()],
+            options: of(FEEDING_TYPES.map(ft => ({ displayValue: ft.label, returnValue: ft.value }))),
+          },
+          {
+            name: 'food_type',
+            type: 'select',
+            label: 'Food Type',
+            size: 'half',
+            value: 'sugar syrup',
+            syncValidators: [syncValidators.required()],
+            options: of(FOOD_TYPES.map(ft => ({ displayValue: ft.label, returnValue: ft.value }))),
+          },
+          {
+            name: 'food_quantity',
+            type: 'number',
+            label: 'Qty / Beehive',
+            size: 'half',
+            value: null,
+            syncValidators: [syncValidators.required(), syncValidators.rangeNumber({ min: 0, max: 9_999_999 })],
+          },
+          {
+            name: 'unit',
+            type: 'select',
+            label: 'Unit',
+            size: 'half',
+            value: 'kg',
+            syncValidators: [syncValidators.required()],
+            options: of(FEEDING_UNITS.map(u => ({ displayValue: u.label, returnValue: u.value }))),
+          },
+        ],
       },
-    );
+    });
 
-    if (!result) return;
+    if (!value) return;
 
-    if (result.beehive_id) {
+    const beehiveId = value.beehive_id ? Number(value.beehive_id) : null;
+
+    if (beehiveId) {
       const duplicate = this.allFeeding().some(
-        f => f.beehiveId === result.beehive_id && f.date === result.date
+        f => f.beehiveId === beehiveId && f.date === value.date
       );
       if (duplicate) {
-        const beehiveName = this.allBeehives().find(b => b.id === result.beehive_id)?.name ?? '';
-        this.toast.warning(`A record for ${result.date} on beehive "${beehiveName}" already exists. Edit that record instead.`);
+        const beehiveName = allBeehives.find(b => b.id === beehiveId)?.name ?? '';
+        this.toast.warning(`A record for ${value.date} on beehive "${beehiveName}" already exists. Edit that record instead.`);
         return;
       }
     }
 
-    this.feedingService.createFeeding(result).subscribe({
+    const payload: { date: string; feeding_type: FeedingType; food_type: FoodType; food_quantity: number; unit: FeedingUnit; beehive_id?: number; apiary_id?: number } = {
+      date: value.date,
+      feeding_type: value.feeding_type,
+      food_type: value.food_type,
+      food_quantity: Number(value.food_quantity),
+      unit: value.unit,
+    };
+    if (beehiveId) {
+      payload.beehive_id = beehiveId;
+    } else {
+      payload.apiary_id = Number(value.apiary_id);
+    }
+
+    this.feedingService.createFeeding(payload).subscribe({
       next: res => {
         if (res.success) {
           this.store.dispatch(FeedingActions.reload());
@@ -128,24 +214,67 @@ export class FeedingComponent implements OnInit {
   // ── Edit ─────────────────────────────────────────────────
 
   async startEdit(row: Feeding): Promise<void> {
-    const result = await this.modal.open<AddFeedingModalResult, AddFeedingModalData>(
-      AddFeedingModalComponent,
-      {
-        type: 'center',
-        width: '640px',
-        data: {
-          apiaries: this.apiaries(),
-          allBeehives: this.allBeehives(),
-          preselectedApiaryId: 0,
-          preselectedBeehiveId: 0,
-          editRow: row,
-        },
+    const value = await this.modal.open<any>(FormModalComponent, {
+      type: 'center',
+      width: '640px',
+      data: {
+        title: 'Edit Feeding Record',
+        fields: [
+          {
+            name: 'date',
+            type: 'date',
+            label: 'Date',
+            size: 'half',
+            value: row.date,
+            syncValidators: [syncValidators.required()],
+          },
+          {
+            name: 'feeding_type',
+            type: 'select',
+            label: 'Feeding Type',
+            size: 'half',
+            value: row.feeding_type,
+            syncValidators: [syncValidators.required()],
+            options: of(FEEDING_TYPES.map(ft => ({ displayValue: ft.label, returnValue: ft.value }))),
+          },
+          {
+            name: 'food_type',
+            type: 'select',
+            label: 'Food Type',
+            size: 'half',
+            value: row.food_type,
+            syncValidators: [syncValidators.required()],
+            options: of(FOOD_TYPES.map(ft => ({ displayValue: ft.label, returnValue: ft.value }))),
+          },
+          {
+            name: 'food_quantity',
+            type: 'number',
+            label: 'Qty / Beehive',
+            size: 'half',
+            value: row.food_quantity,
+            syncValidators: [syncValidators.required(), syncValidators.rangeNumber({ min: 0, max: 9_999_999 })],
+          },
+          {
+            name: 'unit',
+            type: 'select',
+            label: 'Unit',
+            size: 'half',
+            value: row.unit,
+            syncValidators: [syncValidators.required()],
+            options: of(FEEDING_UNITS.map(u => ({ displayValue: u.label, returnValue: u.value }))),
+          },
+        ],
       },
-    );
-    if (!result) return;
+    });
+    if (!value) return;
 
-    const { beehive_id, ...payload } = result;
-    this.feedingService.updateFeeding(row.id, payload).subscribe({
+    this.feedingService.updateFeeding(row.id, {
+      date: value.date,
+      feeding_type: value.feeding_type,
+      food_type: value.food_type,
+      food_quantity: Number(value.food_quantity),
+      unit: value.unit,
+    }).subscribe({
       next: res => {
         if (res.success) {
           this.store.dispatch(FeedingActions.reload());

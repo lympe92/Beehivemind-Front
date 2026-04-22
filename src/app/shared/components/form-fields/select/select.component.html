@@ -2,21 +2,19 @@
   @if (label) {
     <label class="form-label">{{ label }}{{ isRequired ? ' *' : '' }}</label>
   }
-  @if (options) {
-    <div [formGroup]="form">
-      <select
-        formControlName="select"
-        class="form-control"
-        [multiple]="isMultiple"
-        [class.multiple-select]="isMultiple"
-        [class.invalid]="isFieldValid()"
-      >
-        @for (opt of options; track opt.returnValue) {
-          <option [value]="opt.returnValue">{{ opt.displayValue }}</option>
-        }
-      </select>
-    </div>
-  }
+  <div [formGroup]="form">
+    <select
+      formControlName="select"
+      class="form-control"
+      [multiple]="isMultiple"
+      [class.multiple-select]="isMultiple"
+      [class.invalid]="isFieldValid()"
+    >
+      @for (opt of resolvedOptions; track opt.returnValue) {
+        <option [ngValue]="opt.returnValue">{{ opt.displayValue }}</option>
+      }
+    </select>
+  </div>
   <app-form-errors
     [errors]="saFormControlName?.valid === false && saFormControlName?.touched ? (saFormControlName?.control?.errors ?? null) : null"
   />

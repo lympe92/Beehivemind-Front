@@ -14,11 +14,13 @@ export interface DynamicField<T = any> {
     | 'radio'
     | 'date'
     | 'range'
-    | 'toggle';
+    | 'toggle'
+    | 'map';
   label: string;
   isMultiple?: boolean;
   placeholder?: string;
-  options?: Observable<FieldOption[]>;
+  options?: Observable<FieldOption[]> | ((value: any) => Observable<FieldOption[]>);
+  cascadeFrom?: string;
   value?: any;
   syncValidators?: any[];
   asyncValidators?: any[];

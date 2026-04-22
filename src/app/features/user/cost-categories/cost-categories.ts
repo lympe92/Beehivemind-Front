@@ -1,14 +1,12 @@
 import { Component, inject, OnInit, output, signal } from '@angular/core';
-import { CostCategory } from '../../../core/models/cost-category.model';
+import { of } from 'rxjs';
+import { CostCategory, CostType } from '../../../core/models/cost-category.model';
 import { CostCategoryService } from '../../../core/services/cost-category.service';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
-import {
-  AddCostCategoryModalComponent,
-  AddCostCategoryModalData,
-  AddCostCategoryModalResult,
-} from '../../../shared/components/ui/modal/add-cost-category-modal/add-cost-category-modal';
+import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
+import { syncValidators } from '../../../shared/components/ui/form/validators.config';
 
 @Component({
   selector: 'app-cost-categories',
@@ -38,13 +36,49 @@ export class CostCategoriesComponent implements OnInit {
   }
 
   async startAdd(): Promise<void> {
-    const result = await this.modal.open<AddCostCategoryModalResult>(
-      AddCostCategoryModalComponent,
-      { type: 'center', width: '440px' },
-    );
-    if (!result) return;
+    const value = await this.modal.open<any>(FormModalComponent, {
+      type: 'center',
+      width: '440px',
+      data: {
+        title: 'Add Cost Category',
+        fields: [
+          {
+            name: 'name',
+            type: 'text',
+            label: 'Name',
+            size: 'full',
+            value: '',
+            syncValidators: [syncValidators.required()],
+          },
+          {
+            name: 'description',
+            type: 'textarea',
+            label: 'Description',
+            size: 'full',
+            value: '',
+          },
+          {
+            name: 'type',
+            type: 'select',
+            label: 'Type',
+            size: 'full',
+            value: 'income',
+            syncValidators: [syncValidators.required()],
+            options: of([
+              { displayValue: 'Income', returnValue: 'income' },
+              { displayValue: 'Outgoing', returnValue: 'outcome' },
+            ]),
+          },
+        ],
+      },
+    });
+    if (!value) return;
 
-    this.categoryService.createCategory(result).subscribe({
+    this.categoryService.createCategory({
+      name: value.name.trim(),
+      description: value.description?.trim() ?? '',
+      type: value.type as CostType,
+    }).subscribe({
       next: res => {
         if (res.success) {
           this.load();
@@ -58,17 +92,49 @@ export class CostCategoriesComponent implements OnInit {
   }
 
   async startEdit(row: CostCategory): Promise<void> {
-    const result = await this.modal.open<AddCostCategoryModalResult, AddCostCategoryModalData>(
-      AddCostCategoryModalComponent,
-      {
-        type: 'center',
-        width: '440px',
-        data: { editRow: row },
+    const value = await this.modal.open<any>(FormModalComponent, {
+      type: 'center',
+      width: '440px',
+      data: {
+        title: 'Edit Cost Category',
+        fields: [
+          {
+            name: 'name',
+            type: 'text',
+            label: 'Name',
+            size: 'full',
+            value: row.name,
+            syncValidators: [syncValidators.required()],
+          },
+          {
+            name: 'description',
+            type: 'textarea',
+            label: 'Description',
+            size: 'full',
+            value: row.description,
+          },
+          {
+            name: 'type',
+            type: 'select',
+            label: 'Type',
+            size: 'full',
+            value: row.type,
+            syncValidators: [syncValidators.required()],
+            options: of([
+              { displayValue: 'Income', returnValue: 'income' },
+              { displayValue: 'Outgoing', returnValue: 'outcome' },
+            ]),
+          },
+        ],
       },
-    );
-    if (!result) return;
+    });
+    if (!value) return;
 
-    this.categoryService.updateCategory(row.id, result).subscribe({
+    this.categoryService.updateCategory(row.id, {
+      name: value.name.trim(),
+      description: value.description?.trim() ?? '',
+      type: value.type as CostType,
+    }).subscribe({
       next: res => {
         if (res.success) {
           this.load();

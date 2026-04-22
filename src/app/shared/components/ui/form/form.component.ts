@@ -10,6 +10,7 @@ import { RadioComponent } from '../../form-fields/radio/radio.component';
 import { CheckboxesComponent } from '../../form-fields/checkboxes/checkboxes.component';
 import { RangeComponent } from '../../form-fields/range/range.component';
 import { ToggleComponent } from '../../form-fields/toggle/toggle.component';
+import { MapFieldComponent } from '../../form-fields/map-field/map-field.component';
 import { ButtonComponent } from '../button/button';
 
 @Component({
@@ -26,6 +27,7 @@ import { ButtonComponent } from '../button/button';
     CheckboxesComponent,
     RangeComponent,
     ToggleComponent,
+    MapFieldComponent,
     ButtonComponent,
   ],
   templateUrl: './form.component.html',
