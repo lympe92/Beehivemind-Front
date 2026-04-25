@@ -4,4 +4,6 @@ export interface Apiary {
   hivesNumber: number;
   latitude: number;
   longitude: number;
+  location: string | null;
+  dateEstablished: string | null;
 }

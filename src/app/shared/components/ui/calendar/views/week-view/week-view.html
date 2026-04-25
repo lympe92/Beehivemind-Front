@@ -1,0 +1,35 @@
+<div class="week">
+
+  <div class="week__grid">
+    @for (day of days(); track day.date.getTime()) {
+      <div class="week__col" [class.week__col--today]="day.isToday">
+
+        <div class="week__col-header" (click)="dayClick.emit(day.date)">
+          <span class="week__col-weekday">{{ weekday(day.date) }}</span>
+          <span class="week__col-num" [class.week__col-num--today]="day.isToday">
+            {{ day.date.getDate() }}
+          </span>
+        </div>
+
+        <div class="week__col-events">
+          @for (ev of day.events; track ev.id) {
+            <div
+              class="week__event"
+              [style.--ev-color]="color(ev.color)"
+              (click)="eventClick.emit(ev)">
+              @if (ev.startTime) {
+                <span class="week__event-time">{{ ev.startTime }}</span>
+              }
+              <span class="week__event-title">{{ ev.title }}</span>
+            </div>
+          }
+          @if (!day.events.length) {
+            <div class="week__empty"></div>
+          }
+        </div>
+
+      </div>
+    }
+  </div>
+
+</div>

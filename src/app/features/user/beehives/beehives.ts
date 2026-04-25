@@ -12,6 +12,7 @@ import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/dat
 import { CardComponent } from '../../../shared/components/ui/card/card';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
+import { QrCodeModalComponent, QrCodeModalData } from '../../../shared/components/ui/modal/qr-code-modal/qr-code-modal';
 
 interface BeehiveForm {
   name: string;
@@ -136,6 +137,21 @@ export class BeehivesComponent implements OnInit {
         }
       },
       error: () => this.toast.error('Something went wrong. Please try again.'),
+    });
+  }
+
+  // ── QR Code ──────────────────────────────────────────────
+
+  showQr(beehive: Beehive): void {
+    const apiary = this.apiaries().find(a => a.id === beehive.apiaryId);
+    this.modal.open<void>(QrCodeModalComponent, {
+      type: 'center',
+      data: {
+        value: beehive.uuid,
+        title: `Beehive ${beehive.name}`,
+        subtitle: apiary?.name,
+        downloadName: `beehive-${beehive.uuid}`,
+      } satisfies QrCodeModalData,
     });
   }
 

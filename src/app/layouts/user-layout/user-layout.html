@@ -16,12 +16,45 @@
         @if (sidebarOpen()) { <span>Dashboard</span> }
       </a>
 
+      <a routerLink="/user/calendar" routerLinkActive="active" class="sidebar__link">
+        <span class="icon">📅</span>
+        @if (sidebarOpen()) { <span>Calendar</span> }
+      </a>
+
       <div class="sidebar__divider"></div>
 
-      <a routerLink="/user/apiary" routerLinkActive="active" class="sidebar__link">
-        <span class="icon">🏡</span>
-        @if (sidebarOpen()) { <span>Apiaries</span> }
-      </a>
+      <!-- Apiaries accordion -->
+      <div class="sidebar__group" [class.sidebar__group--open]="isGroupOpen('apiaries')">
+        <button
+          class="sidebar__group-header"
+          [class.sidebar__group-header--active]="isGroupOpen('apiaries')"
+          (click)="toggleGroup('apiaries')">
+          <span class="icon">🏡</span>
+          @if (sidebarOpen()) {
+            <span class="sidebar__group-label">Apiaries</span>
+            <svg class="sidebar__chevron" [class.sidebar__chevron--open]="isGroupOpen('apiaries')"
+              width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          }
+        </button>
+
+        @if (sidebarOpen() && isGroupOpen('apiaries')) {
+          <div class="sidebar__sub">
+            <a routerLink="/user/apiary" routerLinkActive="active"
+               [routerLinkActiveOptions]="{exact: true}"
+               class="sidebar__sub-link">
+              Apiaries List
+            </a>
+            <a routerLink="/user/apiary/details" routerLinkActive="active" class="sidebar__sub-link">
+              Apiaries Details
+            </a>
+            <a routerLink="/user/apiary/map" routerLinkActive="active" class="sidebar__sub-link">
+              Map
+            </a>
+          </div>
+        }
+      </div>
 
       <a routerLink="/user/beehives" routerLinkActive="active" class="sidebar__link">
         <span class="icon">🐝</span>

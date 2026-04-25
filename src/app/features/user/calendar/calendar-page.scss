@@ -1,0 +1,11 @@
+.cal-page {
+  height: calc(100vh - 120px); // adjust to your layout's header offset
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+
+  app-calendar {
+    flex: 1;
+    min-height: 0;
+  }
+}

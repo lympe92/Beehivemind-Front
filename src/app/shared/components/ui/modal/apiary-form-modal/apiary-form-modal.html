@@ -1,0 +1,50 @@
+<app-modal-shell [title]="title" (close)="close()">
+
+  <form [formGroup]="form" class="apiary-form">
+
+    <app-form-input
+      formControlName="name"
+      label="Name"
+      inputType="text" />
+
+    <div class="apiary-form__row">
+      <app-form-input
+        formControlName="hivesNumber"
+        label="Hives"
+        inputType="number"
+        [noSpinners]="true" />
+      <app-form-input
+        formControlName="dateEstablished"
+        label="Date Established"
+        inputType="date" />
+    </div>
+
+    <div class="apiary-form__location-wrap">
+      <app-form-input
+        formControlName="location"
+        label="Location"
+        [placeholder]="geocoding() ? 'Detecting location...' : 'Click the map or type manually'" />
+    </div>
+
+    <div class="apiary-form__map-label">
+      Coordinates *
+      @if (coordinatesError()) {
+        <span class="apiary-form__map-error">Please click the map to set a location</span>
+      }
+    </div>
+    <div class="apiary-form__map" [class.apiary-form__map--error]="coordinatesError()">
+      <app-map-picker
+        [marker]="marker()"
+        (markerChange)="onMarkerChange($event)" />
+    </div>
+
+  </form>
+
+  <ng-template #footer>
+    <button class="apiary-form__btn apiary-form__btn--ghost" type="button" (click)="close()">Cancel</button>
+    <button class="apiary-form__btn apiary-form__btn--primary" type="button" (click)="submit()">
+      {{ isEdit ? 'Save' : 'Add' }}
+    </button>
+  </ng-template>
+
+</app-modal-shell>

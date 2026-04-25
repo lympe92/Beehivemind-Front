@@ -47,21 +47,25 @@ export class ApiaryService {
   // camelCase → snake_case for requests
   private toApi(a: Partial<Apiary>): object {
     return {
-      ...(a.name      !== undefined && { name: a.name }),
-      ...(a.hivesNumber !== undefined && { hives_number: a.hivesNumber }),
-      ...(a.latitude  !== undefined && { latitude: a.latitude }),
-      ...(a.longitude !== undefined && { longitude: a.longitude }),
+      ...(a.name            !== undefined && { name: a.name }),
+      ...(a.hivesNumber     !== undefined && { hives_number: a.hivesNumber }),
+      ...(a.latitude        !== undefined && { latitude: a.latitude }),
+      ...(a.longitude       !== undefined && { longitude: a.longitude }),
+      ...(a.location        !== undefined && { location: a.location }),
+      ...(a.dateEstablished !== undefined && { date_established: a.dateEstablished }),
     };
   }
 
   // snake_case → camelCase for responses
   private fromApi(a: any): Apiary {
     return {
-      id:          a.id,
-      name:        a.name,
-      hivesNumber: a.hives_number ?? a.hivesNumber,
-      latitude:    a.latitude,
-      longitude:   a.longitude,
+      id:              a.id,
+      name:            a.name,
+      hivesNumber:     a.hives_number ?? a.hivesNumber,
+      latitude:        a.latitude,
+      longitude:       a.longitude,
+      location:        a.location ?? null,
+      dateEstablished: a.date_established ?? null,
     };
   }
 }

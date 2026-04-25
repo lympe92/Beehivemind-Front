@@ -113,4 +113,13 @@ export class AuthEffects {
       ),
     ),
   );
+
+  logoutSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.logoutSuccess),
+        tap(() => this.router.navigate(['/auth/login'])),
+      ),
+    { dispatch: false },
+  );
 }

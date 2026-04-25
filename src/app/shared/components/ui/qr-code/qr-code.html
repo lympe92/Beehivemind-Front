@@ -1,0 +1,5 @@
+@if (dataUrl()) {
+  <img [src]="dataUrl()!" [width]="size()" [height]="size()" alt="QR Code" class="qr-image" />
+} @else {
+  <div class="qr-placeholder" [style.width.px]="size()" [style.height.px]="size()"></div>
+}

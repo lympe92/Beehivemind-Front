@@ -1,0 +1,24 @@
+<div class="day">
+
+  @if (!dayEvents().length) {
+    <div class="day__empty">No events for this day.</div>
+  } @else {
+    <div class="day__list">
+      @for (ev of dayEvents(); track ev.id) {
+        <div
+          class="day__event"
+          [style.--ev-color]="color(ev.color)"
+          (click)="eventClick.emit(ev)">
+          <div class="day__event-bar"></div>
+          <div class="day__event-body">
+            @if (timeRange(ev)) {
+              <span class="day__event-time">{{ timeRange(ev) }}</span>
+            }
+            <span class="day__event-title">{{ ev.title }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

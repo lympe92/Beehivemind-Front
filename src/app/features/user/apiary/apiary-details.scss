@@ -1,0 +1,94 @@
+@use 'styles/user-theme' as *;
+
+.apiary-details {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  // ── Page header ───────────────────────────────────────────
+  &__page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__page-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+  }
+
+  // ── States ────────────────────────────────────────────────
+  &__state {
+    color: $text-muted;
+    font-size: 0.9rem;
+    padding: 48px 0;
+    text-align: center;
+  }
+
+  // ── Cards list ────────────────────────────────────────────
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  // ── Card header actions ───────────────────────────────────
+  &__card-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  // ── Detail fields grid ────────────────────────────────────
+  &__fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px 32px;
+    padding: 4px 0;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  &__label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $text-muted;
+  }
+
+  &__value {
+    font-size: 0.9rem;
+    color: $text-primary;
+
+    &--mono {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: $text-muted;
+    }
+  }
+
+  // ── Buttons ───────────────────────────────────────────────
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+
+    &--primary { background: $accent; color: $accent-fg; &:hover { background: $accent-hover; } }
+    &--ghost   { background: transparent; border: 1px solid $border; color: $text-muted; &:hover { background: $bg-hover; color: $text-primary; } }
+    &--danger  { background: transparent; border: 1px solid rgba($danger, 0.4); color: #fca5a5; &:hover { background: rgba($danger, 0.15); } }
+    &--sm      { padding: 4px 10px; font-size: 0.8rem; }
+  }
+}

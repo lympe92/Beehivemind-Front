@@ -46,6 +46,7 @@
       </ng-template>
 
       <ng-template #actionsTpl let-row>
+        <button class="bh__btn bh__btn--ghost bh__btn--sm" (click)="showQr(row)">QR</button>
         <button class="bh__btn bh__btn--ghost bh__btn--sm" (click)="startEdit(row)">Edit</button>
         <button class="bh__btn bh__btn--danger bh__btn--sm" (click)="deleteRow(row)">Delete</button>
       </ng-template>

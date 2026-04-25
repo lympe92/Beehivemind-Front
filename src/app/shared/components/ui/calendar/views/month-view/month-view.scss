@@ -1,0 +1,130 @@
+.month {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+
+  &__weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid var(--cal-border);
+  }
+
+  &__weekday {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--cal-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: center;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    flex: 1;
+    min-height: 0;
+  }
+
+  &__day {
+    border-right: 1px solid var(--cal-border);
+    border-bottom: 1px solid var(--cal-border);
+    padding: 0.375rem 0.5rem;
+    cursor: pointer;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    transition: background 0.1s;
+
+    &:nth-child(7n) { border-right: none; }
+
+    &:hover { background: var(--cal-hover); }
+
+    &--other {
+      background: var(--cal-other-month);
+      .month__day-num { color: var(--cal-text-muted); opacity: 0.5; }
+    }
+
+    &--today {
+      .month__day-num {
+        background: var(--cal-accent);
+        color: #fff;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+
+  &__day-num {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--cal-text);
+    align-self: flex-end;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__events {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  &__pill {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--ev-color, #f59e0b);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.6;
+    transition: filter 0.1s;
+
+    &:hover { filter: brightness(0.9); }
+  }
+
+  &__pill-time {
+    opacity: 0.85;
+    flex-shrink: 0;
+    font-size: 0.65rem;
+  }
+
+  &__pill-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__more {
+    font-size: 0.7rem;
+    color: var(--cal-text-muted);
+    cursor: pointer;
+    padding: 1px 4px;
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--cal-hover);
+      color: var(--cal-text);
+    }
+  }
+}

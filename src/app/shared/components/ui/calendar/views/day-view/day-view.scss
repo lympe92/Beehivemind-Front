@@ -1,0 +1,63 @@
+.day {
+  flex: 1;
+  padding: 1rem;
+  overflow: auto;
+
+  &__empty {
+    text-align: center;
+    color: var(--cal-text-muted);
+    padding: 3rem 0;
+    font-size: 0.9rem;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 640px;
+  }
+
+  &__event {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--cal-border);
+    cursor: pointer;
+    background: var(--cal-bg);
+    transition: box-shadow 0.15s, transform 0.1s;
+
+    &:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transform: translateX(2px);
+    }
+  }
+
+  &__event-bar {
+    width: 4px;
+    flex-shrink: 0;
+    background: var(--ev-color, #f59e0b);
+  }
+
+  &__event-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.625rem 0.875rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__event-time {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ev-color, #f59e0b);
+  }
+
+  &__event-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--cal-text);
+  }
+}

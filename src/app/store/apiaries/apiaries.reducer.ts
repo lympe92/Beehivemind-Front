@@ -5,11 +5,9 @@ import { initialApiariesState } from './apiaries.state';
 export const apiariesReducer = createReducer(
   initialApiariesState,
 
-  on(ApiariesActions.load, (state) => ({
-    ...state,
-    loading: true,
-    error: null,
-  })),
+  on(ApiariesActions.load, (state) =>
+    state.loaded ? state : { ...state, loading: true, error: null }
+  ),
 
   on(ApiariesActions.reload, (state) => ({
     ...state,

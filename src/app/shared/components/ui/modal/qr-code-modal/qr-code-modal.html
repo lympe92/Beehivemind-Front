@@ -1,0 +1,15 @@
+<app-modal-shell [title]="data.title" [subtitle]="data.subtitle ?? ''" (close)="close()">
+
+  <div class="qr-modal__body">
+    <app-qr-code [value]="data.value" [size]="260" (ready)="onQrReady($event)" />
+    <p class="qr-modal__uuid">{{ data.value }}</p>
+  </div>
+
+  <ng-template #footer>
+    <button class="qr-modal__btn qr-modal__btn--ghost" type="button" (click)="close()">Close</button>
+    <button class="qr-modal__btn qr-modal__btn--primary" type="button" (click)="download()">
+      Download PNG
+    </button>
+  </ng-template>
+
+</app-modal-shell>

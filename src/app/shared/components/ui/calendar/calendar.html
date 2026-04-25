@@ -1,0 +1,58 @@
+<div class="cal">
+
+  <!-- Header: navigation + period label + view switcher -->
+  <div class="cal__header">
+
+    <div class="cal__nav">
+      <button class="cal__nav-btn" (click)="navigate(-1)" aria-label="Previous">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="cal__today-btn" (click)="goToToday()">Today</button>
+      <button class="cal__nav-btn" (click)="navigate(1)" aria-label="Next">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <span class="cal__period">{{ periodLabel() }}</span>
+    </div>
+
+    <div class="cal__view-switcher">
+      @for (v of views; track v.key) {
+        <button
+          class="cal__view-btn"
+          [class.cal__view-btn--active]="view() === v.key"
+          (click)="setView(v.key)">
+          {{ v.label }}
+        </button>
+      }
+    </div>
+
+  </div>
+
+  <!-- Body: delegated to view component -->
+  <div class="cal__body">
+    @if (view() === 'month') {
+      <app-cal-month
+        [date]="date()"
+        [events]="events()"
+        (eventClick)="onEventClick($event)"
+        (dayClick)="onDayClick($event)" />
+    }
+    @if (view() === 'week') {
+      <app-cal-week
+        [date]="date()"
+        [events]="events()"
+        (eventClick)="onEventClick($event)"
+        (dayClick)="onDayClick($event)" />
+    }
+    @if (view() === 'day') {
+      <app-cal-day
+        [date]="date()"
+        [events]="events()"
+        (eventClick)="onEventClick($event)" />
+    }
+  </div>
+
+</div>

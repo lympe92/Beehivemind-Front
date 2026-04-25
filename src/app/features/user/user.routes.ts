@@ -8,7 +8,20 @@ export const userRoutes: Routes = [
   },
   {
     path: 'apiary',
-    loadComponent: () => import('./apiary/apiary').then((m) => m.ApiaryComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./apiary/apiary').then((m) => m.ApiaryComponent),
+      },
+      {
+        path: 'details',
+        loadComponent: () => import('./apiary/apiary-details').then((m) => m.ApiaryDetailsComponent),
+      },
+      {
+        path: 'map',
+        loadComponent: () => import('./apiary/apiary-map').then((m) => m.ApiaryMapComponent),
+      },
+    ],
   },
   {
     path: 'beehives',
@@ -29,6 +42,10 @@ export const userRoutes: Routes = [
   {
     path: 'financial',
     loadComponent: () => import('./financial/financial').then((m) => m.FinancialComponent),
+  },
+  {
+    path: 'calendar',
+    loadComponent: () => import('./calendar/calendar-page').then((m) => m.CalendarPageComponent),
   },
   {
     path: 'profile',

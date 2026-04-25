@@ -1,0 +1,126 @@
+// ── CSS custom properties (override at any scope) ────────────────────────────
+
+:host {
+  --cal-bg:          #ffffff;
+  --cal-border:      #e5e5e5;
+  --cal-text:        #171717;
+  --cal-text-muted:  #737373;
+  --cal-other-month: #fafafa;
+  --cal-hover:       #f5f5f5;
+  --cal-accent:      #f59e0b;
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--cal-bg);
+  border: 1px solid var(--cal-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+// ── Header ───────────────────────────────────────────────────────────────────
+
+.cal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--cal-border);
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.cal__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cal__nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--cal-border);
+  background: var(--cal-bg);
+  color: var(--cal-text);
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: var(--cal-hover); }
+}
+
+.cal__today-btn {
+  height: 32px;
+  padding: 0 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--cal-border);
+  background: var(--cal-bg);
+  color: var(--cal-text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: var(--cal-hover); }
+}
+
+.cal__period {
+  margin-left: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--cal-text);
+  white-space: nowrap;
+}
+
+// ── View switcher ─────────────────────────────────────────────────────────────
+
+.cal__view-switcher {
+  display: flex;
+  gap: 2px;
+  background: var(--cal-hover);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.cal__view-btn {
+  padding: 0.3rem 0.75rem;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--cal-text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover { color: var(--cal-text); }
+
+  &--active {
+    background: var(--cal-bg);
+    color: var(--cal-text);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// ── Body ─────────────────────────────────────────────────────────────────────
+
+.cal__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  app-cal-month,
+  app-cal-week,
+  app-cal-day {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+}

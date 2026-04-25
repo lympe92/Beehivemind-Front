@@ -1,72 +1,31 @@
 <div class="apiary">
 
-  <div class="apiary__layout">
+  <app-card title="Apiaries List">
+    <button card-header-end class="apiary__btn apiary__btn--primary" (click)="startAdd()">+ Add</button>
 
-    <!-- Left: Table -->
-    <app-card title="Apiaries">
-      <button card-header-end class="apiary__btn apiary__btn--primary" (click)="startAdd()">+ Add</button>
+    <app-data-table
+      [columns]="columns"
+      [rows]="apiaries()"
+      [loading]="loading()"
+      [pagination]="tablePagination"
+      (pageChange)="goToPage($event)"
+      emptyMessage="No apiaries yet. Add one to get started.">
 
-      <app-data-table
-        [columns]="columns"
-        [rows]="apiaries()"
-        [loading]="loading()"
-        [editingId]="editingId"
-        [pagination]="tablePagination"
-        [clickableRows]="true"
-        (pageChange)="goToPage($event)"
-        (rowClick)="onRowSelect($event)"
-        emptyMessage="No apiaries yet. Add one and set its location on the map.">
-
-        <ng-template #cellTpl let-row let-col="col">
-          @switch (col.key) {
-            @case ('coords') {
-              <span class="apiary__muted">{{ row.latitude | number:'1.4-4' }}, {{ row.longitude | number:'1.4-4' }}</span>
-            }
-            @default { {{ row[col.key] ?? '—' }} }
+      <ng-template #cellTpl let-row let-col="col">
+        @switch (col.key) {
+          @case ('dateEstablished') {
+            {{ row.dateEstablished ? (row.dateEstablished | date:'mediumDate') : '—' }}
           }
-        </ng-template>
+          @default { {{ row[col.key] ?? '—' }} }
+        }
+      </ng-template>
 
-        <ng-template #editRowTpl let-row>
-          <td><input class="apiary__input" [(ngModel)]="editForm.name" name="e_name" /></td>
-          <td><input class="apiary__input apiary__input--sm" type="number" min="0" [(ngModel)]="editForm.hivesNumber" name="e_hives" /></td>
-          <td>
-            @if (markerPosition) {
-              {{ markerPosition.lat | number:'1.4-4' }}, {{ markerPosition.lng | number:'1.4-4' }}
-            } @else {
-              <span class="apiary__muted">Click map to change</span>
-            }
-          </td>
-          <td class="dt__actions">
-            <button class="apiary__btn apiary__btn--primary apiary__btn--sm" (click)="confirmEdit()">Save</button>
-            <button class="apiary__btn apiary__btn--ghost apiary__btn--sm" (click)="cancelEdit()">Cancel</button>
-          </td>
-        </ng-template>
+      <ng-template #actionsTpl let-row>
+        <button class="apiary__btn apiary__btn--ghost apiary__btn--sm" (click)="startEdit(row)">Edit</button>
+        <button class="apiary__btn apiary__btn--danger apiary__btn--sm" (click)="deleteRow(row)">Delete</button>
+      </ng-template>
 
-        <ng-template #actionsTpl let-row>
-          <button class="apiary__btn apiary__btn--ghost apiary__btn--sm" (click)="startEdit(row); $event.stopPropagation()">Edit</button>
-          <button class="apiary__btn apiary__btn--danger apiary__btn--sm" (click)="deleteRow(row); $event.stopPropagation()">Delete</button>
-        </ng-template>
-
-      </app-data-table>
-    </app-card>
-
-    <!-- Right: Map -->
-    <app-card title="Location" class="apiary__map-card" [flush]="true" height="560px">
-      @if (markerPosition) {
-        <span card-header-end class="apiary__coords apiary__coords--header">
-          {{ markerPosition.lat | number:'1.6-6' }}, {{ markerPosition.lng | number:'1.6-6' }}
-        </span>
-      }
-
-      <div class="apiary__map-wrap">
-        <app-map-picker
-          [center]="mapCenter"
-          [zoom]="mapZoom"
-          [marker]="markerPosition"
-          (markerChange)="markerPosition = $event" />
-      </div>
-    </app-card>
-
-  </div>
+    </app-data-table>
+  </app-card>
 
 </div>

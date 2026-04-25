@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApexOptions } from 'ngx-apexcharts';
 import { AvgInspection, Inspection } from '../../../core/models/inspection.model';
 import { InspectionService } from '../../../core/services/inspection.service';
@@ -35,6 +36,7 @@ export class UserDashboardComponent implements OnInit {
   private store = inject(Store);
   private inspectionService = inject(InspectionService);
   private chartBuilder = inject(ChartBuilderService);
+  private destroyRef = inject(DestroyRef);
 
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);
@@ -185,7 +187,7 @@ export class UserDashboardComponent implements OnInit {
       this.selectedApiaryId.set(apiaryId);
       this.selectedBeehiveId.set(null);
       this.chartLoading.set(true);
-      this.inspectionService.getAvgInspectionsOfApiary(apiaryId).subscribe(res => {
+      this.inspectionService.getAvgInspectionsOfApiary(apiaryId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
         if (res.success) this.chartInspections.set(res.data);
         this.chartLoading.set(false);
       });
@@ -198,7 +200,7 @@ export class UserDashboardComponent implements OnInit {
       this.selectedBeehiveId.set(null);
       const apiaryId = this.selectedApiaryId()!;
       this.chartLoading.set(true);
-      this.inspectionService.getAvgInspectionsOfApiary(apiaryId).subscribe(res => {
+      this.inspectionService.getAvgInspectionsOfApiary(apiaryId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
         if (res.success) this.chartInspections.set(res.data);
         this.chartLoading.set(false);
       });
@@ -206,7 +208,7 @@ export class UserDashboardComponent implements OnInit {
       this.filterLevel.set('beehive');
       this.selectedBeehiveId.set(beehiveId);
       this.chartLoading.set(true);
-      this.inspectionService.getInspectionsOfBeehive(beehiveId).subscribe(res => {
+      this.inspectionService.getInspectionsOfBeehive(beehiveId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
         if (res.success) this.chartInspections.set(res.data);
         this.chartLoading.set(false);
       });
@@ -217,7 +219,7 @@ export class UserDashboardComponent implements OnInit {
 
   private loadAvgData(): void {
     this.chartLoading.set(true);
-    this.inspectionService.getAvgInspectionsOfUser().subscribe(res => {
+    this.inspectionService.getAvgInspectionsOfUser().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
       if (res.success) this.chartInspections.set(res.data);
       this.chartLoading.set(false);
     });

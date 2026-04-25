@@ -39,10 +39,11 @@ export class BeehiveService {
 
   private fromApi(b: any): Beehive {
     return {
-      id: b.id,
-      name: b.name ?? String(b.number ?? b.id),
+      id:       b.id,
+      uuid:     b.uuid,
+      name:     b.name ?? String(b.number ?? b.id),
       apiaryId: b.apiary_id,
-      queen: b.queen ?? null,
+      queen:    b.queen ?? null,
     };
   }
 }

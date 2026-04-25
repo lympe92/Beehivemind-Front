@@ -1,0 +1,61 @@
+<div class="apiary-details">
+
+  <div class="apiary-details__page-header">
+    <h2 class="apiary-details__page-title">Apiaries Details</h2>
+    <button class="apiary-details__btn apiary-details__btn--primary" (click)="startAdd()">+ Add Apiary</button>
+  </div>
+
+  @if (loading()) {
+    <div class="apiary-details__state">Loading…</div>
+  } @else if (apiaries().length === 0) {
+    <div class="apiary-details__state">No apiaries yet. Add one to get started.</div>
+  } @else {
+    <div class="apiary-details__list">
+      @for (apiary of apiaries(); track apiary.id) {
+        <app-card [title]="apiary.name">
+
+          <div card-header-end class="apiary-details__card-actions">
+            <button class="apiary-details__btn apiary-details__btn--ghost apiary-details__btn--sm"
+              (click)="startEdit(apiary)">Edit</button>
+            <button class="apiary-details__btn apiary-details__btn--danger apiary-details__btn--sm"
+              (click)="deleteApiary(apiary)">Delete</button>
+          </div>
+
+          <div class="apiary-details__fields">
+
+            <div class="apiary-details__field">
+              <span class="apiary-details__label">Hives</span>
+              <span class="apiary-details__value">{{ apiary.hivesNumber }}</span>
+            </div>
+
+            <div class="apiary-details__field">
+              <span class="apiary-details__label">Location</span>
+              <span class="apiary-details__value">{{ apiary.location || '—' }}</span>
+            </div>
+
+            <div class="apiary-details__field">
+              <span class="apiary-details__label">Date Established</span>
+              <span class="apiary-details__value">
+                {{ apiary.dateEstablished ? (apiary.dateEstablished | date:'mediumDate') : '—' }}
+              </span>
+            </div>
+
+            <div class="apiary-details__field">
+              <span class="apiary-details__label">Coordinates</span>
+              <span class="apiary-details__value apiary-details__value--mono">
+                @if (apiary.latitude && apiary.longitude) {
+                  {{ apiary.latitude }}, {{ apiary.longitude }}
+                } @else {
+                  —
+                }
+              </span>
+            </div>
+
+          </div>
+
+        </app-card>
+      }
+    </div>
+  }
+
+</div>
