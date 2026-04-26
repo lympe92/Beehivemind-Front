@@ -1,0 +1,61 @@
+<div class="treatments">
+
+  <app-card title="Create Treatments">
+    <button card-header-end class="treatments__btn treatments__btn--primary" (click)="addType()">
+      + New Type
+    </button>
+
+    @if (typesLoading()) {
+      <div class="treatments__state">Loading…</div>
+    } @else if (types().length === 0) {
+      <div class="treatments__state">No treatment types yet. Create one to get started.</div>
+    } @else {
+      <div class="treatments__types-grid">
+        @for (type of types(); track type.id) {
+          <div class="treatments__type-card">
+
+            <div class="treatments__type-header">
+              <div class="treatments__type-title">
+                <span class="treatments__type-name">{{ type.name }}</span>
+                <span class="treatments__badge treatments__badge--disease">{{ type.disease }}</span>
+              </div>
+              <div class="treatments__type-actions">
+                <button class="treatments__btn treatments__btn--ghost treatments__btn--sm"
+                  (click)="editType(type)">Edit</button>
+                <button class="treatments__btn treatments__btn--danger treatments__btn--sm"
+                  (click)="deleteType(type)">Delete</button>
+              </div>
+            </div>
+
+            <div class="treatments__type-meta">
+              <span class="treatments__meta-item">{{ type.product }}</span>
+              @if (type.dose) {
+                <span class="treatments__meta-sep">·</span>
+                <span class="treatments__meta-item">{{ type.dose }}</span>
+              }
+              @if (type.isRecurring) {
+                <span class="treatments__meta-sep">·</span>
+                <span class="treatments__badge treatments__badge--recurring">
+                  {{ (type.repetitions ?? 0) + 1 }}× / {{ type.intervalDays }}d
+                </span>
+              } @else {
+                <span class="treatments__meta-sep">·</span>
+                <span class="treatments__badge treatments__badge--single">Single</span>
+              }
+            </div>
+
+            @if (type.notes) {
+              <p class="treatments__type-notes">{{ type.notes }}</p>
+            }
+
+            <button class="treatments__btn treatments__btn--apply" (click)="applyType(type)">
+              Apply Treatment
+            </button>
+
+          </div>
+        }
+      </div>
+    }
+  </app-card>
+
+</div>

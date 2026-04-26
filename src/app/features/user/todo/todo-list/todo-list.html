@@ -1,0 +1,63 @@
+<div class="todo-list">
+
+  <div class="todo-list__header">
+    <h1 class="todo-list__title">To-Do List</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="todo-list__empty">Loading...</div>
+  } @else if (overdue().length === 0 && upcoming().length === 0) {
+    <div class="todo-list__empty">
+      <span class="todo-list__empty-icon">✅</span>
+      <p>All caught up! Nothing pending.</p>
+    </div>
+  } @else {
+
+    <!-- Overdue -->
+    @if (overdue().length > 0) {
+      <section class="todo-section todo-section--overdue">
+        <div class="todo-section__label">
+          <span class="todo-section__dot todo-section__dot--overdue"></span>
+          Overdue
+        </div>
+        <div class="todo-section__items">
+          @for (item of overdue(); track item.entityId) {
+            <div class="todo-item todo-item--overdue">
+              <span class="todo-item__icon">{{ typeIcon(item.type) }}</span>
+              <div class="todo-item__body">
+                <span class="todo-item__title">{{ item.title }}</span>
+                <span class="todo-item__sub">{{ item.subtitle }}</span>
+                <span class="todo-item__date">{{ item.scheduledDate | date:'d MMM yyyy' }}</span>
+              </div>
+              @if (item.entityType === 'treatment_instance') {
+                <button class="todo-item__done" (click)="markDone(item)">Done</button>
+              }
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Upcoming grouped by date -->
+    @for (group of upcoming(); track group.date) {
+      <section class="todo-section">
+        <div class="todo-section__label">{{ group.label }}</div>
+        <div class="todo-section__items">
+          @for (item of group.items; track item.entityId) {
+            <div class="todo-item">
+              <span class="todo-item__icon">{{ typeIcon(item.type) }}</span>
+              <div class="todo-item__body">
+                <span class="todo-item__title">{{ item.title }}</span>
+                <span class="todo-item__sub">{{ item.subtitle }}</span>
+              </div>
+              @if (item.entityType === 'treatment_instance') {
+                <button class="todo-item__done" (click)="markDone(item)">Done</button>
+              }
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+  }
+</div>

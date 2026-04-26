@@ -1,0 +1,71 @@
+<div class="td">
+
+  <app-card title="Treatment Sessions">
+    <button card-header-end class="td__btn td__btn--primary" (click)="applyTreatment()">
+      + Apply Treatment
+    </button>
+
+    @if (sessionsLoading()) {
+      <div class="td__state">Loading…</div>
+    } @else if (sessions().length === 0) {
+      <div class="td__state">No sessions yet. Go to Create Treatments and apply a type.</div>
+    } @else {
+      <div class="td__list">
+        @for (session of sessions(); track session.id) {
+
+          <div class="td__session">
+
+            <div class="td__session-header">
+              <div class="td__session-info">
+                <span class="td__session-name">{{ session.treatmentType?.name ?? '—' }}</span>
+                <span class="td__pill td__pill--apiary">{{ apiaryName(session.apiaryId) }}</span>
+              </div>
+              <button class="td__btn td__btn--danger td__btn--sm" (click)="deleteSession(session)">
+                Delete
+              </button>
+            </div>
+
+            <div class="td__session-meta">
+              <span>Started {{ session.startDate | date:'mediumDate' }}</span>
+              <span class="td__sep">·</span>
+              <span>{{ session.beehiveIds.length }} hive{{ session.beehiveIds.length !== 1 ? 's' : '' }}</span>
+              <span class="td__sep">·</span>
+              <span>{{ instancesDone(session) }}/{{ session.instances.length }} done</span>
+              @if (session.treatmentType?.isRecurring) {
+                <span class="td__sep">·</span>
+                <span class="td__pill td__pill--recurring">
+                  every {{ session.treatmentType?.intervalDays }}d
+                </span>
+              }
+            </div>
+
+            @if (session.notes) {
+              <p class="td__session-notes">{{ session.notes }}</p>
+            }
+
+            <div class="td__instances">
+              @for (inst of session.instances; track inst.id) {
+                <div class="td__instance"
+                  [class.td__instance--done]="inst.status === 'done'"
+                  [class.td__instance--skipped]="inst.status === 'skipped'">
+                  <span class="td__instance-dot"></span>
+                  <span class="td__instance-date">{{ inst.scheduledDate | date:'mediumDate' }}</span>
+                  @if (inst.actualDate && inst.actualDate !== inst.scheduledDate) {
+                    <span class="td__instance-actual">→ {{ inst.actualDate | date:'mediumDate' }}</span>
+                  }
+                  <span class="td__instance-status">{{ inst.status }}</span>
+                  @if (inst.notes) {
+                    <span class="td__instance-notes" [title]="inst.notes">💬</span>
+                  }
+                </div>
+              }
+            </div>
+
+          </div>
+
+        }
+      </div>
+    }
+  </app-card>
+
+</div>

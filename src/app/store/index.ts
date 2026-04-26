@@ -14,6 +14,12 @@ import { feedingReducer } from './feeding/feeding.reducer';
 import { FeedingEffects } from './feeding/feeding.effects';
 import { harvestReducer } from './harvest/harvest.reducer';
 import { HarvestEffects } from './harvest/harvest.effects';
+import { treatmentTypesReducer } from './treatment-types/treatment-types.reducer';
+import { TreatmentTypesEffects } from './treatment-types/treatment-types.effects';
+import { treatmentSessionsReducer } from './treatment-sessions/treatment-sessions.reducer';
+import { TreatmentSessionsEffects } from './treatment-sessions/treatment-sessions.effects';
+import { notificationsReducer } from './notifications/notifications.reducer';
+import { NotificationsEffects } from './notifications/notifications.effects';
 
 export const appReducers = {
   auth: authReducer,
@@ -24,6 +30,9 @@ export const appReducers = {
   inspections: inspectionsReducer,
   feeding: feedingReducer,
   harvest: harvestReducer,
+  treatmentTypes: treatmentTypesReducer,
+  treatmentSessions: treatmentSessionsReducer,
+  notifications:     notificationsReducer,
 };
 
 export const appEffects = [
@@ -35,4 +44,7 @@ export const appEffects = [
   InspectionsEffects,
   FeedingEffects,
   HarvestEffects,
+  TreatmentTypesEffects,
+  TreatmentSessionsEffects,
+  NotificationsEffects,
 ];

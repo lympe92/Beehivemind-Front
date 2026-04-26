@@ -1,0 +1,51 @@
+<div class="notif-bell">
+
+  <button class="notif-bell__btn" (click)="toggle()" [class.notif-bell__btn--active]="isOpen()">
+    <svg class="notif-bell__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    @if (badgeLabel()) {
+      <span class="notif-bell__badge">{{ badgeLabel() }}</span>
+    }
+  </button>
+
+  @if (isOpen()) {
+    <div class="notif-panel">
+      <div class="notif-panel__header">
+        <span class="notif-panel__title">Notifications</span>
+        @if (unreadCount() > 0) {
+          <button class="notif-panel__read-all" (click)="markAllRead($event)">
+            Mark all read
+          </button>
+        }
+      </div>
+
+      <div class="notif-panel__body">
+        @if (loading()) {
+          <div class="notif-panel__empty">Loading...</div>
+        } @else if (notifications().length === 0) {
+          <div class="notif-panel__empty">No notifications</div>
+        } @else {
+          @for (n of notifications(); track n.id) {
+            <button
+              class="notif-item"
+              [class.notif-item--unread]="!n.isRead"
+              (click)="markRead(n, $event)">
+              @if (!n.isRead) {
+                <span class="notif-item__dot"></span>
+              }
+              <div class="notif-item__content">
+                <span class="notif-item__title">{{ n.title }}</span>
+                <span class="notif-item__msg">{{ n.message }}</span>
+                <span class="notif-item__date">{{ n.createdAt | date:'d MMM, HH:mm' }}</span>
+              </div>
+            </button>
+          }
+        }
+      </div>
+    </div>
+  }
+
+</div>

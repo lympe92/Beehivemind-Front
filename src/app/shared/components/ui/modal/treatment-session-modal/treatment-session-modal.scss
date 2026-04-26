@@ -1,0 +1,145 @@
+@use 'styles/user-theme' as *;
+
+.tsm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__row { display: flex; flex-direction: column; gap: 6px; }
+
+  &__label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: $text-muted;
+  }
+
+  &__count {
+    font-size: 0.75rem;
+    color: $accent;
+  }
+
+  &__input,
+  &__textarea {
+    background: $bg-hover;
+    border: 1px solid $border;
+    border-radius: 6px;
+    color: $text-primary;
+    font-size: 0.875rem;
+    padding: 8px 12px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+
+    &:focus { outline: none; border-color: $accent; }
+  }
+
+  select.tsm-form__input { cursor: pointer; appearance: auto; }
+  &__textarea { resize: vertical; font-family: inherit; }
+}
+
+.tsm-type-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-size: 0.8rem;
+  color: $text-muted;
+  padding: 6px 10px;
+  background: $bg-hover;
+  border-radius: 6px;
+
+  &__sep { color: $border; }
+
+  &__item--badge {
+    background: rgba($accent, 0.15);
+    color: $accent;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+}
+
+.tsm-beehives {
+  border: 1px solid $border;
+  border-radius: 6px;
+  overflow: hidden;
+
+  &__all {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: $bg-hover;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: $text-muted;
+    cursor: pointer;
+    border-bottom: 1px solid $border;
+    user-select: none;
+
+    input { cursor: pointer; accent-color: $accent; }
+  }
+
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    font-size: 0.85rem;
+    color: $text-primary;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid rgba($border, 0.5);
+
+    &:hover { background: $bg-hover; }
+    input { cursor: pointer; accent-color: $accent; }
+  }
+}
+
+.tsm-empty {
+  font-size: 0.85rem;
+  color: $text-muted;
+  margin: 0;
+  padding: 12px 0;
+}
+
+.tsm-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &--primary {
+    background: $accent;
+    color: $accent-fg;
+    &:hover { background: $accent-hover; }
+    &:disabled { opacity: 0.45; cursor: not-allowed; }
+  }
+
+  &--ghost {
+    background: transparent;
+    border: 1px solid $border;
+    color: $text-muted;
+    &:hover { background: $bg-hover; color: $text-primary; }
+  }
+}

@@ -25,6 +25,10 @@ export class RequestService<T = unknown> {
     return this.http.put<ApiResponse<T>>(environment.apiUrl + suffix, data);
   };
 
+  patchRequest = <T>(suffix: string, data = {}): Observable<ApiResponse<T>> => {
+    return this.http.patch<ApiResponse<T>>(environment.apiUrl + suffix, data);
+  };
+
   deleteRequest = <T>(suffix: string, data = {}): Observable<ApiResponse<T>> => {
     return this.http.delete<ApiResponse<T>>(environment.apiUrl + suffix, { body: data });
   };

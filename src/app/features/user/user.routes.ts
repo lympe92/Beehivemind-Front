@@ -28,6 +28,19 @@ export const userRoutes: Routes = [
     loadComponent: () => import('./beehives/beehives').then((m) => m.BeehivesComponent),
   },
   {
+    path: 'treatments',
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./treatments/treatments').then((m) => m.TreatmentsComponent),
+      },
+      {
+        path: 'details',
+        loadComponent: () => import('./treatments/treatments-details').then((m) => m.TreatmentsDetailsComponent),
+      },
+    ],
+  },
+  {
     path: 'inspections',
     loadComponent: () => import('./inspections/inspections').then((m) => m.InspectionsComponent),
   },
@@ -44,8 +57,23 @@ export const userRoutes: Routes = [
     loadComponent: () => import('./financial/financial').then((m) => m.FinancialComponent),
   },
   {
+    path: 'todo',
+    children: [
+      { path: '', redirectTo: 'list', pathMatch: 'full' },
+      {
+        path: 'list',
+        loadComponent: () => import('./todo/todo-list/todo-list').then((m) => m.TodoListComponent),
+      },
+      {
+        path: 'calendar',
+        loadComponent: () => import('./calendar/calendar-page').then((m) => m.CalendarPageComponent),
+      },
+    ],
+  },
+  {
     path: 'calendar',
-    loadComponent: () => import('./calendar/calendar-page').then((m) => m.CalendarPageComponent),
+    redirectTo: 'todo/calendar',
+    pathMatch: 'full',
   },
   {
     path: 'profile',

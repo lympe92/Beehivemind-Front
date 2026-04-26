@@ -16,10 +16,33 @@
         @if (sidebarOpen()) { <span>Dashboard</span> }
       </a>
 
-      <a routerLink="/user/calendar" routerLinkActive="active" class="sidebar__link">
-        <span class="icon">📅</span>
-        @if (sidebarOpen()) { <span>Calendar</span> }
-      </a>
+      <!-- To-Do accordion -->
+      <div class="sidebar__group" [class.sidebar__group--open]="isGroupOpen('todo')">
+        <button
+          class="sidebar__group-header"
+          [class.sidebar__group-header--active]="isGroupOpen('todo')"
+          (click)="toggleGroup('todo')">
+          <span class="icon">✅</span>
+          @if (sidebarOpen()) {
+            <span class="sidebar__group-label">To-Do</span>
+            <svg class="sidebar__chevron" [class.sidebar__chevron--open]="isGroupOpen('todo')"
+              width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          }
+        </button>
+
+        @if (sidebarOpen() && isGroupOpen('todo')) {
+          <div class="sidebar__sub">
+            <a routerLink="/user/todo/list" routerLinkActive="active" class="sidebar__sub-link">
+              To-Do List
+            </a>
+            <a routerLink="/user/todo/calendar" routerLinkActive="active" class="sidebar__sub-link">
+              Calendar
+            </a>
+          </div>
+        }
+      </div>
 
       <div class="sidebar__divider"></div>
 
@@ -60,6 +83,36 @@
         <span class="icon">🐝</span>
         @if (sidebarOpen()) { <span>Beehives</span> }
       </a>
+
+      <!-- Treatments accordion -->
+      <div class="sidebar__group" [class.sidebar__group--open]="isGroupOpen('treatments')">
+        <button
+          class="sidebar__group-header"
+          [class.sidebar__group-header--active]="isGroupOpen('treatments')"
+          (click)="toggleGroup('treatments')">
+          <span class="icon">💊</span>
+          @if (sidebarOpen()) {
+            <span class="sidebar__group-label">Treatments</span>
+            <svg class="sidebar__chevron" [class.sidebar__chevron--open]="isGroupOpen('treatments')"
+              width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          }
+        </button>
+
+        @if (sidebarOpen() && isGroupOpen('treatments')) {
+          <div class="sidebar__sub">
+            <a routerLink="/user/treatments" routerLinkActive="active"
+               [routerLinkActiveOptions]="{exact: true}"
+               class="sidebar__sub-link">
+              Create Treatments
+            </a>
+            <a routerLink="/user/treatments/details" routerLinkActive="active" class="sidebar__sub-link">
+              Treatment Sessions
+            </a>
+          </div>
+        }
+      </div>
 
       <a routerLink="/user/inspections" routerLinkActive="active" class="sidebar__link">
         <span class="icon">🔍</span>
@@ -111,6 +164,9 @@
       <button class="user-header__toggle" (click)="toggleSidebar()">
         <span>{{ sidebarOpen() ? '◀' : '▶' }}</span>
       </button>
+      <div class="user-header__actions">
+        <app-notification-bell />
+      </div>
     </header>
     <main class="user-content">
       <router-outlet />

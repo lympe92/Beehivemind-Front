@@ -1,0 +1,192 @@
+$panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+:host {
+  display: block;
+  position: relative;
+}
+
+// ── Bell button ────────────────────────────────────────
+.notif-bell {
+  position: relative;
+
+  &__btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: pointer;
+    color: #737373;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+
+    &:hover,
+    &--active {
+      color: #171717;
+      border-color: #d4d4d4;
+      background: #f5f5f5;
+    }
+  }
+
+  &__icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  &__badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    background: #ef4444;
+    color: #ffffff;
+    border-radius: 9px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    pointer-events: none;
+  }
+}
+
+// ── Dropdown panel ─────────────────────────────────────
+.notif-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 360px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  box-shadow: $panel-shadow;
+  z-index: 1000;
+  overflow: hidden;
+  animation: notif-drop 0.15s ease;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  &__title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #171717;
+  }
+
+  &__read-all {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #737373;
+    padding: 0;
+    transition: color 0.15s;
+
+    &:hover {
+      color: #171717;
+    }
+  }
+
+  &__body {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  &__empty {
+    padding: 24px 16px;
+    text-align: center;
+    color: #a3a3a3;
+    font-size: 0.875rem;
+  }
+}
+
+// ── Notification item ──────────────────────────────────
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-bottom: 1px solid #f5f5f5;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: #fafafa;
+  }
+
+  &--unread {
+    background: #fef9f0;
+
+    &:hover {
+      background: #fef3e0;
+    }
+  }
+
+  &__dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f59e0b;
+    margin-top: 5px;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #171717;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__msg {
+    font-size: 0.8rem;
+    color: #525252;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__date {
+    font-size: 0.75rem;
+    color: #a3a3a3;
+    margin-top: 2px;
+  }
+}
+
+@keyframes notif-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -4,11 +4,12 @@ import { Store } from '@ngrx/store';
 import { AsyncPipe } from '@angular/common';
 import { AuthActions } from '../../store/auth/auth.actions';
 import { selectCurrentUser } from '../../store/auth/auth.selectors';
+import { NotificationBellComponent } from '../../shared/components/ui/notification-bell/notification-bell';
 
 @Component({
   selector: 'app-user-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, AsyncPipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, AsyncPipe, NotificationBellComponent],
   templateUrl: './user-layout.html',
   styleUrl: './user-layout.scss',
 })
@@ -23,7 +24,9 @@ export class UserLayoutComponent implements OnInit {
   ngOnInit(): void {
     // Auto-open the group that contains the current route
     const url = this.router.url;
-    if (url.startsWith('/user/apiary')) this.openGroup('apiaries');
+    if (url.startsWith('/user/apiary'))      this.openGroup('apiaries');
+    if (url.startsWith('/user/treatments'))  this.openGroup('treatments');
+    if (url.startsWith('/user/todo') || url.startsWith('/user/calendar')) this.openGroup('todo');
   }
 
   toggleSidebar(): void {

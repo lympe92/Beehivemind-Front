@@ -1,0 +1,75 @@
+<app-modal-shell [title]="title" (close)="close()">
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="ttm-form">
+
+    <div class="ttm-form__row">
+      <label class="ttm-form__label">Name *</label>
+      <input class="ttm-form__input" formControlName="name" placeholder="e.g. Formic Acid Varroa" />
+    </div>
+
+    <div class="ttm-form__row">
+      <label class="ttm-form__label">Disease *</label>
+      <select class="ttm-form__input" formControlName="disease">
+        <option value="">— Select disease —</option>
+        @for (d of diseases; track d.value) {
+          <option [value]="d.value">{{ d.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="ttm-form__row">
+      <label class="ttm-form__label">Product *</label>
+      <input class="ttm-form__input" formControlName="product" placeholder="e.g. Formic Acid 65%" />
+    </div>
+
+    <div class="ttm-form__row">
+      <label class="ttm-form__label">Dose</label>
+      <input class="ttm-form__input" formControlName="dose" placeholder="e.g. 50ml per hive" />
+    </div>
+
+    <div class="ttm-form__row">
+      <label class="ttm-form__label">Notes</label>
+      <textarea class="ttm-form__textarea" formControlName="notes" rows="3"
+        placeholder="General instructions or observations…"></textarea>
+    </div>
+
+    <div class="ttm-form__toggle">
+      <label class="ttm-form__toggle-label">
+        <input type="checkbox" formControlName="isRecurring" class="ttm-form__checkbox" />
+        Recurring treatment
+      </label>
+    </div>
+
+    @if (recurring) {
+      <div class="ttm-form__recurring">
+        <div class="ttm-form__row ttm-form__row--half">
+          <label class="ttm-form__label">Repeat every (days) *</label>
+          <input class="ttm-form__input" type="number" min="1" formControlName="intervalDays"
+            placeholder="e.g. 7" />
+        </div>
+        <div class="ttm-form__row ttm-form__row--half">
+          <label class="ttm-form__label">Repetitions *</label>
+          <input class="ttm-form__input" type="number" min="1" formControlName="repetitions"
+            placeholder="e.g. 3" />
+        </div>
+        @if (form.value.intervalDays && form.value.repetitions) {
+          <p class="ttm-form__preview">
+            Will create {{ (form.value.repetitions ?? 0) + 1 }} sessions:
+            day 0@for (i of [].constructor(form.value.repetitions ?? 0); track $index) {
+              , day {{ ($index + 1) * (form.value.intervalDays ?? 0) }}
+            }
+          </p>
+        }
+      </div>
+    }
+
+  </form>
+
+  <ng-template #footer>
+    <button type="button" class="ttm-btn ttm-btn--ghost" (click)="close()">Cancel</button>
+    <button type="button" class="ttm-btn ttm-btn--primary" (click)="submit()">
+      {{ isEdit ? 'Save Changes' : 'Create' }}
+    </button>
+  </ng-template>
+
+</app-modal-shell>

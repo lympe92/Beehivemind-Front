@@ -1,0 +1,214 @@
+@use 'styles/user-theme' as *;
+
+.treatments {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  // ── State ─────────────────────────────────────────────────
+  &__state {
+    color: $text-muted;
+    font-size: 0.9rem;
+    padding: 40px 0;
+    text-align: center;
+  }
+
+  // ── Types grid ────────────────────────────────────────────
+  &__types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  &__type-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    border: 1px solid $border;
+    border-radius: 8px;
+    background: $bg-hover;
+    transition: border-color 0.15s;
+
+    &:hover { border-color: rgba($accent, 0.4); }
+  }
+
+  &__type-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__type-title {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__type-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  &__type-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  &__type-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    font-size: 0.8rem;
+  }
+
+  &__type-notes {
+    font-size: 0.8rem;
+    color: $text-muted;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  // ── Badges ────────────────────────────────────────────────
+  &__badge {
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+
+    &--disease   { background: rgba(#6366f1, 0.15); color: #818cf8; }
+    &--recurring { background: rgba($accent, 0.15); color: $accent; }
+    &--single    { background: rgba($border, 0.5); color: $text-muted; }
+  }
+
+  // ── Sessions ──────────────────────────────────────────────
+  &__sessions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__session {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border: 1px solid $border;
+    border-radius: 8px;
+    background: $bg-hover;
+  }
+
+  &__session-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__session-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__session-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  &__session-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    font-size: 0.8rem;
+  }
+
+  // ── Instances timeline ────────────────────────────────────
+  &__instances {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 4px;
+  }
+
+  &__instance {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    color: $text-muted;
+    padding: 3px 8px;
+    border-radius: 20px;
+    border: 1px solid $border;
+    background: transparent;
+
+    &--done    { border-color: rgba(#34d399, 0.5); color: #34d399; }
+    &--skipped { border-color: rgba($border, 0.5); opacity: 0.5; }
+  }
+
+  &__instance-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  &__instance-actual {
+    color: $accent;
+    font-size: 0.75rem;
+  }
+
+  &__instance-status {
+    text-transform: capitalize;
+    font-weight: 500;
+  }
+
+  // ── Shared ────────────────────────────────────────────────
+  &__meta-item {
+    color: $text-muted;
+    font-size: 0.8rem;
+
+    &--muted { opacity: 0.7; }
+  }
+
+  &__meta-sep { color: rgba($border, 0.8); }
+
+  // ── Buttons ───────────────────────────────────────────────
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+
+    &--primary { background: $accent; color: $accent-fg; &:hover { background: $accent-hover; } }
+    &--ghost   { background: transparent; border: 1px solid $border; color: $text-muted; &:hover { background: rgba($border, 0.3); color: $text-primary; } }
+    &--danger  { background: transparent; border: 1px solid rgba($danger, 0.4); color: #fca5a5; &:hover { background: rgba($danger, 0.15); } }
+    &--sm      { padding: 4px 10px; font-size: 0.8rem; }
+    &--apply   {
+      margin-top: 4px;
+      align-self: flex-start;
+      background: rgba($accent, 0.12);
+      color: $accent;
+      border: 1px solid rgba($accent, 0.3);
+      font-size: 0.8rem;
+      padding: 5px 12px;
+      &:hover { background: rgba($accent, 0.22); }
+    }
+  }
+}

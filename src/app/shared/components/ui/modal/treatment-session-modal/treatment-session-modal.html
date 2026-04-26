@@ -1,0 +1,97 @@
+<app-modal-shell title="Apply Treatment" (close)="close()">
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="tsm-form">
+
+    <!-- Treatment Type -->
+    <div class="tsm-form__row">
+      <label class="tsm-form__label">Treatment Type *</label>
+      <select class="tsm-form__input" formControlName="treatmentTypeId">
+        <option [value]="null">— Select type —</option>
+        @for (t of data.types; track t.id) {
+          <option [value]="t.id">{{ t.name }} ({{ t.disease }})</option>
+        }
+      </select>
+    </div>
+
+    @if (selectedType) {
+      <div class="tsm-type-info">
+        <span class="tsm-type-info__item">{{ selectedType.product }}</span>
+        @if (selectedType.dose) {
+          <span class="tsm-type-info__sep">·</span>
+          <span class="tsm-type-info__item">{{ selectedType.dose }}</span>
+        }
+        @if (selectedType.isRecurring) {
+          <span class="tsm-type-info__sep">·</span>
+          <span class="tsm-type-info__item tsm-type-info__item--badge">
+            {{ (selectedType.repetitions ?? 0) + 1 }}× every {{ selectedType.intervalDays }}d
+          </span>
+        }
+      </div>
+    }
+
+    <!-- Start Date -->
+    <div class="tsm-form__row">
+      <label class="tsm-form__label">Start Date *</label>
+      <input class="tsm-form__input" type="date" formControlName="startDate" />
+    </div>
+
+    <!-- Apiary filter -->
+    <div class="tsm-form__row">
+      <label class="tsm-form__label">Apiary</label>
+      <select class="tsm-form__input"
+        (change)="onApiaryChange($any($event.target).value)">
+        <option value="all">All Apiaries</option>
+        @for (a of apiaries(); track a.id) {
+          <option [value]="a.id">{{ a.name }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Beehives checklist -->
+    <div class="tsm-form__row">
+      <div class="tsm-form__label-row">
+        <label class="tsm-form__label">Beehives *</label>
+        <span class="tsm-form__count">{{ checkedBeehiveIds().size }} selected</span>
+      </div>
+
+      @if (filteredBeehives().length === 0) {
+        <p class="tsm-empty">No beehives in this apiary.</p>
+      } @else {
+        <div class="tsm-beehives">
+          <label class="tsm-beehives__all">
+            <input type="checkbox" [checked]="allChecked"
+              (change)="toggleAll($any($event.target).checked)" />
+            Select all
+          </label>
+          <div class="tsm-beehives__list">
+            @for (b of filteredBeehives(); track b.id) {
+              <label class="tsm-beehives__item">
+                <input type="checkbox" [checked]="isChecked(b.id)"
+                  (change)="toggleBeehive(b.id, $any($event.target).checked)" />
+                {{ b.name }}
+              </label>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Notes -->
+    <div class="tsm-form__row">
+      <label class="tsm-form__label">Notes</label>
+      <textarea class="tsm-form__textarea" formControlName="notes" rows="2"
+        placeholder="Optional session notes…"></textarea>
+    </div>
+
+  </form>
+
+  <ng-template #footer>
+    <button type="button" class="tsm-btn tsm-btn--ghost" (click)="close()">Cancel</button>
+    <button type="button" class="tsm-btn tsm-btn--primary"
+      [disabled]="checkedBeehiveIds().size === 0"
+      (click)="submit()">
+      Apply Treatment
+    </button>
+  </ng-template>
+
+</app-modal-shell>
