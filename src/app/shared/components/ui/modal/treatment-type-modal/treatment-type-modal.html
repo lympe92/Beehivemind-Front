@@ -54,9 +54,9 @@
         </div>
         @if (form.value.intervalDays && form.value.repetitions) {
           <p class="ttm-form__preview">
-            Will create {{ (form.value.repetitions ?? 0) + 1 }} sessions:
-            day 0@for (i of [].constructor(form.value.repetitions ?? 0); track $index) {
-              , day {{ ($index + 1) * (form.value.intervalDays ?? 0) }}
+            Will create {{ form.value.repetitions + 1 }} sessions:
+            day 0@for (i of [].constructor(form.value.repetitions); track $index) {
+              , day {{ ($index + 1) * form.value.intervalDays }}
             }
           </p>
         }

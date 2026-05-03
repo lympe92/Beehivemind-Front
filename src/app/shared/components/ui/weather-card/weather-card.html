@@ -1,0 +1,119 @@
+<div class="wc">
+
+  @if (loading()) {
+    <div class="wc__state">Loading weather…</div>
+  } @else if (error() || !weather()) {
+    <div class="wc__state wc__state--error">
+      Weather unavailable.
+      @if (!locationName) { <span>Set apiary coordinates to enable weather.</span> }
+    </div>
+  } @else {
+
+    <!-- ── Current ─────────────────────────────────────────── -->
+    <div class="wc__current">
+      <div class="wc__now">
+        <span class="wc__now-icon" [innerHTML]="icon(weather()!.current.weatherCode)"></span>
+        <span class="wc__temp">{{ weather()!.current.temperature }}°C</span>
+      </div>
+      <div class="wc__location">{{ locationName || 'Apiary' }}</div>
+
+      <div class="wc__metrics">
+        <span class="wc__metric">
+          <svg class="wc__mi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 2a3 3 0 0 1 3 3c0 3-3 7-3 7S5 8 5 5a3 3 0 0 1 3-3z"/><circle cx="8" cy="5" r="1" fill="currentColor" stroke="none"/></svg>
+          {{ weather()!.current.humidity }}% humidity
+        </span>
+        <span class="wc__metric">
+          <svg class="wc__mi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8c1-3 4-4 6-2s5 1 6-2M2 11c1-3 4-4 6-2s5 1 6-2"/></svg>
+          {{ weather()!.current.windSpeed }} km/h {{ windDir(weather()!.current.windDirection) }}
+        </span>
+        <span class="wc__metric">
+          <svg class="wc__mi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8c2-4 5-3 7 0s5 4 7 0"/></svg>
+          Gust {{ weather()!.current.windGust }} km/h
+        </span>
+        <span class="wc__metric">
+          <svg class="wc__mi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v5l3 2"/><circle cx="8" cy="8" r="6"/></svg>
+          {{ weather()!.current.precipitationProbability }}% rain
+        </span>
+        <span class="wc__metric">
+          <svg class="wc__mi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="3" fill="currentColor" stroke="none"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.1 3.1l1.4 1.4M11.5 11.5l1.4 1.4M3.1 12.9l1.4-1.4M11.5 4.5l1.4-1.4"/></svg>
+          UV {{ weather()!.current.uvIndex }}
+        </span>
+        <span class="wc__metric">
+          <svg class="wc__mi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10a5 5 0 0 1 5-4h.5A4 4 0 0 1 14 10"/><path d="M1 13h14"/></svg>
+          {{ weather()!.current.cloudCover }}% cloud
+        </span>
+        <span class="wc__metric">
+          <svg class="wc__mi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3h3"/></svg>
+          {{ weather()!.current.pressureSurfaceLevel }} hPa
+        </span>
+      </div>
+
+      @if (weather()!.hourly.length > 0) {
+        <button class="wc__expand-btn" (click)="toggleHourly()">
+          <svg class="wc__chevron" [class.wc__chevron--open]="showHourly()"
+               viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+          {{ showHourly() ? 'Hide hourly' : "Today's hourly" }}
+        </button>
+      }
+    </div>
+
+    <!-- ── Hourly vertical list ───────────────────────────── -->
+    @if (showHourly() && weather()!.hourly.length > 0) {
+      <div class="wc__hourly">
+
+        <!-- header row -->
+        <div class="wc__h-header">
+          <span>Time</span>
+          <span></span>
+          <span>Temp</span>
+          <span>Rain%</span>
+          <span>mm</span>
+          <span>Wind</span>
+          <span>Hum</span>
+          <span>Cloud</span>
+        </div>
+
+        @for (h of weather()!.hourly; track h.time) {
+          <div class="wc__h-row">
+            <span class="wc__h-time">{{ h.time }}</span>
+            <span class="wc__h-icon" [innerHTML]="icon(h.weatherCode)"></span>
+            <span class="wc__h-temp">{{ h.temperature }}°C</span>
+            <span class="wc__h-rain" [class.wc__h-rain--high]="h.precipitationProbability >= 60">
+              {{ h.precipitationProbability }}%
+            </span>
+            <span class="wc__h-mm">{{ h.precipitationMm }}</span>
+            <span class="wc__h-wind">{{ h.windSpeed }} km/h</span>
+            <span class="wc__h-hum">{{ h.humidity }}%</span>
+            <span class="wc__h-cloud">{{ h.cloudCover }}%</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ── 7-day forecast ────────────────────────────────── -->
+    <div class="wc__forecast">
+      @for (day of weather()!.forecast; track day.date) {
+        <div class="wc__day">
+          <span class="wc__day-label">{{ dayLabel(day.date) }}</span>
+          <span class="wc__day-icon" [innerHTML]="icon(day.weatherCode)"></span>
+          <span class="wc__day-high">{{ day.tempMax }}°</span>
+          <span class="wc__day-low">{{ day.tempMin }}°</span>
+          <span class="wc__day-rain">{{ day.precipitationProbability }}%</span>
+          @if (day.precipitationMm > 0) {
+            <span class="wc__day-mm">{{ day.precipitationMm }} mm</span>
+          }
+          @if (day.sunriseTime) {
+            <span class="wc__day-sun">↑ {{ day.sunriseTime }}</span>
+          }
+          @if (day.sunsetTime) {
+            <span class="wc__day-sun">↓ {{ day.sunsetTime }}</span>
+          }
+          <span class="wc__day-wind">{{ day.windSpeedMax }} km/h</span>
+        </div>
+      }
+    </div>
+
+  }
+</div>

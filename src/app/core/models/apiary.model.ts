@@ -6,4 +6,5 @@ export interface Apiary {
   longitude: number;
   location: string | null;
   dateEstablished: string | null;
+  lastVisited: string | null;
 }

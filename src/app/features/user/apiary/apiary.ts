@@ -1,5 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Apiary } from '../../../core/models/apiary.model';
 import { ApiaryService } from '../../../core/services/apiary.service';
@@ -15,7 +16,7 @@ import { ApiaryFormModalComponent } from '../../../shared/components/ui/modal/ap
 @Component({
   selector: 'app-apiary',
   standalone: true,
-  imports: [DatePipe, DataTableComponent, CardComponent],
+  imports: [DatePipe, RouterLink, DataTableComponent, CardComponent],
   templateUrl: './apiary.html',
   styleUrl: './apiary.scss',
 })

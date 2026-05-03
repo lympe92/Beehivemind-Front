@@ -1,8 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Apiary } from '../../../core/models/apiary.model';
 import { ApiaryService } from '../../../core/services/apiary.service';
+import { AgendaService } from '../../../core/services/agenda.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { selectAllApiaries, selectApiariesLoading } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
@@ -14,21 +16,31 @@ import { ApiaryFormModalComponent } from '../../../shared/components/ui/modal/ap
 @Component({
   selector: 'app-apiary-details',
   standalone: true,
-  imports: [DatePipe, CardComponent],
+  imports: [DatePipe, RouterLink, CardComponent],
   templateUrl: './apiary-details.html',
   styleUrl: './apiary-details.scss',
 })
 export class ApiaryDetailsComponent implements OnInit {
-  private store = inject(Store);
+  private store        = inject(Store);
   private apiaryService = inject(ApiaryService);
-  private toast = inject(ToastService);
-  private modal = inject(ModalService);
+  private agendaService = inject(AgendaService);
+  private toast        = inject(ToastService);
+  private modal        = inject(ModalService);
 
   readonly apiaries = this.store.selectSignal(selectAllApiaries);
-  readonly loading = this.store.selectSignal(selectApiariesLoading);
+  readonly loading  = this.store.selectSignal(selectApiariesLoading);
+  todosMap          = signal<Record<number, number>>({});
 
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
+    this.agendaService.getAll().subscribe(items => {
+      const map: Record<number, number> = {};
+      for (const item of items) {
+        if (item.apiaryId == null) continue;
+        map[item.apiaryId] = (map[item.apiaryId] ?? 0) + 1;
+      }
+      this.todosMap.set(map);
+    });
   }
 
   async startAdd(): Promise<void> {

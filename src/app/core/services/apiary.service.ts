@@ -56,8 +56,14 @@ export class ApiaryService {
     };
   }
 
+  getApiary(id: number): Observable<ApiResponse<Apiary>> {
+    return this.request.getRequest<any>(`apiaries/${id}`).pipe(
+      map(res => ({ ...res, data: res.data ? this.fromApi(res.data) : res.data }))
+    );
+  }
+
   // snake_case → camelCase for responses
-  private fromApi(a: any): Apiary {
+  fromApi(a: any): Apiary {
     return {
       id:              a.id,
       name:            a.name,
@@ -66,6 +72,7 @@ export class ApiaryService {
       longitude:       a.longitude,
       location:        a.location ?? null,
       dateEstablished: a.date_established ?? null,
+      lastVisited:     a.last_visited ?? null,
     };
   }
 }

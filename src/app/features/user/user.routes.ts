@@ -21,6 +21,10 @@ export const userRoutes: Routes = [
         path: 'map',
         loadComponent: () => import('./apiary/apiary-map').then((m) => m.ApiaryMapComponent),
       },
+      {
+        path: ':id',
+        loadComponent: () => import('./apiary/apiary-view/apiary-view').then((m) => m.ApiaryViewComponent),
+      },
     ],
   },
   {

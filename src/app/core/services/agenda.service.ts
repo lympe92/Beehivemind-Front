@@ -10,9 +10,13 @@ export class AgendaService {
 
   getAll(): Observable<AgendaItem[]> {
     return this.request.getRequest<any[]>('agenda').pipe(
-      map((res: ApiResponse<any[]>) =>
-        (res.data ?? []).map(i => this.fromApi(i))
-      )
+      map((res: ApiResponse<any[]>) => (res.data ?? []).map(i => this.fromApi(i)))
+    );
+  }
+
+  getByApiary(apiaryId: number): Observable<AgendaItem[]> {
+    return this.request.getRequest<any[]>(`agenda?apiary_id=${apiaryId}`).pipe(
+      map((res: ApiResponse<any[]>) => (res.data ?? []).map(i => this.fromApi(i)))
     );
   }
 
@@ -26,6 +30,7 @@ export class AgendaService {
       entityType:    i.entity_type,
       entityId:      i.entity_id,
       sessionId:     i.session_id ?? undefined,
+      apiaryId:      i.apiary_id ?? undefined,
     };
   }
 }

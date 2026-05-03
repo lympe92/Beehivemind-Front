@@ -23,7 +23,7 @@
         <div class="todo-section__items">
           @for (item of overdue(); track item.entityId) {
             <div class="todo-item todo-item--overdue">
-              <span class="todo-item__icon">{{ typeIcon(item.type) }}</span>
+              <span class="todo-item__icon" [innerHTML]="typeIcon(item.type)"></span>
               <div class="todo-item__body">
                 <span class="todo-item__title">{{ item.title }}</span>
                 <span class="todo-item__sub">{{ item.subtitle }}</span>
@@ -45,7 +45,7 @@
         <div class="todo-section__items">
           @for (item of group.items; track item.entityId) {
             <div class="todo-item">
-              <span class="todo-item__icon">{{ typeIcon(item.type) }}</span>
+              <span class="todo-item__icon" [innerHTML]="typeIcon(item.type)"></span>
               <div class="todo-item__body">
                 <span class="todo-item__title">{{ item.title }}</span>
                 <span class="todo-item__sub">{{ item.subtitle }}</span>

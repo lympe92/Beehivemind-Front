@@ -12,13 +12,20 @@
   } @else {
     <div class="apiary-details__list">
       @for (apiary of apiaries(); track apiary.id) {
-        <app-card [title]="apiary.name">
+        <app-card>
 
           <div card-header-end class="apiary-details__card-actions">
             <button class="apiary-details__btn apiary-details__btn--ghost apiary-details__btn--sm"
               (click)="startEdit(apiary)">Edit</button>
             <button class="apiary-details__btn apiary-details__btn--danger apiary-details__btn--sm"
               (click)="deleteApiary(apiary)">Delete</button>
+          </div>
+
+          <!-- Clickable name as card title -->
+          <div class="apiary-details__card-title">
+            <a class="apiary-details__name-link" [routerLink]="['/user/apiary', apiary.id]">
+              {{ apiary.name }}
+            </a>
           </div>
 
           <div class="apiary-details__fields">
@@ -41,6 +48,13 @@
             </div>
 
             <div class="apiary-details__field">
+              <span class="apiary-details__label">Last Visited</span>
+              <span class="apiary-details__value">
+                {{ apiary.lastVisited ? (apiary.lastVisited | date:'mediumDate') : '—' }}
+              </span>
+            </div>
+
+            <div class="apiary-details__field">
               <span class="apiary-details__label">Coordinates</span>
               <span class="apiary-details__value apiary-details__value--mono">
                 @if (apiary.latitude && apiary.longitude) {
@@ -52,6 +66,14 @@
             </div>
 
           </div>
+
+          @if (todosMap()[apiary.id] > 0) {
+            <div class="apiary-details__todos">
+              <a class="apiary-details__todos-badge" [routerLink]="['/user/todo/list']">
+                {{ todosMap()[apiary.id] }} pending to-do{{ todosMap()[apiary.id] > 1 ? 's' : '' }}
+              </a>
+            </div>
+          }
 
         </app-card>
       }

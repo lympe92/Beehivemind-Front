@@ -1,0 +1,250 @@
+:host { display: block; }
+
+.wc {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+  border-radius: 12px;
+  color: #ffffff;
+  overflow: hidden;
+
+  // ── State ────────────────────────────────────────────────
+  &__state {
+    padding: 28px;
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+    span { display: block; font-size: 0.8rem; margin-top: 4px; opacity: 0.6; }
+    &--error { color: #fca5a5; }
+  }
+
+  // ── Current ──────────────────────────────────────────────
+  &__current {
+    padding: 20px 24px 16px;
+  }
+
+  &__now {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 2px;
+  }
+
+  &__now-icon {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+  }
+
+  &__temp {
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  &__location {
+    font-size: 0.88rem;
+    opacity: 0.72;
+    margin-bottom: 14px;
+  }
+
+  &__metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-bottom: 14px;
+  }
+
+  &__metric {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    opacity: 0.85;
+    white-space: nowrap;
+  }
+
+  &__mi {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    opacity: 0.65;
+  }
+
+  // ── Expand button ─────────────────────────────────────────
+  &__expand-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    &:hover { background: rgba(255,255,255,0.18); }
+  }
+
+  &__chevron {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s ease;
+    &--open { transform: rotate(180deg); }
+  }
+
+  // ── Hourly vertical list ──────────────────────────────────
+  &__hourly {
+    border-top: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.18);
+    max-height: 320px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+  }
+
+  &__h-header {
+    display: grid;
+    grid-template-columns: 48px 26px 54px 42px 38px 76px 46px 50px;
+    gap: 0;
+    padding: 6px 16px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    opacity: 0.45;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    position: sticky;
+    top: 0;
+    background: #1e3d6e;
+  }
+
+  &__h-row {
+    display: grid;
+    grid-template-columns: 48px 26px 54px 42px 38px 76px 46px 50px;
+    align-items: center;
+    gap: 0;
+    padding: 7px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    transition: background 0.1s;
+    &:last-child { border-bottom: none; }
+    &:hover { background: rgba(255,255,255,0.07); }
+  }
+
+  &__h-time {
+    font-size: 0.78rem;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+
+  &__h-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  &__h-temp {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  &__h-rain {
+    font-size: 0.8rem;
+    color: #93c5fd;
+    opacity: 0.8;
+    &--high { color: #60a5fa; opacity: 1; font-weight: 600; }
+  }
+
+  &__h-wind {
+    font-size: 0.78rem;
+    opacity: 0.72;
+  }
+
+  &__h-hum {
+    font-size: 0.78rem;
+    opacity: 0.65;
+  }
+
+  &__h-mm {
+    font-size: 0.78rem;
+    color: #93c5fd;
+    opacity: 0.75;
+  }
+
+  &__h-cloud {
+    font-size: 0.78rem;
+    opacity: 0.55;
+  }
+
+  // ── 7-day forecast ────────────────────────────────────────
+  &__forecast {
+    display: flex;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    overflow-x: auto;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  &__day {
+    flex: 1;
+    min-width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 6px 12px;
+    border-right: 1px solid rgba(255,255,255,0.07);
+    transition: background 0.12s;
+    &:last-child { border-right: none; }
+    &:hover { background: rgba(255,255,255,0.06); }
+  }
+
+  &__day-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.6;
+  }
+
+  &__day-icon {
+    width: 28px;
+    height: 28px;
+    margin: 3px 0;
+  }
+
+  &__day-high {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  &__day-low {
+    font-size: 0.78rem;
+    opacity: 0.5;
+  }
+
+  &__day-rain {
+    font-size: 0.7rem;
+    color: #93c5fd;
+    opacity: 0.85;
+  }
+
+  &__day-sun {
+    font-size: 0.64rem;
+    opacity: 0.5;
+    white-space: nowrap;
+  }
+
+  &__day-mm {
+    font-size: 0.68rem;
+    color: #93c5fd;
+    opacity: 0.85;
+  }
+
+  &__day-wind {
+    font-size: 0.68rem;
+    opacity: 0.55;
+  }
+}

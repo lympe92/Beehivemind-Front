@@ -13,6 +13,9 @@
 
       <ng-template #cellTpl let-row let-col="col">
         @switch (col.key) {
+          @case ('name') {
+            <a class="apiary__name-link" [routerLink]="['/user/apiary', row.id]">{{ row.name }}</a>
+          }
           @case ('dateEstablished') {
             {{ row.dateEstablished ? (row.dateEstablished | date:'mediumDate') : '—' }}
           }

@@ -7,4 +7,5 @@ export interface AgendaItem {
   entityType: string;
   entityId: number;
   sessionId?: number;
+  apiaryId?: number;
 }

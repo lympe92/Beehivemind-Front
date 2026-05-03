@@ -1,0 +1,222 @@
+@use 'styles/user-theme' as *;
+
+.apiary-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &__loading {
+    padding: 48px 0;
+    text-align: center;
+    color: $text-muted;
+    font-size: 0.9rem;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__back {
+    font-size: 0.82rem;
+    color: $text-muted;
+    text-decoration: none;
+    transition: color 0.15s;
+    &:hover { color: $text-primary; }
+  }
+
+  &__title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__no-coords {
+    background: #fafafa;
+    border: 1px dashed $border;
+    border-radius: 10px;
+    padding: 20px;
+    font-size: 0.85rem;
+    color: $text-muted;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    a { color: $accent; text-decoration: underline; }
+  }
+
+  // ── Info grid ─────────────────────────────────────────────
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 680px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__grid-full {
+    grid-column: 1 / -1;
+  }
+
+  &__empty {
+    color: $text-muted;
+    font-size: 0.875rem;
+    margin: 0;
+    padding: 8px 0;
+  }
+
+  // ── Details fields ────────────────────────────────────────
+  &__fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $text-muted;
+  }
+
+  &__value {
+    font-size: 0.9rem;
+    color: $text-primary;
+  }
+
+  // ── Todos ─────────────────────────────────────────────────
+  &__todos {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__todo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid $border;
+    border-left: 3px solid $border;
+    border-radius: 6px;
+    font-size: 0.85rem;
+
+    &--overdue { border-left-color: #ef4444; background: #fff8f8; }
+  }
+
+  &__todo-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  &__todo-title { font-weight: 600; color: $text-primary; }
+  &__todo-sub   { font-size: 0.78rem; color: $text-muted; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  &__todo-date  { font-size: 0.75rem; color: $text-muted; }
+
+  &__done-btn {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border: 1px solid $border;
+    border-radius: 5px;
+    background: #fff;
+    color: $text-muted;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    &:hover { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+  }
+
+  // ── Inspections ───────────────────────────────────────────
+  &__insp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__insp-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid $border;
+    font-size: 0.85rem;
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__insp-date { color: $text-primary; font-weight: 500; min-width: 80px; }
+  &__insp-hive { color: $text-muted; min-width: 60px; }
+
+  &__insp-pills {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  &__pill {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+
+    &--warn   { background: #fef3c7; color: #92400e; }
+    &--danger { background: #fee2e2; color: #991b1b; }
+  }
+
+  // ── Treatment sessions ────────────────────────────────────
+  &__sessions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__session-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid $border;
+    &:last-child { border-bottom: none; padding-bottom: 0; }
+  }
+
+  &__session-name { font-weight: 600; font-size: 0.88rem; color: $text-primary; }
+  &__session-date { font-size: 0.78rem; color: $text-muted; }
+
+  &__session-instances {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  &__inst-pill {
+    font-size: 0.72rem;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: #e5e7eb;
+    color: #374151;
+
+    &--done    { background: #dcfce7; color: #166534; }
+    &--skipped { background: #f3f4f6; color: #9ca3af; text-decoration: line-through; }
+    &--overdue { background: #fee2e2; color: #991b1b; }
+  }
+}
