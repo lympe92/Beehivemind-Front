@@ -76,8 +76,4 @@ export class AuthService {
   logout(): Observable<void> {
     return this.request.postRequest('user/logout').pipe(map(() => void 0));
   }
-
-  clearSession(): void {
-    // Token is managed by NgRx store — logout effect calls this
-  }
 }

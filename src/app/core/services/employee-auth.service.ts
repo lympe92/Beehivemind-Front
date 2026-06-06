@@ -48,8 +48,4 @@ export class EmployeeAuthService {
       .postRequest<{ token: string; employee: Employee }>('employee/2fa/verify', { two_factor_token: twoFactorToken, ...payload })
       .pipe(map((res) => ({ employee: res.data.employee, token: res.data.token })));
   }
-
-  clearSession(): void {
-    // Token revoked server-side on logout action
-  }
 }
