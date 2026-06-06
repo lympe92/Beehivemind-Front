@@ -1,0 +1,8 @@
+<div class="msg" [class.msg--user]="isUser()" [class.msg--assistant]="!isUser()">
+  <div class="msg__bubble">
+    <div class="msg__content" [innerHTML]="formattedContent()"></div>
+    <time class="msg__time" [dateTime]="message().created_at">
+      {{ message().created_at | date:'HH:mm' }}
+    </time>
+  </div>
+</div>

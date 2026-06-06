@@ -20,6 +20,8 @@ import { treatmentSessionsReducer } from './treatment-sessions/treatment-session
 import { TreatmentSessionsEffects } from './treatment-sessions/treatment-sessions.effects';
 import { notificationsReducer } from './notifications/notifications.reducer';
 import { NotificationsEffects } from './notifications/notifications.effects';
+import { aiChatReducer } from './ai-chat/ai-chat.reducer';
+import { AiChatEffects } from './ai-chat/ai-chat.effects';
 
 export const appReducers = {
   auth: authReducer,
@@ -32,7 +34,8 @@ export const appReducers = {
   harvest: harvestReducer,
   treatmentTypes: treatmentTypesReducer,
   treatmentSessions: treatmentSessionsReducer,
-  notifications:     notificationsReducer,
+  notifications: notificationsReducer,
+  aiChat:        aiChatReducer,
 };
 
 export const appEffects = [
@@ -47,4 +50,5 @@ export const appEffects = [
   TreatmentTypesEffects,
   TreatmentSessionsEffects,
   NotificationsEffects,
+  AiChatEffects,
 ];

@@ -1,0 +1,29 @@
+<div class="conv-list">
+  @if (loading() && conversations().length === 0) {
+    <p class="conv-list__loading">Loading…</p>
+  }
+
+  @if (!loading() && conversations().length === 0) {
+    <p class="conv-list__empty">No conversations yet.</p>
+  }
+
+  @for (conv of conversations(); track trackById($index, conv)) {
+    <button
+      class="conv-list__item"
+      [class.conv-list__item--active]="conv.id === activeId()"
+      (click)="select(conv.id)">
+      <span class="conv-list__title">{{ conv.title }}</span>
+      <span class="conv-list__date">{{ conv.last_message_at | date:'d MMM' }}</span>
+      <button
+        class="conv-list__delete"
+        title="Delete conversation"
+        (click)="delete($event, conv.id)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </button>
+  }
+</div>

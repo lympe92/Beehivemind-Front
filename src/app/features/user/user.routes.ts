@@ -83,4 +83,17 @@ export const userRoutes: Routes = [
     path: 'profile',
     loadComponent: () => import('./profile/profile').then((m) => m.ProfileComponent),
   },
+  {
+    path: 'ai-chat',
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./ai-chat/ai-chat-page/ai-chat-page').then(m => m.AiChatPageComponent),
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./ai-chat/ai-chat-page/ai-chat-page').then(m => m.AiChatPageComponent),
+      },
+    ],
+  },
 ];
