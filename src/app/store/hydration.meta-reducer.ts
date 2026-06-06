@@ -1,10 +1,16 @@
 import { ActionReducer, INIT, UPDATE } from '@ngrx/store';
 import { isPlatformBrowser } from '@angular/common';
+import { AppState } from './index';
 
 const STORAGE_KEY = 'bhm_auth';
 
+/** Subset of the root state that is persisted to localStorage. */
+type PersistedState = Pick<AppState, 'auth' | 'employeeAuth'>;
+
 export function createHydrationMetaReducer(platformId: object) {
-  return function hydrationMetaReducer(reducer: ActionReducer<any>): ActionReducer<any> {
+  return function hydrationMetaReducer(
+    reducer: ActionReducer<AppState>,
+  ): ActionReducer<AppState> {
     return (state, action) => {
       if (!isPlatformBrowser(platformId)) {
         return reducer(state, action);
@@ -15,7 +21,8 @@ export function createHydrationMetaReducer(platformId: object) {
         try {
           const stored = localStorage.getItem(STORAGE_KEY);
           if (stored) {
-            return reducer({ ...state, ...JSON.parse(stored) }, action);
+            const parsed = JSON.parse(stored) as Partial<PersistedState>;
+            return reducer({ ...state, ...parsed } as AppState, action);
           }
         } catch {
           localStorage.removeItem(STORAGE_KEY);
@@ -26,20 +33,19 @@ export function createHydrationMetaReducer(platformId: object) {
 
       // Persist only the essentials — skip loading/error flags
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        const snapshot: PersistedState = {
           auth: {
-            user: nextState.auth.user,
-            token: nextState.auth.token,
+            ...nextState.auth,
             loading: false,
             error: null,
           },
           employeeAuth: {
-            employee: nextState.employeeAuth.employee,
-            token: nextState.employeeAuth.token,
+            ...nextState.employeeAuth,
             loading: false,
             error: null,
           },
-        }));
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
       } catch {}
 
       return nextState;

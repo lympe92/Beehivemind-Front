@@ -52,3 +52,8 @@ export const appEffects = [
   NotificationsEffects,
   AiChatEffects,
 ];
+
+/** Root application state, derived from the registered reducers. */
+export type AppState = {
+  [K in keyof typeof appReducers]: ReturnType<(typeof appReducers)[K]>;
+};

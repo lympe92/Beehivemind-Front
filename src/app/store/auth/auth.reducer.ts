@@ -13,12 +13,6 @@ export const authReducer = createReducer(
     pendingToken: token,
   })),
 
-  on(AuthActions.loginSuccess, (state, { user, token }) => ({
-    ...state,
-    pendingUser: null,
-    pendingToken: null,
-  })),
-
   on(AuthActions.login, AuthActions.loginWithGoogle, (state) => ({
     ...state,
     loading: true,
@@ -33,6 +27,8 @@ export const authReducer = createReducer(
     error: null,
     twoFactorToken: null,
     twoFactorPending: null,
+    pendingUser: null,
+    pendingToken: null,
   })),
 
   on(AuthActions.loginFailure, (state, { error, retryAfterMinutes }) => ({
