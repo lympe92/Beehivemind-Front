@@ -9,6 +9,7 @@
     "test": "ng test",
     "format": "prettier --write \"src/**/*.{ts,html,scss,css,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,scss,css,json}\"",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "serve:ssr:beehivemind-Front": "node dist/beehivemind-Front/server/server.mjs"
   },
   "private": true,
