@@ -41,7 +41,13 @@ export class TreatmentsDetailsComponent implements OnInit {
   }
 
   async applyTreatment(): Promise<void> {
-    const result = await this.modal.open<any>(TreatmentSessionModalComponent, {
+    const result = await this.modal.open<{
+      treatmentTypeId: number;
+      apiaryId: number | null;
+      startDate: string;
+      beehiveIds: number[];
+      notes: string | null;
+    }>(TreatmentSessionModalComponent, {
       type: 'center',
       width: '560px',
       data: { types: this.types() },
@@ -57,7 +63,7 @@ export class TreatmentsDetailsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
@@ -79,7 +85,7 @@ export class TreatmentsDetailsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 

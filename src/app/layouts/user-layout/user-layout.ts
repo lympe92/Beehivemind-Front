@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AsyncPipe } from '@angular/common';
@@ -12,6 +12,7 @@ import { NotificationBellComponent } from '../../shared/components/ui/notificati
   imports: [RouterOutlet, RouterLink, RouterLinkActive, AsyncPipe, NotificationBellComponent],
   templateUrl: './user-layout.html',
   styleUrl: './user-layout.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserLayoutComponent implements OnInit {
   private store  = inject(Store);

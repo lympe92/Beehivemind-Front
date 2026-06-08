@@ -4,25 +4,39 @@ import { RequestService } from './request.service';
 import { ApiResponse } from '../models/api-response.model';
 import { TreatmentType } from '../models/treatment-type.model';
 
+/** Raw treatment-type payload as returned by the API (snake_case). */
+export interface TreatmentTypePayload {
+  id: number;
+  name: string;
+  disease: string;
+  product: string;
+  dose?: string | null;
+  notes?: string | null;
+  interval_days?: number | null;
+  repetitions?: number | null;
+  is_recurring?: boolean;
+  created_at?: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TreatmentTypeService {
   private request = inject(RequestService);
 
   getAll(): Observable<ApiResponse<TreatmentType[]>> {
-    return this.request.getRequest<any>('treatment-types').pipe(
-      map(res => ({ ...res, data: (res.data ?? []).map((t: any) => this.fromApi(t)) }))
+    return this.request.getRequest<TreatmentTypePayload[]>('treatment-types').pipe(
+      map(res => ({ ...res, data: (res.data ?? []).map(t => this.fromApi(t)) }))
     );
   }
 
   create(data: Partial<TreatmentType>): Observable<ApiResponse<TreatmentType>> {
-    return this.request.postRequest<any>('treatment-types', this.toApi(data)).pipe(
-      map(res => ({ ...res, data: res.data ? this.fromApi(res.data) : res.data }))
+    return this.request.postRequest<TreatmentTypePayload>('treatment-types', this.toApi(data)).pipe(
+      map(res => ({ ...res, data: this.fromApi(res.data) }))
     );
   }
 
   update(id: number, data: Partial<TreatmentType>): Observable<ApiResponse<TreatmentType>> {
-    return this.request.putRequest<any>(`treatment-types/${id}`, this.toApi(data)).pipe(
-      map(res => ({ ...res, data: res.data ? this.fromApi(res.data) : res.data }))
+    return this.request.putRequest<TreatmentTypePayload>(`treatment-types/${id}`, this.toApi(data)).pipe(
+      map(res => ({ ...res, data: this.fromApi(res.data) }))
     );
   }
 
@@ -42,7 +56,7 @@ export class TreatmentTypeService {
     };
   }
 
-  fromApi(t: any): TreatmentType {
+  fromApi(t: TreatmentTypePayload): TreatmentType {
     return {
       id:          t.id,
       name:        t.name,

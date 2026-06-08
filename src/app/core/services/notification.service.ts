@@ -2,9 +2,28 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Notification, NotificationsListResponse } from '../models/notification.model';
+import { Notification } from '../models/notification.model';
 import { ApiResponse } from '../models/api-response.model';
 import { RequestService } from './request.service';
+
+/** Raw notification payload as returned by the API (snake_case). */
+interface NotificationPayload {
+  id: number;
+  type: string;
+  title: string;
+  message: string;
+  entity_type: string;
+  entity_id: number;
+  read_at?: string | null;
+  is_read?: boolean;
+  created_at?: string | null;
+}
+
+interface NotificationsListPayload {
+  success: boolean;
+  data: NotificationPayload[];
+  unread_count: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
@@ -13,7 +32,7 @@ export class NotificationService {
   private base    = environment.apiUrl;
 
   getAll(): Observable<{ notifications: Notification[]; unreadCount: number }> {
-    return this.http.get<NotificationsListResponse>(`${this.base}notifications`).pipe(
+    return this.http.get<NotificationsListPayload>(`${this.base}notifications`).pipe(
       map(res => ({
         notifications: (res.data ?? []).map(n => this.fromApi(n)),
         unreadCount:   res.unread_count ?? 0,
@@ -22,8 +41,8 @@ export class NotificationService {
   }
 
   markRead(id: number): Observable<ApiResponse<Notification>> {
-    return this.request.patchRequest<any>(`notifications/${id}/read`).pipe(
-      map(res => ({ ...res, data: res.data ? this.fromApi(res.data) : res.data }))
+    return this.request.patchRequest<NotificationPayload>(`notifications/${id}/read`).pipe(
+      map(res => ({ ...res, data: this.fromApi(res.data) }))
     );
   }
 
@@ -31,7 +50,7 @@ export class NotificationService {
     return this.request.postRequest<void>('notifications/read-all');
   }
 
-  fromApi(n: any): Notification {
+  fromApi(n: NotificationPayload): Notification {
     return {
       id:         n.id,
       type:       n.type,

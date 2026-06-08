@@ -12,7 +12,7 @@ import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { routes } from './app.routes';
 import { appReducers, appEffects } from './store';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
-import { employeeInterceptor } from './core/interceptors/employee.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { createHydrationMetaReducer } from './store/hydration.meta-reducer';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
@@ -20,7 +20,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([employeeInterceptor, authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
     provideStore(appReducers),
     {
       provide: META_REDUCERS,

@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -15,6 +16,7 @@ import { COUNTRIES, Country } from '../../../core/data/countries';
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent implements OnInit {
   private authService = inject(AuthService);
@@ -22,6 +24,7 @@ export class RegisterComponent implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private platformId = inject(PLATFORM_ID);
+  private destroyRef = inject(DestroyRef);
 
   loading = signal(false);
   error = signal<string | null>(null);
@@ -43,9 +46,12 @@ export class RegisterComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.store.select(selectIsLoggedIn).subscribe((loggedIn) => {
-      if (loggedIn) this.router.navigate(['/dashboard']);
-    });
+    this.store
+      .select(selectIsLoggedIn)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((loggedIn) => {
+        if (loggedIn) this.router.navigate(['/user/dashboard']);
+      });
 
     if (isPlatformBrowser(this.platformId)) {
       this.loadGoogleSignIn();
@@ -117,7 +123,19 @@ export class RegisterComponent implements OnInit {
   }
 
   private initGsi(): void {
-    const g = (window as any).google;
+    const g = (window as unknown as {
+      google?: {
+        accounts?: {
+          id?: {
+            initialize(config: {
+              client_id: string;
+              callback: (response: { credential: string }) => void;
+            }): void;
+            renderButton(parent: HTMLElement, options: Record<string, unknown>): void;
+          };
+        };
+      };
+    }).google;
     if (!g?.accounts?.id) return;
 
     g.accounts.id.initialize({

@@ -27,15 +27,14 @@ export class ProfileEffects {
     this.actions$.pipe(
       ofType(ProfileActions.updateProfile),
       exhaustMap(({ data }) =>
-        this.profileService.updateProfile(data as any).pipe(
+        this.profileService.updateProfile(data).pipe(
           map((res) => {
             this.toast.success('Profile updated successfully.');
             return ProfileActions.updateProfileSuccess({ profile: res.data });
           }),
-          catchError((err) => {
-            this.toast.error(err?.error?.message ?? 'Something went wrong. Please try again.');
-            return of(ProfileActions.updateProfileFailure({ error: err?.error?.message ?? '' }));
-          }),
+          catchError((err) =>
+            of(ProfileActions.updateProfileFailure({ error: err?.error?.message ?? '' })),
+          ),
         ),
       ),
     ),
@@ -55,10 +54,9 @@ export class ProfileEffects {
             this.toast.success(hadPassword ? 'Password changed successfully.' : 'Password set successfully.');
             return ProfileActions.changePasswordSuccess();
           }),
-          catchError((err) => {
-            this.toast.error(err?.error?.message ?? 'Something went wrong. Please try again.');
-            return of(ProfileActions.changePasswordFailure({ error: err?.error?.message ?? '' }));
-          }),
+          catchError((err) =>
+            of(ProfileActions.changePasswordFailure({ error: err?.error?.message ?? '' })),
+          ),
         ),
       ),
     ),

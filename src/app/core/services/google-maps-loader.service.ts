@@ -10,7 +10,11 @@ export class GoogleMapsLoaderService {
   load(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    if ((window as any).google?.maps?.importLibrary) {
+    const w = window as unknown as Record<string, unknown> & {
+      google?: { maps?: { importLibrary?: unknown } };
+    };
+
+    if (w.google?.maps?.importLibrary) {
       this.mapsLoaded.set(true);
       return;
     }
@@ -18,8 +22,8 @@ export class GoogleMapsLoaderService {
     if (document.getElementById('google-maps-script')) return;
 
     const callbackName = '__googleMapsReady';
-    (window as any)[callbackName] = () => {
-      delete (window as any)[callbackName];
+    w[callbackName] = () => {
+      delete w[callbackName];
       setTimeout(() => this.mapsLoaded.set(true));
     };
 
@@ -28,7 +32,6 @@ export class GoogleMapsLoaderService {
     script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&callback=${callbackName}`;
     script.async = true;
     script.defer = true;
-    script.onerror = () => console.error('Google Maps failed to load');
     document.head.appendChild(script);
   }
 }

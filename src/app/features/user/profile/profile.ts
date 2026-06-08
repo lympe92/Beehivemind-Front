@@ -126,7 +126,7 @@ export class ProfileComponent implements OnInit {
       data: {
         name: this.infoForm.name.trim(),
         surname: this.infoForm.surname.trim(),
-        country: (this.infoForm.country.trim() || null) as any,
+        country: this.infoForm.country.trim() || null,
         unit: this.infoForm.unit,
       },
     }));

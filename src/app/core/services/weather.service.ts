@@ -1,34 +1,57 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { RequestService } from './request.service';
 import { WeatherData, WeatherCurrent, WeatherDay, WeatherHour } from '../models/weather.model';
+
+/** Raw Tomorrow.io forecast payload, as proxied by the backend. */
+interface WeatherValues {
+  temperature?: number;
+  temperatureMin?: number;
+  temperatureMax?: number;
+  humidity?: number;
+  windSpeed?: number;
+  windGust?: number;
+  windDirection?: number;
+  windSpeedMax?: number;
+  precipitationProbability?: number;
+  precipitationIntensity?: number;
+  precipitationAccumulationAvg?: number;
+  uvIndex?: number;
+  weatherCode?: number;
+  cloudCover?: number;
+  pressureSurfaceLevel?: number;
+  sunriseTime?: string;
+  sunsetTime?: string;
+}
+
+interface WeatherEntry {
+  time: string;
+  values?: WeatherValues;
+}
+
+interface TomorrowForecast {
+  timelines?: {
+    hourly?: WeatherEntry[];
+    daily?: WeatherEntry[];
+  };
+}
 
 @Injectable({ providedIn: 'root' })
 export class WeatherService {
-  private http = inject(HttpClient);
-  private readonly BASE = 'https://api.tomorrow.io/v4/weather/forecast';
+  private request = inject(RequestService);
 
   getForecast(lat: number, lng: number): Observable<WeatherData> {
-    const fields = [
-      'temperature', 'temperatureMin', 'temperatureMax',
-      'humidity', 'windSpeed', 'windGust', 'windDirection', 'windSpeedMax',
-      'precipitationProbability', 'precipitationIntensity', 'precipitationAccumulationAvg',
-      'uvIndex', 'weatherCode',
-      'cloudCover', 'pressureSurfaceLevel',
-      'sunriseTime', 'sunsetTime',
-    ].join(',');
-
-    const url = `${this.BASE}?location=${lat},${lng}&fields=${fields}&timesteps=1h,1d&units=metric&apikey=${environment.weatherApiKey}`;
-
-    return this.http.get<any>(url).pipe(map(res => this.parse(res)));
+    // Proxied through our backend (/api/weather) so the upstream API key stays server-side.
+    return this.request
+      .getRequest<TomorrowForecast>(`weather?lat=${lat}&lng=${lng}`)
+      .pipe(map((res) => this.parse(res.data)));
   }
 
-  private parse(res: any): WeatherData {
+  private parse(res: TomorrowForecast): WeatherData {
     const hourlyRaw = res?.timelines?.hourly ?? [];
     const daily     = res?.timelines?.daily  ?? [];
 
-    const now = hourlyRaw[0]?.values ?? {};
+    const now: WeatherValues = hourlyRaw[0]?.values ?? {};
     const current: WeatherCurrent = {
       temperature:              Math.round(now.temperature ?? 0),
       humidity:                 Math.round(now.humidity ?? 0),
@@ -42,7 +65,7 @@ export class WeatherService {
       weatherCode:              now.weatherCode ?? 1000,
     };
 
-    const forecast: WeatherDay[] = daily.slice(0, 7).map((d: any) => ({
+    const forecast: WeatherDay[] = daily.slice(0, 7).map((d: WeatherEntry) => ({
       date:                     d.time.slice(0, 10),
       tempMin:                  Math.round(d.values?.temperatureMin ?? 0),
       tempMax:                  Math.round(d.values?.temperatureMax ?? 0),
@@ -56,8 +79,8 @@ export class WeatherService {
 
     const todayStr = new Date().toISOString().slice(0, 10);
     const hourly: WeatherHour[] = hourlyRaw
-      .filter((h: any) => h.time.slice(0, 10) === todayStr)
-      .map((h: any) => ({
+      .filter((h: WeatherEntry) => h.time.slice(0, 10) === todayStr)
+      .map((h: WeatherEntry) => ({
         time:                     this.utcToLocal(h.time),
         temperature:              Math.round(h.values?.temperature ?? 0),
         precipitationProbability: Math.round(h.values?.precipitationProbability ?? 0),

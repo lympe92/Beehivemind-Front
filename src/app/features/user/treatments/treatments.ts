@@ -5,8 +5,6 @@ import { TreatmentTypeService } from '../../../core/services/treatment-type.serv
 import { TreatmentTypesActions } from '../../../store/treatment-types/treatment-types.actions';
 import { TreatmentSessionsActions } from '../../../store/treatment-sessions/treatment-sessions.actions';
 import { selectAllTreatmentTypes, selectTreatmentTypesLoading } from '../../../store/treatment-types/treatment-types.selectors';
-import { selectAllTreatmentSessions } from '../../../store/treatment-sessions/treatment-sessions.selectors';
-import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
@@ -41,7 +39,7 @@ export class TreatmentsComponent implements OnInit {
   }
 
   async addType(): Promise<void> {
-    const result = await this.modal.open<any>(TreatmentTypeModalComponent, {
+    const result = await this.modal.open<Partial<TreatmentType>>(TreatmentTypeModalComponent, {
       type: 'center',
       width: '560px',
       data: {},
@@ -57,12 +55,12 @@ export class TreatmentsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
   async editType(type: TreatmentType): Promise<void> {
-    const result = await this.modal.open<any>(TreatmentTypeModalComponent, {
+    const result = await this.modal.open<Partial<TreatmentType>>(TreatmentTypeModalComponent, {
       type: 'center',
       width: '560px',
       data: { type },
@@ -78,7 +76,7 @@ export class TreatmentsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
@@ -101,12 +99,18 @@ export class TreatmentsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
   async applyType(type: TreatmentType): Promise<void> {
-    const result = await this.modal.open<any>(TreatmentSessionModalComponent, {
+    const result = await this.modal.open<{
+      treatmentTypeId: number;
+      apiaryId: number | null;
+      startDate: string;
+      beehiveIds: number[];
+      notes: string | null;
+    }>(TreatmentSessionModalComponent, {
       type: 'center',
       width: '560px',
       data: {
@@ -125,7 +129,7 @@ export class TreatmentsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 }

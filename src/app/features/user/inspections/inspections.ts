@@ -18,6 +18,26 @@ import { FormModalComponent } from '../../../shared/components/ui/modal/form-mod
 import { syncValidators } from '../../../shared/components/ui/form/validators.config';
 import { DynamicField } from '../../../core/models/form.model';
 
+/** Shape of the inspection add/edit form value. */
+interface InspectionFormValue {
+  apiary_id: number;
+  beehive_id: number;
+  date: string;
+  population: number;
+  frame_space: number;
+  pollen: number;
+  honey: number;
+  opened_brood: number;
+  closed_brood: number;
+  varroa: boolean;
+  american_foulbrood: boolean;
+  european_foulbrood: boolean;
+  nosema: boolean;
+  queen_exists: boolean;
+  queen_cells: boolean;
+  queen_year: number | null;
+}
+
 @Component({
   selector: 'app-inspections',
   standalone: true,
@@ -96,7 +116,7 @@ export class InspectionsComponent implements OnInit {
     const apiaries = this.apiaries();
     const allBeehives = this.allBeehives();
 
-    const value = await this.modal.open<any>(FormModalComponent, {
+    const value = await this.modal.open<InspectionFormValue>(FormModalComponent, {
       type: 'center',
       width: '640px',
       data: {
@@ -119,7 +139,7 @@ export class InspectionsComponent implements OnInit {
             value: this.selectedBeehiveId() || null,
             syncValidators: [syncValidators.required()],
             cascadeFrom: 'apiary_id',
-            options: (apiaryId: number) => of(
+            options: (apiaryId: unknown) => of(
               allBeehives
                 .filter(b => b.apiaryId === apiaryId)
                 .map(b => ({ displayValue: b.name, returnValue: b.id })),
@@ -151,14 +171,14 @@ export class InspectionsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
   // ── Edit ─────────────────────────────────────────────────
 
   async startEdit(row: Inspection): Promise<void> {
-    const value = await this.modal.open<any>(FormModalComponent, {
+    const value = await this.modal.open<InspectionFormValue>(FormModalComponent, {
       type: 'center',
       width: '640px',
       data: {
@@ -178,7 +198,7 @@ export class InspectionsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
@@ -203,7 +223,7 @@ export class InspectionsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
@@ -284,7 +304,7 @@ export class InspectionsComponent implements OnInit {
     ];
   }
 
-  private toPayload(value: any, beehiveId: number) {
+  private toPayload(value: InspectionFormValue, beehiveId: number) {
     return {
       beehive_id: beehiveId,
       date: value.date,

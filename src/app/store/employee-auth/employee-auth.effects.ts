@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, exhaustMap, map, of, tap } from 'rxjs';
+import { catchError, exhaustMap, map, of } from 'rxjs';
 import { EmployeeAuthService } from '../../core/services/employee-auth.service';
 import { EmployeeAuthActions } from './employee-auth.actions';
 
@@ -34,7 +34,6 @@ export class EmployeeAuthEffects {
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(EmployeeAuthActions.logout),
-      tap(() => this.employeeAuthService.clearSession()),
       map(() => EmployeeAuthActions.logoutSuccess()),
     ),
   );

@@ -1,7 +1,8 @@
 import { FieldOption } from './form-fields.model';
 import { Observable } from 'rxjs';
+import { AsyncValidatorFn, ValidatorFn } from '@angular/forms';
 
-export interface DynamicField<T = any> {
+export interface DynamicField {
   name: string;
   type:
     | 'text'
@@ -19,11 +20,11 @@ export interface DynamicField<T = any> {
   label: string;
   isMultiple?: boolean;
   placeholder?: string;
-  options?: Observable<FieldOption[]> | ((value: any) => Observable<FieldOption[]>);
+  options?: Observable<FieldOption[]> | ((value: unknown) => Observable<FieldOption[]>);
   cascadeFrom?: string;
-  value?: any;
-  syncValidators?: any[];
-  asyncValidators?: any[];
+  value?: unknown;
+  syncValidators?: ValidatorFn[];
+  asyncValidators?: AsyncValidatorFn[];
   conditions?: {
     disabled?: FieldCondition[];
     visible?: FieldCondition[];
@@ -34,7 +35,7 @@ export interface DynamicField<T = any> {
 
 export interface FieldCondition {
   triggerField: string;
-  triggerValue: any;
+  triggerValue: unknown;
   operator?:
     | 'equals'
     | 'notEquals'

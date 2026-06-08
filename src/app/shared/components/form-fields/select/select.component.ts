@@ -38,7 +38,7 @@ export class SelectComponent implements ControlValueAccessor {
   @Input() label!: string;
   @Input() placeholder: string = '';
   @Input() isMultiple = false;
-  @Input() options?: Observable<FieldOption[]> | ((value: any) => Observable<FieldOption[]>);
+  @Input() options?: Observable<FieldOption[]> | ((value: unknown) => Observable<FieldOption[]>);
   @Input() cascadeFrom?: string;
 
   resolvedOptions: FieldOption[] = [];
@@ -62,7 +62,7 @@ export class SelectComponent implements ControlValueAccessor {
       select: [this.isMultiple ? [] : null],
     });
 
-    this.form.valueChanges.subscribe(x => {
+    this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(x => {
       this.onChange(x.select);
       this.onTouched();
     });
@@ -76,7 +76,7 @@ export class SelectComponent implements ControlValueAccessor {
 
       merge(of(sourceControl.value), sourceControl.valueChanges)
         .pipe(
-          switchMap(val => (this.options as (v: any) => Observable<FieldOption[]>)(val)),
+          switchMap(val => (this.options as (v: unknown) => Observable<FieldOption[]>)(val)),
           takeUntilDestroyed(this.destroyRef),
         )
         .subscribe(opts => (this.resolvedOptions = opts));
@@ -87,17 +87,17 @@ export class SelectComponent implements ControlValueAccessor {
     }
   }
 
-  onChange: (value: any) => void = () => {};
+  onChange: (value: unknown) => void = () => {};
   onTouched: () => void = () => {};
 
-  writeValue(value: any): void {
+  writeValue(value: unknown): void {
     if (value !== undefined) {
-      this.value = value;
+      this.value = value as string;
       this.form.get('select')?.patchValue(value);
     }
   }
 
-  registerOnChange(fn: (value: any) => void): void { this.onChange = fn; }
+  registerOnChange(fn: (value: unknown) => void): void { this.onChange = fn; }
   registerOnTouched(fn: () => void): void { this.onTouched = fn; }
   setDisabledState(isDisabled: boolean): void { this.disabled = isDisabled; }
 

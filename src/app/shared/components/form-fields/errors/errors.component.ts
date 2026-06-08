@@ -1,7 +1,14 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ValidationErrors } from '@angular/forms';
 
-const ERROR_MESSAGES: Record<string, (params?: any) => string> = {
+interface ErrorParams {
+  requiredLength?: number;
+  maximumLength?: number;
+  min?: number;
+  max?: number;
+}
+
+const ERROR_MESSAGES: Record<string, (params?: ErrorParams) => string> = {
   required:           ()  => 'This field is required',
   email:              ()  => 'Invalid email address',
   minLength:          (p) => `Minimum ${p?.requiredLength} characters required`,
@@ -38,7 +45,7 @@ export class ErrorsComponent implements OnChanges {
       .filter(([, value]) => value !== false)
       .map(([key, value]) => {
         const fn = ERROR_MESSAGES[key];
-        return fn ? fn(value as any) : key;
+        return fn ? fn(value as ErrorParams) : key;
       });
   }
 }

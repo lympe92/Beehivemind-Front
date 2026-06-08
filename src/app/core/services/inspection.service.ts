@@ -5,12 +5,32 @@ import { RequestService } from './request.service';
 import { ApiResponse } from '../models/api-response.model';
 import { AvgInspection, Inspection } from '../models/inspection.model';
 
+/** Raw inspection record payload as returned by the API (snake_case). */
+interface InspectionPayload {
+  id: number;
+  date: Inspection['date'];
+  beehive_id: number;
+  population: Inspection['population'];
+  frame_space: Inspection['frame_space'];
+  pollen: Inspection['pollen'];
+  honey: Inspection['honey'];
+  opened_brood: Inspection['opened_brood'];
+  closed_brood: Inspection['closed_brood'];
+  varroa: Inspection['varroa'];
+  american_foulbrood: Inspection['american_foulbrood'];
+  european_foulbrood: Inspection['european_foulbrood'];
+  nosema: Inspection['nosema'];
+  queen_exists: Inspection['queen_exists'];
+  queen_cells: Inspection['queen_cells'];
+  queen_year: Inspection['queen_year'];
+}
+
 @Injectable({ providedIn: 'root' })
 export class InspectionService {
   private request = inject(RequestService);
 
   getAllInspections(): Observable<ApiResponse<Inspection[]>> {
-    return this.request.getRequest<any[]>('inspections').pipe(
+    return this.request.getRequest<InspectionPayload[]>('inspections').pipe(
       map(res => ({ ...res, data: res.data.map(this.fromApi) }))
     );
   }
@@ -24,7 +44,7 @@ export class InspectionService {
   }
 
   getInspectionsOfApiary(apiaryId: number): Observable<ApiResponse<Inspection[]>> {
-    return this.request.getRequest<any[]>(`inspections/apiary/${apiaryId}`).pipe(
+    return this.request.getRequest<InspectionPayload[]>(`inspections/apiary/${apiaryId}`).pipe(
       map(res => ({ ...res, data: res.data.map(this.fromApi) }))
     );
   }
@@ -34,7 +54,7 @@ export class InspectionService {
   }
 
   getInspectionsOfBeehive(beehiveId: number): Observable<ApiResponse<Inspection[]>> {
-    return this.request.getRequest<any[]>(`inspections/beehive/${beehiveId}`).pipe(
+    return this.request.getRequest<InspectionPayload[]>(`inspections/beehive/${beehiveId}`).pipe(
       map(res => ({ ...res, data: res.data.map(this.fromApi) }))
     );
   }
@@ -51,7 +71,7 @@ export class InspectionService {
     return this.request.deleteRequest<void>(`records/${id}`);
   }
 
-  private fromApi = (r: any): Inspection => ({
+  private fromApi = (r: InspectionPayload): Inspection => ({
     id: r.id,
     date: r.date,
     beehiveId: r.beehive_id,

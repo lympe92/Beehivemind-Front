@@ -24,9 +24,9 @@ export interface TablePagination {
   styleUrl: './data-table.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class DataTableComponent {
+export class DataTableComponent<T = unknown> {
   @Input({ required: true }) columns: ColumnDef[] = [];
-  @Input({ required: true }) rows: any[] = [];
+  @Input({ required: true }) rows: T[] = [];
   @Input() editingId: number | null = null;
   @Input() pagination: TablePagination | null = null;
   @Input() loading = false;
@@ -34,12 +34,12 @@ export class DataTableComponent {
   @Input() showActions = true;
   @Input() clickableRows = false;
 
-  @ContentChild('cellTpl', { read: TemplateRef }) cellTpl?: TemplateRef<any>;
-  @ContentChild('editRowTpl', { read: TemplateRef }) editRowTpl?: TemplateRef<any>;
-  @ContentChild('actionsTpl', { read: TemplateRef }) actionsTpl?: TemplateRef<any>;
+  @ContentChild('cellTpl', { read: TemplateRef }) cellTpl?: TemplateRef<unknown>;
+  @ContentChild('editRowTpl', { read: TemplateRef }) editRowTpl?: TemplateRef<unknown>;
+  @ContentChild('actionsTpl', { read: TemplateRef }) actionsTpl?: TemplateRef<unknown>;
 
   @Output() pageChange = new EventEmitter<number>();
-  @Output() rowClick = new EventEmitter<any>();
+  @Output() rowClick = new EventEmitter<T>();
 
   get totalCols(): number {
     return this.columns.length + (this.actionsTpl && this.showActions ? 1 : 0);

@@ -92,7 +92,7 @@ export class BeehivesComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
@@ -136,7 +136,7 @@ export class BeehivesComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
@@ -175,7 +175,7 @@ export class BeehivesComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 

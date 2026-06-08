@@ -46,7 +46,14 @@ export class ApiaryDetailsComponent implements OnInit {
   async startAdd(): Promise<void> {
     const existingNames = this.apiaries().map(a => a.name);
 
-    const value = await this.modal.open<any>(ApiaryFormModalComponent, {
+    const value = await this.modal.open<{
+      name: string;
+      hivesNumber: number;
+      latitude: number;
+      longitude: number;
+      location?: string | null;
+      dateEstablished?: string | null;
+    }>(ApiaryFormModalComponent, {
       type: 'center',
       width: '640px',
       data: {},
@@ -75,12 +82,19 @@ export class ApiaryDetailsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
   async startEdit(apiary: Apiary): Promise<void> {
-    const value = await this.modal.open<any>(ApiaryFormModalComponent, {
+    const value = await this.modal.open<{
+      name: string;
+      hivesNumber: number;
+      latitude: number;
+      longitude: number;
+      location?: string | null;
+      dateEstablished?: string | null;
+    }>(ApiaryFormModalComponent, {
       type: 'center',
       width: '640px',
       data: { apiary },
@@ -104,7 +118,7 @@ export class ApiaryDetailsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
@@ -126,7 +140,7 @@ export class ApiaryDetailsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 

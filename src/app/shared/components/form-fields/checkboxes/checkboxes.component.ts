@@ -29,7 +29,7 @@ export class CheckboxesComponent implements ControlValueAccessor {
   @Input() options!: FieldOption[];
   @Input() direction: 'row' | 'column' = 'row';
 
-  value!: (string | number | boolean)[];
+  value!: (string | number | boolean | null)[];
   disabled: boolean = false;
   saFormControlName?: SAFormControlNameDirective | null;
 
@@ -39,11 +39,11 @@ export class CheckboxesComponent implements ControlValueAccessor {
     });
   }
 
-  onChange: (value: any) => void = () => {};
+  onChange: (value: unknown) => void = () => {};
   onTouched: () => void = () => {};
 
   writeValue(value: string[]): void { this.value = value; }
-  registerOnChange(fn: (value: any) => void): void { this.onChange = fn; }
+  registerOnChange(fn: (value: unknown) => void): void { this.onChange = fn; }
   registerOnTouched(fn: () => void): void { this.onTouched = fn; }
   setDisabledState(isDisabled: boolean): void { this.disabled = isDisabled; }
 
@@ -53,7 +53,7 @@ export class CheckboxesComponent implements ControlValueAccessor {
     this.onTouched();
   }
 
-  private updateValue(returnValue: string | boolean | number | null): any {
+  private updateValue(returnValue: string | boolean | number | null): (string | number | boolean | null)[] {
     if (!this.value) return [returnValue];
     return this.value.find(x => x === returnValue)
       ? this.value.filter(x => x !== returnValue)

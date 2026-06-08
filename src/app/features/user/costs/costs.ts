@@ -44,7 +44,7 @@ export class CostsComponent implements OnInit {
   }
 
   async startAdd(): Promise<void> {
-    const value = await this.modal.open<any>(FormModalComponent, {
+    const value = await this.modal.open<{ date: string; name: string; category_id: number; amount: number }>(FormModalComponent, {
       type: 'center',
       width: '440px',
       data: {
@@ -106,12 +106,12 @@ export class CostsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
   async startEdit(row: Cost): Promise<void> {
-    const value = await this.modal.open<any>(FormModalComponent, {
+    const value = await this.modal.open<{ date: string; name: string; category_id: number; amount: number }>(FormModalComponent, {
       type: 'center',
       width: '440px',
       data: {
@@ -173,7 +173,7 @@ export class CostsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
@@ -196,7 +196,7 @@ export class CostsComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 

@@ -1,5 +1,6 @@
 import {
   Component,
+  DestroyRef,
   EventEmitter,
   forwardRef,
   Injector,
@@ -7,6 +8,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ControlValueAccessor,
   FormControl,
@@ -48,7 +50,7 @@ export class RangeComponent implements OnInit, ControlValueAccessor {
 
   rangeForm!: FormGroup;
 
-  @Output() inputChanged = new EventEmitter<any>();
+  @Output() inputChanged = new EventEmitter<string | number>();
 
   protected value: string | number = '';
   protected disabled: boolean = false;
@@ -57,6 +59,7 @@ export class RangeComponent implements OnInit, ControlValueAccessor {
   constructor(
     private injector: Injector,
     private formManagementService: FormManagementService,
+    private destroyRef: DestroyRef,
   ) {
     queueMicrotask((): void => {
       this.saFormControlName = this.injector.get(SAFormControlNameDirective, null);
@@ -66,7 +69,7 @@ export class RangeComponent implements OnInit, ControlValueAccessor {
   ngOnInit(): void {
     this.rangeForm = this.formManagementService.getRangeFormFieldForm();
 
-    this.rangeForm.valueChanges.subscribe(x => {
+    this.rangeForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(x => {
       const { minValue, maxValue } = x;
       if (minValue > maxValue) {
         this.rangeForm.patchValue({ maxValue: minValue }, { emitEvent: false });
@@ -77,14 +80,14 @@ export class RangeComponent implements OnInit, ControlValueAccessor {
     });
   }
 
-  onChange: (value: any) => void = () => {};
+  onChange: (value: unknown) => void = () => {};
   onTouched: () => void = () => {};
 
-  writeValue(value: any): void {
-    if (value !== undefined) this.value = value;
+  writeValue(value: unknown): void {
+    if (value !== undefined) this.value = value as string | number;
   }
 
-  registerOnChange(fn: (value: any) => void): void { this.onChange = fn; }
+  registerOnChange(fn: (value: unknown) => void): void { this.onChange = fn; }
   registerOnTouched(fn: () => void): void { this.onTouched = fn; }
   setDisabledState(isDisabled: boolean): void { this.disabled = isDisabled; }
 

@@ -5,24 +5,35 @@ import { RequestService } from './request.service';
 import { ApiResponse } from '../models/api-response.model';
 import { Harvest } from '../models/harvest.model';
 
+/** Raw harvest record payload as returned by the API (snake_case). */
+interface HarvestPayload {
+  id: number;
+  date: Harvest['date'];
+  honey_type: Harvest['honey_type'];
+  honey_description?: Harvest['honey_description'];
+  food_quantity: Harvest['food_quantity'];
+  unit: Harvest['unit'];
+  beehive_id: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class HarvestService {
   private request = inject(RequestService);
 
   getAllHarvest(): Observable<ApiResponse<Harvest[]>> {
-    return this.request.getRequest<any[]>('harvest').pipe(
+    return this.request.getRequest<HarvestPayload[]>('harvest').pipe(
       map(res => ({ ...res, data: res.data.map(this.fromApi) }))
     );
   }
 
   getHarvestOfApiary(apiaryId: number): Observable<ApiResponse<Harvest[]>> {
-    return this.request.getRequest<any[]>(`harvest/apiary/${apiaryId}`).pipe(
+    return this.request.getRequest<HarvestPayload[]>(`harvest/apiary/${apiaryId}`).pipe(
       map(res => ({ ...res, data: res.data.map(this.fromApi) }))
     );
   }
 
   getHarvestOfBeehive(beehiveId: number): Observable<ApiResponse<Harvest[]>> {
-    return this.request.getRequest<any[]>(`harvest/beehive/${beehiveId}`).pipe(
+    return this.request.getRequest<HarvestPayload[]>(`harvest/beehive/${beehiveId}`).pipe(
       map(res => ({ ...res, data: res.data.map(this.fromApi) }))
     );
   }
@@ -47,7 +58,7 @@ export class HarvestService {
     return this.request.deleteRequest<void>(`records/apiary/${apiaryId}/${date}`);
   }
 
-  private fromApi = (r: any): Harvest => ({
+  private fromApi = (r: HarvestPayload): Harvest => ({
     id: r.id,
     date: r.date,
     honey_type: r.honey_type,

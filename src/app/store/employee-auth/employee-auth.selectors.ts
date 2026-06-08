@@ -4,8 +4,8 @@ import { EMPLOYEE_ROLE_HIERARCHY, EmployeeAuthState } from './employee-auth.stat
 export const selectEmployeeAuthState = createFeatureSelector<EmployeeAuthState>('employeeAuth');
 
 export const selectCurrentEmployee = createSelector(selectEmployeeAuthState, (s) => s.employee);
-export const selectEmployeeToken = createSelector(selectEmployeeAuthState, (s) => s.token);
-export const selectIsEmployeeLoggedIn = createSelector(selectEmployeeAuthState, (s) => !!s.token);
+// Auth token now lives in an HttpOnly cookie; login state derives from the employee object.
+export const selectIsEmployeeLoggedIn = createSelector(selectEmployeeAuthState, (s) => !!s.employee);
 export const selectEmployeeAuthLoading = createSelector(selectEmployeeAuthState, (s) => s.loading);
 export const selectEmployeeAuthError = createSelector(selectEmployeeAuthState, (s) => s.error);
 export const selectEmployeeTwoFactorToken = createSelector(selectEmployeeAuthState, (s) => s.twoFactorToken);

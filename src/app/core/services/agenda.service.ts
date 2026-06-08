@@ -1,26 +1,38 @@
 import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { RequestService } from './request.service';
-import { ApiResponse } from '../models/api-response.model';
 import { AgendaItem } from '../models/agenda-item.model';
+
+/** Raw agenda item payload as returned by the API (snake_case). */
+interface AgendaPayload {
+  type: AgendaItem['type'];
+  title: AgendaItem['title'];
+  subtitle: AgendaItem['subtitle'];
+  scheduled_date: string;
+  is_overdue?: boolean;
+  entity_type: string;
+  entity_id: number;
+  session_id?: number;
+  apiary_id?: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AgendaService {
   private request = inject(RequestService);
 
   getAll(): Observable<AgendaItem[]> {
-    return this.request.getRequest<any[]>('agenda').pipe(
-      map((res: ApiResponse<any[]>) => (res.data ?? []).map(i => this.fromApi(i)))
+    return this.request.getRequest<AgendaPayload[]>('agenda').pipe(
+      map((res) => (res.data ?? []).map(i => this.fromApi(i)))
     );
   }
 
   getByApiary(apiaryId: number): Observable<AgendaItem[]> {
-    return this.request.getRequest<any[]>(`agenda?apiary_id=${apiaryId}`).pipe(
-      map((res: ApiResponse<any[]>) => (res.data ?? []).map(i => this.fromApi(i)))
+    return this.request.getRequest<AgendaPayload[]>(`agenda?apiary_id=${apiaryId}`).pipe(
+      map((res) => (res.data ?? []).map(i => this.fromApi(i)))
     );
   }
 
-  private fromApi(i: any): AgendaItem {
+  private fromApi(i: AgendaPayload): AgendaItem {
     return {
       type:          i.type,
       title:         i.title,

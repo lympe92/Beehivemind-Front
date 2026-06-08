@@ -85,7 +85,7 @@ export class CouponsComponent implements OnInit {
       code: c.code,
       type: c.type,
       value: c.value,
-      value_unit: (c.value_unit as any) ?? 'days',
+      value_unit: (c.value_unit as 'days' | 'months') ?? 'days',
       max_uses: c.max_uses ? String(c.max_uses) : '',
       expires_at: c.expires_at ? c.expires_at.slice(0, 16) : '',
       is_active: c.is_active,
@@ -96,7 +96,7 @@ export class CouponsComponent implements OnInit {
   }
 
   submitForm(): void {
-    const payload: any = {
+    const payload: Record<string, unknown> = {
       code: this.form.code,
       type: this.form.type,
       value: Number(this.form.value),
@@ -105,7 +105,7 @@ export class CouponsComponent implements OnInit {
       is_active: this.form.is_active,
     };
     if (this.form.type === 'free_period') {
-      payload.value_unit = this.form.value_unit;
+      payload['value_unit'] = this.form.value_unit;
     }
 
     const req = this.formMode() === 'create'

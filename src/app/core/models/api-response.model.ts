@@ -3,7 +3,7 @@ export interface ApiResponse<T> {
   code: number;
   message: string;
   data: T;
-  errors?: any; // todo Define type
+  errors?: Record<string, string[]>;
   meta?: Metadata;
 }
 

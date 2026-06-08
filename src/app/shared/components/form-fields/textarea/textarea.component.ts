@@ -37,14 +37,14 @@ export class TextareaComponent implements ControlValueAccessor {
     });
   }
 
-  onChange: (value: any) => void = () => {};
+  onChange: (value: unknown) => void = () => {};
   onTouched: () => void = () => {};
 
-  writeValue(value: any): void {
-    if (value !== undefined) this.value = value;
+  writeValue(value: unknown): void {
+    if (value !== undefined) this.value = value as string;
   }
 
-  registerOnChange(fn: (value: any) => void): void { this.onChange = fn; }
+  registerOnChange(fn: (value: unknown) => void): void { this.onChange = fn; }
   registerOnTouched(fn: () => void): void { this.onTouched = fn; }
   setDisabledState(isDisabled: boolean): void { this.disabled = isDisabled; }
 

@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RequestService } from '../../../../core/services/request.service';
@@ -15,6 +16,7 @@ import { DataTableComponent, ColumnDef, TablePagination } from '../../../../shar
 export class RawListComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private request = inject(RequestService);
+  private destroyRef = inject(DestroyRef);
 
   modelKey = signal('');
   config = computed<ModelConfig | null>(() => RAW_MODELS[this.modelKey()] ?? null);
@@ -37,7 +39,7 @@ export class RawListComponent implements OnInit {
     return { page: this.page(), totalPages: lp, total: this.total() };
   });
 
-  rows = signal<any[]>([]);
+  rows = signal<Record<string, unknown>[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
   total = signal(0);
@@ -49,14 +51,14 @@ export class RawListComponent implements OnInit {
   showModal = signal(false);
   isEditing = signal(false);
   editingId = signal<number | null>(null);
-  formData = signal<Record<string, any>>({});
+  formData = signal<Record<string, unknown>>({});
   formError = signal<string | null>(null);
   formLoading = signal(false);
 
   deleteConfirmId = signal<number | null>(null);
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       this.modelKey.set(params.get('model') ?? '');
       this.page.set(1);
       this.search = '';
@@ -72,19 +74,23 @@ export class RawListComponent implements OnInit {
     const params = new URLSearchParams({ page: String(this.page()) });
     if (this.search) params.set('search', this.search);
 
-    this.request.getRequest<any>(`admin/raw/${cfg.endpoint}?${params}`).subscribe({
-      next: (res) => {
-        const paginated = res.data;
-        this.rows.set(paginated.data ?? []);
-        this.total.set(paginated.total ?? 0);
-        this.lastPage.set(paginated.last_page ?? 1);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.error.set('Failed to load data');
-        this.loading.set(false);
-      },
-    });
+    this.request
+      .getRequest<{ data: Record<string, unknown>[]; total: number; last_page: number }>(
+        `admin/raw/${cfg.endpoint}?${params}`,
+      )
+      .subscribe({
+        next: (res) => {
+          const paginated = res.data;
+          this.rows.set(paginated.data ?? []);
+          this.total.set(paginated.total ?? 0);
+          this.lastPage.set(paginated.last_page ?? 1);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.error.set('Failed to load data');
+          this.loading.set(false);
+        },
+      });
   }
 
   onSearch(): void {
@@ -100,7 +106,7 @@ export class RawListComponent implements OnInit {
   openCreate(): void {
     const cfg = this.config();
     if (!cfg) return;
-    const initial: Record<string, any> = {};
+    const initial: Record<string, unknown> = {};
     cfg.fields.forEach((f) => { initial[f.key] = f.type === 'boolean' ? false : ''; });
     this.formData.set(initial);
     this.isEditing.set(false);
@@ -109,21 +115,21 @@ export class RawListComponent implements OnInit {
     this.showModal.set(true);
   }
 
-  openEdit(row: any): void {
+  openEdit(row: Record<string, unknown>): void {
     const cfg = this.config();
     if (!cfg) return;
-    const data: Record<string, any> = {};
+    const data: Record<string, unknown> = {};
     cfg.fields.filter((f) => !f.createOnly).forEach((f) => { data[f.key] = row[f.key] ?? ''; });
     this.formData.set(data);
     this.isEditing.set(true);
-    this.editingId.set(row.id);
+    this.editingId.set(Number(row['id']));
     this.formError.set(null);
     this.showModal.set(true);
   }
 
-  getField(key: string): any { return this.formData()[key]; }
+  getField(key: string): unknown { return this.formData()[key]; }
 
-  setField(key: string, value: any): void {
+  setField(key: string, value: unknown): void {
     this.formData.update((d) => ({ ...d, [key]: value }));
   }
 
@@ -169,7 +175,7 @@ export class RawListComponent implements OnInit {
     });
   }
 
-  formatCell(value: any): string {
+  formatCell(value: unknown): string {
     if (value === null || value === undefined) return '—';
     if (typeof value === 'boolean') return value ? '✓' : '✗';
     if (Array.isArray(value)) return value.join(', ');

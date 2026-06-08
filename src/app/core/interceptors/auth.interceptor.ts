@@ -1,24 +1,15 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { exhaustMap, take } from 'rxjs';
-import { selectToken } from '../../store/auth/auth.selectors';
 import { environment } from '../../../environments/environment';
 
+/**
+ * Authentication is carried by an HttpOnly cookie set by the backend, so the
+ * token is never exposed to JavaScript. We only need to send credentials on
+ * our own API calls; the cookie does the rest. Admin/employee endpoints use a
+ * separate cookie, but the backend selects it by route — the frontend just
+ * needs credentials enabled here too.
+ */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // Only attach the user token to our own API calls...
   if (!req.url.startsWith(environment.apiUrl)) return next(req);
 
-  // ...and never to admin/employee endpoints — those are handled by employeeInterceptor.
-  if (req.url.includes('/api/admin') || req.url.includes('/api/employee')) return next(req);
-
-  const store = inject(Store);
-
-  return store.select(selectToken).pipe(
-    take(1),
-    exhaustMap((token) => {
-      if (!token) return next(req);
-      return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
-    }),
-  );
+  return next(req.clone({ withCredentials: true }));
 };

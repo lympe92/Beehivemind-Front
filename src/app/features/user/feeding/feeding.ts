@@ -94,7 +94,15 @@ export class FeedingComponent implements OnInit {
     const apiaries = this.apiaries();
     const allBeehives = this.allBeehives();
 
-    const value = await this.modal.open<any>(FormModalComponent, {
+    const value = await this.modal.open<{
+      apiary_id: number;
+      beehive_id: number | null;
+      date: string;
+      feeding_type: FeedingType;
+      food_type: FoodType;
+      food_quantity: number;
+      unit: FeedingUnit;
+    }>(FormModalComponent, {
       type: 'center',
       width: '640px',
       data: {
@@ -116,7 +124,7 @@ export class FeedingComponent implements OnInit {
             size: 'half',
             value: this.selectedBeehiveId() || null,
             cascadeFrom: 'apiary_id',
-            options: (apiaryId: number) => of([
+            options: (apiaryId: unknown) => of([
               { displayValue: '— All beehives —', returnValue: null },
               ...allBeehives
                 .filter(b => b.apiaryId === apiaryId)
@@ -207,14 +215,22 @@ export class FeedingComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
   // ── Edit ─────────────────────────────────────────────────
 
   async startEdit(row: Feeding): Promise<void> {
-    const value = await this.modal.open<any>(FormModalComponent, {
+    const value = await this.modal.open<{
+      apiary_id: number;
+      beehive_id: number | null;
+      date: string;
+      feeding_type: FeedingType;
+      food_type: FoodType;
+      food_quantity: number;
+      unit: FeedingUnit;
+    }>(FormModalComponent, {
       type: 'center',
       width: '640px',
       data: {
@@ -283,7 +299,7 @@ export class FeedingComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
@@ -308,7 +324,7 @@ export class FeedingComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 }

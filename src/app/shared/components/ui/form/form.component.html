@@ -1,5 +1,5 @@
-<form [formGroup]="form" class="form-container" [class.loading]="loading">
-  @for (field of fields; track field.name) {
+<form [formGroup]="form" class="form-container" [class.loading]="loading()">
+  @for (field of fields(); track field.name) {
     <div [ngClass]="field.size" class="field-wrap">
       @if (field.type === 'text' || field.type === 'number' || field.type === 'email' || field.type === 'password' || field.type === 'date') {
         <app-form-input
@@ -59,7 +59,7 @@
   }
   <div class="button-container">
     <app-button variant="primary" type="submit" (click)="submit()">
-      {{ submitLabel }}
+      {{ submitLabel() }}
     </app-button>
   </div>
 </form>

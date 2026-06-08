@@ -98,7 +98,15 @@ export class HarvestComponent implements OnInit {
     const apiaries = this.apiaries();
     const allBeehives = this.allBeehives();
 
-    const value = await this.modal.open<any>(FormModalComponent, {
+    const value = await this.modal.open<{
+      apiary_id: number;
+      beehive_id: number | null;
+      date: string;
+      honey_type: HarvestType;
+      honey_description?: string;
+      food_quantity: number;
+      unit: HarvestUnit;
+    }>(FormModalComponent, {
       type: 'center',
       width: '640px',
       data: {
@@ -120,7 +128,7 @@ export class HarvestComponent implements OnInit {
             size: 'half',
             value: this.selectedBeehiveId() || null,
             cascadeFrom: 'apiary_id',
-            options: (apiaryId: number) => of([
+            options: (apiaryId: unknown) => of([
               { displayValue: '— All beehives —', returnValue: null },
               ...allBeehives
                 .filter(b => b.apiaryId === apiaryId)
@@ -209,14 +217,22 @@ export class HarvestComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
   // ── Edit ─────────────────────────────────────────────────
 
   async startEdit(row: Harvest): Promise<void> {
-    const value = await this.modal.open<any>(FormModalComponent, {
+    const value = await this.modal.open<{
+      apiary_id: number;
+      beehive_id: number | null;
+      date: string;
+      honey_type: HarvestType;
+      honey_description?: string;
+      food_quantity: number;
+      unit: HarvestUnit;
+    }>(FormModalComponent, {
       type: 'center',
       width: '640px',
       data: {
@@ -283,7 +299,7 @@ export class HarvestComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
@@ -308,7 +324,7 @@ export class HarvestComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 

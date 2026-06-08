@@ -1,9 +1,11 @@
-import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { combineLatest } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { EmployeeAuthActions } from '../../../store/employee-auth/employee-auth.actions';
 import {
@@ -29,6 +31,7 @@ export class AdminLoginComponent implements OnInit {
   private router = inject(Router);
   private employeeAuthService = inject(EmployeeAuthService);
   private platformId = inject(PLATFORM_ID);
+  private destroyRef = inject(DestroyRef);
 
   loading$ = this.store.select(selectEmployeeAuthLoading);
   error$ = this.store.select(selectEmployeeAuthError);
@@ -55,18 +58,22 @@ export class AdminLoginComponent implements OnInit {
   backupCode = '';
 
   ngOnInit(): void {
-    this.store.select(selectIsEmployeeLoggedIn).subscribe((loggedIn) => {
-      if (loggedIn) this.router.navigate(['/admin/dashboard']);
-    });
+    this.store
+      .select(selectIsEmployeeLoggedIn)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((loggedIn) => {
+        if (loggedIn) this.router.navigate(['/admin/dashboard']);
+      });
 
-    // When step becomes 'setup', fetch the QR
-    this.store.select(selectEmployeeTwoFactorStep).subscribe((step) => {
-      if (step === 'setup') {
-        this.store.select(selectEmployeeTwoFactorToken).subscribe((token) => {
-          if (token) this.loadSetup(token);
-        }).unsubscribe();
-      }
-    });
+    // When step becomes 'setup', fetch the QR with the current temp token
+    combineLatest([
+      this.store.select(selectEmployeeTwoFactorStep),
+      this.store.select(selectEmployeeTwoFactorToken),
+    ])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([step, token]) => {
+        if (step === 'setup' && token) this.loadSetup(token);
+      });
   }
 
   submit(): void {

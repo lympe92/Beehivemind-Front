@@ -13,7 +13,7 @@ export interface ValidatorConfig {
 export interface SyncValidatorDefinition {
   validator: (
     control: AbstractControl,
-    arg?: any,
+    arg?: unknown,
   ) => ValidationErrors | null | Promise<ValidationErrors | null>;
   message: string;
 }

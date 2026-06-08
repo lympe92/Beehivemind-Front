@@ -4,8 +4,9 @@ import { AuthState } from './auth.state';
 export const selectAuthState = createFeatureSelector<AuthState>('auth');
 
 export const selectCurrentUser = createSelector(selectAuthState, (state) => state.user);
-export const selectToken = createSelector(selectAuthState, (state) => state.token);
-export const selectIsLoggedIn = createSelector(selectAuthState, (state) => !!state.token);
+// Auth token now lives in an HttpOnly cookie (not in JS-readable state); login
+// state is derived from the presence of the user object.
+export const selectIsLoggedIn = createSelector(selectAuthState, (state) => !!state.user);
 export const selectAuthLoading = createSelector(selectAuthState, (state) => state.loading);
 export const selectAuthError = createSelector(selectAuthState, (state) => state.error);
 

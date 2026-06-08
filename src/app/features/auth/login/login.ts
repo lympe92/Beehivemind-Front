@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -19,12 +20,14 @@ import { environment } from '../../../../environments/environment';
   imports: [ReactiveFormsModule, AsyncPipe, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent implements OnInit {
   private store = inject(Store);
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
+  private destroyRef = inject(DestroyRef);
 
   loading$ = this.store.select(selectAuthLoading);
   error$ = this.store.select(selectAuthError);
@@ -36,9 +39,12 @@ export class LoginComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.store.select(selectIsLoggedIn).subscribe((loggedIn) => {
-      if (loggedIn) this.router.navigate(['/user/dashboard']);
-    });
+    this.store
+      .select(selectIsLoggedIn)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((loggedIn) => {
+        if (loggedIn) this.router.navigate(['/user/dashboard']);
+      });
 
     if (isPlatformBrowser(this.platformId)) {
       this.loadGoogleSignIn();
@@ -66,7 +72,19 @@ export class LoginComponent implements OnInit {
   }
 
   private initGsi(): void {
-    const g = (window as any).google;
+    const g = (window as unknown as {
+      google?: {
+        accounts?: {
+          id?: {
+            initialize(config: {
+              client_id: string;
+              callback: (response: { credential: string }) => void;
+            }): void;
+            renderButton(parent: HTMLElement, options: Record<string, unknown>): void;
+          };
+        };
+      };
+    }).google;
     if (!g?.accounts?.id) return;
 
     g.accounts.id.initialize({

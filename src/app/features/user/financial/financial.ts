@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { catchError, forkJoin, of } from 'rxjs';
 import { ApexOptions } from 'ngx-apexcharts';
 import { CostCategory } from '../../../core/models/cost-category.model';
 import { CostByCategory, MonthlyCost, YearCostSum } from '../../../core/models/cost.model';
@@ -18,6 +19,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
   imports: [ApexChartComponent, CardComponent, CostCategoriesComponent, CostsComponent],
   templateUrl: './financial.html',
   styleUrl: './financial.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FinancialComponent implements OnInit {
   private costCategoryService = inject(CostCategoryService);
@@ -106,12 +108,19 @@ export class FinancialComponent implements OnInit {
 
   private loadCharts(): void {
     this.chartsLoading.set(true);
-    let pending = 4;
-    const done = () => { if (--pending === 0) this.chartsLoading.set(false); };
 
-    this.costService.getMonthlyCosts().subscribe({ next: res => { if (res.success) this.monthlyCosts.set(res.data); done(); }, error: done });
-    this.costService.getYearCostSum().subscribe({ next: res => { if (res.success) this.yearSum.set(res.data); done(); }, error: done });
-    this.costService.getIncomeCostsByCategory().subscribe({ next: res => { if (res.success) this.incomeCosts.set(res.data); done(); }, error: done });
-    this.costService.getOutcomeCostsByCategory().subscribe({ next: res => { if (res.success) this.outcomeCosts.set(res.data); done(); }, error: done });
+    // Each request fails independently — one error doesn't drop the other charts.
+    forkJoin({
+      monthly: this.costService.getMonthlyCosts().pipe(catchError(() => of(null))),
+      yearSum: this.costService.getYearCostSum().pipe(catchError(() => of(null))),
+      income: this.costService.getIncomeCostsByCategory().pipe(catchError(() => of(null))),
+      outcome: this.costService.getOutcomeCostsByCategory().pipe(catchError(() => of(null))),
+    }).subscribe(({ monthly, yearSum, income, outcome }) => {
+      if (monthly?.success) this.monthlyCosts.set(monthly.data);
+      if (yearSum?.success) this.yearSum.set(yearSum.data);
+      if (income?.success) this.incomeCosts.set(income.data);
+      if (outcome?.success) this.outcomeCosts.set(outcome.data);
+      this.chartsLoading.set(false);
+    });
   }
 }

@@ -4,7 +4,7 @@ export interface FieldConfig {
   key: string;
   label: string;
   type: FieldType;
-  options?: { value: any; label: string }[];
+  options?: { value: string | number | boolean; label: string }[];
   required?: boolean;
   createOnly?: boolean; // show only on create form
 }

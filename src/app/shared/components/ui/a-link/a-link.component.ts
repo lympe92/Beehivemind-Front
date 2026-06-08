@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
 })
 export class ALinkComponent {
   readonly routerLink = input<string[]>();
-  readonly queryParams = input<{ [key: string]: any }>();
+  readonly queryParams = input<{ [key: string]: unknown }>();
   readonly fragment = input<string>();
   readonly target = input<string>('_self');
   readonly ariaLabel = input<string>('');

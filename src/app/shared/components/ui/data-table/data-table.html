@@ -11,8 +11,8 @@
       </tr>
     </thead>
     <tbody>
-      @for (row of rows; track row.id; let idx = $index) {
-        @if (editingId === row.id && editRowTpl) {
+      @for (row of rows; track $any(row).id; let idx = $index) {
+        @if (editingId === $any(row).id && editRowTpl) {
           <tr class="dt__row--editing">
             <ng-container
               [ngTemplateOutlet]="editRowTpl"
@@ -31,7 +31,7 @@
                     [ngTemplateOutletContext]="{ $implicit: row, col: col, index: idx }">
                   </ng-container>
                 } @else {
-                  {{ row[col.key] ?? '—' }}
+                  {{ $any(row)[col.key] ?? '—' }}
                 }
               </td>
             }

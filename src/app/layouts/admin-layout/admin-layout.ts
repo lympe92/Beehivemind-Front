@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AsyncPipe } from '@angular/common';
@@ -17,6 +17,7 @@ import {
   imports: [RouterOutlet, RouterLink, RouterLinkActive, AsyncPipe],
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminLayoutComponent {
   private store = inject(Store);

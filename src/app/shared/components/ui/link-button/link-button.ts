@@ -14,6 +14,6 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 export class LinkButtonComponent {
   variant = input<ButtonVariant>('primary');
   size = input<ButtonSize>('md');
-  routerLink = input.required<string | any[]>();
+  routerLink = input.required<string | unknown[]>();
   fullWidth = input<boolean>(false);
 }

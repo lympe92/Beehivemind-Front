@@ -31,16 +31,22 @@ export function createHydrationMetaReducer(platformId: object) {
 
       const nextState = reducer(state, action);
 
-      // Persist only the essentials — skip loading/error flags
+      // Persist the user/employee object only — tokens live in HttpOnly cookies
+      // and must never touch localStorage (XSS-safe).
       try {
         const snapshot: PersistedState = {
           auth: {
             ...nextState.auth,
+            token: null,
+            pendingToken: null,
+            twoFactorToken: null,
             loading: false,
             error: null,
           },
           employeeAuth: {
             ...nextState.employeeAuth,
+            token: null,
+            twoFactorToken: null,
             loading: false,
             error: null,
           },

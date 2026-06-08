@@ -39,11 +39,11 @@ export class RadioComponent implements ControlValueAccessor {
     });
   }
 
-  onChange: (value: any) => void = () => {};
+  onChange: (value: unknown) => void = () => {};
   onTouched: () => void = () => {};
 
   writeValue(value: string | null): void { this.value = value; }
-  registerOnChange(fn: (value: any) => void): void { this.onChange = fn; }
+  registerOnChange(fn: (value: unknown) => void): void { this.onChange = fn; }
   registerOnTouched(fn: () => void): void { this.onTouched = fn; }
   setDisabledState(isDisabled: boolean): void { this.disabled = isDisabled; }
 

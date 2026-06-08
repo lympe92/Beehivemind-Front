@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { FormControl, FormGroup, UntypedFormBuilder } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, UntypedFormBuilder } from '@angular/forms';
 import { DynamicField } from '../models/form.model';
-import { syncValidators } from '../../shared/components/ui/form/validators.config';
 
 export type ConditionOperator =
   | 'equals'
@@ -32,7 +31,7 @@ export class FormManagementService {
   constructor(private fb: UntypedFormBuilder) {}
 
   getDynamicForm(fields: DynamicField[]): FormGroup {
-    const group: any = {};
+    const group: Record<string, AbstractControl> = {};
     fields.forEach(f => {
       group[f.name] = new FormControl(
         {
@@ -48,8 +47,8 @@ export class FormManagementService {
     return new FormGroup(group);
   }
 
-  private getRightFormControlValue(field: DynamicField): any {
-    if (field.type === 'date') return field.value?.split('T')[0] || '';
+  private getRightFormControlValue(field: DynamicField): unknown {
+    if (field.type === 'date') return (field.value as string | undefined)?.split('T')[0] || '';
     return field.value ?? null;
   }
 
@@ -92,7 +91,7 @@ export class FormManagementService {
     });
   }
 
-  private evaluateCondition(operator: ConditionOperator, value: any, triggerValue: any): boolean {
+  private evaluateCondition(operator: ConditionOperator, value: unknown, triggerValue: unknown): boolean {
     switch (operator) {
       case 'equals':            return triggerValue === value;
       case 'notEquals':         return triggerValue !== value;

@@ -69,7 +69,14 @@ export class ApiaryComponent implements OnInit {
   async startAdd(): Promise<void> {
     const existingNames = this.allApiaries().map(a => a.name);
 
-    const value = await this.modal.open<any>(ApiaryFormModalComponent, {
+    const value = await this.modal.open<{
+      name: string;
+      hivesNumber: number;
+      latitude: number;
+      longitude: number;
+      location?: string | null;
+      dateEstablished?: string | null;
+    }>(ApiaryFormModalComponent, {
       type: 'center',
       width: '640px',
       data: {},
@@ -98,14 +105,21 @@ export class ApiaryComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
   // ── Edit ─────────────────────────────────────────────────
 
   async startEdit(apiary: Apiary): Promise<void> {
-    const value = await this.modal.open<any>(ApiaryFormModalComponent, {
+    const value = await this.modal.open<{
+      name: string;
+      hivesNumber: number;
+      latitude: number;
+      longitude: number;
+      location?: string | null;
+      dateEstablished?: string | null;
+    }>(ApiaryFormModalComponent, {
       type: 'center',
       width: '640px',
       data: { apiary },
@@ -129,7 +143,7 @@ export class ApiaryComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 
@@ -153,7 +167,7 @@ export class ApiaryComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => this.toast.error('Something went wrong. Please try again.'),
+      error: () => {},
     });
   }
 

@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  input,
+  OnInit,
+  output,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { AsyncPipe, NgClass } from '@angular/common';
 import { FormManagementService } from '../../../../core/services/forms-management.service';
@@ -32,22 +41,24 @@ import { ButtonComponent } from '../button/button';
   ],
   templateUrl: './form.component.html',
   styleUrl: './form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormComponent implements OnInit {
-  @Input() fields: DynamicField[] = [];
-  @Input() submitLabel: string = 'Submit';
-  @Input() loading: boolean = false;
+  private formManagementService = inject(FormManagementService);
+  private destroyRef = inject(DestroyRef);
 
-  @Output() submitForm = new EventEmitter<any>();
+  readonly fields = input<DynamicField[]>([]);
+  readonly submitLabel = input<string>('Submit');
+  readonly loading = input<boolean>(false);
+
+  readonly submitForm = output<Record<string, unknown>>();
 
   form!: FormGroup;
 
-  constructor(private formManagementService: FormManagementService) {}
-
   ngOnInit(): void {
-    this.form = this.formManagementService.getDynamicForm(this.fields);
-    this.form.valueChanges.subscribe(() => {
-      this.formManagementService.disableFieldsIfNeeded(this.form, this.fields);
+    this.form = this.formManagementService.getDynamicForm(this.fields());
+    this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.formManagementService.disableFieldsIfNeeded(this.form, this.fields());
     });
   }
 

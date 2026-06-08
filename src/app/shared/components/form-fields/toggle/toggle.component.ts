@@ -42,7 +42,7 @@ export class ToggleComponent implements ControlValueAccessor, OnInit {
   onChange: (value: boolean) => void = () => {};
   onTouched: () => void = () => {};
 
-  writeValue(value: any): void {
+  writeValue(value: unknown): void {
     this.checked = !!value;
   }
 

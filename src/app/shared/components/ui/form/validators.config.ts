@@ -45,7 +45,7 @@ export const syncValidators = {
 };
 
 export const asyncValidators = {
-  apiValidator: (http: HttpClient, urlPath: string, mapperRes: (res: any) => boolean) =>
+  apiValidator: (http: HttpClient, urlPath: string, mapperRes: (res: unknown) => boolean) =>
     (control: AbstractControl): Observable<ValidationErrors | null> => {
       if (!control.dirty && control.pristine) return of(null);
       if (!control.value) return of({ apiValidator: true });
