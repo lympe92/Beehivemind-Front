@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://your-api-domain.com/api/',
+  apiUrl: 'https://api.beehivemind.tech/api/',
   appUrl: 'https://beehivemind.tech',
   appName: 'BeehiveMind',
   googleMapsApiKey: 'AIzaSyDKZMFseSM5hgOWKr4a8sPFgmN8m5drFLM',
