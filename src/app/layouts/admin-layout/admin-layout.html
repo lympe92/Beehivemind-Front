@@ -61,6 +61,10 @@
           </div>
         }
       }
+      <a routerLink="/admin/profile" routerLinkActive="active" class="sidebar__link" title="My Profile">
+        <span class="icon">⚙️</span>
+        @if (sidebarOpen()) { <span>Profile</span> }
+      </a>
       <button class="sidebar__logout" (click)="logout()" title="Logout">
         <span>🚪</span>
       </button>

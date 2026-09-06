@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { RequestService } from './request.service';
 import { Employee } from '../../store/employee-auth/employee-auth.state';
+import { ApiResponse } from '../models/api-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class EmployeeAuthService {
@@ -47,5 +48,13 @@ export class EmployeeAuthService {
     return this.request
       .postRequest<{ token: string; employee: Employee }>('employee/2fa/verify', { two_factor_token: twoFactorToken, ...payload })
       .pipe(map((res) => ({ employee: res.data.employee, token: res.data.token })));
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<ApiResponse<null>> {
+    return this.request.putRequest<null>('employee/change-password', {
+      current_password: currentPassword,
+      new_password: newPassword,
+      new_password_confirmation: newPassword,
+    });
   }
 }

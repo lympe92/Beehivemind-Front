@@ -8,6 +8,11 @@ export const adminRoutes: Routes = [
       import('./dashboard/dashboard').then((m) => m.AdminDashboardComponent),
   },
   {
+    path: 'profile',
+    loadComponent: () =>
+      import('./profile/profile').then((m) => m.AdminProfileComponent),
+  },
+  {
     path: 'users',
     loadComponent: () =>
       import('./user-management/user-management').then((m) => m.UserManagementComponent),

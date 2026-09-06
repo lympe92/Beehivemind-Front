@@ -1,0 +1,42 @@
+<div class="admin-profile">
+  <div class="page-header">
+    <h2>My Profile</h2>
+  </div>
+
+  <div class="panel">
+    <h3>Change Password</h3>
+
+    @if (successMessage()) {
+      <div class="state-msg state-msg--success">{{ successMessage() }}</div>
+    }
+    @if (errorMessage()) {
+      <div class="state-msg state-msg--error">{{ errorMessage() }}</div>
+    }
+
+    <div class="form-group">
+      <label>Current Password</label>
+      <input type="password" [(ngModel)]="form.current_password" name="cur_pw" placeholder="Current password" />
+    </div>
+
+    <div class="form-group">
+      <label>New Password</label>
+      <input type="password" [(ngModel)]="form.new_password" name="new_pw" placeholder="Min. 8 chars, uppercase, lowercase, number" />
+      @if (form.new_password) {
+        @for (rule of passwordErrors; track rule.key) {
+          <small class="field-error">{{ rule.message }}</small>
+        }
+      }
+    </div>
+
+    <div class="form-group">
+      <label>Confirm New Password</label>
+      <input type="password" [(ngModel)]="form.confirm_password" name="conf_pw" placeholder="Repeat new password" />
+    </div>
+
+    <div class="panel__actions">
+      <button class="btn btn--primary" (click)="savePassword()" [disabled]="saving()">
+        {{ saving() ? 'Saving...' : 'Change Password' }}
+      </button>
+    </div>
+  </div>
+</div>
