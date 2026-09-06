@@ -55,9 +55,9 @@ export class EmployeeManagementComponent implements OnInit {
 
   loadEmployees(): void {
     this.loading.set(true);
-    this.request.getRequest<{ data: AdminEmployee[] }>('admin/employees').subscribe({
+    this.request.getRequest<AdminEmployee[]>('admin/employees').subscribe({
       next: (res) => {
-        this.employees.set(res.data.data);
+        this.employees.set(res.data);
         this.loading.set(false);
       },
       error: () => {

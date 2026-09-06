@@ -18,11 +18,6 @@ interface AdminUser {
   created_at: string;
 }
 
-interface PaginatedResponse<T> {
-  data: T[];
-  meta: { total: number; page: number; per_page: number; total_pages: number };
-}
-
 @Component({
   selector: 'app-user-management',
   standalone: true,
@@ -66,10 +61,10 @@ export class UserManagementComponent implements OnInit {
     if (this.statusFilter) params.set('status', this.statusFilter);
     if (this.planFilter) params.set('plan', this.planFilter);
 
-    this.request.getRequest<PaginatedResponse<AdminUser>>(`admin/users?${params}`).subscribe({
+    this.request.getRequest<AdminUser[]>(`admin/users?${params}`).subscribe({
       next: (res) => {
-        this.users.set(res.data.data);
-        this.total.set(res.data.meta?.total ?? 0);
+        this.users.set(res.data);
+        this.total.set(res.meta?.total ?? 0);
         this.loading.set(false);
       },
       error: () => {

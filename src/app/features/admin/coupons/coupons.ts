@@ -61,9 +61,9 @@ export class CouponsComponent implements OnInit {
 
   loadCoupons(): void {
     this.loading.set(true);
-    this.request.getRequest<{ data: Coupon[] }>('admin/coupons').subscribe({
+    this.request.getRequest<Coupon[]>('admin/coupons').subscribe({
       next: (res) => {
-        this.coupons.set(res.data.data);
+        this.coupons.set(res.data);
         this.loading.set(false);
       },
       error: () => {

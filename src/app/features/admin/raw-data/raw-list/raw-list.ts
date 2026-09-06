@@ -75,15 +75,12 @@ export class RawListComponent implements OnInit {
     if (this.search) params.set('search', this.search);
 
     this.request
-      .getRequest<{ data: Record<string, unknown>[]; total: number; last_page: number }>(
-        `admin/raw/${cfg.endpoint}?${params}`,
-      )
+      .getRequest<Record<string, unknown>[]>(`admin/raw/${cfg.endpoint}?${params}`)
       .subscribe({
         next: (res) => {
-          const paginated = res.data;
-          this.rows.set(paginated.data ?? []);
-          this.total.set(paginated.total ?? 0);
-          this.lastPage.set(paginated.last_page ?? 1);
+          this.rows.set(res.data ?? []);
+          this.total.set(res.meta?.total ?? 0);
+          this.lastPage.set(res.meta?.total_pages ?? 1);
           this.loading.set(false);
         },
         error: () => {
