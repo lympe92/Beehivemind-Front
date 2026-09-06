@@ -58,12 +58,44 @@
             <button class="btn btn--sm btn--success" (click)="updateStatus(row.id, 'active')">Activate</button>
           }
           @if (row.status === 'active') {
-            <button class="btn btn--sm btn--warn" (click)="updateStatus(row.id, 'suspended')">Suspend</button>
+            <button class="btn btn--sm btn--warn" (click)="openSuspend(row)">Suspend</button>
             <button class="btn btn--sm btn--danger" (click)="updateStatus(row.id, 'banned')">Ban</button>
+          }
+          @if (isAtLeastAdmin()) {
+            <button class="btn btn--sm btn--danger" (click)="deleteUser(row)">Delete</button>
           }
         </ng-template>
 
       </app-data-table>
+    </div>
+  }
+
+  @if (suspendModalFor(); as user) {
+    <div class="modal-overlay" (click)="closeSuspendModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3>Suspend {{ user.name }} {{ user.surname }}</h3>
+
+        <div class="form-group form-group--inline">
+          <input type="radio" id="suspend_indefinite" name="suspend_mode" value="indefinite" [(ngModel)]="suspendMode" />
+          <label for="suspend_indefinite">Indefinitely</label>
+        </div>
+        <div class="form-group form-group--inline">
+          <input type="radio" id="suspend_until" name="suspend_mode" value="until" [(ngModel)]="suspendMode" />
+          <label for="suspend_until">Until a specific date</label>
+        </div>
+
+        @if (suspendMode === 'until') {
+          <div class="form-group">
+            <label>Suspended until</label>
+            <input type="datetime-local" [(ngModel)]="suspendUntil" />
+          </div>
+        }
+
+        <div class="modal__actions">
+          <button class="btn btn--secondary" (click)="closeSuspendModal()">Cancel</button>
+          <button class="btn btn--warn" (click)="confirmSuspend()" [disabled]="suspendMode === 'until' && !suspendUntil">Suspend</button>
+        </div>
+      </div>
     </div>
   }
 </div>

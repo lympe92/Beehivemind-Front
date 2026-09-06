@@ -4,7 +4,7 @@ import { SlicePipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RequestService } from '../../../core/services/request.service';
 import { Store } from '@ngrx/store';
-import { selectIsAtLeastModerator } from '../../../store/employee-auth/employee-auth.selectors';
+import { selectIsAtLeastModerator, selectIsAtLeastAdmin } from '../../../store/employee-auth/employee-auth.selectors';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 
 interface AdminUser {
@@ -30,6 +30,7 @@ export class UserManagementComponent implements OnInit {
   private store = inject(Store);
 
   isAtLeastModerator = toSignal(this.store.select(selectIsAtLeastModerator), { initialValue: false });
+  isAtLeastAdmin = toSignal(this.store.select(selectIsAtLeastAdmin), { initialValue: false });
 
   users = signal<AdminUser[]>([]);
   loading = signal(true);
@@ -40,6 +41,10 @@ export class UserManagementComponent implements OnInit {
   search = '';
   statusFilter = '';
   planFilter = '';
+
+  suspendModalFor = signal<AdminUser | null>(null);
+  suspendMode: 'indefinite' | 'until' = 'indefinite';
+  suspendUntil = '';
 
   readonly columns: ColumnDef[] = [
     { key: 'name', label: 'Name' },
@@ -79,14 +84,42 @@ export class UserManagementComponent implements OnInit {
     this.loadUsers();
   }
 
-  updateStatus(userId: number, status: string): void {
-    this.request.postRequest(`admin/users/${userId}/status`, { status }).subscribe({
+  updateStatus(userId: number, status: string, suspendedUntil: string | null = null): void {
+    const payload: Record<string, unknown> = { status };
+    if (status === 'suspended') payload['suspended_until'] = suspendedUntil;
+
+    this.request.patchRequest(`admin/users/${userId}/status`, payload).subscribe({
       next: () => this.loadUsers(),
     });
   }
 
+  openSuspend(user: AdminUser): void {
+    this.suspendModalFor.set(user);
+    this.suspendMode = 'indefinite';
+    this.suspendUntil = '';
+  }
+
+  closeSuspendModal(): void {
+    this.suspendModalFor.set(null);
+  }
+
+  confirmSuspend(): void {
+    const user = this.suspendModalFor();
+    if (!user) return;
+    const until = this.suspendMode === 'until' && this.suspendUntil ? this.suspendUntil : null;
+    this.updateStatus(user.id, 'suspended', until);
+    this.closeSuspendModal();
+  }
+
   forceConfirm(userId: number): void {
     this.request.postRequest(`admin/users/${userId}/force-confirm`, {}).subscribe({
+      next: () => this.loadUsers(),
+    });
+  }
+
+  deleteUser(user: AdminUser): void {
+    if (!confirm(`Permanently delete ${user.name} ${user.surname} (${user.email})? This cannot be undone — all their apiaries, beehives, and records will be deleted too.`)) return;
+    this.request.deleteRequest(`admin/users/${user.id}`).subscribe({
       next: () => this.loadUsers(),
     });
   }

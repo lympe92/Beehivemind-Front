@@ -92,6 +92,74 @@
     &--danger  { background: rgba(239,68,68,0.2);  color: #f87171; }
     &--info    { background: rgba(99,102,241,0.2); color: #818cf8; }
 
+    &--secondary { background: #334155; color: #f1f5f9; }
+
     &:hover { opacity: 0.8; }
+  }
+}
+
+// Modal
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 28px;
+  width: 100%;
+  max-width: 420px;
+
+  h3 {
+    color: #f1f5f9;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 20px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+
+    &--inline {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+
+    label {
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    input {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #f1f5f9;
+      font-size: 0.875rem;
+      padding: 8px 12px;
+      outline: none;
+
+      &[type="radio"] { width: 16px; height: 16px; padding: 0; }
+      &:focus { border-color: #f59e0b; }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
   }
 }
