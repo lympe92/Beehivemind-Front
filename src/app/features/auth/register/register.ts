@@ -9,6 +9,7 @@ import { AuthActions } from '../../../store/auth/auth.actions';
 import { selectIsLoggedIn } from '../../../store/auth/auth.selectors';
 import { environment } from '../../../../environments/environment';
 import { COUNTRIES, Country } from '../../../core/data/countries';
+import { getFailedPasswordRules, passwordStrengthValidator, PasswordRule } from '../../../shared/components/ui/form/password-rules';
 
 @Component({
   selector: 'app-auth-register',
@@ -35,11 +36,15 @@ export class RegisterComponent implements OnInit {
 
   countries: Country[] = COUNTRIES;
 
+  get passwordErrors(): PasswordRule[] {
+    return getFailedPasswordRules(this.form.controls['password'].value);
+  }
+
   form: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(55)]],
     surname: ['', [Validators.required, Validators.maxLength(55)]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    password: ['', [Validators.required, passwordStrengthValidator()]],
     country: [null],
     country_latitude: [null],
     country_longitude: [null],

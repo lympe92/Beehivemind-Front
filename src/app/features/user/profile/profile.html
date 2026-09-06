@@ -59,7 +59,12 @@
         }
         <div class="prof__form-group">
           <label class="prof__label">New Password</label>
-          <input class="prof__input" type="password" [(ngModel)]="passwordForm.new_password" name="new_pw" placeholder="Min. 8 characters" />
+          <input class="prof__input" type="password" [(ngModel)]="passwordForm.new_password" name="new_pw" placeholder="Min. 8 chars, uppercase, lowercase, number" />
+          @if (passwordForm.new_password) {
+            @for (rule of passwordErrors; track rule.key) {
+              <small class="prof__field-error">{{ rule.message }}</small>
+            }
+          }
         </div>
         <div class="prof__form-group">
           <label class="prof__label">Confirm New Password</label>

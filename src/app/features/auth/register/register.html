@@ -49,6 +49,11 @@
         <div class="form-group">
           <label>Password</label>
           <input type="password" formControlName="password" placeholder="Min. 8 characters" autocomplete="new-password" />
+          @if (form.controls['password'].touched) {
+            @for (rule of passwordErrors; track rule.key) {
+              <small class="form-error">{{ rule.message }}</small>
+            }
+          }
         </div>
 
         <div class="form-group">

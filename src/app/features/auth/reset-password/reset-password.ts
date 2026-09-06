@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { getFailedPasswordRules, passwordStrengthValidator, PasswordRule } from '../../../shared/components/ui/form/password-rules';
 
 @Component({
   selector: 'app-auth-reset-password',
@@ -27,8 +28,12 @@ export class ResetPasswordComponent implements OnInit {
 
   // When token present: show "new password" form
   resetForm = this.fb.group({
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    password: ['', [Validators.required, passwordStrengthValidator()]],
   });
+
+  get passwordErrors(): PasswordRule[] {
+    return getFailedPasswordRules(this.resetForm.controls.password.value);
+  }
 
   ngOnInit(): void {
     const token = this.route.snapshot.queryParamMap.get('token');

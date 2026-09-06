@@ -15,6 +15,7 @@ import {
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { LoaderComponent } from '../../../shared/components/ui/loader/loader';
 import { CardComponent } from '../../../shared/components/ui/card/card';
+import { getFailedPasswordRules, PasswordRule } from '../../../shared/components/ui/form/password-rules';
 
 const UNITS = [
   { value: 'kg',    label: 'Kg / Lt (Metric)' },
@@ -134,10 +135,14 @@ export class ProfileComponent implements OnInit {
 
   // ── Password ─────────────────────────────────────────────
 
+  get passwordErrors(): PasswordRule[] {
+    return getFailedPasswordRules(this.passwordForm.new_password);
+  }
+
   savePassword(): void {
     const hasPassword = this.profile()?.has_password ?? true;
     if (hasPassword && !this.passwordForm.current_password) { this.toast.error('Enter your current password.'); return; }
-    if (this.passwordForm.new_password.length < 8) { this.toast.error('New password must be at least 8 characters.'); return; }
+    if (this.passwordErrors.length) { return; }
     if (this.passwordForm.new_password !== this.passwordForm.confirm_password) { this.toast.error('Passwords do not match.'); return; }
 
     this.store.dispatch(ProfileActions.changePassword({

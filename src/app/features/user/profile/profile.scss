@@ -49,6 +49,11 @@
     color: $text-muted;
   }
 
+  &__field-error {
+    font-size: 0.75rem;
+    color: #dc2626;
+  }
+
   &__input,
   &__select {
     border: 1px solid $border;
