@@ -57,12 +57,14 @@ export class CompleteProfileComponent implements OnInit {
     }, { headers }).subscribe({
       next: () => {
         this.pendingUser$.pipe(take(1)).subscribe(user => {
+          this.loading.set(false);
           if (user) {
             this.store.dispatch(AuthActions.loginSuccess({
               user: { ...user, country: this.selectedCountry!.name },
               token: this.pendingToken!,
             }));
           }
+          this.router.navigate(['/user/dashboard']);
         });
       },
       error: () => {
@@ -80,6 +82,7 @@ export class CompleteProfileComponent implements OnInit {
           token: this.pendingToken!,
         }));
       }
+      this.router.navigate(['/user/dashboard']);
     });
   }
 }
