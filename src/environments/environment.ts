@@ -5,4 +5,5 @@ export const environment = {
   appName: 'BeehiveMind',
   googleMapsApiKey: 'AIzaSyAXbmXTK5ArPM9Wc17b5PpT2h_KtpUejUs',
   googleClientId: '416173920739-mu01bo21nv4l007gmmhlob9s61lqamis.apps.googleusercontent.com',
+  googleAnalyticsId: '',
 }
