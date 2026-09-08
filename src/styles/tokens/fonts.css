@@ -7,13 +7,15 @@
    width only — no Condensed, no Extended, no italics. One variable file covers
    the whole 400-700 axis; see CLAUDE.md for the weight roles.
 
-   Currently the desktop variable OTF (CFF2), hence format("opentype"). Swap in
-   the foundry's woff2 for production — same declaration, ~half the bytes. */
+   The shipped file is a subset built from the foundry's variable OTF by
+   tools/build-font.py: width and italic axes pinned, weight axis cut to
+   400-700, Latin + Greek + punctuation only, WOFF2. 40 KB instead of 1.2 MB.
+   The full OTF stays in tools/fonts/ for rebuilding; it is not deployed. */
 
 @font-face {
   font-family: "Peridot PE";
   font-style: normal;
   font-weight: 400 700;
   font-display: swap;
-  src: url("/assets/fonts/fonnts.com-Peridot_PE_Variable_Regular.otf") format("opentype");
+  src: url("/assets/fonts/peridot-pe-variable.woff2") format("woff2");
 }

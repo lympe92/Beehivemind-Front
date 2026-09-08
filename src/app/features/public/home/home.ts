@@ -89,12 +89,13 @@ export class HomeComponent {
         { title: 'Fix a figure in place', body: 'Click the cell and type. No dialog, and no re-entering the rest of the row to change one number.' },
         { title: 'Nothing to transcribe', body: "What you said in the field is already here. The evening's paperwork is reading it, not typing it up." },
       ],
+      // Not `priority`: the band sits below the first screen on every width,
+      // and an eager 83 KB GIF competed with the hero image for bandwidth.
       image: {
         src: 'assets/img/inspections.gif',
         alt: 'The Beehivemind inspection table, with a row being edited in place',
         width: 477,
         height: 213,
-        priority: true,
       },
     },
     splitAccordion: {
