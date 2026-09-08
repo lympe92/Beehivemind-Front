@@ -13,6 +13,9 @@ import { CostsComponent } from '../costs/costs';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+/** The design system draws the last seven months, ending with the current one. */
+const CHART_MONTHS = 7;
+
 @Component({
   selector: 'app-financial',
   standalone: true,
@@ -41,11 +44,23 @@ export class FinancialComponent implements OnInit {
     const data = this.monthlyCosts();
     if (!data.length) return null;
 
-    const income = Array<number>(12).fill(0);
-    const outcome = Array<number>(12).fill(0);
+    // The API returns the last twelve months keyed by month number only, so a
+    // window ending at the current month is the one reading that is never
+    // ambiguous; the kit shows seven columns.
+    const now = new Date();
+    const window = Array.from({ length: CHART_MONTHS }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (CHART_MONTHS - 1) + i, 1);
+      return { month: d.getMonth() + 1, year: d.getFullYear() };
+    });
+    const crossesYear = window[0].year !== window[window.length - 1].year;
+
+    const income = window.map(() => 0);
+    const outcome = window.map(() => 0);
     for (const item of data) {
-      if (item.type === 'income') income[item.month - 1] = Number(item.amount);
-      else outcome[item.month - 1] = Number(item.amount);
+      const idx = window.findIndex(w => w.month === Number(item.month));
+      if (idx === -1) continue;
+      if (item.type === 'income') income[idx] = Number(item.amount);
+      else outcome[idx] = Number(item.amount);
     }
 
     return this.chartBuilder.bar({
@@ -53,7 +68,7 @@ export class FinancialComponent implements OnInit {
         { name: 'Income', data: income },
         { name: 'Outgoing', data: outcome },
       ],
-      categories: MONTHS,
+      categories: window.map(w => MONTHS[w.month - 1] + (crossesYear ? ' ' + String(w.year).slice(2) : '')),
     });
   });
 

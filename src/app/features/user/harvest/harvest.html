@@ -20,11 +20,11 @@
 
       <ng-template #cellTpl let-row let-col="col">
         @switch (col.key) {
-          @case ('beehiveId') { {{ getBeehiveName(row.beehiveId) }} }
-          @case ('date') { {{ row.date | date:'mediumDate' }} }
+          @case ('beehiveId') { <span class="dt__nowrap">{{ getBeehiveName(row.beehiveId) }}</span> }
+          @case ('date') { <span class="dt__nowrap">{{ row.date | date:'mediumDate' }}</span> }
           <!-- The source uses || rather than ??, so an empty string also falls back to the dash. -->
           @case ('honey_description') { {{ row.honey_description || '—' }} }
-          @case ('food_quantity') { {{ row.food_quantity }} {{ row.unit }} }
+          @case ('food_quantity') { <span class="dt__nowrap">{{ row.food_quantity }} {{ row.unit }}</span> }
           @default { {{ row[col.key] ?? '—' }} }
         }
       </ng-template>

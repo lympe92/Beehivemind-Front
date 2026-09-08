@@ -25,6 +25,7 @@ Financial overview: income/outgoing cost tracking with charts, plus management o
 ## Patterns / gotchas
 - **Parent–child sync via outputs:** child CRUD emits `costsChange` / `categoriesChange`; `FinancialComponent` reloads charts / updates the categories signal in response.
 - **Resilient chart loading:** `loadCharts()` uses `forkJoin` with per-request `catchError(() => of(null))` — one failed chart endpoint doesn't drop the others.
+- **Monthly chart window:** the API's `costs/stats/monthly` returns the last twelve months keyed by month number only, so `monthlyBarOptions` draws a window of the last **seven** months ending with the current one (`CHART_MONTHS`, the design system's column count); labels get a two-digit year suffix only when the window crosses a year. Twelve columns rotated the labels at 375.
 - CRUD still uses `FormModalComponent` + `ModalService.confirm` + `ToastService` (same as records pattern), just without the store.
 
 ## Related

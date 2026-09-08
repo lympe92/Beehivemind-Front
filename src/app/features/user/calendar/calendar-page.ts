@@ -29,7 +29,7 @@ export class CalendarPageComponent implements OnInit {
       const beehive = beehiveMap.get(i.beehiveId);
       return {
         id:    i.id,
-        title: beehive ? `Beehive ${beehive.name}` : `Beehive #${i.beehiveId}`,
+        title: beehive ? beehive.name : `Beehive #${i.beehiveId}`,
         date:  i.date,
         color: 'blue',
         meta:  { type: 'inspection', id: i.id },

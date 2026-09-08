@@ -28,6 +28,7 @@ Conversational assistant over the user's beekeeping data. Conversation list + me
 - **URL sync without reload:** after the first message of a *new* conversation, an `effect` calls `location.replaceState('/user/ai-chat/:id')` (avoids re-triggering the route's `loadConversation`). Tracked via the private `isNewMode` flag.
 - **Auto-scroll:** an `effect` flags `shouldScroll` on new visible messages; `ngAfterViewChecked` scrolls the container to the bottom.
 - `visibleMessages` filters to `user`/`assistant` roles only (hides tool/system). Send disabled when empty, > 4000 chars, or already sending.
+- The `n / 4000` counter under the composer renders only once the user has typed (the kit's composer has no counter at rest); it turns amber above 3500.
 
 ## Related
 [Root](../../../../../CLAUDE.md) · `store/ai-chat/` · auto-memory `project_ai_chat.md`.

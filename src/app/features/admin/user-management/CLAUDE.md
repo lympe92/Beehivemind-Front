@@ -12,7 +12,7 @@ Admin view of beekeeper accounts: search/filter, change status, force email conf
 - **No store, no domain service** — calls `RequestService` directly against `admin/*` endpoints:
   - `GET admin/users?page&search&status&plan` (server-side paginated `{ data, meta }`)
   - `POST admin/users/:id/status`, `POST admin/users/:id/force-confirm`
-- Local `signal`s: `users`, `loading`, `error`, `total`, `page`; plain fields for `search`/`statusFilter`/`planFilter` (`FormsModule`), rendered in the dashboard's `.fb` filter bar.
+- Local `signal`s: `users`, `loading`, `error`, `total`, `page`; plain fields for `search`/`statusFilter`/`planFilter` (`FormsModule`), rendered in the dashboard's `.fb` filter bar. The header meta reads "shown of total" like the kit (`users().length` on this page of `meta.total` matching the filters).
 - Reads `selectIsAtLeastModerator` / `selectIsAtLeastAdmin` from `employeeAuth` store (via `toSignal`) to gate actions by role.
 - Suspend opens `SuspendUserModalComponent` (indefinite / until a date); ban and delete go through `ModalService.confirm({ danger: true })` — the delete message names what else is deleted with the account.
 - Status is a tinted badge (`.app-badge--active|--suspended|--banned`); plan is the outlined neutral badge.

@@ -71,9 +71,11 @@
             maxlength="4000"></textarea>
           <button type="button" class="app-btn app-btn--primary" [disabled]="!canSend()" (click)="sendMessage()">Send</button>
         </div>
-        <div class="ai-chat__counter" [class.ai-chat__counter--warn]="charWarning()">
-          {{ characterCount() }} / 4000
-        </div>
+        @if (characterCount() > 0) {
+          <div class="ai-chat__counter" [class.ai-chat__counter--warn]="charWarning()">
+            {{ characterCount() }} / 4000
+          </div>
+        }
       </div>
     </app-card>
 
