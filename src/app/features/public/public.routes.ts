@@ -18,6 +18,11 @@ export const publicRoutes: Routes = [
     data: { seoKey: 'app' },
   },
   {
+    path: 'pricing',
+    loadComponent: () => import('./pricing/pricing').then((m) => m.PricingComponent),
+    data: { seoKey: 'pricing' },
+  },
+  {
     path: 'apiariesandbeehives',
     loadComponent: () =>
       import('./apiaries-and-beehives/apiaries-and-beehives').then(
@@ -50,9 +55,26 @@ export const publicRoutes: Routes = [
     data: { seoKey: 'help' },
   },
   {
+    path: 'about',
+    loadComponent: () => import('./about/about').then((m) => m.AboutComponent),
+    data: { seoKey: 'about' },
+  },
+  {
+    path: 'contact',
+    loadComponent: () => import('./contact/contact').then((m) => m.ContactComponent),
+    data: { seoKey: 'contact' },
+  },
+  // The old marketing link that every "Need a consultation?" CTA carried.
+  { path: 'pages/contact-us', redirectTo: 'contact' },
+  {
     path: 'privacy',
     loadComponent: () => import('./privacy/privacy').then((m) => m.PrivacyComponent),
     data: { seoKey: 'privacy' },
+  },
+  {
+    path: 'terms',
+    loadComponent: () => import('./terms/terms').then((m) => m.TermsComponent),
+    data: { seoKey: 'terms' },
   },
   {
     path: 'blog',

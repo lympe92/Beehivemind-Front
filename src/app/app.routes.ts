@@ -20,11 +20,10 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./features/user/user.routes').then((m) => m.userRoutes),
   },
-  // User auth
+  // User auth. Component-less on purpose: the auth screens carry their own
+  // brand lockup and legal line (AuthCard), so no header or footer wraps them.
   {
     path: 'auth',
-    loadComponent: () =>
-      import('./layouts/public-layout/public-layout').then((m) => m.PublicLayoutComponent),
     loadChildren: () =>
       import('./features/auth/auth.routes').then((m) => m.authRoutes),
   },

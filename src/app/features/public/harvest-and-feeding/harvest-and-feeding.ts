@@ -1,42 +1,31 @@
 import { Component } from '@angular/core';
-import { AsyncPipe } from '@angular/common';
-import { of } from 'rxjs';
 import { HeroCenterContentComponent } from '../../../shared/components/hero-sections/hero-center-content/hero-center-content';
 import { SplitContentComponent } from '../../../shared/components/info-sections/split-content/split-content';
 import { CtaBannerComponent } from '../../../shared/components/cta-sections/cta-banner/cta-banner';
 import { InfoColumnsComponent } from '../../../shared/components/info-sections/info-columns/info-columns';
-import { ImageConfig } from '../../../shared/components/ui/image/image.model';
-import { CtaLink } from '../../../shared/components/ui/link-button/link-button.model';
-import { InfoColumnItem } from '../../../shared/components/info-sections/info-columns/info-columns.model';
+import { CtaBannerConfig, HeroConfig, InfoColumnsConfig, SplitContentConfig } from '../public-page.model';
 
-interface SplitContentData {
-  title: string;
-  description: string;
-  image: ImageConfig;
-}
-
-interface HarvestAndFeedingPageData {
-  hero: { title: string; subtitle: string; image: ImageConfig; primaryCta: CtaLink; secondaryCta: CtaLink };
-  splitContents: SplitContentData[];
-  infoColumns: { title: string; items: InfoColumnItem[] };
-  ctaBanner: { title: string; description: string; cta: CtaLink };
+interface HarvestAndFeedingPageConfig {
+  hero: HeroConfig;
+  splitContents: SplitContentConfig[];
+  infoColumns: InfoColumnsConfig;
+  ctaBanner: CtaBannerConfig;
 }
 
 @Component({
   selector: 'app-harvest-and-feeding',
   standalone: true,
-  imports: [AsyncPipe, HeroCenterContentComponent, SplitContentComponent, CtaBannerComponent, InfoColumnsComponent],
+  imports: [HeroCenterContentComponent, SplitContentComponent, CtaBannerComponent, InfoColumnsComponent],
   templateUrl: './harvest-and-feeding.html',
-  styleUrl: './harvest-and-feeding.scss',
 })
 export class HarvestAndFeedingComponent {
-  readonly pageData$ = of<HarvestAndFeedingPageData>({
+  readonly page: HarvestAndFeedingPageConfig = {
     hero: {
       title: 'Throw away the beekeeping inspection spreadsheets',
       subtitle: "Never worry about your feeding and harvest data. Beehivemind's tables update in real time via voice.",
-      image: { src: 'assets/img/jar.webp', alt: 'Jar', width: 417, height: 417 },
-      primaryCta: { label: 'Get Started', routerLink: '/auth/login', variant: 'primary' },
-      secondaryCta: { label: 'Need a consultation? »', routerLink: '/pages/contact-us', variant: 'outline' },
+      image: { src: 'assets/img/jar.webp', alt: 'Jar', width: 417, height: 417, priority: true },
+      primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },
+      secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline' },
     },
     splitContents: [
       {
@@ -68,5 +57,9 @@ export class HarvestAndFeedingComponent {
       description: "That's right, what are you waiting for? The only thing left to do is to register and download BeehiveMind App today!",
       cta: { label: 'Get Started', routerLink: '/auth/register', variant: 'outline' },
     },
-  });
+  };
+
+  side(index: number): 'start' | 'end' {
+    return index % 2 === 0 ? 'start' : 'end';
+  }
 }

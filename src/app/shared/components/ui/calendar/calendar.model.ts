@@ -18,21 +18,36 @@ export interface CalendarDay {
 }
 
 // ── Named color palette ──────────────────────────────────────────────────────
+// A user-choice palette for calendar events, not brand colour — which is why it
+// survives the one-accent rule. Seven, not eight: `orange` used to be declared
+// twice (the brand value, then a Tailwind one that won), so the default colour
+// of every unset event was off the palette. The brand value is the one kept.
+// An eighth colour has to be a hue not already here, never a second orange.
 
 export const CALENDAR_COLORS: Record<string, string> = {
-  amber:  '#f59e0b',
+  orange: '#f69520',
   blue:   '#3b82f6',
   green:  '#22c55e',
   red:    '#ef4444',
-  orange: '#f97316',
   purple: '#a855f7',
   teal:   '#14b8a6',
   gray:   '#6b7280',
 };
 
 export function resolveColor(color?: string): string {
-  if (!color) return CALENDAR_COLORS['amber'];
+  if (!color) return CALENDAR_COLORS['orange'];
   return CALENDAR_COLORS[color] ?? color;
+}
+
+/** An event chip is a tint of its hue with an ink label; the hue itself stays
+ *  legible as an inset rule down the left edge. White on these hues measured
+ *  2.27:1 to 3.96:1; ink on a 22% tint clears 4.5:1 for all seven. */
+export function chipBackground(color?: string): string {
+  return `color-mix(in srgb, ${resolveColor(color)} 22%, #fff)`;
+}
+
+export function chipBar(color?: string): string {
+  return `inset 3px 0 0 ${resolveColor(color)}`;
 }
 
 // ── Pure date utilities ──────────────────────────────────────────────────────

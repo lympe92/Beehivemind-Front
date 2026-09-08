@@ -1,0 +1,93 @@
+/* Typography — scale from _variables.scss and _typography.scss, face changed to
+   Peridot PE.
+   Headings are weight 400, not bold, with negative tracking that tightens as the
+   size grows (-2px at h1/h2, -1px at h3, -0.2px below). That light-and-tight
+   heading against 400-weight body copy is the brand's typographic signature.
+   Heading sizes step up at md (768px) and again at xl (1200px); the values below
+   are the xl end of each ramp, with the mobile start recorded alongside. */
+
+/* The @font-face lives in fonts.css — one file, normal width, axis 400-700. */
+
+:root {
+  --font-family-base: "Peridot PE", system-ui, -apple-system, sans-serif;
+  --font-family-heading: var(--font-family-base);
+
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-sm: 0.875rem;    /* 14px */
+  --font-size-lg: 1.125rem;    /* 18px — .lead */
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;   /* buttons */
+  --font-weight-bold: 700;     /* strong, b */
+
+  --line-height-base: 1.6;
+  --line-height-heading: 1.25;
+
+  /* Heading ramp — mobile start → xl end */
+  --h1-size-sm: 2.5rem;   /* 40px */
+  --h1-size-md: 3.5rem;   /* 56px */
+  --h1-size: 4rem;        /* 64px */
+  --h1-tracking: -2px;
+
+  --h2-size-sm: 2rem;     /* 32px */
+  --h2-size-md: 3rem;     /* 48px */
+  --h2-size: 3.5rem;      /* 56px */
+  --h2-tracking: -2px;
+
+  --h3-size-sm: 1.625rem; /* 26px */
+  --h3-size: 2rem;        /* 32px */
+  --h3-tracking: -1px;
+
+  --h4-size-sm: 1.25rem;  /* 20px */
+  --h4-size: 1.5rem;      /* 24px */
+  --h4-tracking: -0.2px;
+
+  --h5-size-sm: 1rem;     /* 16px */
+  --h5-size: 1.25rem;     /* 20px */
+  --h5-tracking: -0.2px;
+
+  --h6-size-sm: 1rem;     /* 16px */
+  --h6-size: 1.25rem;     /* 20px */
+  --h6-tracking: -0.2px;
+
+  /* Two heading weights, and the split is by SIZE, not by importance.
+
+     h1-h3 (64/56/32px) stay 400: at those sizes the size is doing the work,
+     and light-and-tight is the identity. h4-h6 (24/20/20px) are 500, because
+     a 20px heading at 400 sits above 16px body at 400 — same weight, four
+     pixels of difference, and nothing else separating them. Tracking cannot
+     carry it either: these levels are at -0.2px, essentially normal.
+
+     This replaces "every heading is 400, no exceptions". The earlier exception
+     that was refused — .info-columns__title at 500 — was an h2 at 56px, where
+     the claim had no measurement behind it. This one does: it is the level
+     where a heading stops being distinguishable from the paragraph under it.
+
+     h4-h6 were 300 before that, which read weak and cost the bottom of the
+     axis; 500 is the other direction, and it is a weight the axis already
+     carries for buttons and labels. No fourth weight is introduced.
+
+     The 500 step is for a heading that LABELS following copy, and there is no
+     opt-out list, because a heading that IS the copy is not a heading. Three
+     elements were marked up as h4/h5 while being body text — the hero
+     subtitle, the Ribbon pull quote and the SplitContent description — and all
+     three are now p, blockquote and p. They keep their sizes by class.
+
+     That is the durable version of this rule: if an element has to opt out of
+     the heading weight, check its element first. An h4 holding 226 characters
+     over eight justified lines was never a heading. */
+  /* ---------- Structural voice (option 1C) ----------
+     Every small functional label — eyebrows, card titles, section labels, table
+     headers, nav items, form field labels, tab labels, status badges. Caps plus
+     positive tracking, because Peridot's 400 and 500 sit too close together to
+     separate a label from body copy by weight alone.
+     Buttons are NOT labels: a label names a region, a button does something, so
+     .btn and .app-btn stay sentence case. */
+  --structural-size: 0.6875rem;      /* 11px */
+  --structural-size-sm: 0.65625rem;  /* 10.5px */
+  --structural-weight: 500;
+  --structural-tracking: 0.12em;
+
+  --heading-weight: 400;      /* h1-h3, and every editorial heading */
+  --heading-weight-sm: 500;   /* h4-h6, where size no longer separates */
+}

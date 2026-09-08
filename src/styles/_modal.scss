@@ -1,79 +1,13 @@
 // =============================================================================
-// MODAL GLOBAL STYLES
-// CDK renders overlays at <body> level — must be global, not component-scoped
+// MODAL — CDK glue
+// The design system's `.modal-backdrop` / `.modal-panel` / `.mshell` rules live
+// in components/app/app.css and assume the panel is the backdrop's child. CDK
+// renders the backdrop and the pane as siblings at <body> level, so this sheet
+// only adds what CDK needs: the pane variants the ModalService names, the
+// overlay wrapper, and the flex chain from the pane down to `.mshell` so a long
+// form scrolls inside the panel instead of clipping.
+// Every value is a token; nothing here restates the palette.
 // =============================================================================
-
-// ── Backdrop ─────────────────────────────────────────────────────────────────
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  animation: modal-backdrop-in 0.2s ease;
-}
-
-@keyframes modal-backdrop-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-// ── Base panel ───────────────────────────────────────────────────────────────
-
-.modal-panel {
-  outline: none;
-  overflow: hidden;
-
-  // User layout theme vars (defaults)
-  --modal-bg:         #ffffff;
-  --modal-border:     #e5e5e5;
-  --modal-text:       #171717;
-  --modal-text-muted: #737373;
-  --modal-hover:      #e5e5e5;
-}
-
-// ── Center ───────────────────────────────────────────────────────────────────
-
-.modal-panel--center {
-  width: min(560px, calc(100vw - 32px));
-  max-height: calc(100vh - 48px);
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  animation: modal-center-in 0.2s ease;
-}
-
-@keyframes modal-center-in {
-  from { opacity: 0; transform: scale(0.96) translateY(8px); }
-  to   { opacity: 1; transform: scale(1)    translateY(0);   }
-}
-
-// ── Drawer (slide from right) ─────────────────────────────────────────────────
-
-.modal-panel--drawer {
-  position: fixed !important;
-  right: 0;
-  top: 0;
-  height: 100vh;
-  width: min(480px, 100vw);
-  border-radius: 12px 0 0 12px;
-  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
-  animation: modal-drawer-in 0.25s ease;
-}
-
-@keyframes modal-drawer-in {
-  from { opacity: 0; transform: translateX(100%); }
-  to   { opacity: 1; transform: translateX(0);    }
-}
-
-// ── Confirm ───────────────────────────────────────────────────────────────────
-
-.modal-panel--confirm {
-  width: min(400px, calc(100vw - 32px));
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  animation: modal-center-in 0.18s ease;
-}
-
-// ── CDK overlay container positioning ────────────────────────────────────────
 
 .cdk-overlay-container {
   position: fixed;
@@ -85,11 +19,21 @@
   inset: 0;
 }
 
+.modal-backdrop {
+  animation: modal-backdrop-in var(--transition-speed) var(--transition-easing);
+}
+
+@keyframes modal-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 .cdk-global-overlay-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  padding: var(--app-pad-lg);
 
   .modal-panel--drawer {
     align-self: stretch;
@@ -100,5 +44,66 @@
   .modal-panel--center,
   .modal-panel--confirm {
     pointer-events: auto;
+  }
+}
+
+// The pane. CDK sets width/max-width inline from the ModalService config; the
+// class only carries what the config does not: the ceiling on height and the
+// flex chain.
+.modal-panel {
+  outline: none;
+  max-height: 100%;
+  animation: modal-center-in var(--transition-speed) var(--transition-easing);
+
+  > .cdk-dialog-container,
+  > .cdk-dialog-container > *,
+  app-modal-shell {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    max-height: 100%;
+  }
+}
+
+.modal-panel--center {
+  width: min(560px, 100%);
+}
+
+.modal-panel--confirm {
+  width: min(420px, 100%);
+}
+
+@keyframes modal-center-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+// The drawer keeps the system's `.drawer-panel` geometry: attached to the edge,
+// square against it, full height.
+.modal-panel--drawer {
+  position: fixed !important;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  max-height: none;
+  width: min(440px, 100vw);
+  border-radius: 0;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.16);
+  animation: modal-drawer-in var(--transition-speed) var(--transition-easing);
+}
+
+@keyframes modal-drawer-in {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 767px) {
+  .cdk-global-overlay-wrapper {
+    padding: 16px;
+  }
+
+  .modal-panel--drawer {
+    width: 100vw;
   }
 }

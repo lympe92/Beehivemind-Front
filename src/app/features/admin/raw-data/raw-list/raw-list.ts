@@ -2,35 +2,41 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DecimalPipe } from '@angular/common';
+import { of } from 'rxjs';
 import { RequestService } from '../../../../core/services/request.service';
-import { ModelConfig, RAW_MODELS } from '../raw-data.models';
+import { FieldConfig, ModelConfig, RAW_MODELS } from '../raw-data.models';
 import { DataTableComponent, ColumnDef, TablePagination } from '../../../../shared/components/ui/data-table/data-table';
+import { CardComponent } from '../../../../shared/components/ui/card/card';
+import { AppErrorComponent } from '../../../../shared/components/ui/app-error/app-error';
+import { ModalService } from '../../../../core/modal/modal.service';
+import { FormModalComponent } from '../../../../shared/components/ui/modal/form-modal/form-modal';
+import { DynamicField } from '../../../../core/models/form.model';
+import { syncValidators } from '../../../../shared/components/ui/form/validators.config';
+import { ToastService } from '../../../../shared/components/ui/toast/toast.service';
+
+type RawRow = Record<string, unknown>;
 
 @Component({
   selector: 'app-raw-list',
   standalone: true,
-  imports: [FormsModule, RouterLink, DataTableComponent],
+  imports: [FormsModule, RouterLink, DecimalPipe, DataTableComponent, CardComponent, AppErrorComponent],
   templateUrl: './raw-list.html',
-  styleUrl: './raw-list.scss',
 })
 export class RawListComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private request = inject(RequestService);
   private destroyRef = inject(DestroyRef);
+  private modal = inject(ModalService);
+  private toast = inject(ToastService);
 
   modelKey = signal('');
   config = computed<ModelConfig | null>(() => RAW_MODELS[this.modelKey()] ?? null);
-  visibleFields = computed(() => {
-    const cfg = this.config();
-    if (!cfg) return [];
-    return this.isEditing()
-      ? cfg.fields.filter((f) => !f.createOnly)
-      : cfg.fields;
-  });
+  isTokens = computed(() => this.modelKey() === 'tokens');
 
   tableColumns = computed<ColumnDef[]>(() => {
     const cfg = this.config();
-    return cfg ? cfg.displayColumns.map(k => ({ key: k, label: k })) : [];
+    return cfg ? cfg.displayColumns.map(k => ({ key: k, label: k.replace(/_/g, ' ') })) : [];
   });
 
   tablePagination = computed<TablePagination | null>(() => {
@@ -39,7 +45,7 @@ export class RawListComponent implements OnInit {
     return { page: this.page(), totalPages: lp, total: this.total() };
   });
 
-  rows = signal<Record<string, unknown>[]>([]);
+  rows = signal<RawRow[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
   total = signal(0);
@@ -47,15 +53,6 @@ export class RawListComponent implements OnInit {
   lastPage = signal(1);
 
   search = '';
-
-  showModal = signal(false);
-  isEditing = signal(false);
-  editingId = signal<number | null>(null);
-  formData = signal<Record<string, unknown>>({});
-  formError = signal<string | null>(null);
-  formLoading = signal(false);
-
-  deleteConfirmId = signal<number | null>(null);
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
@@ -71,11 +68,12 @@ export class RawListComponent implements OnInit {
     if (!cfg) return;
 
     this.loading.set(true);
+    this.error.set(null);
     const params = new URLSearchParams({ page: String(this.page()) });
     if (this.search) params.set('search', this.search);
 
     this.request
-      .getRequest<Record<string, unknown>[]>(`admin/raw/${cfg.endpoint}?${params}`)
+      .getRequest<RawRow[]>(`admin/raw/${cfg.endpoint}?${params}`)
       .subscribe({
         next: (res) => {
           this.rows.set(res.data ?? []);
@@ -84,7 +82,7 @@ export class RawListComponent implements OnInit {
           this.loading.set(false);
         },
         error: () => {
-          this.error.set('Failed to load data');
+          this.error.set('The table did not load.');
           this.loading.set(false);
         },
       });
@@ -100,81 +98,113 @@ export class RawListComponent implements OnInit {
     this.loadData();
   }
 
-  openCreate(): void {
-    const cfg = this.config();
-    if (!cfg) return;
-    const initial: Record<string, unknown> = {};
-    cfg.fields.forEach((f) => { initial[f.key] = f.type === 'boolean' ? false : ''; });
-    this.formData.set(initial);
-    this.isEditing.set(false);
-    this.editingId.set(null);
-    this.formError.set(null);
-    this.showModal.set(true);
+  /** The registry entry becomes a field config; the form driver does the rest. */
+  private fields(cfg: ModelConfig, row: RawRow | null): DynamicField[] {
+    const source = row ? cfg.fields.filter(f => !f.createOnly) : cfg.fields;
+    return source.map(f => this.toDynamicField(f, row));
   }
 
-  openEdit(row: Record<string, unknown>): void {
-    const cfg = this.config();
-    if (!cfg) return;
-    const data: Record<string, unknown> = {};
-    cfg.fields.filter((f) => !f.createOnly).forEach((f) => { data[f.key] = row[f.key] ?? ''; });
-    this.formData.set(data);
-    this.isEditing.set(true);
-    this.editingId.set(Number(row['id']));
-    this.formError.set(null);
-    this.showModal.set(true);
+  private toDynamicField(f: FieldConfig, row: RawRow | null): DynamicField {
+    const current = row ? row[f.key] : undefined;
+    const validators = f.required ? [syncValidators.required()] : [];
+    const base = { name: f.key, label: f.label, syncValidators: validators } as const;
+
+    switch (f.type) {
+      case 'select':
+        return {
+          ...base, type: 'select', size: 'half',
+          value: current ?? null,
+          options: of((f.options ?? []).map(o => ({ displayValue: o.label, returnValue: o.value }))),
+        };
+      case 'boolean':
+        return { ...base, type: 'toggle', size: 'half', value: !!current };
+      case 'textarea':
+        return { ...base, type: 'textarea', size: 'full', value: (current as string) ?? '' };
+      case 'number':
+        return { ...base, type: 'number', size: 'half', value: current === undefined || current === null ? null : Number(current) };
+      case 'date':
+      case 'datetime':
+        return { ...base, type: 'date', size: 'half', value: (current as string) ?? '' };
+      case 'email':
+        return { ...base, type: 'email', size: 'half', value: (current as string) ?? '', syncValidators: [...validators, syncValidators.email()] };
+      case 'password':
+        return { ...base, type: 'password', size: 'half', value: '' };
+      default:
+        return { ...base, type: 'text', size: 'half', value: (current as string) ?? '' };
+    }
   }
 
-  getField(key: string): unknown { return this.formData()[key]; }
-
-  setField(key: string, value: unknown): void {
-    this.formData.update((d) => ({ ...d, [key]: value }));
-  }
-
-  submitForm(): void {
+  async openCreate(): Promise<void> {
     const cfg = this.config();
     if (!cfg) return;
-    this.formLoading.set(true);
-    this.formError.set(null);
-
-    const data = this.formData();
-    const req = this.isEditing()
-      ? this.request.putRequest(`admin/raw/${cfg.endpoint}/${this.editingId()}`, data)
-      : this.request.postRequest(`admin/raw/${cfg.endpoint}`, data);
-
-    req.subscribe({
-      next: () => {
-        this.formLoading.set(false);
-        this.showModal.set(false);
-        this.loadData();
+    const result = await this.modal.open<RawRow>(FormModalComponent, {
+      type: 'center',
+      data: {
+        title: `New ${cfg.singularLabel.toLowerCase()}`,
+        subtitle: 'This writes straight to the table.',
+        fields: this.fields(cfg, null),
+        submitLabel: 'Create',
+        cancelLabel: 'Cancel',
       },
-      error: (err) => {
-        this.formLoading.set(false);
-        this.formError.set(err?.error?.message ?? 'Operation failed');
-      },
+    });
+    if (!result) return;
+    this.request.postRequest(`admin/raw/${cfg.endpoint}`, result).subscribe({
+      next: () => this.loadData(),
+      error: (err) => this.toast.error(err?.error?.message ?? 'The row was not created.'),
     });
   }
 
-  confirmDelete(id: number): void { this.deleteConfirmId.set(id); }
-  cancelDelete(): void { this.deleteConfirmId.set(null); }
-
-  doDelete(): void {
+  async openEdit(row: RawRow): Promise<void> {
     const cfg = this.config();
-    const id = this.deleteConfirmId();
-    if (!cfg || id === null) return;
+    if (!cfg) return;
+    const result = await this.modal.open<RawRow>(FormModalComponent, {
+      type: 'center',
+      data: {
+        title: `Edit ${cfg.singularLabel.toLowerCase()}`,
+        subtitle: 'This writes straight to the table.',
+        fields: this.fields(cfg, row),
+        submitLabel: 'Save',
+        cancelLabel: 'Cancel',
+      },
+    });
+    if (!result) return;
+    this.request.putRequest(`admin/raw/${cfg.endpoint}/${row['id']}`, result).subscribe({
+      next: () => this.loadData(),
+      error: (err) => this.toast.error(err?.error?.message ?? 'The row was not saved.'),
+    });
+  }
 
-    const isToken = this.modelKey() === 'tokens';
-    const req = isToken
+  async confirmDelete(row: RawRow): Promise<void> {
+    const cfg = this.config();
+    if (!cfg) return;
+    const tokens = this.isTokens();
+    const confirmed = await this.modal.confirm({
+      title: tokens ? 'Revoke this token?' : 'Delete this record?',
+      message: tokens
+        ? 'The device holding it is signed out immediately and will have to sign in again.'
+        : 'This writes straight to the table. Nothing here checks what else points at this row.',
+      confirmLabel: tokens ? 'Revoke' : 'Delete',
+      danger: true,
+    });
+    if (!confirmed) return;
+
+    const id = row['id'];
+    const req = tokens
       ? this.request.postRequest(`admin/raw/tokens/${id}/revoke`, {})
       : this.request.deleteRequest(`admin/raw/${cfg.endpoint}/${id}`);
 
-    req.subscribe({
-      next: () => { this.deleteConfirmId.set(null); this.loadData(); },
-    });
+    req.subscribe({ next: () => this.loadData() });
+  }
+
+  rawValue(value: unknown): string {
+    if (value === null || value === undefined) return '';
+    if (Array.isArray(value)) return value.join(', ');
+    return String(value);
   }
 
   formatCell(value: unknown): string {
     if (value === null || value === undefined) return '—';
-    if (typeof value === 'boolean') return value ? '✓' : '✗';
+    if (typeof value === 'boolean') return value ? 'true' : 'false';
     if (Array.isArray(value)) return value.join(', ');
     const str = String(value);
     return str.length > 40 ? str.slice(0, 40) + '…' : str;

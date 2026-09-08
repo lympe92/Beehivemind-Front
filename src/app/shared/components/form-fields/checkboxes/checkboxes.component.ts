@@ -4,10 +4,13 @@ import { SAFormControlNameDirective } from '../../../../core/directives/dynamic-
 import { ErrorsComponent } from '../errors/errors.component';
 import { FieldOption } from '../../../../core/models/form-fields.model';
 
+/**
+ * A group of checkboxes under one label with one shared error slot. The value
+ * is an array of `returnValue`s. The native input is the control.
+ */
 @Component({
   selector: 'app-form-checkboxes',
   templateUrl: './checkboxes.component.html',
-  styleUrls: ['./checkboxes.component.scss'],
   standalone: true,
   hostDirectives: [
     {
@@ -27,16 +30,20 @@ import { FieldOption } from '../../../../core/models/form-fields.model';
 export class CheckboxesComponent implements ControlValueAccessor {
   @Input() label!: string;
   @Input() options!: FieldOption[];
-  @Input() direction: 'row' | 'column' = 'row';
+  @Input() direction: 'row' | 'column' = 'column';
 
   value!: (string | number | boolean | null)[];
   disabled: boolean = false;
-  saFormControlName?: SAFormControlNameDirective | null;
-
+  private _saFormControlName?: SAFormControlNameDirective | null;
+  /** The host FormControlName, resolved on first use: it cannot be injected during construction,
+   *  and resolving it in a microtask left the required marker unrendered under OnPush. */
+  get saFormControlName(): SAFormControlNameDirective | null {
+    if (this._saFormControlName === undefined) {
+      this._saFormControlName = this.injector.get(SAFormControlNameDirective, null);
+    }
+    return this._saFormControlName;
+  }
   constructor(private injector: Injector) {
-    queueMicrotask((): void => {
-      this.saFormControlName = this.injector.get(SAFormControlNameDirective, null);
-    });
   }
 
   onChange: (value: unknown) => void = () => {};
@@ -48,6 +55,7 @@ export class CheckboxesComponent implements ControlValueAccessor {
   setDisabledState(isDisabled: boolean): void { this.disabled = isDisabled; }
 
   onToggleOption(returnValue: string | boolean | number | null): void {
+    if (this.disabled) return;
     this.value = this.updateValue(returnValue);
     this.onChange(this.value);
     this.onTouched();
@@ -55,13 +63,13 @@ export class CheckboxesComponent implements ControlValueAccessor {
 
   private updateValue(returnValue: string | boolean | number | null): (string | number | boolean | null)[] {
     if (!this.value) return [returnValue];
-    return this.value.find(x => x === returnValue)
+    return this.value.includes(returnValue)
       ? this.value.filter(x => x !== returnValue)
       : [...this.value, returnValue];
   }
 
   isChecked(option: string | boolean | number | null): boolean {
-    return option !== null && option !== undefined ? this.value?.includes(option) : false;
+    return option !== null && option !== undefined ? !!this.value?.includes(option) : false;
   }
 
   isFieldValid(): boolean {

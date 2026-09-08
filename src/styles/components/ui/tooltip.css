@@ -1,0 +1,42 @@
+/* ---------- Tooltip ----------
+   A label for a control that has no room for one. Not a place for
+   explanation: if it is a sentence, it belongs on the page.
+
+   This exists for exactly one condition in this product — the collapsed
+   sidebar, where a 64px rail leaves icons with no label — and it replaces
+   `title=`, which waits about a second, never appears on touch, never appears
+   on keyboard focus, and cannot be styled.
+
+   The rule that keeps it honest: the tooltip is NEVER the only source of the
+   name. Every control that has one also carries an `aria-label`, so a screen
+   reader and a touch user get the label without it. The tooltip is a
+   convenience for a mouse, and nothing depends on it. */
+.tip {
+  position: relative;
+  display: inline-flex;
+}
+
+.tip__bubble {
+  position: fixed;
+  z-index: 1100;
+  padding: 5px 9px;
+  border-radius: var(--radius-sm, 6px);
+  /* Ink on white is the product's contrast; a tooltip is the one surface that
+     inverts, because it floats over content and has to read instantly against
+     whatever is behind it. White on #212121 is 16.1:1. */
+  background: var(--color-dark);
+  color: var(--color-white);
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: tip-in var(--transition-speed) var(--transition-easing);
+}
+
+@keyframes tip-in {
+  from { opacity: 0; transform: translateX(-3px); }
+  to { opacity: 1; transform: translateX(0); }
+}

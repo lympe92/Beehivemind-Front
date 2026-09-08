@@ -1,0 +1,124 @@
+/* Colors — derived from the only authored brand material: the logo and the
+   illustrations. Both logo files sample at 0% colour, pure black on white. The
+   illustrations carry exactly one hue, measured across all twelve coloured
+   files at #f69520 — the XD value the mobile client already used. Every other
+   accent that used to live here (#ec861f, #f59e0b, #F5A623, blue #1a73b5, teal
+   #26a69a) was downstream drift and is gone.
+
+   Measured proportions in the artwork: ~85% paper, ~15% ink, 1-11% accent. The
+   accent never exceeds 11% of any illustration. Treat that as its budget.
+
+   One accent, ink, a six-step neutral ramp, three semantic states. */
+
+:root {
+  /* ---------- Brand ---------- */
+  /* The single accent. Fills, rules and marks only: on white it measures
+     2.4:1, far short of the 4.5:1 text needs. Orange means "act here". */
+  --color-primary: #f69520;
+  /* -8% lightness, where the .btn hover states resolve to */
+  --color-primary-hover: #e48109;
+
+  /* Ink is the second brand colour, and the logo's only one. It carries the
+     secondary action — a black button, not a blue one. */
+  --color-secondary: #212121;
+  /* Hover LIGHTENS. #000000 belongs to the mark alone, so an ink button has no
+     darker step to go to — and the same inversion the fills already use ("a
+     fill that fails gets lighter") applies to an ink one. White on #424242 is
+     9.7:1. */
+  --color-secondary-hover: var(--color-dark-grey);
+
+  /* Kept as a name for the handful of rules that ask for "the accent"
+     (the footer rule, .text-accent). It is the same single hue. */
+  --color-accent: var(--color-primary);
+
+  /* ---------- Neutrals ---------- */
+  --color-dark: #212121;
+  --color-dark-grey: #424242;
+  --color-grey: #757575;
+  --color-light-grey: #e0e0e0;
+  --color-light: #f5f5f5;
+  --color-white: #ffffff;
+  /* The mark's own black, and nothing else's. No text, no fill, no band uses
+     it: the two blacks stay two by #000000 having exactly one job. */
+  --color-ink: #000000;
+
+  /* ---------- Semantic ----------
+     Warning moved off orange: #fb8c00 and the accent were the same hue, so a
+     caution badge and a primary button read identically. This dark gold is
+     unmistakably not the accent and still passes 4.5:1 on white.
+     There is no info state — it existed only to give the blue a job. */
+  --color-success: #43a047;
+  --color-warning: #8a6d00;
+  /* #d32f2f for error TEXT on white (4.60:1). It was #e53935 at 4.23:1 — held
+     as acceptable for a while, then measured across every screen of the three
+     surfaces and found to be the only rule left under 4.5, on sixteen labels
+     (Delete, Ban, "Yes"). One token darker and all sixteen clear.
+
+     The FILL does not follow it down. A filled destructive button carries an
+     ink label, and a fill that fails gets lighter, not darker: #ef5350 gives
+     ink 4.62:1, where #d32f2f gives 3.19:1. */
+  --color-error: #d32f2f;
+  --color-error-fill: #ef5350;
+
+  /* ---------- Semantic aliases ---------- */
+  --text-body: var(--color-dark);
+  --text-muted: var(--color-grey);
+  --text-heading: var(--color-dark);
+  --text-lead: var(--color-dark-grey);
+  /* Ink on the fill, not white. White on #f69520 is 2.27:1; ink is 7.09:1.
+     The rule generalises: fills stay light and labels stay ink, which is why
+     the destructive fill below had to be LIGHTENED rather than darkened —
+     darkening a fill helps white and hurts ink. */
+  --text-on-primary: var(--color-dark);
+  /* No brand blue. A link is ink and earns its affordance from the underline,
+     which is why the underline colour is part of the contract. */
+  --text-link: var(--color-dark);
+  /* The label does not change on hover — the underline going orange is the
+     whole signal. Same logic as the header: state is carried by a rule. */
+  --text-link-hover: var(--color-dark);
+  --text-link-underline: var(--color-light-grey);
+  --text-link-underline-hover: var(--color-primary);
+
+  --surface-page: var(--color-white);
+  --surface-muted: var(--color-light);
+  --surface-card: var(--color-white);
+  --surface-inverse: var(--color-dark);
+
+  --border-color: var(--color-light-grey);
+  /* cards use a slightly tighter grey than the global border */
+  --border-card: #e5e5e5;
+
+  /* ---------- Focus ----------
+     Ink, not the accent. Focus is a function rather than a decoration, and
+     #f69520 measures 2.4:1 on white — short of the 3:1 a non-text indicator
+     needs, and invisible on an orange fill. Ink reads 16:1 on paper and 7.09:1
+     on the accent, so one ring serves every surface. The dark bands override
+     --focus-ring-color to white in their own scope. */
+  --focus-ring-color: var(--color-dark);
+  --focus-ring-color-inverse: var(--color-white);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* ---------- Section surfaces ----------
+     The dark band used to be #403b3b — a WARM charcoal (R 64, G 59, B 59). The
+     logo is perfectly neutral, and warmth appears nowhere in the artwork, so it
+     was drift like the blue and the teal. The band is now plain ink.
+
+     Two blacks in the system, not five: #000000 for the mark, #212121 for
+     everything else. #171717, #121212 and #403b3b all collapsed here. */
+  --surface-band-dark: var(--color-dark);
+  --surface-ribbon-dark: var(--surface-band-dark);
+  /* Was #f3f3f3, a seventh grey 1.5% off --color-light and imperceptible
+     beside it. Collapsed into the ramp. */
+  --surface-section-light: var(--color-light);
+
+  /* ---------- Card component contract ----------
+     _card.scss already exposes these as custom properties so any scope in the
+     tree can override them. Kept as-is. */
+  --card-bg: #ffffff;
+  --card-border: var(--color-light-grey);
+  --card-radius: 8px;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --card-title-color: var(--color-grey);
+  --card-title-size: var(--structural-size);
+}

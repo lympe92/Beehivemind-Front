@@ -17,6 +17,11 @@ import {
 } from '../../../../store/notifications/notifications.selectors';
 import { Notification } from '../../../../core/models/notification.model';
 
+/**
+ * The header bell: unread badge, dropdown panel, per-item read and mark-all.
+ * Closes on outside click and on Escape. Mounted once, in user-layout.
+ * Styles: `.notif-*` in styles/components/app/app.css.
+ */
 @Component({
   selector: 'app-notification-bell',
   standalone: true,
@@ -67,5 +72,10 @@ export class NotificationBellComponent implements OnInit {
     if (!this.elRef.nativeElement.contains(event.target)) {
       this.isOpen.set(false);
     }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.isOpen.set(false);
   }
 }

@@ -1,6 +1,14 @@
-<a
-  [routerLink]="routerLink()"
-  [class]="'btn btn--' + variant() + ' btn--' + size() + (fullWidth() ? ' btn--full' : '')"
->
-  <ng-content />
-</a>
+<!-- One projection slot, rendered into whichever anchor applies. Two bare
+     <ng-content> tags would send the label to the last one only, leaving an
+     external link with an empty pill. -->
+<ng-template #label><ng-content /></ng-template>
+
+@if (external()) {
+  <a [attr.href]="routerLink()" target="_blank" rel="noopener noreferrer" [class]="classes()">
+    <ng-container [ngTemplateOutlet]="label" />
+  </a>
+} @else {
+  <a [routerLink]="routerLink()" [class]="classes()">
+    <ng-container [ngTemplateOutlet]="label" />
+  </a>
+}

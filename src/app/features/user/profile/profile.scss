@@ -1,259 +1,150 @@
-@use 'styles/user-theme' as *;
-
+// Layout the design system draws inline on its ProfilePage. Every value is a
+// token; the controls, badges, fields and buttons are the global app classes.
 .prof {
-  height: 100%;
-  flex-direction: column;
-  gap: 20px;
-
-  // ── Grid ─────────────────────────────────────────────────
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: 20px;
-    align-items: start;
+  &__account {
+    display: flex;
+    align-items: center;
+    gap: var(--app-pad);
   }
 
-  &__full {
+  &__avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--app-gray-100);
+    border: 1px solid var(--app-border);
+    display: grid;
+    place-items: center;
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--app-text-muted);
+    flex-shrink: 0;
+  }
+
+  &__who {
+    min-width: 0;
+  }
+
+  &__who-name {
+    font-size: 0.95rem;
+    font-weight: var(--font-weight-medium);
+  }
+
+  &__who-sub {
+    font-size: 0.8rem;
+    color: var(--app-text-muted);
+    overflow-wrap: anywhere;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__grid-full {
     grid-column: 1 / -1;
   }
 
-  // ── Email display ─────────────────────────────────────────
-  &__email-row {
+  &__stack {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid rgba($border, 0.6);
-    margin-bottom: 4px;
+    gap: var(--app-pad);
+
+    &--narrow {
+      max-width: 360px;
+    }
   }
 
-  &__email {
-    font-size: 0.95rem;
-    color: $text-primary;
-    font-weight: 500;
-  }
-
-  // ── Form ─────────────────────────────────────────────────
-  &__form-group {
+  &__section {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 14px;
+
+    & + & {
+      padding-top: var(--app-pad);
+      border-top: 1px solid var(--app-border-soft);
+    }
   }
 
-  &__form-actions {
-    padding-top: 4px;
+  &__section-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--app-pad);
   }
 
-  &__label {
+  &__section-title {
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-medium);
+  }
+
+  &__section-sub {
     font-size: 0.8rem;
-    color: $text-muted;
+    color: var(--app-text-muted);
+    max-width: 60ch;
   }
 
-  &__field-error {
-    font-size: 0.75rem;
-    color: #dc2626;
-  }
-
-  &__input,
-  &__select {
-    border: 1px solid $border;
-    border-radius: 6px;
-    color: $text-primary;
-    font-size: 0.875rem;
-    padding: 8px 12px;
-    width: 100%;
-    transition: border-color 0.15s;
-
-    &:focus {
-      outline: none;
-      border-color: $accent;
-    }
-
-    &::placeholder { color: rgba($text-muted, 0.6); }
-  }
-
-  &__select {
-    appearance: none;
-    background-image: $select-arrow;
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 30px;
-    cursor: pointer;
-  }
-
-  // ── 2FA ──────────────────────────────────────────────────
-  &__tfa-badge {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    background: rgba($danger, 0.15);
-    color: #fca5a5;
-    border: 1px solid rgba($danger, 0.3);
-
-    &--on {
-      background: rgba($success, 0.15);
-      color: #86efac;
-      border-color: rgba($success, 0.3);
-    }
-  }
-
-  &__tfa-desc {
-    font-size: 0.875rem;
-    color: $text-muted;
-    margin: 0 0 16px;
-    line-height: 1.5;
-  }
-
-  &__tfa-actions {
+  &__setup {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  &__tfa-setup {
-    display: flex;
-    gap: 40px;
+    gap: var(--app-gap);
     flex-wrap: wrap;
     align-items: flex-start;
   }
 
-  &__tfa-steps {
+  &__step {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-width: 320px;
   }
 
-  &__tfa-step-label {
-    font-size: 0.875rem;
-    color: $text-primary;
-    font-weight: 500;
-    margin: 0;
-  }
-
-  &__qr-canvas {
-    border-radius: 8px;
-    background: #fff;
-    padding: 8px;
+  &__qr {
     display: block;
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: var(--app-bg-panel);
+    padding: 8px;
+
+    &--loading {
+      width: 216px;
+      height: 216px;
+      display: grid;
+      place-items: center;
+      color: var(--app-text-muted);
+      font-size: 0.85rem;
+    }
   }
 
-  &__qr-loading {
-    width: 216px;
-    height: 216px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f9fafb;
-    border-radius: 8px;
-    color: #9ca3af;
-    font-size: 0.85rem;
-  }
-
-  &__tfa-secret {
+  &__secret {
     font-size: 0.8rem;
-    color: $text-muted;
-    cursor: pointer;
+    color: var(--app-text-muted);
 
-    summary { user-select: none; }
+    summary {
+      cursor: pointer;
+      user-select: none;
+    }
   }
 
-  &__tfa-secret-key {
+  &__secret-key {
     display: block;
     margin-top: 6px;
-    font-size: 0.8rem;
-    background: $bg-dark;
-    border: 1px solid $border;
-    border-radius: 6px;
-    padding: 8px 12px;
-    color: $accent;
-    letter-spacing: 0.05em;
     word-break: break-all;
   }
 
-  &__tfa-backup {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  &__tfa-backup-warn {
-    font-size: 0.875rem;
-    color: #fde68a;
-    background: rgba($warning, 0.1);
-    border: 1px solid rgba($warning, 0.3);
-    border-radius: 6px;
-    padding: 10px 14px;
-    margin: 0;
-  }
-
-  &__tfa-backup-grid {
+  &__codes {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 8px;
   }
 
-  &__backup-code {
+  &__code {
     display: block;
     text-align: center;
-    background: $bg-dark;
-    border: 1px solid $border;
-    border-radius: 6px;
-    padding: 8px;
-    font-size: 0.9rem;
-    color: $text-primary;
     letter-spacing: 0.1em;
-    font-family: monospace;
-  }
-
-  &__tfa-disable {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    max-width: 360px;
-  }
-
-  // ── Button ───────────────────────────────────────────────
-  &__btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 9px 20px;
-    border-radius: 6px;
-    border: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s, opacity 0.15s;
-
-    &--primary {
-      background: $accent;
-      color: $accent-fg;
-      &:hover:not(:disabled) { background: $accent-hover; }
-      &:disabled { opacity: 0.5; cursor: not-allowed; }
-    }
-
-    &--ghost {
-      background: transparent;
-      border: 1px solid $border;
-      color: $text-muted;
-      &:hover:not(:disabled) { background: rgba($border, 0.4); color: $text-primary; }
-      &:disabled { opacity: 0.5; cursor: not-allowed; }
-    }
-
-    &--danger {
-      background: transparent;
-      border: 1px solid rgba($danger, 0.4);
-      color: #fca5a5;
-      &:hover:not(:disabled) { background: rgba($danger, 0.15); }
-      &:disabled { opacity: 0.5; cursor: not-allowed; }
-    }
-  }
-
-  &__input--code {
-    text-align: center;
-    font-size: 1.4rem;
-    letter-spacing: 0.4em;
-    font-weight: 600;
-    max-width: 200px;
   }
 }

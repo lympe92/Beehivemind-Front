@@ -1,32 +1,13 @@
-<div class="auth-page">
-  <div class="auth-card">
-    @if (state() === 'loading') {
-      <div class="auth-card__header">
-        <h1>Confirming your email...</h1>
-        <p>Please wait a moment.</p>
-      </div>
-    } @else if (state() === 'success') {
-      <div class="auth-card__header">
-        <h1>Email confirmed!</h1>
-        <p>Your account is now active.</p>
-      </div>
-      <div class="auth-info">
-        You can now sign in to your BeehiveMind account.
-      </div>
-      <p class="auth-card__footer">
-        <a routerLink="/auth/login">Go to login</a>
-      </p>
-    } @else {
-      <div class="auth-card__header">
-        <h1>Confirmation failed</h1>
-        <p>The link may be invalid or expired.</p>
-      </div>
-      <div class="auth-form__error" style="margin-top: 16px;">
-        Invalid or expired confirmation token.
-      </div>
-      <p class="auth-card__footer">
-        <a routerLink="/auth/login">Back to login</a>
-      </p>
-    }
-  </div>
-</div>
+@if (state() === 'loading') {
+  <app-auth-card title="Confirming your email..." subtitle="Please wait a moment." />
+} @else if (state() === 'success') {
+  <app-auth-card title="Email confirmed!" subtitle="Your account is now active.">
+    <div class="auth-info">You can now sign in to your BeehiveMind account.</div>
+    <p class="auth-card__footer"><a routerLink="/auth/login">Go to login</a></p>
+  </app-auth-card>
+} @else {
+  <app-auth-card title="Confirmation failed" subtitle="The link may be invalid or expired.">
+    <div class="auth-form__error" role="alert">Invalid or expired confirmation token.</div>
+    <p class="auth-card__footer"><a routerLink="/auth/login">Back to login</a></p>
+  </app-auth-card>
+}

@@ -7,12 +7,16 @@ import { PublicHeaderComponent } from '../header/public-header/public-header';
 import { SeoService } from '../../core/services/seo.service';
 import { SEO_CONFIG } from '../../core/services/seo.config';
 
+/**
+ * The public shell: fixed header, the page, footer. Each page renders its own
+ * `<main>` of `<section>`s so the band rhythm rule in base.css
+ * (`main > section`) reaches every band.
+ */
 @Component({
   selector: 'app-public-layout',
   standalone: true,
   imports: [RouterOutlet, PublicFooterComponent, PublicHeaderComponent],
   templateUrl: './public-layout.html',
-  styleUrl: './public-layout.scss',
 })
 export class PublicLayoutComponent implements OnInit {
   private readonly router = inject(Router);

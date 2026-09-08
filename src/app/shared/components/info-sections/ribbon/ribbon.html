@@ -1,6 +1,8 @@
-<section [class]="'ribbon' + (mode() === 'dark' ? ' ribbon--dark' : '')">
-  <div class="container">
-    <h4 class="text-center">"{{ quote() }}"</h4>
-    <h5 class="text-center">{{ author() }}</h5>
-  </div>
-</section>
+<div class="container">
+  <blockquote class="ribbon__quote">
+    <p>{{ quote() }}</p>
+    @if (author()) {
+      <cite class="ribbon__author">{{ author() }}</cite>
+    }
+  </blockquote>
+</div>

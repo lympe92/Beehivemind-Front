@@ -10,13 +10,13 @@ import {
   selectTwoFactorToken,
 } from '../../../store/auth/auth.selectors';
 import { take } from 'rxjs';
+import { AuthCardComponent } from '../../../shared/components/forms/auth-card/auth-card';
 
 @Component({
   selector: 'app-two-factor-verify',
   standalone: true,
-  imports: [FormsModule, AsyncPipe],
+  imports: [FormsModule, AsyncPipe, AuthCardComponent],
   templateUrl: './two-factor-verify.html',
-  styleUrl: './two-factor-verify.scss',
 })
 export class TwoFactorVerifyComponent implements OnInit {
   private store = inject(Store);

@@ -24,7 +24,6 @@ interface BeehiveForm {
   standalone: true,
   imports: [FormsModule, FilterBarComponent, DataTableComponent, CardComponent],
   templateUrl: './beehives.html',
-  styleUrl: './beehives.scss',
 })
 export class BeehivesComponent implements OnInit {
   private store = inject(Store);

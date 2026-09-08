@@ -1,13 +1,13 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { AuthCardComponent } from '../../../shared/components/forms/auth-card/auth-card';
 
 @Component({
   selector: 'app-auth-confirmation',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, AuthCardComponent],
   templateUrl: './confirmation.html',
-  styleUrl: './confirmation.scss',
 })
 export class ConfirmationComponent implements OnInit {
   private route = inject(ActivatedRoute);

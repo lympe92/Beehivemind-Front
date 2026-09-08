@@ -1,25 +1,25 @@
-<div class="bh">
+<div class="app-page">
 
-  <!-- Filters + Bulk Create -->
+  <!-- Filters + bulk create -->
   <app-filter-bar
     [apiaries]="apiaries()"
     [apiaryId]="selectedApiaryId()"
     (apiaryIdChange)="onApiaryChange($event)">
 
     @if (selectedApiaryId() !== 0) {
-      <div class="bh__filter-group">
-        <label class="bh__label">Beehives to Create</label>
-        <div class="bh__create-group">
-          <input class="bh__input bh__input--sm" type="number" min="1" [(ngModel)]="beehivesToCreate" name="count" placeholder="0" />
-          <button class="bh__btn bh__btn--primary bh__btn--sm" (click)="addBeehives()">Create</button>
+      <div class="fb__group">
+        <label class="fb__label" for="bh-count">Beehives to Create</label>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <input id="bh-count" class="app-input app-input--sm" type="number" min="1"
+                 [(ngModel)]="beehivesToCreate" name="count" placeholder="0" />
+          <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="addBeehives()">Create</button>
         </div>
       </div>
     }
 
   </app-filter-bar>
 
-  <!-- Beehives table -->
-  <app-card title="Beehives">
+  <app-card title="Beehives" [flush]="true">
     <app-data-table
       [columns]="columns"
       [rows]="beehives()"
@@ -36,19 +36,25 @@
       </ng-template>
 
       <ng-template #editRowTpl let-row let-i="index">
-        <td class="dt__muted">{{ i + 1 }}</td>
-        <td><input class="bh__input" [(ngModel)]="editForm.name" name="edit_name" placeholder="Beehive name" /></td>
-        <td><input class="bh__input bh__input--sm" type="number" min="2000" [(ngModel)]="editForm.queen_year" name="edit_qy" placeholder="e.g. 2023" /></td>
+        <td><span class="dt__muted">{{ i + 1 }}</span></td>
+        <td>
+          <input class="app-input" [(ngModel)]="editForm.name" name="edit_name"
+                 placeholder="Beehive name" aria-label="Beehive name" />
+        </td>
+        <td>
+          <input class="app-input app-input--sm" type="number" min="2000" [(ngModel)]="editForm.queen_year"
+                 name="edit_qy" placeholder="e.g. 2023" aria-label="Queen year" />
+        </td>
         <td class="dt__actions">
-          <button class="bh__btn bh__btn--primary bh__btn--sm" (click)="confirmEdit()">Save</button>
-          <button class="bh__btn bh__btn--ghost bh__btn--sm" (click)="cancelEdit()">Cancel</button>
+          <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="confirmEdit()">Save</button>
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="cancelEdit()">Cancel</button>
         </td>
       </ng-template>
 
       <ng-template #actionsTpl let-row>
-        <button class="bh__btn bh__btn--ghost bh__btn--sm" (click)="showQr(row)">QR</button>
-        <button class="bh__btn bh__btn--ghost bh__btn--sm" (click)="startEdit(row)">Edit</button>
-        <button class="bh__btn bh__btn--danger bh__btn--sm" (click)="deleteRow(row)">Delete</button>
+        <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="showQr(row)">QR</button>
+        <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
+        <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
       </ng-template>
 
     </app-data-table>

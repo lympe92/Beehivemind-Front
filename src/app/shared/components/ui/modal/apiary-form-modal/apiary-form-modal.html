@@ -1,13 +1,13 @@
 <app-modal-shell [title]="title" (close)="close()">
 
-  <form [formGroup]="form" class="apiary-form">
+  <form [formGroup]="form" class="form-stack" (ngSubmit)="submit()" novalidate>
 
     <app-form-input
       formControlName="name"
       label="Name"
       inputType="text" />
 
-    <div class="apiary-form__row">
+    <div class="form-row">
       <app-form-input
         formControlName="hivesNumber"
         label="Hives"
@@ -19,30 +19,32 @@
         inputType="date" />
     </div>
 
-    <div class="apiary-form__location-wrap">
-      <app-form-input
-        formControlName="location"
-        label="Location"
-        [placeholder]="geocoding() ? 'Detecting location...' : 'Click the map or type manually'" />
-    </div>
+    <app-form-input
+      formControlName="location"
+      label="Location"
+      [placeholder]="geocoding() ? 'Detecting location…' : 'Click the map or type manually'" />
 
-    <div class="apiary-form__map-label">
-      Coordinates *
-      @if (coordinatesError()) {
-        <span class="apiary-form__map-error">Please click the map to set a location</span>
-      }
-    </div>
-    <div class="apiary-form__map" [class.apiary-form__map--error]="coordinatesError()">
-      <app-map-picker
-        [marker]="marker()"
-        (markerChange)="onMarkerChange($event)" />
+    <div class="form-group">
+      <span class="form-label">
+        <span>Coordinates *</span>
+        @if (coordinatesError()) {
+          <span class="apiary-form__map-error">Click the map to set a location</span>
+        }
+      </span>
+      <!-- Coordinates can only be set by clicking the map: a beekeeper knows
+           where the apiary is, not its decimal degrees. -->
+      <div class="apiary-form__map" [class.apiary-form__map--error]="coordinatesError()">
+        <app-map-picker
+          [marker]="marker()"
+          (markerChange)="onMarkerChange($event)" />
+      </div>
     </div>
 
   </form>
 
   <ng-template #footer>
-    <button class="apiary-form__btn apiary-form__btn--ghost" type="button" (click)="close()">Cancel</button>
-    <button class="apiary-form__btn apiary-form__btn--primary" type="button" (click)="submit()">
+    <button class="app-btn app-btn--ghost" type="button" (click)="close()">Cancel</button>
+    <button class="app-btn app-btn--primary" type="button" (click)="submit()">
       {{ isEdit ? 'Save' : 'Add' }}
     </button>
   </ng-template>

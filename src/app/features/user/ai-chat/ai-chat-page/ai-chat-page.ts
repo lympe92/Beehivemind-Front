@@ -28,6 +28,8 @@ import { AiMessage, SendMessageRequest } from '../../../../core/models/ai-chat.m
 import { DatePipe } from '@angular/common';
 import { ConversationListComponent } from '../conversation-list/conversation-list';
 import { ChatMessageComponent } from '../chat-message/chat-message';
+import { CardComponent } from '../../../../shared/components/ui/card/card';
+import { CalloutComponent } from '../../../../shared/components/ui/callout/callout';
 
 const EXAMPLE_PROMPTS = [
   'How has my most active beehive been doing this month?',
@@ -38,7 +40,7 @@ const EXAMPLE_PROMPTS = [
 @Component({
   selector: 'app-ai-chat-page',
   standalone: true,
-  imports: [DatePipe, ConversationListComponent, ChatMessageComponent],
+  imports: [DatePipe, ConversationListComponent, ChatMessageComponent, CardComponent, CalloutComponent],
   templateUrl: './ai-chat-page.html',
   styleUrl: './ai-chat-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,6 +79,7 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
 
   // ── Scroll ───────────────────────────────────────────────────
   private messagesContainer = viewChild<ElementRef<HTMLDivElement>>('messagesContainer');
+  private composer = viewChild<ElementRef<HTMLTextAreaElement>>('composer');
   private shouldScroll = false;
 
   // ── State ────────────────────────────────────────────────────
@@ -184,8 +187,7 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
 
   tryPrompt(prompt: string): void {
     this.inputMessage.set(prompt);
-    const textarea = document.querySelector<HTMLTextAreaElement>('.chat-input__textarea');
-    textarea?.focus();
+    this.composer()?.nativeElement.focus();
   }
 
   trackById(_: number, item: { id: number }): number {

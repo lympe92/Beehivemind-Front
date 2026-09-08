@@ -1,72 +1,61 @@
-<div class="dashboard">
-  <h2 class="dashboard__title">Dashboard</h2>
+<div class="app-page">
+  <div class="app-page-header">
+    <h1 class="app-page-title">Dashboard</h1>
+  </div>
 
   @if (loading()) {
-    <div class="dashboard__loading">Loading stats...</div>
+    <div class="app-state">Loading stats…</div>
   } @else if (error()) {
-    <div class="dashboard__error">{{ error() }}</div>
+    <app-error [message]="error()!" [retry]="true" (retried)="load()" />
   } @else if (stats(); as s) {
-    <div class="stats-grid">
-
-      <!-- Users -->
-      <div class="stat-card stat-card--accent">
-        <div class="stat-card__label">Total Users</div>
-        <div class="stat-card__value">{{ s.users.total }}</div>
-        <div class="stat-card__sub">+{{ s.users.new_this_month }} this month</div>
+    <!-- The accent appears once, on the figure the page exists for. Ten more
+         coloured cards would put it past its budget and stop it meaning anything. -->
+    <div class="admin-stats">
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot admin-stat__dot--accent"></span>Total users</span>
+        <span class="admin-stat__value">{{ s.users.total | number }}</span>
+        <span class="admin-stat__sub">+{{ s.users.new_this_month | number }} this month</span>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-card__label">Active</div>
-        <div class="stat-card__value">{{ s.users.active }}</div>
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot admin-stat__dot--success"></span>Active</span>
+        <span class="admin-stat__value">{{ s.users.active | number }}</span>
       </div>
-
-      <div class="stat-card stat-card--warn">
-        <div class="stat-card__label">Suspended</div>
-        <div class="stat-card__value">{{ s.users.suspended }}</div>
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot admin-stat__dot--warning"></span>Suspended</span>
+        <span class="admin-stat__value">{{ s.users.suspended | number }}</span>
       </div>
-
-      <div class="stat-card stat-card--danger">
-        <div class="stat-card__label">Banned</div>
-        <div class="stat-card__value">{{ s.users.banned }}</div>
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot admin-stat__dot--danger"></span>Banned</span>
+        <span class="admin-stat__value">{{ s.users.banned | number }}</span>
       </div>
-
-      <!-- Plans -->
-      <div class="stat-card">
-        <div class="stat-card__label">Free Plan</div>
-        <div class="stat-card__value">{{ s.users.by_plan.free }}</div>
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot"></span>Free plan</span>
+        <span class="admin-stat__value">{{ s.users.by_plan.free | number }}</span>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-card__label">Pro Plan</div>
-        <div class="stat-card__value">{{ s.users.by_plan.pro }}</div>
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot"></span>Pro plan</span>
+        <span class="admin-stat__value">{{ s.users.by_plan.pro | number }}</span>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-card__label">Enterprise</div>
-        <div class="stat-card__value">{{ s.users.by_plan.enterprise }}</div>
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot"></span>Enterprise</span>
+        <span class="admin-stat__value">{{ s.users.by_plan.enterprise | number }}</span>
       </div>
-
-      <!-- Platform -->
-      <div class="stat-card">
-        <div class="stat-card__label">Employees</div>
-        <div class="stat-card__value">{{ s.employees }}</div>
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot"></span>Employees</span>
+        <span class="admin-stat__value">{{ s.employees | number }}</span>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-card__label">Apiaries</div>
-        <div class="stat-card__value">{{ s.apiaries }}</div>
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot"></span>Apiaries</span>
+        <span class="admin-stat__value">{{ s.apiaries | number }}</span>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-card__label">Beehives</div>
-        <div class="stat-card__value">{{ s.beehives }}</div>
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot"></span>Beehives</span>
+        <span class="admin-stat__value">{{ s.beehives | number }}</span>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-card__label">Records</div>
-        <div class="stat-card__value">{{ s.records }}</div>
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot"></span>Records</span>
+        <span class="admin-stat__value">{{ s.records | number }}</span>
       </div>
-
     </div>
   }
 </div>

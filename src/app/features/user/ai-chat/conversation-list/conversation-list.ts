@@ -7,6 +7,7 @@ import {
   selectConversationsLoading,
 } from '../../../../store/ai-chat/ai-chat.selectors';
 import { ToastService } from '../../../../shared/components/ui/toast/toast.service';
+import { ModalService } from '../../../../core/modal/modal.service';
 
 @Component({
   selector: 'app-conversation-list',
@@ -19,6 +20,7 @@ import { ToastService } from '../../../../shared/components/ui/toast/toast.servi
 export class ConversationListComponent implements OnInit {
   private store = inject(Store);
   private toast = inject(ToastService);
+  private modal = inject(ModalService);
 
   activeId = input<number | null>(null);
   selected = output<number>();
@@ -34,10 +36,15 @@ export class ConversationListComponent implements OnInit {
     this.selected.emit(id);
   }
 
-  delete(event: Event, id: number): void {
+  async delete(event: Event, id: number): Promise<void> {
     event.stopPropagation();
-    // eslint-disable-next-line no-alert
-    if (!confirm('Delete this conversation? This cannot be undone.')) return;
+    const confirmed = await this.modal.confirm({
+      title: 'Delete conversation',
+      message: 'Delete this conversation? Its messages cannot be recovered.',
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!confirmed) return;
     this.store.dispatch(AiChatActions.deleteConversation({ id }));
     this.toast.success('Conversation deleted.');
   }

@@ -3,22 +3,32 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { WeatherService } from '../../../../core/services/weather.service';
 import { WeatherData } from '../../../../core/models/weather.model';
 
-const S = `style="width:100%;height:100%;display:block"`;
+const S = 'style="width:100%;height:100%;display:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+// Every cloud body used to be filled white-alpha, which only worked on the old
+// blue gradient. On the white card a cloud is a light grey fill with a
+// currentColor stroke.
+const CLOUD = '#e0e0e0';
 
 const ICONS: Record<string, string> = {
-  'clear': `<svg ${S} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>`,
-  'mostly-clear': `<svg ${S} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3" fill="currentColor" stroke="none"/><path d="M9 3v1.5M3.2 3.2l1 1M3 9h1.5M3.2 14.8l1-1M14.8 3.2l-1 1" stroke-width="1.5"/><path d="M16 11.5a3.5 3.5 0 0 1 0 7H8a3.5 3.5 0 0 1 0-7h.2A4.5 4.5 0 0 1 16 11.5z" fill="rgba(255,255,255,0.35)" stroke="currentColor"/></svg>`,
-  'partly-cloudy': `<svg ${S} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3" fill="currentColor" stroke="none" opacity="0.85"/><path d="M8 2v1M2.5 2.5l.7.7M2 8h1M2.5 13.5l.7-.7M13.5 2.5l-.7.7" stroke-width="1.5" opacity="0.85"/><path d="M18 13a4 4 0 0 1 0 8H7a4 4 0 0 1 0-8h.2A5 5 0 0 1 18 13z" fill="rgba(255,255,255,0.3)" stroke="currentColor"/></svg>`,
-  'mostly-cloudy': `<svg ${S} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="8" r="2.5" fill="currentColor" stroke="none" opacity="0.5"/><path d="M7 3v1M2.8 3l.7.7M2 8h1" stroke-width="1.5" opacity="0.5"/><path d="M19 11a4.5 4.5 0 0 1 0 9H6a4.5 4.5 0 0 1 0-9h.2A6 6 0 0 1 19 11z" fill="rgba(255,255,255,0.28)" stroke="currentColor"/></svg>`,
-  'overcast': `<svg ${S} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 10a5 5 0 0 1 0 10H5a5 5 0 0 1 0-10h.2A7 7 0 0 1 19 10z" fill="rgba(255,255,255,0.22)" stroke="currentColor"/></svg>`,
-  'fog': `<svg ${S} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h18M3 12h18M5 16h14M7 20h10"/></svg>`,
-  'drizzle': `<svg ${S} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 9a5 5 0 0 1 0 10H6a5 5 0 0 1 0-10h.2A6.5 6.5 0 0 1 17 9z" fill="rgba(255,255,255,0.22)"/><path d="M8 20l-1 2M12 20l-1 2M16 20l-1 2" stroke-width="1.5"/></svg>`,
-  'rain': `<svg ${S} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 9a5 5 0 0 1 0 10H6a5 5 0 0 1 0-10h.2A6.5 6.5 0 0 1 17 9z" fill="rgba(255,255,255,0.22)"/><path d="M7 19v3M11 19v3M15 19v3M9 21v3M13 21v3"/></svg>`,
-  'snow': `<svg ${S} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 9a5 5 0 0 1 0 10H6a5 5 0 0 1 0-10h.2A6.5 6.5 0 0 1 17 9z" fill="rgba(255,255,255,0.22)"/><path d="M8 20l.5 2-.5 2M12 20v4M16 20l-.5 2 .5 2M7 22h2M11 22h2M15 22h2" stroke-width="1.5"/></svg>`,
-  'sleet': `<svg ${S} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 9a5 5 0 0 1 0 10H6a5 5 0 0 1 0-10h.2A6.5 6.5 0 0 1 17 9z" fill="rgba(255,255,255,0.22)"/><path d="M8 19v2M12 19l-.5 2M16 19v2M9 22l-.5 1M13 21l-.5 1" stroke-width="1.5"/></svg>`,
-  'storm': `<svg ${S} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8a5 5 0 0 1 0 10H6a5 5 0 0 1 0-10h.2A6.5 6.5 0 0 1 17 8z" fill="rgba(255,255,255,0.22)"/><path d="M13 12l-3 5h5l-3 5" stroke-width="2.5"/></svg>`,
+  'clear': `<svg ${S}><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>`,
+  'mostly-clear': `<svg ${S}><circle cx="9" cy="9" r="3" fill="currentColor" stroke="none"/><path d="M9 3v1.5M3.2 3.2l1 1M3 9h1.5M3.2 14.8l1-1M14.8 3.2l-1 1" stroke-width="1.5"/><path d="M16 11.5a3.5 3.5 0 0 1 0 7H8a3.5 3.5 0 0 1 0-7h.2A4.5 4.5 0 0 1 16 11.5z" fill="${CLOUD}" stroke="currentColor"/></svg>`,
+  'partly-cloudy': `<svg ${S}><circle cx="8" cy="8" r="3" fill="currentColor" stroke="none"/><path d="M8 2v1M2.5 2.5l.7.7M2 8h1M2.5 13.5l.7-.7M13.5 2.5l-.7.7" stroke-width="1.5"/><path d="M18 13a4 4 0 0 1 0 8H7a4 4 0 0 1 0-8h.2A5 5 0 0 1 18 13z" fill="${CLOUD}" stroke="currentColor"/></svg>`,
+  'mostly-cloudy': `<svg ${S}><circle cx="7" cy="8" r="2.5" fill="currentColor" stroke="none"/><path d="M7 3v1M2.8 3l.7.7M2 8h1" stroke-width="1.5"/><path d="M19 11a4.5 4.5 0 0 1 0 9H6a4.5 4.5 0 0 1 0-9h.2A6 6 0 0 1 19 11z" fill="${CLOUD}" stroke="currentColor"/></svg>`,
+  'overcast': `<svg ${S}><path d="M19 10a5 5 0 0 1 0 10H5a5 5 0 0 1 0-10h.2A7 7 0 0 1 19 10z" fill="${CLOUD}" stroke="currentColor"/></svg>`,
+  'fog': `<svg ${S}><path d="M3 8h18M3 12h18M5 16h14M7 20h10"/></svg>`,
+  'drizzle': `<svg ${S}><path d="M17 9a5 5 0 0 1 0 10H6a5 5 0 0 1 0-10h.2A6.5 6.5 0 0 1 17 9z" fill="${CLOUD}"/><path d="M8 20l-1 2M12 20l-1 2M16 20l-1 2" stroke-width="1.5"/></svg>`,
+  'rain': `<svg ${S}><path d="M17 9a5 5 0 0 1 0 10H6a5 5 0 0 1 0-10h.2A6.5 6.5 0 0 1 17 9z" fill="${CLOUD}"/><path d="M7 19v3M11 19v3M15 19v3M9 21v3M13 21v3"/></svg>`,
+  'snow': `<svg ${S}><path d="M17 9a5 5 0 0 1 0 10H6a5 5 0 0 1 0-10h.2A6.5 6.5 0 0 1 17 9z" fill="${CLOUD}"/><path d="M8 20l.5 2-.5 2M12 20v4M16 20l-.5 2 .5 2M7 22h2M11 22h2M15 22h2" stroke-width="1.5"/></svg>`,
+  'sleet': `<svg ${S}><path d="M17 9a5 5 0 0 1 0 10H6a5 5 0 0 1 0-10h.2A6.5 6.5 0 0 1 17 9z" fill="${CLOUD}"/><path d="M8 19v2M12 19l-.5 2M16 19v2M9 22l-.5 1M13 21l-.5 1" stroke-width="1.5"/></svg>`,
+  'storm': `<svg ${S}><path d="M17 8a5 5 0 0 1 0 10H6a5 5 0 0 1 0-10h.2A6.5 6.5 0 0 1 17 8z" fill="${CLOUD}"/><path d="M13 12l-3 5h5l-3 5" stroke-width="2.5"/></svg>`,
 };
 
+/**
+ * The apiary forecast card: current conditions with seven metrics, an
+ * expandable hourly table and a seven-day strip. It is a `.card` like every
+ * other dashboard panel; the accent appears once, on the current-condition
+ * icon. Styles: `.wc__*` in styles/components/app/app.css.
+ */
 @Component({
   selector: 'app-weather-card',
   standalone: true,

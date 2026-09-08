@@ -10,6 +10,8 @@ google-map {
   height: 100%;
 }
 
+// The frame the tiles land in, on the neutral ramp. Muted grey drops under
+// 4.5:1 on a tint, so the label steps to the darker grey.
 .map-picker__placeholder {
   width: 100%;
   height: 100%;
@@ -17,7 +19,7 @@ google-map {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e5e5e5;
-  color: #737373;
+  background: var(--app-gray-100);
+  color: var(--app-gray-600);
   font-size: 0.875rem;
 }

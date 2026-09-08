@@ -1,0 +1,105 @@
+<div class="app-page">
+  <div class="app-page-header">
+    <h1 class="app-page-title">AI response review</h1>
+    <span class="app-page-meta">{{ total() | number }} awaiting review</span>
+  </div>
+
+  @if (error()) {
+    <app-callout tone="error" [dismissable]="true" (dismiss)="error.set(null)">{{ error() }}</app-callout>
+  }
+
+  <!-- Result detail -->
+  @if (selectedResult(); as result) {
+    <app-card title="Judgment">
+      <button card-header-end type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="closeResult()">Close</button>
+
+      <div class="app-fields">
+        <div class="app-field">
+          <span class="app-field__label">Overall score (1–5)</span>
+          <span class="app-field__value">
+            <span class="app-badge" [class.app-badge--banned]="result.judgment.composite_score <= 2.5" [class.app-badge--active]="result.judgment.composite_score > 2.5">
+              {{ result.judgment.composite_score }}
+            </span>
+          </span>
+        </div>
+        <div class="app-field">
+          <span class="app-field__label">Factual accuracy</span>
+          <span class="app-field__value">{{ result.judgment.factual_accuracy }}/5</span>
+        </div>
+        <div class="app-field">
+          <span class="app-field__label">Tool correctness</span>
+          <span class="app-field__value">{{ result.judgment.tool_correctness }}/5</span>
+        </div>
+        <div class="app-field">
+          <span class="app-field__label">Refusal appropriateness</span>
+          <span class="app-field__value">
+            {{ result.judgment.refusal_appropriateness !== null ? result.judgment.refusal_appropriateness + '/5' : '—' }}
+          </span>
+        </div>
+        <div class="app-field">
+          <span class="app-field__label">Helpfulness</span>
+          <span class="app-field__value">{{ result.judgment.helpfulness }}/5</span>
+        </div>
+        <div class="app-field">
+          <span class="app-field__label">Hallucination</span>
+          <span class="app-field__value">
+            <span class="app-bool" [class.app-bool--yes]="result.judgment.hallucination_flag">{{ result.judgment.hallucination_flag ? 'Yes' : 'No' }}</span>
+          </span>
+        </div>
+        <div class="app-field">
+          <span class="app-field__label">Safety concern</span>
+          <span class="app-field__value">
+            <span class="app-bool" [class.app-bool--yes]="result.judgment.safety_flag">{{ result.judgment.safety_flag ? 'Yes' : 'No' }}</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="app-field" style="margin-top: var(--app-pad)">
+        <span class="app-field__label">Reasoning</span>
+        <p class="app-field__value" style="margin: 0; max-width: 72ch">{{ result.judgment.reasoning }}</p>
+      </div>
+    </app-card>
+  }
+
+  <app-card [flush]="true">
+    <app-data-table
+      [columns]="columns"
+      [rows]="pending()"
+      [loading]="loading()"
+      [pagination]="tablePagination"
+      (pageChange)="goToPage($event)"
+      emptyMessage="Nothing is waiting for review.">
+
+      <ng-template #cellTpl let-row let-col="col">
+        @switch (col.key) {
+          @case ('user_question') { {{ row.user_question || '—' }} }
+          @case ('ai_response') {
+            {{ (row.ai_response || '—') | slice:0:120 }}{{ row.ai_response && row.ai_response.length > 120 ? '…' : '' }}
+          }
+          @case ('created_at') { {{ row.created_at | slice:0:10 }} }
+          @default { {{ row[col.key] ?? '—' }} }
+        }
+      </ng-template>
+
+      <ng-template #actionsTpl let-row>
+        @if (results()[row.message_id]; as rubric) {
+          <span class="app-badge" [class.app-badge--banned]="rubric.composite_score <= 2.5" [class.app-badge--active]="rubric.composite_score > 2.5">
+            {{ rubric.composite_score }}
+          </span>
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="viewResult(row.message_id)">View</button>
+        } @else if (judgingId() === row.message_id) {
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" disabled>Judging…</button>
+        } @else {
+          <button
+            type="button"
+            class="app-btn app-btn--primary app-btn--sm"
+            [disabled]="judgingId() !== null"
+            (click)="judge(row.message_id)">
+            Judge
+          </button>
+        }
+      </ng-template>
+
+    </app-data-table>
+  </app-card>
+</div>

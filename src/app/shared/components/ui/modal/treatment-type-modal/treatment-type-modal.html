@@ -1,15 +1,15 @@
 <app-modal-shell [title]="title" (close)="close()">
 
-  <form [formGroup]="form" (ngSubmit)="submit()" class="ttm-form">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form-stack" novalidate>
 
-    <div class="ttm-form__row">
-      <label class="ttm-form__label">Name *</label>
-      <input class="ttm-form__input" formControlName="name" placeholder="e.g. Formic Acid Varroa" />
+    <div class="form-group">
+      <label class="form-label" for="ttm-name">Name *</label>
+      <input id="ttm-name" class="form-control" formControlName="name" placeholder="e.g. Formic Acid Varroa" />
     </div>
 
-    <div class="ttm-form__row">
-      <label class="ttm-form__label">Disease *</label>
-      <select class="ttm-form__input" formControlName="disease">
+    <div class="form-group">
+      <label class="form-label" for="ttm-disease">Disease *</label>
+      <select id="ttm-disease" class="form-select" formControlName="disease">
         <option value="">— Select disease —</option>
         @for (d of diseases; track d.value) {
           <option [value]="d.value">{{ d.label }}</option>
@@ -17,47 +17,54 @@
       </select>
     </div>
 
-    <div class="ttm-form__row">
-      <label class="ttm-form__label">Product *</label>
-      <input class="ttm-form__input" formControlName="product" placeholder="e.g. Formic Acid 65%" />
+    <div class="form-group">
+      <label class="form-label" for="ttm-product">Product *</label>
+      <input id="ttm-product" class="form-control" formControlName="product" placeholder="e.g. Formic Acid 65%" />
     </div>
 
-    <div class="ttm-form__row">
-      <label class="ttm-form__label">Dose</label>
-      <input class="ttm-form__input" formControlName="dose" placeholder="e.g. 50ml per hive" />
+    <div class="form-group">
+      <label class="form-label" for="ttm-dose">Dose</label>
+      <input id="ttm-dose" class="form-control" formControlName="dose" placeholder="e.g. 50ml per hive" />
     </div>
 
-    <div class="ttm-form__row">
-      <label class="ttm-form__label">Notes</label>
-      <textarea class="ttm-form__textarea" formControlName="notes" rows="3"
+    <div class="form-group">
+      <label class="form-label" for="ttm-notes">Notes</label>
+      <textarea id="ttm-notes" class="form-control" formControlName="notes" rows="3"
         placeholder="General instructions or observations…"></textarea>
     </div>
 
-    <div class="ttm-form__toggle">
-      <label class="ttm-form__toggle-label">
-        <input type="checkbox" formControlName="isRecurring" class="ttm-form__checkbox" />
-        Recurring treatment
-      </label>
+    <div class="form-group">
+      <button
+        type="button"
+        role="switch"
+        class="toggle-row"
+        [attr.aria-checked]="recurring"
+        (click)="form.controls.isRecurring.setValue(!recurring)">
+        <span class="toggle-track" [class.checked]="recurring"><span class="toggle-thumb"></span></span>
+        <span class="toggle-label">Recurring treatment</span>
+      </button>
     </div>
 
     @if (recurring) {
-      <div class="ttm-form__recurring">
-        <div class="ttm-form__row ttm-form__row--half">
-          <label class="ttm-form__label">Repeat every (days) *</label>
-          <input class="ttm-form__input" type="number" min="1" formControlName="intervalDays"
-            placeholder="e.g. 7" />
+      <div class="ttm-recurring">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="ttm-interval">Repeat every (days) *</label>
+            <input id="ttm-interval" class="form-control no-spinners" type="number" min="1" formControlName="intervalDays"
+              placeholder="e.g. 7" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ttm-repetitions">Repetitions *</label>
+            <input id="ttm-repetitions" class="form-control no-spinners" type="number" min="1" formControlName="repetitions"
+              placeholder="e.g. 3" />
+          </div>
         </div>
-        <div class="ttm-form__row ttm-form__row--half">
-          <label class="ttm-form__label">Repetitions *</label>
-          <input class="ttm-form__input" type="number" min="1" formControlName="repetitions"
-            placeholder="e.g. 3" />
-        </div>
+        <!-- The live preview of the schedule the type will generate —
+             `repetitions` is the number of repeats, so doses are repetitions + 1. -->
         @if (form.value.intervalDays && form.value.repetitions) {
-          <p class="ttm-form__preview">
+          <p class="ttm-recurring__preview">
             Will create {{ form.value.repetitions + 1 }} sessions:
-            day 0@for (i of [].constructor(form.value.repetitions); track $index) {
-              , day {{ ($index + 1) * form.value.intervalDays }}
-            }
+            day 0@for (i of [].constructor(form.value.repetitions); track $index) {, day {{ ($index + 1) * form.value.intervalDays }}}
           </p>
         }
       </div>
@@ -66,8 +73,8 @@
   </form>
 
   <ng-template #footer>
-    <button type="button" class="ttm-btn ttm-btn--ghost" (click)="close()">Cancel</button>
-    <button type="button" class="ttm-btn ttm-btn--primary" (click)="submit()">
+    <button type="button" class="app-btn app-btn--ghost" (click)="close()">Cancel</button>
+    <button type="button" class="app-btn app-btn--primary" (click)="submit()">
       {{ isEdit ? 'Save Changes' : 'Create' }}
     </button>
   </ng-template>

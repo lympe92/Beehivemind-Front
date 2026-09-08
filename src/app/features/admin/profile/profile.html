@@ -1,42 +1,21 @@
-<div class="admin-profile">
-  <div class="page-header">
-    <h2>My Profile</h2>
+<div class="app-page">
+  <div class="app-page-header">
+    <h1 class="app-page-title">My profile</h1>
   </div>
 
-  <div class="panel">
-    <h3>Change Password</h3>
-
-    @if (successMessage()) {
-      <div class="state-msg state-msg--success">{{ successMessage() }}</div>
-    }
-    @if (errorMessage()) {
-      <div class="state-msg state-msg--error">{{ errorMessage() }}</div>
-    }
-
-    <div class="form-group">
-      <label>Current Password</label>
-      <input type="password" [(ngModel)]="form.current_password" name="cur_pw" placeholder="Current password" />
-    </div>
-
-    <div class="form-group">
-      <label>New Password</label>
-      <input type="password" [(ngModel)]="form.new_password" name="new_pw" placeholder="Min. 8 chars, uppercase, lowercase, number" />
-      @if (form.new_password) {
-        @for (rule of passwordErrors; track rule.key) {
-          <small class="field-error">{{ rule.message }}</small>
-        }
+  <div class="app-page-narrow">
+    <app-card title="Change password">
+      @if (successMessage()) {
+        <app-callout tone="success">{{ successMessage() }}</app-callout>
       }
-    </div>
-
-    <div class="form-group">
-      <label>Confirm New Password</label>
-      <input type="password" [(ngModel)]="form.confirm_password" name="conf_pw" placeholder="Repeat new password" />
-    </div>
-
-    <div class="panel__actions">
-      <button class="btn btn--primary" (click)="savePassword()" [disabled]="saving()">
-        {{ saving() ? 'Saving...' : 'Change Password' }}
-      </button>
-    </div>
+      @if (errorMessage()) {
+        <app-callout tone="error">{{ errorMessage() }}</app-callout>
+      }
+      <app-form
+        [fields]="fields"
+        submitLabel="Change password"
+        [loading]="saving()"
+        (submitForm)="savePassword($event)" />
+    </app-card>
   </div>
 </div>

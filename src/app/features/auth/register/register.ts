@@ -10,13 +10,14 @@ import { selectIsLoggedIn } from '../../../store/auth/auth.selectors';
 import { environment } from '../../../../environments/environment';
 import { COUNTRIES, Country } from '../../../core/data/countries';
 import { getFailedPasswordRules, passwordStrengthValidator, PasswordRule } from '../../../shared/components/ui/form/password-rules';
+import { AuthCardComponent } from '../../../shared/components/forms/auth-card/auth-card';
+import { InputComponent } from '../../../shared/components/form-fields/input/input.component';
 
 @Component({
   selector: 'app-auth-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, AuthCardComponent, InputComponent],
   templateUrl: './register.html',
-  styleUrl: './register.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent implements OnInit {

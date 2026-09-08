@@ -13,7 +13,6 @@ import { syncValidators } from '../../../shared/components/ui/form/validators.co
   standalone: true,
   imports: [DataTableComponent],
   templateUrl: './cost-categories.html',
-  styleUrl: './cost-categories.scss',
 })
 export class CostCategoriesComponent implements OnInit {
   private categoryService = inject(CostCategoryService);
@@ -24,7 +23,6 @@ export class CostCategoriesComponent implements OnInit {
 
   readonly columns: ColumnDef[] = [
     { key: 'name', label: 'Name' },
-    { key: 'description', label: 'Description' },
     { key: 'type', label: 'Type' },
   ];
 

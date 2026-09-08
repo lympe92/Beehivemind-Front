@@ -1,17 +1,12 @@
-<div class="auth-page">
-  <div class="auth-card">
-    <div class="auth-card__header">
-      <h1>One last step</h1>
-      <p>Where are your apiaries located?</p>
-    </div>
+<app-auth-card title="One last step" subtitle="Where are your apiaries located?">
+  @if (error()) {
+    <div class="auth-form__error" role="alert">{{ error() }}</div>
+  }
 
-    @if (error()) {
-      <div class="auth-form__error">{{ error() }}</div>
-    }
-
+  <div class="auth-form">
     <div class="form-group">
-      <label>Country</label>
-      <select (change)="onCountryChange($event)" class="form-select">
+      <label class="form-label" for="profile-country">Country</label>
+      <select id="profile-country" class="form-select" (change)="onCountryChange($event)" autocomplete="country-name">
         <option value="">Select your country</option>
         @for (c of countries; track c.code) {
           <option [value]="c.code">{{ c.name }}</option>
@@ -21,14 +16,14 @@
 
     <button
       type="button"
-      class="auth-btn"
+      class="btn btn--md btn--primary btn--full"
       (click)="submit()"
       [disabled]="!selectedCountry || loading()">
       {{ loading() ? 'Saving...' : 'Continue' }}
     </button>
-
-    <p class="auth-card__footer">
-      <button type="button" class="auth-link-btn" (click)="skip()">Skip for now</button>
-    </p>
   </div>
-</div>
+
+  <p class="auth-card__footer">
+    <button type="button" class="auth-link-btn" (click)="skip()">Skip for now</button>
+  </p>
+</app-auth-card>

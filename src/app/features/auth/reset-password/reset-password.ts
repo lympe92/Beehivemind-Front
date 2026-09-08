@@ -3,13 +3,14 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { getFailedPasswordRules, passwordStrengthValidator, PasswordRule } from '../../../shared/components/ui/form/password-rules';
+import { AuthCardComponent } from '../../../shared/components/forms/auth-card/auth-card';
+import { InputComponent } from '../../../shared/components/form-fields/input/input.component';
 
 @Component({
   selector: 'app-auth-reset-password',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, AuthCardComponent, InputComponent],
   templateUrl: './reset-password.html',
-  styleUrl: './reset-password.scss',
 })
 export class ResetPasswordComponent implements OnInit {
   private route = inject(ActivatedRoute);

@@ -6,6 +6,7 @@
 - **Angular CDK** (`@angular/cdk/dialog`) for overlays
 - **SSR** (`@angular/ssr`, Express) with client hydration + store hydration meta-reducer
 - **Google Maps** (`@angular/google-maps`), **ApexCharts** (`ngx-apexcharts`), **qrcode**
+- **Design system CSS** — plain `.css` under `src/styles/tokens/` and `src/styles/components/`, ported verbatim from the Beehivemind design-system handoff and loaded by `src/styles.scss`. See [Style Layer](#style-layer).
 
 ## Commands
 | Command | Action |
@@ -32,7 +33,9 @@ Layered architecture. Data flows: **`RequestService` → domain service → `Api
 | `src/app/features/` | Route-level pages, grouped by zone: `public/ auth/ user/ admin/` |
 | `src/app/layouts/` | Shell layouts: `public-layout`, `user-layout`, `admin-layout` |
 | `src/app/shared/components/ui/` | Reusable UI primitives (form, modal, toast, card, map, table, chart…) |
-| `src/app/shared/components/*-sections/` | Landing-page content blocks (hero, cta, info) |
+| `src/app/shared/components/*-sections/` | Landing-page bands (hero, cta, info) — attribute components: `<section app-…>` |
+| `src/app/shared/components/forms/auth-card/` | `AuthCard` — the shell every auth screen (user and admin) sits in |
+| `src/styles/` | The style layer: `tokens/`, `components/` (design-system CSS, verbatim) + repo-owned `_modal.scss`, `_app-page.scss` |
 
 **Each feature folder has its own `CLAUDE.md`** documenting that feature — see the [Feature Map](#feature-map) index below. The root file is the hub; feature files are spokes. When working on a feature, read its `CLAUDE.md` first.
 
@@ -45,7 +48,7 @@ Top-level routes in `app.routes.ts`, all lazy-loaded. Four zones, each with its 
 | Zone | Path | Guard | Layout | Features dir |
 |------|------|-------|--------|--------------|
 | Public (marketing) | `/` | — | `public-layout` | `features/public/` |
-| Auth | `/auth` | — | `public-layout` | `features/auth/` |
+| Auth | `/auth` | — | none — each screen renders `AuthCard` (brand mark + legal line) | `features/auth/` |
 | User (beekeeper) | `/user` | `authGuard` | `user-layout` | `features/user/` |
 | Admin login | `/admin/login` | — | none | `features/admin/login` |
 | Admin panel | `/admin` | `employeeGuard` + `employeeRoleGuard(role)` | `admin-layout` | `features/admin/` |
@@ -171,6 +174,7 @@ Each row links to that feature's own `CLAUDE.md`.
 
 | Feature | Route | Store slice(s) | Docs |
 |---------|-------|----------------|------|
+| Public site | `/`, `/features`, `/app`, `/pricing`, `/inspections`, `/apiariesandbeehives`, `/harvestandfeeding`, `/financial`, `/help`, `/about`, `/contact`, `/privacy`, `/terms`, `/blog` (+ `/:slug`) | — (static page configs) | [↗](src/app/features/public/CLAUDE.md) |
 | Dashboard | `/user/dashboard` | `apiaries`, `beehives`, `inspections` | [↗](src/app/features/user/dashboard/CLAUDE.md) |
 | Apiaries | `/user/apiary` (+ `/details`, `/map`, `/:id`) | `apiaries`, `beehives` | [↗](src/app/features/user/apiary/CLAUDE.md) |
 | Beehives | `/user/beehives` | `beehives` | [↗](src/app/features/user/beehives/CLAUDE.md) |
@@ -185,11 +189,42 @@ Each row links to that feature's own `CLAUDE.md`.
 | Admin · Users | `/admin/users` | — (direct `RequestService`) | [↗](src/app/features/admin/user-management/CLAUDE.md) |
 | Admin · Employees | `/admin/employees` | — | [↗](src/app/features/admin/employee-management/CLAUDE.md) |
 | Admin · Coupons | `/admin/coupons` | — | [↗](src/app/features/admin/coupons/CLAUDE.md) |
+| Admin · AI Responses | `/admin/ai-responses` | — (direct `RequestService`) | [↗](src/app/features/admin/ai-responses/CLAUDE.md) |
+| Admin · Moderation | `/admin/moderation` | — (placeholder page; no brief yet) | `features/admin/moderation/` |
 | Admin · Raw Data | `/admin/raw` (+ `/:model`) | — | [↗](src/app/features/admin/raw-data/CLAUDE.md) |
 
 > When you add a new feature, create its `CLAUDE.md` using [`treatments/CLAUDE.md`](src/app/features/user/treatments/CLAUDE.md) as the template and add a row here.
 
-> **Admin-zone deviation:** admin features use a lighter pattern than the user zone — direct `RequestService` (no domain service / no store), local-signal state, inline forms, and some still use native `confirm()`. Each admin feature doc flags this; details in [`user-management/CLAUDE.md`](src/app/features/admin/user-management/CLAUDE.md#admin-zone-conventions).
+> **Admin-zone deviation:** admin features use a lighter pattern than the user zone — direct `RequestService` (no domain service / no store), local-signal state, server-side pagination. They share the dashboard's *visual* vocabulary (`.app-page`, `.card`, `.dt__table`, `.app-btn`, `.app-badge`, `.fb`) and its dialogs: forms are `FormModalComponent` + `DynamicField[]` configs, destructive actions go through `ModalService.confirm()` with a message naming the consequence. Native `confirm()` is gone. Details in [`user-management/CLAUDE.md`](src/app/features/admin/user-management/CLAUDE.md#admin-zone-conventions).
+
+---
+
+## Style Layer
+
+The visual language is the Beehivemind design system, ported as-is. `DECISIONS.md` in that handoff is the authority on palette, type and spacing; when this repo disagrees with it, the repo is the drift.
+
+**Where the CSS lives**
+
+| Path | Role |
+|------|------|
+| `src/styles/tokens/*.css` | Custom properties: fonts, colours, type scale, spacing, radius, shadows, motion, layout (band rhythm), `user-theme` (dashboard `--app-*` aliases), charts |
+| `src/styles/components/base.css`, `utilities.css`, `sections.css` | Reset, utilities, the website's section bands (`main > section` rhythm) |
+| `src/styles/components/ui/` | `.btn` (website pill), `.callout`, `.tip` |
+| `src/styles/components/layout/` | `public-layout.css` (header/footer), `user-layout.css` (sidebar shell, `.dashboard*`) |
+| `src/styles/components/forms/forms.css` | `.form-*`, `.dform`, `.auth-*`, `.tfa-*`, radio/checkbox/toggle/range |
+| `src/styles/components/app/app.css` | Dashboard vocabulary: `.card`, `.dt__*`, `.fb`, `.app-btn`, `.app-input`, `.app-badge`, `.app-page*`, `.app-tile`, `.app-session`, `.app-instance`, `.app-chat`, `.app-map`, `.cal-*`, `.wc__*`, `.notif-*`, `.admin-*`, `.mshell`, `.modal-*`, `.toast*` |
+| `src/styles/_modal.scss` | Repo-owned CDK Dialog glue (overlay container, backdrop, panel sizing) |
+| `src/styles/_app-page.scss` | Repo-owned page-header helpers the DS draws inline (`.app-page-meta`, `.app-page-back`, `.app-page-lead`, `.app-page-narrow`, `.fb__group--end`) |
+
+**Rules**
+- **Components write no CSS.** A page or component is markup on the global classes. A `styleUrl` is allowed only for layout the design system draws inline in its kit (e.g. `todo-list.scss`, `profile.scss`, `ai-chat-page.scss`) and it may use tokens only — never a hex literal, never a new colour.
+- **One accent** (`--color-primary` #f69520), ink `#212121`, a six-step grey ramp, semantic success/warning/danger. There is no info/blue state. Tinted grounds take ink labels.
+- **Weights 400 / 500 / 700 only.** Labels use the structural voice (`--structural-*`: uppercase, 500, tracked). Buttons stay sentence case.
+- **Two button families, one brand:** `.btn.btn--md.btn--primary|--outline` on the website and auth screens; `.app-btn[.app-btn--primary|--ghost|--danger|--danger-solid][.app-btn--sm|--block]` in the dashboard and admin. Density, not brand.
+- **Disabled is `opacity: .5`**, the focus ring is ink, and every colour on screen resolves to a token.
+- **Public pages** are `readonly page = {…}` configs + a `<main>` of `<section app-…>` elements (see [`features/public/CLAUDE.md`](src/app/features/public/CLAUDE.md)). Sections are attribute-selector components so the `main > section` band rule matches the DOM.
+- **Audit:** the handoff's `audit/checks.js` battery (overflow, weights, contrast, off-palette, disabled opacity, hit targets, clipping, measure, dialog contract) is run against every route at 375/768/1024/1440 and must report zero findings. The harness is in `audit/`: `cd audit && npm install`, start `ng serve --port 4301`, then `npm run audit` (all routes; `-- --only=/user/beehives,admin` narrows, `--dialogs=0` skips the dialog contract) or `npm run probe -- <path> <width> [user|admin]` to list what overflows on one page. It drives the system Chrome through puppeteer-core, mocks `localhost:8000/api/*` from `mocks.mjs`, and seeds `localStorage.bhm_auth` for the user/admin zones. Known blind spot: `color-mix()` grounds (calendar chips) come back as `color(srgb …)`, which the battery cannot parse, so they are not measured.
+- **Visual comparison against the kits:** `npm run kits` serves the handoff folder on port 4302, then `npm run shots` (same `--only`/`--widths` flags) writes `audit/shots/<n>-<page>-<width>.png` — the app on the left, the design system's `ui_kits` page on the right, for every route at every width. Look at them; that is how the fidelity pass was done. `npm run probe -- <path> <width>` and `node inspect.mjs` are the two debugging aids.
 
 ---
 
@@ -211,7 +246,7 @@ Quick summary:
 ## Modal System
 
 ### Overview
-Modals are powered by Angular CDK `Dialog`. All overlay styles are **global** (in `src/styles/_modal.scss`) because CDK renders panels at `<body>` level — never scope them inside a component.
+Modals are powered by Angular CDK `Dialog`. All overlay styles are **global** because CDK renders panels at `<body>` level — never scope them inside a component. The panel chrome (`.modal-panel`, `.modal-backdrop`, `.mshell*`) comes from the design system's `app.css`; `src/styles/_modal.scss` is only the glue that fits it to CDK's overlay DOM. `ModalService` also locks `body` scroll while a panel is open (the dialog contract: focus moves in, the page behind stops scrolling, Escape closes).
 
 ### Key files
 | File | Role |
@@ -220,7 +255,9 @@ Modals are powered by Angular CDK `Dialog`. All overlay styles are **global** (i
 | `src/app/core/modal/modal.service.ts` | `ModalService` — single entry point for opening modals |
 | `src/app/shared/components/ui/modal/modal-shell/modal-shell.ts` | Shell wrapper component (header, body, optional footer slot) |
 | `src/app/shared/components/ui/modal/confirm-modal/confirm-modal.ts` | Built-in confirm dialog (uses `ModalShellComponent`) |
-| `src/styles/_modal.scss` | Global CDK panel + backdrop styles |
+| `src/app/shared/components/ui/modal/form-modal/form-modal.ts` | Generic dialog around one `<app-form>` config (`title`, `fields`, `submitLabel`, `cancelLabel`) |
+| `src/app/shared/components/ui/modal/suspend-user-modal/` | Admin: how long to suspend an account |
+| `src/styles/_modal.scss` | CDK overlay/backdrop/panel glue |
 
 ### ModalService API
 

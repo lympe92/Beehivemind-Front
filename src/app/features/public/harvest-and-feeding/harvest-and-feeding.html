@@ -1,24 +1,25 @@
-@if (pageData$ | async; as page) {
-  <app-hero-center-content
+<main>
+  <section app-hero-center-content
     [title]="page.hero.title"
     [subtitle]="page.hero.subtitle"
     [image]="page.hero.image"
     [primaryCta]="page.hero.primaryCta"
-    [secondaryCta]="page.hero.secondaryCta" />
+    [secondaryCta]="page.hero.secondaryCta"></section>
 
-  @for (content of page.splitContents; track content.title) {
-    <app-split-content
+  @for (content of page.splitContents; track content.title; let i = $index) {
+    <section app-split-content
       [title]="content.title"
       [description]="content.description"
-      [image]="content.image" />
+      [image]="content.image"
+      [mediaSide]="side(i)"></section>
   }
 
-  <app-info-columns
+  <section app-info-columns
     [title]="page.infoColumns.title"
-    [items]="page.infoColumns.items" />
+    [items]="page.infoColumns.items"></section>
 
-  <app-cta-banner
+  <section app-cta-banner
     [title]="page.ctaBanner.title"
-    [description]="page.ctaBanner.description"
-    [cta]="page.ctaBanner.cta" />
-}
+    [description]="page.ctaBanner.description ?? ''"
+    [cta]="page.ctaBanner.cta"></section>
+</main>

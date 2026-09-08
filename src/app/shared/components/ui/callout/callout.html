@@ -1,0 +1,30 @@
+<div class="callout callout--{{ tone() }}" role="status">
+  <!-- Warning is a triangle; success is the tick alone; the rest are circles.
+       A tick inside a circle closes up at 18px. -->
+  <svg class="callout__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    @switch (tone()) {
+      @case ('warning') { <path d="M12 3.5L2.5 20h19L12 3.5z" /><path d="M12 9v5" /><path d="M12 17.5v.5" /> }
+      @case ('success') { <path d="M20 6L9 17l-5-5" /> }
+      @case ('error')   { <circle cx="12" cy="12" r="9.5" /><path d="M15 9l-6 6M9 9l6 6" /> }
+      @case ('neutral') { <circle cx="12" cy="12" r="9.5" /><path d="M12 11v6" /><path d="M12 7.5v.5" /> }
+      @default          { <circle cx="12" cy="12" r="9.5" /><path d="M12 8v5" /><path d="M12 16.5v.5" /> }
+    }
+  </svg>
+  <div class="callout__body">
+    @if (title()) {
+      <span class="callout__title">{{ title() }}</span>
+    }
+    <p class="callout__text"><ng-content /></p>
+    @if (actionLabel()) {
+      <button type="button" class="callout__action" (click)="action.emit()">{{ actionLabel() }}</button>
+    }
+  </div>
+  @if (dismissable()) {
+    <button type="button" class="callout__close" aria-label="Dismiss" (click)="dismiss.emit()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M18 6L6 18M6 6l12 12" />
+      </svg>
+    </button>
+  }
+</div>

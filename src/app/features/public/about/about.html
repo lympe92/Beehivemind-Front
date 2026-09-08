@@ -1,0 +1,33 @@
+<main>
+  <section app-page-intro
+    [eyebrow]="page.intro.eyebrow ?? ''"
+    [title]="page.intro.title"
+    [lead]="page.intro.lead ?? ''"></section>
+
+  <section app-split-content
+    [title]="page.story.title"
+    [description]="page.story.description"
+    [steps]="page.story.steps ?? []"
+    [image]="page.story.image"
+    mediaSide="end"></section>
+
+  <!-- level 3: this follows SplitContent's h2. -->
+  <section app-text-columns [columns]="page.principles" [level]="3"></section>
+
+  <!-- The dark ribbon sits between the principles and the light facts band,
+       never against the closing banner. -->
+  <section app-ribbon
+    [mode]="page.quote.mode"
+    [quote]="page.quote.quote"
+    [author]="page.quote.author"></section>
+
+  <section app-info-columns
+    [mode]="page.facts.mode ?? 'default'"
+    [title]="page.facts.title"
+    [items]="page.facts.items"></section>
+
+  <section app-cta-banner
+    [title]="page.cta.title"
+    [description]="page.cta.description ?? ''"
+    [cta]="page.cta.cta"></section>
+</main>

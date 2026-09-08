@@ -1,44 +1,38 @@
-<div class="month">
+<div class="cal-month__weekdays">
+  @for (w of WEEKDAYS; track w) {
+    <div class="cal-month__weekday">{{ w }}</div>
+  }
+</div>
 
-  <div class="month__weekdays">
-    @for (w of WEEKDAYS; track w) {
-      <div class="month__weekday">{{ w }}</div>
-    }
-  </div>
+<div class="cal-month__grid">
+  @for (day of days(); track day.date.getTime()) {
+    <button
+      type="button"
+      class="cal-month__day"
+      [class.cal-month__day--other]="!day.isCurrentMonth"
+      (click)="dayClick.emit(day.date)">
 
-  <div class="month__grid">
-    @for (day of days(); track day.date.getTime()) {
-      <div
-        class="month__day"
-        [class.month__day--other]="!day.isCurrentMonth"
-        [class.month__day--today]="day.isToday"
-        (click)="dayClick.emit(day.date)">
+      <span class="cal-month__num" [class.cal-month__num--today]="day.isToday">
+        {{ day.date.getDate() }}
+      </span>
 
-        <span class="month__day-num">{{ day.date.getDate() }}</span>
-
-        <div class="month__events">
-          @for (ev of day.events.slice(0, MAX_PILLS); track ev.id) {
-            <div
-              class="month__pill"
-              [style.--ev-color]="color(ev.color)"
-              (click)="eventClick.emit(ev); $event.stopPropagation()">
-              @if (ev.startTime) {
-                <span class="month__pill-time">{{ ev.startTime }}</span>
-              }
-              <span class="month__pill-title">{{ ev.title }}</span>
-            </div>
-          }
-          @if (day.events.length > MAX_PILLS) {
-            <div
-              class="month__more"
-              (click)="dayClick.emit(day.date); $event.stopPropagation()">
-              +{{ day.events.length - MAX_PILLS }} more
-            </div>
-          }
-        </div>
-
-      </div>
-    }
-  </div>
-
+      @for (ev of day.events.slice(0, MAX_PILLS); track ev.id) {
+        <span
+          class="cal-event"
+          role="button"
+          tabindex="0"
+          [style.background]="chipBg(ev.color)"
+          [style.box-shadow]="chipBar(ev.color)"
+          [title]="ev.title"
+          (click)="eventClick.emit(ev); $event.stopPropagation()"
+          (keydown.enter)="eventClick.emit(ev); $event.stopPropagation()">
+          @if (ev.startTime) { {{ ev.startTime }} }
+          {{ ev.title }}
+        </span>
+      }
+      @if (day.events.length > MAX_PILLS) {
+        <span class="cal-month__more">+{{ day.events.length - MAX_PILLS }} more</span>
+      }
+    </button>
+  }
 </div>

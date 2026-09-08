@@ -10,6 +10,9 @@
       [class.multiple-select]="isMultiple"
       [class.invalid]="isFieldValid()"
     >
+      @if (placeholder && !isMultiple) {
+        <option [ngValue]="null">{{ placeholder }}</option>
+      }
       @for (opt of resolvedOptions; track opt.returnValue) {
         <option [ngValue]="opt.returnValue">{{ opt.displayValue }}</option>
       }

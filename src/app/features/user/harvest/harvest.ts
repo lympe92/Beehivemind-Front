@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import {
@@ -26,9 +27,8 @@ import { syncValidators } from '../../../shared/components/ui/form/validators.co
 @Component({
   selector: 'app-harvest',
   standalone: true,
-  imports: [DataTableComponent, CardComponent, FilterBarComponent],
+  imports: [DataTableComponent, CardComponent, FilterBarComponent, DatePipe],
   templateUrl: './harvest.html',
-  styleUrl: './harvest.scss',
 })
 export class HarvestComponent implements OnInit {
   private store = inject(Store);
@@ -36,19 +36,13 @@ export class HarvestComponent implements OnInit {
   private toast = inject(ToastService);
   private modal = inject(ModalService);
 
-  columns = computed<ColumnDef[]>(() => {
-    const base: ColumnDef[] = [
-      { key: 'date', label: 'Date' },
-      { key: 'honey_type', label: 'Type' },
-      { key: 'honey_description', label: 'Description' },
-      { key: 'food_quantity', label: 'Total Quantity' },
-      { key: 'unit', label: 'Unit' },
-    ];
-    if (this.selectedApiaryId() !== 0 && this.selectedBeehiveId() === 0) {
-      return [...base, { key: 'beehiveId', label: 'Beehive' }];
-    }
-    return base;
-  });
+  readonly columns: ColumnDef[] = [
+    { key: 'beehiveId', label: 'Beehive', width: '26%' },
+    { key: 'date', label: 'Date' },
+    { key: 'honey_type', label: 'Type' },
+    { key: 'honey_description', label: 'Description' },
+    { key: 'food_quantity', label: 'Quantity' },
+  ];
 
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);

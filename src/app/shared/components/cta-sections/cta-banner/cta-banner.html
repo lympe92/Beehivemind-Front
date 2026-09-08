@@ -1,17 +1,17 @@
-<section class="cta-banner">
-  <div class="container">
-    <div class="flex-col">
-      <h2 class="cta-banner__title">{{ title() }}</h2>
+<div class="container">
+  <div class="flex-col">
+    <h2 class="cta-banner__title">{{ title() }}</h2>
+    @if (description()) {
       <p class="cta-banner__text">{{ description() }}</p>
-    </div>
-
-    <div class="text-center" data-aos="fade-up" data-aos-anchor-placement="bottom-bottom">
-      <app-link
-        [routerLink]="cta().routerLink"
-        [variant]="cta().variant ?? 'primary'"
-        [size]="cta().size ?? 'md'">
-        {{ cta().label }}
-      </app-link>
-    </div>
+    }
   </div>
-</section>
+
+  <div class="cta-banner__action">
+    <app-link
+      [routerLink]="cta().routerLink"
+      [variant]="cta().variant ?? 'primary'"
+      [size]="cta().size ?? 'md'">
+      {{ cta().label }}
+    </app-link>
+  </div>
+</div>

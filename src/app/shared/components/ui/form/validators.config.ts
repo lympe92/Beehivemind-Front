@@ -10,13 +10,27 @@ export const syncValidators = {
       Validators.required(control) ? { required: true } : null,
 
   rangeNumber:
-    ({ min, max }: { min: number; max: number }) =>
+    ({ min, max }: { min?: number; max?: number }) =>
     (control: AbstractControl): ValidationErrors | null => {
       const value = control.value;
-      if (value === null || value === undefined) return null;
-      return value < min || value > max
-        ? { range: { min, max, actual: value } }
-        : null;
+      if (value === null || value === undefined || value === '') return null;
+      const n = Number(value);
+      const below = min !== undefined && n < min;
+      const above = max !== undefined && n > max;
+      if (!below && !above) return null;
+      if (min !== undefined && max !== undefined) return { range: { min, max, actual: value } };
+      return below
+        ? { range: { min, actual: value, message: `Must be ${min} or more` } }
+        : { range: { max, actual: value, message: `Must be ${max} or less` } };
+    },
+
+  /** A regex the value has to match; the message is the copy shown when it does not. */
+  pattern:
+    (regex: RegExp, message: string) =>
+    (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (value === null || value === undefined || value === '') return null;
+      return regex.test(String(value)) ? null : { [`pattern_${regex.source}`]: { message } };
     },
 
   email:
@@ -94,11 +108,13 @@ export const crossFieldValidators = {
       return Number(value) > Number(minValue) ? null : { greaterThan: { min: minValue, actual: value } };
     },
 
-  equalTo: (targetFieldName: string) =>
+  /** `targetLabel`, when given, names the other field in the message: "Must match the new password". */
+  equalTo: (targetFieldName: string, targetLabel?: string) =>
     (control: AbstractControl): ValidationErrors | null => {
       if (!control.parent) return null;
       const targetValue = control.parent.get(targetFieldName)?.value;
-      return control.value === targetValue ? null : { equalTo: true };
+      if (control.value === targetValue) return null;
+      return targetLabel ? { equalTo: { message: `Must match ${targetLabel}` } } : { equalTo: true };
     },
 
   notEqualTo: (targetFieldName: string) =>

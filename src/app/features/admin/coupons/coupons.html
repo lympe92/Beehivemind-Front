@@ -1,30 +1,31 @@
-<div class="coupons">
-  <div class="page-header">
-    <h2>Coupons</h2>
-    <button class="btn btn--primary" (click)="openCreate()">+ New Coupon</button>
+<div class="app-page">
+  <div class="app-page-header">
+    <h1 class="app-page-title">Coupons</h1>
+    <button type="button" class="app-btn app-btn--primary" (click)="openCreate()">+ New coupon</button>
   </div>
 
-  @if (loading()) {
-    <div class="state-msg">Loading...</div>
-  } @else if (error()) {
-    <div class="state-msg state-msg--error">{{ error() }}</div>
+  @if (error()) {
+    <app-error [message]="error()!" [retry]="true" (retried)="loadCoupons()" />
   } @else {
-    <div class="table-wrap">
+    <app-card [flush]="true">
       <app-data-table
         [columns]="columns"
         [rows]="coupons()"
+        [loading]="loading()"
         emptyMessage="No coupons yet.">
 
         <ng-template #cellTpl let-row let-col="col">
           @switch (col.key) {
-            @case ('code') { <code class="coupon-code">{{ row.code }}</code> }
-            @case ('type') { {{ row.type === 'percentage' ? '% Discount' : 'Free Period' }} }
+            @case ('code') { <code class="admin-code">{{ row.code }}</code> }
+            @case ('type') { {{ row.type === 'percentage' ? '% discount' : 'Free period' }} }
             @case ('value') { {{ formatValue(row) }} }
             @case ('uses') { {{ row.used_count }}{{ row.max_uses ? ' / ' + row.max_uses : '' }} }
-            @case ('expires_at') { {{ row.expires_at ? (row.expires_at | slice:0:10) : '—' }} }
+            @case ('expires_at') {
+              @if (row.expires_at) { {{ row.expires_at | slice:0:10 }} } @else { <span class="dt__muted">Never</span> }
+            }
             @case ('is_usable') {
-              <span class="badge" [class.badge--active]="row.is_usable" [class.badge--inactive]="!row.is_usable">
-                {{ row.is_usable ? 'Active' : 'Inactive' }}
+              <span class="app-badge" [class.app-badge--active]="row.is_usable" [class.app-badge--neutral]="!row.is_usable">
+                {{ row.is_usable ? 'Usable' : 'Spent' }}
               </span>
             }
             @default { {{ row[col.key] ?? '—' }} }
@@ -32,75 +33,12 @@
         </ng-template>
 
         <ng-template #actionsTpl let-row>
-          <button class="btn btn--sm btn--secondary" (click)="openEdit(row)">Edit</button>
-          <button class="btn btn--sm" [class.btn--warn]="row.is_active" [class.btn--success]="!row.is_active" (click)="toggle(row.id)">
-            {{ row.is_active ? 'Disable' : 'Enable' }}
-          </button>
-          <button class="btn btn--sm btn--danger" (click)="deleteCoupon(row.id)">Delete</button>
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="openEdit(row)">Edit</button>
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="toggle(row.id)">{{ row.is_active ? 'Disable' : 'Enable' }}</button>
+          <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteCoupon(row)">Delete</button>
         </ng-template>
 
       </app-data-table>
-    </div>
-  }
-
-  <!-- Form modal -->
-  @if (showForm()) {
-    <div class="modal-overlay" (click)="showForm.set(false)">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <h3>{{ formMode() === 'create' ? 'New Coupon' : 'Edit Coupon' }}</h3>
-
-        <div class="form-group">
-          <label>Code</label>
-          <input type="text" [(ngModel)]="form.code" placeholder="e.g. SUMMER20" />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Type</label>
-            <select [(ngModel)]="form.type">
-              <option value="percentage">% Discount</option>
-              <option value="free_period">Free Period</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Value</label>
-            <input type="number" [(ngModel)]="form.value" min="0.01" />
-          </div>
-        </div>
-
-        @if (form.type === 'free_period') {
-          <div class="form-group">
-            <label>Unit</label>
-            <select [(ngModel)]="form.value_unit">
-              <option value="days">Days</option>
-              <option value="months">Months</option>
-            </select>
-          </div>
-        }
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Max Uses (optional)</label>
-            <input type="number" [(ngModel)]="form.max_uses" min="1" />
-          </div>
-          <div class="form-group">
-            <label>Expires At (optional)</label>
-            <input type="datetime-local" [(ngModel)]="form.expires_at" />
-          </div>
-        </div>
-
-        <div class="form-group form-group--inline">
-          <input type="checkbox" id="is_active" [(ngModel)]="form.is_active" />
-          <label for="is_active">Active</label>
-        </div>
-
-        <div class="modal__actions">
-          <button class="btn btn--secondary" (click)="showForm.set(false)">Cancel</button>
-          <button class="btn btn--primary" (click)="submitForm()">
-            {{ formMode() === 'create' ? 'Create' : 'Save' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    </app-card>
   }
 </div>

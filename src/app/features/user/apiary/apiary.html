@@ -1,7 +1,7 @@
-<div class="apiary">
+<div class="app-page">
 
-  <app-card title="Apiaries List">
-    <button card-header-end class="apiary__btn apiary__btn--primary" (click)="startAdd()">+ Add</button>
+  <app-card title="Apiaries List" [flush]="true">
+    <button card-header-end type="button" class="app-btn app-btn--primary" (click)="startAdd()">+ Add</button>
 
     <app-data-table
       [columns]="columns"
@@ -14,7 +14,7 @@
       <ng-template #cellTpl let-row let-col="col">
         @switch (col.key) {
           @case ('name') {
-            <a class="apiary__name-link" [routerLink]="['/user/apiary', row.id]">{{ row.name }}</a>
+            <a class="app-link" [routerLink]="['/user/apiary', row.id]">{{ row.name }}</a>
           }
           @case ('dateEstablished') {
             {{ row.dateEstablished ? (row.dateEstablished | date:'mediumDate') : '—' }}
@@ -24,8 +24,8 @@
       </ng-template>
 
       <ng-template #actionsTpl let-row>
-        <button class="apiary__btn apiary__btn--ghost apiary__btn--sm" (click)="startEdit(row)">Edit</button>
-        <button class="apiary__btn apiary__btn--danger apiary__btn--sm" (click)="deleteRow(row)">Delete</button>
+        <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
+        <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
       </ng-template>
 
     </app-data-table>

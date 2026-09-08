@@ -1,135 +1,112 @@
-<div class="apiary-view">
+<div class="app-page">
 
   @if (loading()) {
-    <div class="apiary-view__loading">Loading…</div>
+    <div class="app-state">Loading…</div>
   } @else if (!apiary()) {
-    <div class="apiary-view__loading">Apiary not found.</div>
+    <div class="app-state">Apiary not found.</div>
   } @else {
 
-    <!-- Page header -->
-    <div class="apiary-view__header">
-      <a class="apiary-view__back" routerLink="/user/apiary/details">← Apiaries</a>
-      <h1 class="apiary-view__title">{{ apiary()!.name }}</h1>
+    <div class="app-page-header">
+      <h2 class="app-page-title">{{ apiary()!.name }}</h2>
+      <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="edit()">Edit</button>
     </div>
 
-    <div class="apiary-view__body">
+    <!-- Full width at the top. -->
+    @if (apiary()!.latitude && apiary()!.longitude) {
+      <app-weather-card
+        [lat]="apiary()!.latitude"
+        [lng]="apiary()!.longitude"
+        [locationName]="apiary()!.name" />
+    } @else {
+      <app-callout tone="neutral" title="Weather unavailable">
+        No coordinates set for this apiary. Edit it to place it on the map.
+      </app-callout>
+    }
 
-      <!-- Weather card (full width top) -->
-      @if (apiary()!.latitude && apiary()!.longitude) {
-        <app-weather-card
-          [lat]="apiary()!.latitude"
-          [lng]="apiary()!.longitude"
-          [locationName]="apiary()!.location || apiary()!.name" />
+    <div class="app-row--2col">
+      <app-card title="Hives">
+        <span class="app-stat">{{ apiary()!.hivesNumber }}</span>
+        <p class="app-stat__sub">
+          @if (apiary()!.lastVisited) {
+            Last visited {{ apiary()!.lastVisited | date:'mediumDate' }}
+          } @else {
+            Not visited yet
+          }
+        </p>
+      </app-card>
+
+      <app-card title="Pending to-dos">
+        <span class="app-stat">{{ todos().length }}</span>
+        <p class="app-stat__sub">{{ todos().length ? todos()[0].title : 'Nothing outstanding' }}</p>
+      </app-card>
+    </div>
+
+    <app-card title="Recent inspections" [flush]="true">
+      <app-data-table
+        [columns]="inspectionColumns"
+        [rows]="inspections()"
+        [showActions]="false"
+        emptyMessage="No inspections yet.">
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('beehiveId') { {{ beehiveName(row.beehiveId) }} }
+            @case ('date') { {{ row.date | date:'mediumDate' }} }
+            @default { {{ row[col.key] ?? '—' }} }
+          }
+        </ng-template>
+      </app-data-table>
+    </app-card>
+
+    <app-card title="Treatment sessions">
+      @if (sessions().length === 0) {
+        <div class="app-state">No sessions for this apiary.</div>
       } @else {
-        <div class="apiary-view__no-coords">
-          No coordinates set — weather unavailable.
-          <a routerLink="/user/apiary/details">Set coordinates</a>
+        <div class="app-list">
+          @for (session of sessions(); track session.id) {
+            <div class="app-session">
+              <div class="app-tile__header">
+                <div class="app-tile__title">
+                  <span class="app-tile__name">{{ session.treatmentType?.name ?? '—' }}</span>
+                  <span class="app-badge app-badge--apiary">{{ apiary()!.name }}</span>
+                </div>
+                <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteSession(session)">Delete</button>
+              </div>
+
+              <div class="app-tile__meta">
+                <span>Started {{ session.startDate | date:'mediumDate' }}</span>
+                <span class="app-tile__sep">·</span>
+                <span>{{ session.beehiveIds.length }} hive{{ session.beehiveIds.length !== 1 ? 's' : '' }}</span>
+                <span class="app-tile__sep">·</span>
+                <span>{{ instancesDone(session) }}/{{ session.instances.length }} done</span>
+                @if (session.treatmentType?.isRecurring) {
+                  <span class="app-tile__sep">·</span>
+                  <span class="app-badge app-badge--recurring">every {{ session.treatmentType?.intervalDays }}d</span>
+                }
+              </div>
+
+              @if (session.notes) {
+                <p class="app-tile__notes">{{ session.notes }}</p>
+              }
+
+              <div class="app-instances">
+                @for (inst of session.instances; track inst.id) {
+                  <div class="app-instance"
+                    [class.app-instance--done]="inst.status === 'done'"
+                    [class.app-instance--skipped]="inst.status === 'skipped'">
+                    <span class="app-instance__dot"></span>
+                    <span>{{ inst.scheduledDate | date:'mediumDate' }}</span>
+                    @if (inst.actualDate && inst.actualDate !== inst.scheduledDate) {
+                      <span class="app-instance__actual">→ {{ inst.actualDate | date:'mediumDate' }}</span>
+                    }
+                    <span class="app-instance__status">{{ inst.status }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
         </div>
       }
+    </app-card>
 
-      <!-- Info grid -->
-      <div class="apiary-view__grid">
-
-        <!-- Apiary info — full width -->
-        <div class="apiary-view__grid-full">
-        <app-card title="Details">
-          <div class="apiary-view__fields">
-            <div class="apiary-view__field">
-              <span class="apiary-view__label">Hives</span>
-              <span class="apiary-view__value">{{ apiary()!.hivesNumber }}</span>
-            </div>
-            <div class="apiary-view__field">
-              <span class="apiary-view__label">Location</span>
-              <span class="apiary-view__value">{{ apiary()!.location || '—' }}</span>
-            </div>
-            <div class="apiary-view__field">
-              <span class="apiary-view__label">Established</span>
-              <span class="apiary-view__value">
-                {{ apiary()!.dateEstablished ? (apiary()!.dateEstablished | date:'mediumDate') : '—' }}
-              </span>
-            </div>
-            <div class="apiary-view__field">
-              <span class="apiary-view__label">Last Visited</span>
-              <span class="apiary-view__value">
-                {{ apiary()!.lastVisited ? (apiary()!.lastVisited | date:'mediumDate') : '—' }}
-              </span>
-            </div>
-          </div>
-        </app-card>
-        </div>
-
-        <!-- Todos -->
-        <app-card title="To-Do">
-          @if (pendingTodos().length === 0) {
-            <p class="apiary-view__empty">Nothing pending.</p>
-          } @else {
-            <div class="apiary-view__todos">
-              @for (item of pendingTodos(); track item.entityId) {
-                <div class="apiary-view__todo-item" [class.apiary-view__todo-item--overdue]="item.isOverdue">
-                  <span [innerHTML]="typeIcon(item.type)"></span>
-                  <div class="apiary-view__todo-body">
-                    <span class="apiary-view__todo-title">{{ item.title }}</span>
-                    <span class="apiary-view__todo-sub">{{ item.subtitle }}</span>
-                    <span class="apiary-view__todo-date">{{ item.scheduledDate | date:'d MMM' }}</span>
-                  </div>
-                  @if (item.entityType === 'treatment_instance') {
-                    <button class="apiary-view__done-btn" (click)="markDone(item)">Done</button>
-                  }
-                </div>
-              }
-            </div>
-          }
-        </app-card>
-
-        <!-- Last inspections -->
-        <app-card title="Recent Inspections">
-          @if (inspections().length === 0) {
-            <p class="apiary-view__empty">No inspections yet.</p>
-          } @else {
-            <div class="apiary-view__insp-list">
-              @for (insp of inspections(); track insp.id) {
-                <div class="apiary-view__insp-row">
-                  <span class="apiary-view__insp-date">{{ insp.date | date:'d MMM yyyy' }}</span>
-                  <span class="apiary-view__insp-hive">Hive #{{ insp.beehiveId }}</span>
-                  <div class="apiary-view__insp-pills">
-                    @if (insp.varroa) { <span class="apiary-view__pill apiary-view__pill--warn">Varroa</span> }
-                    @if (insp.american_foulbrood) { <span class="apiary-view__pill apiary-view__pill--danger">AFB</span> }
-                    @if (insp.european_foulbrood) { <span class="apiary-view__pill apiary-view__pill--danger">EFB</span> }
-                    @if (insp.nosema) { <span class="apiary-view__pill apiary-view__pill--warn">Nosema</span> }
-                  </div>
-                </div>
-              }
-            </div>
-          }
-        </app-card>
-
-        <!-- Treatment sessions -->
-        <app-card title="Treatments">
-          @if (sessions().length === 0) {
-            <p class="apiary-view__empty">No treatments recorded.</p>
-          } @else {
-            <div class="apiary-view__sessions">
-              @for (s of sessions(); track s.id) {
-                <div class="apiary-view__session-row">
-                  <span class="apiary-view__session-name">{{ s.treatmentType?.name ?? '—' }}</span>
-                  <span class="apiary-view__session-date">{{ s.startDate | date:'d MMM yyyy' }}</span>
-                  <div class="apiary-view__session-instances">
-                    @for (inst of s.instances; track inst.id) {
-                      <span class="apiary-view__inst-pill"
-                        [class.apiary-view__inst-pill--done]="inst.status === 'done'"
-                        [class.apiary-view__inst-pill--skipped]="inst.status === 'skipped'"
-                        [class.apiary-view__inst-pill--overdue]="inst.status === 'planned' && inst.scheduledDate < today">
-                        {{ inst.scheduledDate | date:'d MMM' }}
-                      </span>
-                    }
-                  </div>
-                </div>
-              }
-            </div>
-          }
-        </app-card>
-
-      </div>
-    </div>
   }
 </div>

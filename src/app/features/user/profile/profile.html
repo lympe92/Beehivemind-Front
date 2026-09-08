@@ -1,177 +1,178 @@
-<div class="prof">
+<div class="app-page">
 
   @if (loading()) {
     <app-loader size="lg" />
   } @else {
 
-    <div class="prof__grid">
+    <div class="app-row--2col">
 
-      <!-- Personal Info -->
-      <app-card title="Personal Information">
-        @if (profile()) {
-          <div class="prof__email-row">
-            <span class="prof__label">Email</span>
-            <span class="prof__email">{{ profile()!.email }}</span>
-          </div>
-        }
-
-        <div class="prof__form-group">
-          <label class="prof__label">First Name *</label>
-          <input class="prof__input" [(ngModel)]="infoForm.name" name="name" placeholder="First name" />
-        </div>
-        <div class="prof__form-group">
-          <label class="prof__label">Last Name</label>
-          <input class="prof__input" [(ngModel)]="infoForm.surname" name="surname" placeholder="Last name" />
-        </div>
-        <div class="prof__form-group">
-          <label class="prof__label">Country</label>
-          <input class="prof__input" [(ngModel)]="infoForm.country" name="country" placeholder="e.g. Greece" />
-        </div>
-        <div class="prof__form-group">
-          <label class="prof__label">Preferred Unit</label>
-          <select class="prof__select" [(ngModel)]="infoForm.unit" name="unit">
-            @for (u of UNITS; track u.value) {
-              <option [ngValue]="u.value">{{ u.label }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="prof__form-actions">
-          <button class="prof__btn prof__btn--primary" (click)="saveInfo()" [disabled]="saving() || infoFormUnchanged">
-            {{ saving() ? 'Saving...' : 'Save Changes' }}
-          </button>
-        </div>
-      </app-card>
-
-      <!-- Change Password -->
-      <app-card [title]="profile()?.has_password ? 'Change Password' : 'Set a Password'">
-        @if (!profile()?.has_password) {
-          <p class="prof__tfa-desc">
-            Your account uses Google sign-in. You can set a password to also log in with email.
-          </p>
-        }
-
-        @if (profile()?.has_password) {
-          <div class="prof__form-group">
-            <label class="prof__label">Current Password</label>
-            <input class="prof__input" type="password" [(ngModel)]="passwordForm.current_password" name="cur_pw" placeholder="Current password" />
-          </div>
-        }
-        <div class="prof__form-group">
-          <label class="prof__label">New Password</label>
-          <input class="prof__input" type="password" [(ngModel)]="passwordForm.new_password" name="new_pw" placeholder="Min. 8 chars, uppercase, lowercase, number" />
-          @if (passwordForm.new_password) {
-            @for (rule of passwordErrors; track rule.key) {
-              <small class="prof__field-error">{{ rule.message }}</small>
-            }
-          }
-        </div>
-        <div class="prof__form-group">
-          <label class="prof__label">Confirm New Password</label>
-          <input class="prof__input" type="password" [(ngModel)]="passwordForm.confirm_password" name="conf_pw" placeholder="Repeat new password" />
-        </div>
-
-        <div class="prof__form-actions">
-          <button class="prof__btn prof__btn--primary" (click)="savePassword()" [disabled]="saving()">
-            {{ saving() ? 'Saving...' : (profile()?.has_password ? 'Change Password' : 'Set Password') }}
-          </button>
-        </div>
-      </app-card>
-
-      <!-- Two-Factor Authentication -->
-      <div class="prof__full">
-        <app-card title="Two-Factor Authentication">
-          <span card-header-end class="prof__tfa-badge" [class.prof__tfa-badge--on]="profile()?.two_factor_enabled">
-            {{ profile()?.two_factor_enabled ? 'Enabled' : 'Disabled' }}
-          </span>
-
-          @if (tfaStep() === 'idle' && !profile()?.two_factor_enabled) {
-            <p class="prof__tfa-desc">
-              Add an extra layer of security to your account. You'll need your phone to sign in.
-            </p>
-            <button class="prof__btn prof__btn--primary" (click)="startSetup2FA()" [disabled]="saving()">
-              {{ saving() ? 'Loading...' : 'Enable 2FA' }}
-            </button>
-          }
-
-          @if (tfaStep() === 'idle' && profile()?.two_factor_enabled) {
-            <p class="prof__tfa-desc">
-              Two-factor authentication is active. Your account is protected with an authenticator app.
-            </p>
-            <div class="prof__tfa-actions">
-              <button class="prof__btn prof__btn--ghost" (click)="regenerateBackupCodes()" [disabled]="saving()">
-                {{ saving() ? 'Loading...' : 'Regenerate Backup Codes' }}
-              </button>
-              <button class="prof__btn prof__btn--danger" (click)="startDisable2FA()">Disable 2FA</button>
+      <!-- Account -->
+      <app-card title="Account">
+        <div class="prof__account">
+          <div class="prof__avatar" aria-hidden="true">{{ initials() }}</div>
+          <div class="prof__who">
+            <div class="prof__who-name">{{ profile()?.name }} {{ profile()?.surname }}</div>
+            <div class="prof__who-sub">
+              {{ profile()?.role === 'user' ? 'beekeeper' : profile()?.role }}
+              @if (profile()?.country) { · {{ profile()?.country }} }
             </div>
-          }
+          </div>
+        </div>
+      </app-card>
+
+      <!-- Details -->
+      <app-card title="Details">
+        <div class="prof__grid">
+          <div class="app-field">
+            <label class="app-field__label" for="prof-name">First name</label>
+            <input id="prof-name" class="app-input" [(ngModel)]="infoForm.name" name="name" placeholder="First name" />
+          </div>
+          <div class="app-field">
+            <label class="app-field__label" for="prof-surname">Last name</label>
+            <input id="prof-surname" class="app-input" [(ngModel)]="infoForm.surname" name="surname" placeholder="Last name" />
+          </div>
+          <div class="app-field prof__grid-full">
+            <label class="app-field__label" for="prof-email">Email</label>
+            <input id="prof-email" class="app-input" [value]="profile()?.email ?? ''" disabled />
+          </div>
+          <div class="app-field">
+            <label class="app-field__label" for="prof-country">Country</label>
+            <input id="prof-country" class="app-input" [(ngModel)]="infoForm.country" name="country" placeholder="e.g. Greece" />
+          </div>
+          <div class="app-field">
+            <label class="app-field__label" for="prof-unit">Preferred unit</label>
+            <select id="prof-unit" class="app-input" [(ngModel)]="infoForm.unit" name="unit">
+              @for (u of UNITS; track u.value) {
+                <option [ngValue]="u.value">{{ u.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <ng-template #cardFooter>
+          <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="saveInfo()" [disabled]="saving() || infoFormUnchanged">
+            {{ saving() ? 'Saving...' : 'Save changes' }}
+          </button>
+        </ng-template>
+      </app-card>
+
+    </div>
+
+    <!-- Security -->
+    <app-card title="Security">
+      <div class="prof__stack">
+
+        <!-- Password -->
+        <section class="prof__section">
+          <div class="prof__section-head">
+            <div>
+              <div class="prof__section-title">{{ profile()?.has_password ? 'Password' : 'Set a password' }}</div>
+              <div class="prof__section-sub">
+                @if (profile()?.has_password) {
+                  Change the password you sign in with.
+                } @else {
+                  Your account uses Google sign-in. You can set a password to also log in with email.
+                }
+              </div>
+            </div>
+            <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="openChangePassword()" [disabled]="saving()">
+              {{ profile()?.has_password ? 'Change password' : 'Set password' }}
+            </button>
+          </div>
+        </section>
+
+        <!-- Two-factor authentication -->
+        <section class="prof__section">
+          <div class="prof__section-head">
+            <div>
+              <div class="prof__section-title">Two-factor authentication</div>
+              <div class="prof__section-sub">
+                @if (profile()?.two_factor_enabled) {
+                  Enabled. Your account is protected with an authenticator app.
+                } @else {
+                  Not enabled. You'll need your phone to sign in.
+                }
+              </div>
+            </div>
+
+            @if (tfaStep() === 'idle' && !profile()?.two_factor_enabled) {
+              <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="startSetup2FA()" [disabled]="saving()">
+                {{ saving() ? 'Loading...' : 'Enable 2FA' }}
+              </button>
+            }
+            @if (tfaStep() === 'idle' && profile()?.two_factor_enabled) {
+              <div class="app-tile__actions">
+                <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="regenerateBackupCodes()" [disabled]="saving()">
+                  {{ saving() ? 'Loading...' : 'Regenerate backup codes' }}
+                </button>
+                <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="startDisable2FA()">Disable 2FA</button>
+              </div>
+            }
+          </div>
 
           @if (tfaStep() === 'setup') {
-            <div class="prof__tfa-setup">
-              <div class="prof__tfa-steps">
-                <p class="prof__tfa-step-label">1. Scan this QR code with your authenticator app</p>
+            <div class="prof__setup">
+              <div class="prof__step">
+                <span class="app-field__label">1. Scan this QR code with your authenticator app</span>
                 @if (tfaQrDataUrl()) {
-                  <img [src]="tfaQrDataUrl()" alt="QR Code" class="prof__qr-canvas" />
+                  <img [src]="tfaQrDataUrl()" alt="Authenticator QR code" class="prof__qr" width="200" height="200" />
                 } @else {
-                  <div class="prof__qr-loading">Generating QR code…</div>
+                  <div class="prof__qr prof__qr--loading">Generating QR code…</div>
                 }
-                <details class="prof__tfa-secret">
+                <details class="prof__secret">
                   <summary>Can't scan? Enter manually</summary>
-                  <code class="prof__tfa-secret-key">{{ tfaSecret() }}</code>
+                  <code class="admin-code prof__secret-key">{{ tfaSecret() }}</code>
                 </details>
               </div>
-              <div class="prof__tfa-steps">
-                <p class="prof__tfa-step-label">2. Enter the 6-digit code to confirm</p>
-                <div class="prof__form-group">
-                  <input class="prof__input prof__input--code" type="text" inputmode="numeric" maxlength="6"
-                         [(ngModel)]="tfaCode" name="tfa_code" placeholder="000000" autocomplete="one-time-code" />
-                </div>
-                <div class="prof__tfa-actions">
-                  <button class="prof__btn prof__btn--primary" (click)="confirm2FA()" [disabled]="saving() || tfaCode.length !== 6">
-                    {{ saving() ? 'Verifying...' : 'Confirm & Activate' }}
+              <div class="prof__step">
+                <label class="app-field__label" for="prof-tfa-code">2. Enter the 6-digit code to confirm</label>
+                <input id="prof-tfa-code" class="app-input tfa-code-input" type="text" inputmode="numeric" maxlength="6"
+                       [(ngModel)]="tfaCode" name="tfa_code" placeholder="000000" autocomplete="one-time-code" />
+                <div class="app-tile__actions">
+                  <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="confirm2FA()" [disabled]="saving() || tfaCode.length !== 6">
+                    {{ saving() ? 'Verifying...' : 'Confirm & activate' }}
                   </button>
-                  <button class="prof__btn prof__btn--ghost" (click)="tfaStep.set('idle')">Cancel</button>
+                  <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="tfaStep.set('idle')">Cancel</button>
                 </div>
               </div>
             </div>
           }
 
           @if (tfaStep() === 'backup') {
-            <div class="prof__tfa-backup">
-              <p class="prof__tfa-backup-warn">
-                Save these backup codes in a safe place. Each code can only be used once.
-              </p>
-              <div class="prof__tfa-backup-grid">
+            <div class="prof__stack">
+              <app-callout tone="warning" title="Save these backup codes">
+                Keep them somewhere safe. Each code can only be used once.
+              </app-callout>
+              <div class="prof__codes">
                 @for (code of backupCodes(); track code) {
-                  <code class="prof__backup-code">{{ code }}</code>
+                  <code class="admin-code prof__code">{{ code }}</code>
                 }
               </div>
-              <button class="prof__btn prof__btn--primary" (click)="finishSetup()" style="margin-top: 16px;">
-                I've saved my codes
-              </button>
+              <div>
+                <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="finishSetup()">I've saved my codes</button>
+              </div>
             </div>
           }
 
           @if (tfaStep() === 'disable') {
-            <div class="prof__tfa-disable">
-              <p class="prof__tfa-desc">Enter your password to disable two-factor authentication.</p>
-              <div class="prof__form-group">
-                <label class="prof__label">Password</label>
-                <input class="prof__input" type="password" [(ngModel)]="tfaDisablePassword" name="dis_pw" placeholder="Your password" />
+            <div class="prof__stack prof__stack--narrow">
+              <div class="app-field">
+                <label class="app-field__label" for="prof-dis-pw">Enter your password to disable two-factor authentication</label>
+                <input id="prof-dis-pw" class="app-input" type="password" [(ngModel)]="tfaDisablePassword" name="dis_pw"
+                       autocomplete="current-password" />
               </div>
-              <div class="prof__tfa-actions">
-                <button class="prof__btn prof__btn--danger" (click)="disable2FA()" [disabled]="saving() || !tfaDisablePassword">
+              <div class="app-tile__actions">
+                <button type="button" class="app-btn app-btn--danger-solid app-btn--sm" (click)="disable2FA()" [disabled]="saving() || !tfaDisablePassword">
                   {{ saving() ? 'Disabling...' : 'Disable 2FA' }}
                 </button>
-                <button class="prof__btn prof__btn--ghost" (click)="cancelDisable2FA()">Cancel</button>
+                <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="cancelDisable2FA()">Cancel</button>
               </div>
             </div>
           }
+        </section>
 
-        </app-card>
       </div>
-
-    </div>
+    </app-card>
 
   }
 

@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -15,7 +15,11 @@ import {
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { LoaderComponent } from '../../../shared/components/ui/loader/loader';
 import { CardComponent } from '../../../shared/components/ui/card/card';
-import { getFailedPasswordRules, PasswordRule } from '../../../shared/components/ui/form/password-rules';
+import { CalloutComponent } from '../../../shared/components/ui/callout/callout';
+import { ModalService } from '../../../core/modal/modal.service';
+import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
+import { DynamicField } from '../../../core/models/form.model';
+import { crossFieldValidators, syncValidators } from '../../../shared/components/ui/form/validators.config';
 
 const UNITS = [
   { value: 'kg',    label: 'Kg / Lt (Metric)' },
@@ -27,7 +31,7 @@ type TfaStep = 'idle' | 'setup' | 'backup' | 'disable';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [FormsModule, LoaderComponent, CardComponent],
+  imports: [FormsModule, LoaderComponent, CardComponent, CalloutComponent],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
@@ -35,11 +39,17 @@ export class ProfileComponent implements OnInit {
   private store = inject(Store);
   private platformId = inject(PLATFORM_ID);
   private toast = inject(ToastService);
+  private modal = inject(ModalService);
 
   readonly UNITS = UNITS;
 
   // Store selectors
   readonly profile      = this.store.selectSignal(selectProfile);
+  readonly initials     = computed(() => {
+    const p = this.profile();
+    const parts = [p?.name, p?.surname].filter((s): s is string => !!s);
+    return parts.map(s => s[0].toUpperCase()).join('') || '·';
+  });
   readonly loading      = this.store.selectSignal(selectProfileLoading);
   readonly saving       = this.store.selectSignal(selectProfileSaving);
   readonly tfaSecret    = this.store.selectSignal(selectTfaSetupSecret);
@@ -58,9 +68,6 @@ export class ProfileComponent implements OnInit {
       this.infoForm.unit === this.infoFormOriginal.unit
     );
   }
-
-  // Password form (local UI state)
-  passwordForm = { current_password: '', new_password: '', confirm_password: '' };
 
   // 2FA UI state (local — step, QR url)
   tfaStep = signal<TfaStep>('idle');
@@ -135,22 +142,53 @@ export class ProfileComponent implements OnInit {
 
   // ── Password ─────────────────────────────────────────────
 
-  get passwordErrors(): PasswordRule[] {
-    return getFailedPasswordRules(this.passwordForm.new_password);
-  }
-
-  savePassword(): void {
+  /** The password change is a dialog, as on the design system's profile page. */
+  async openChangePassword(): Promise<void> {
     const hasPassword = this.profile()?.has_password ?? true;
-    if (hasPassword && !this.passwordForm.current_password) { this.toast.error('Enter your current password.'); return; }
-    if (this.passwordErrors.length) { return; }
-    if (this.passwordForm.new_password !== this.passwordForm.confirm_password) { this.toast.error('Passwords do not match.'); return; }
+
+    // Mirrors the API's Password::min(8)->mixedCase()->numbers() rule.
+    const fields: DynamicField[] = [
+      ...(hasPassword ? [{
+        name: 'current_password', type: 'password', label: 'Current password', size: 'full', value: '',
+        syncValidators: [syncValidators.required()],
+      } as DynamicField] : []),
+      {
+        name: 'new_password', type: 'password', label: 'New password', size: 'full', value: '',
+        placeholder: 'Min. 8 characters, with a capital and a number',
+        syncValidators: [
+          syncValidators.required(),
+          syncValidators.minLength(8),
+          syncValidators.pattern(/[A-Z]/, 'Include a capital letter.'),
+          syncValidators.pattern(/[a-z]/, 'Include a lowercase letter.'),
+          syncValidators.pattern(/\d/, 'Include a number.'),
+        ],
+      },
+      {
+        name: 'confirm_password', type: 'password', label: 'Confirm new password', size: 'full', value: '',
+        syncValidators: [syncValidators.required(), crossFieldValidators.equalTo('new_password', 'the new password')],
+      },
+    ];
+
+    const value = await this.modal.open<{ current_password?: string; new_password: string; confirm_password: string }>(
+      FormModalComponent,
+      {
+        type: 'center',
+        data: {
+          title: hasPassword ? 'Change password' : 'Set a password',
+          subtitle: hasPassword ? undefined : 'You can then sign in with email as well as Google.',
+          fields,
+          submitLabel: hasPassword ? 'Change password' : 'Set password',
+          cancelLabel: 'Cancel',
+        },
+      },
+    );
+    if (!value) return;
 
     this.store.dispatch(ProfileActions.changePassword({
-      current_password: this.passwordForm.current_password || undefined,
-      new_password: this.passwordForm.new_password,
-      new_password_confirmation: this.passwordForm.confirm_password,
+      current_password: value.current_password || undefined,
+      new_password: value.new_password,
+      new_password_confirmation: value.confirm_password,
     }));
-    this.passwordForm = { current_password: '', new_password: '', confirm_password: '' };
   }
 
   // ── 2FA ──────────────────────────────────────────────────

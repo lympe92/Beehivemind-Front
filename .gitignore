@@ -42,3 +42,14 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Claude Code personal settings
+.claude/settings.local.json
+
+# Audit harness (audit/): dependencies and run output
+/audit/node_modules
+/audit/package-lock.json
+/audit/report.json
+/audit/*.log
+/audit/shots
+/audit/shots-prev

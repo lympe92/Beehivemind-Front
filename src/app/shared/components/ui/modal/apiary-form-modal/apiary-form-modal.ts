@@ -47,7 +47,7 @@ export class ApiaryFormModalComponent implements OnInit {
   }
 
   get title(): string {
-    return this.isEdit ? 'Edit Apiary' : 'Add Apiary';
+    return this.isEdit ? 'Edit apiary' : 'Add apiary';
   }
 
   ngOnInit(): void {

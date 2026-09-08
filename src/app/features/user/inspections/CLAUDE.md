@@ -20,6 +20,7 @@ Record hive inspections (επιθεωρήσεις): population, frames, brood, h
 5. **Mutation → `reload()` + toast** (the root convention).
 
 ## Gotchas
+- The table leads with a **Beehive** column (name resolved from the `beehives` slice via `beehiveName()`) and a `mediumDate` date, both wrapped in `.dt__nowrap`; headers use the design system's short forms ("Pop.", "Q. year") so all fourteen readings fit one row. Feeding and Harvest follow the same shape (Beehive · Date · … · Quantity with unit).
 - Edit strips `beehive_id` from the payload (`const { beehive_id, ...payload }`) — the beehive isn't reassigned on edit.
 - Toggle fields use `value: !!row?.field`; `queen_exists` defaults to `true` on add.
 

@@ -1,12 +1,12 @@
 .map-wrap {
   height: 300px;
-  border-radius: 8px;
+  border-radius: var(--form-radius);
   overflow: hidden;
-  border: 2px solid transparent;
-  transition: border-color 0.15s;
+  border: 1px solid var(--form-border);
+  transition: border-color var(--transition-speed) var(--transition-easing);
 
   &.invalid {
-    border-color: var(--color-error, #ef4444);
+    border-color: var(--form-error);
   }
 
   app-map-picker {

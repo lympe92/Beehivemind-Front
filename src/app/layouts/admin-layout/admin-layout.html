@@ -1,84 +1,111 @@
-<div class="admin-shell" [class.sidebar-collapsed]="!sidebarOpen()">
+<div class="user-shell admin-shell" [class.sidebar-collapsed]="!sidebarOpen()">
+
+  <div class="sidebar__scrim" (click)="closeSidebar()" aria-hidden="true"></div>
 
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar__brand">
-      <img class="sidebar__logo-full" src="assets/img/logotr.webp" alt="BeehiveMind" />
+      <img class="sidebar__logo-full" src="assets/img/logotr.webp" alt="BeehiveMind" width="32" height="32" />
       @if (sidebarOpen()) {
         <span class="sidebar__brand-name">BEEHIVEMIND</span>
       }
     </div>
 
-    <nav class="sidebar__nav">
+    <nav class="sidebar__nav" aria-label="Admin">
       <!-- All employees -->
-      <a routerLink="/admin/dashboard" routerLinkActive="active" class="sidebar__link">
-        <span class="icon">📊</span>
+      <a routerLink="/admin/dashboard" routerLinkActive="active" class="sidebar__link"
+         [appTip]="tip('Dashboard')" [attr.aria-label]="sidebarOpen() ? null : 'Dashboard'">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13h4v8H3zM10 3h4v18h-4zM17 9h4v12h-4z"/></svg>
         @if (sidebarOpen()) { <span>Dashboard</span> }
       </a>
 
-      <a routerLink="/admin/users" routerLinkActive="active" class="sidebar__link">
-        <span class="icon">👥</span>
+      <a routerLink="/admin/users" routerLinkActive="active" class="sidebar__link"
+         [appTip]="tip('Users')" [attr.aria-label]="sidebarOpen() ? null : 'Users'">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
         @if (sidebarOpen()) { <span>Users</span> }
       </a>
 
       <!-- Moderator+ -->
-      @if (isAtLeastModerator$ | async) {
-        <a routerLink="/admin/moderation" routerLinkActive="active" class="sidebar__link">
-          <span class="icon">🛡️</span>
+      @if (isAtLeastModerator()) {
+        <a routerLink="/admin/moderation" routerLinkActive="active" class="sidebar__link"
+           [appTip]="tip('Moderation')" [attr.aria-label]="sidebarOpen() ? null : 'Moderation'">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           @if (sidebarOpen()) { <span>Moderation</span> }
         </a>
       }
 
       <!-- Admin+ -->
-      @if (isAtLeastAdmin$ | async) {
+      @if (isAtLeastAdmin()) {
         <div class="sidebar__divider"></div>
-        <a routerLink="/admin/employees" routerLinkActive="active" class="sidebar__link">
-          <span class="icon">👔</span>
+        <!-- A briefcase, not a second person glyph: Users and Employees were
+             two near-identical figures one row apart. -->
+        <a routerLink="/admin/employees" routerLinkActive="active" class="sidebar__link"
+           [appTip]="tip('Employees')" [attr.aria-label]="sidebarOpen() ? null : 'Employees'">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16v12H4z"/><path d="M9 8V5h6v3"/><path d="M4 13h16"/></svg>
           @if (sidebarOpen()) { <span>Employees</span> }
         </a>
-        <a routerLink="/admin/coupons" routerLinkActive="active" class="sidebar__link">
-          <span class="icon">🏷️</span>
+        <a routerLink="/admin/coupons" routerLinkActive="active" class="sidebar__link"
+           [appTip]="tip('Coupons')" [attr.aria-label]="sidebarOpen() ? null : 'Coupons'">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a2 2 0 0 1 2-2V6H2v4a2 2 0 0 1 0 4v4h20v-4a2 2 0 0 1-2-2z"/><path d="M12 6v12"/></svg>
           @if (sidebarOpen()) { <span>Coupons</span> }
+        </a>
+        <a routerLink="/admin/ai-responses" routerLinkActive="active" class="sidebar__link"
+           [appTip]="tip('AI Responses')" [attr.aria-label]="sidebarOpen() ? null : 'AI Responses'">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg>
+          @if (sidebarOpen()) { <span>AI Responses</span> }
         </a>
       }
 
       <!-- Superadmin only -->
-      @if (isSuperAdmin$ | async) {
+      @if (isSuperAdmin()) {
         <div class="sidebar__divider"></div>
-        <a routerLink="/admin/raw" routerLinkActive="active" class="sidebar__link">
-          <span class="icon">🗄️</span>
-          @if (sidebarOpen()) { <span>Raw Data</span> }
+        <a routerLink="/admin/raw" routerLinkActive="active" class="sidebar__link"
+           [appTip]="tip('Raw data')" [attr.aria-label]="sidebarOpen() ? null : 'Raw data'">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+          @if (sidebarOpen()) { <span>Raw data</span> }
         </a>
       }
     </nav>
 
     <div class="sidebar__footer">
-      @if (employee$ | async; as emp) {
+      @if (employee(); as emp) {
         @if (sidebarOpen()) {
-          <div class="sidebar__user">
+          <div class="sidebar__user admin-shell__who">
             <span class="sidebar__user-name">{{ emp.name }} {{ emp.surname }}</span>
+            <!-- The role is shown because the nav is gated by it. -->
             <span class="sidebar__user-role">{{ emp.role }}</span>
           </div>
         }
       }
-      <a routerLink="/admin/profile" routerLinkActive="active" class="sidebar__link" title="My Profile">
-        <span class="icon">⚙️</span>
-        @if (sidebarOpen()) { <span>Profile</span> }
+      <a routerLink="/admin/profile" routerLinkActive="active" class="sidebar__link"
+         [appTip]="tip('My profile')" [attr.aria-label]="sidebarOpen() ? null : 'My profile'">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M19.4 15a7.9 7.9 0 0 0 .1-1 7.9 7.9 0 0 0-.1-1l2-1.6-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 4h-4l-.3 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 13a7.9 7.9 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a8 8 0 0 0 1.7 1L11 22h4l.3-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4z"/></svg>
+        @if (sidebarOpen()) { <span>My profile</span> }
       </a>
-      <button class="sidebar__logout" (click)="logout()" title="Logout">
-        <span>🚪</span>
+      <button type="button" class="sidebar__link" (click)="logout()"
+              [appTip]="tip('Log out')" [attr.aria-label]="sidebarOpen() ? null : 'Log out'">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+        @if (sidebarOpen()) { <span>Log out</span> }
       </button>
     </div>
   </aside>
 
   <!-- Main content -->
-  <div class="admin-main">
-    <header class="admin-header">
-      <button class="admin-header__toggle" (click)="toggleSidebar()">
-        {{ sidebarOpen() ? '◀' : '▶' }}
+  <div class="user-main">
+    <header class="user-header">
+      <!-- Names the action rather than pointing a direction. -->
+      <button
+        type="button"
+        class="user-header__toggle"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="sidebarOpen() ? 'Collapse the sidebar' : 'Expand the sidebar'"
+        [attr.aria-expanded]="sidebarOpen()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
       </button>
     </header>
-    <main class="admin-content">
+    <main class="user-content">
       <router-outlet />
     </main>
   </div>

@@ -1,0 +1,8 @@
+/* Motion — from _variables.scss. One duration, one easing, applied to everything.
+   There is no bounce, no spring, no stagger anywhere in the codebase. */
+
+:root {
+  --transition-speed: 200ms;
+  --transition-easing: ease-in-out;
+  --transition-base: all var(--transition-speed) var(--transition-easing);
+}

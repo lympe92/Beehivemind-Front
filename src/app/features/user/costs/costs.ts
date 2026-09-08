@@ -1,4 +1,5 @@
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { of } from 'rxjs';
 import { Cost } from '../../../core/models/cost.model';
 import { CostCategory } from '../../../core/models/cost-category.model';
@@ -12,9 +13,8 @@ import { syncValidators } from '../../../shared/components/ui/form/validators.co
 @Component({
   selector: 'app-costs',
   standalone: true,
-  imports: [DataTableComponent],
+  imports: [DataTableComponent, DatePipe, DecimalPipe],
   templateUrl: './costs.html',
-  styleUrl: './costs.scss',
 })
 export class CostsComponent implements OnInit {
   private costService = inject(CostService);
@@ -26,8 +26,8 @@ export class CostsComponent implements OnInit {
 
   readonly columns: ColumnDef[] = [
     { key: 'date', label: 'Date' },
-    { key: 'name', label: 'Name' },
     { key: 'category', label: 'Category' },
+    { key: 'name', label: 'Description' },
     { key: 'amount', label: 'Amount' },
   ];
 

@@ -16,12 +16,14 @@ import {
   selectIsEmployeeLoggedIn,
 } from '../../../store/employee-auth/employee-auth.selectors';
 import { EmployeeAuthService } from '../../../core/services/employee-auth.service';
+import { AuthCardComponent } from '../../../shared/components/forms/auth-card/auth-card';
+import { InputComponent } from '../../../shared/components/form-fields/input/input.component';
 import QRCode from 'qrcode';
 
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule, AsyncPipe],
+  imports: [ReactiveFormsModule, FormsModule, AsyncPipe, AuthCardComponent, InputComponent],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })

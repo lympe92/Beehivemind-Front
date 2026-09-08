@@ -2,12 +2,16 @@ import { Component, input, computed, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ChartComponent, ApexOptions, ApexChart } from 'ngx-apexcharts';
 
+/**
+ * Every chart in the app. Build `options` with `ChartBuilderService` so the
+ * shared palette and grid carry. The skeleton and empty state are the global
+ * `.apex-skeleton` / `.apex-empty` rules in styles/components/layout/user-layout.css.
+ */
 @Component({
   selector: 'app-apex-chart',
   standalone: true,
   imports: [ChartComponent],
   templateUrl: './apex-chart.html',
-  styleUrl: './apex-chart.scss',
 })
 export class ApexChartComponent {
   readonly options = input<ApexOptions | null>(null);

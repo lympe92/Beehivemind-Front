@@ -1,12 +1,24 @@
-<header [class]="'public-header' + (scrolled() ? ' scroll-on' : '')">
+<!-- The scrim is a SIBLING of the header, below its z-index: inside it, the
+     bar's own stacking context would paint the scrim over the bar. -->
+@if (menuOpen()) {
+  <div class="public-header__scrim" (click)="closeAll()" aria-hidden="true"></div>
+}
+
+<header class="public-header" [class.scroll-on]="scrolled()">
   <div class="container">
-    <nav class="public-header__nav">
+    <nav class="public-header__nav" aria-label="Main">
 
       <a routerLink="/" class="public-header__brand">
         <app-image src="assets/img/logo.webp" alt="Beehivemind Logo" [width]="410" [height]="99" [priority]="true" />
       </a>
 
-      <button [class]="'public-header__toggler' + (menuOpen() ? ' is-open' : '')" type="button" (click)="toggleMenu()" aria-label="Toggle navigation">
+      <button
+        class="public-header__toggler"
+        [class.is-open]="menuOpen()"
+        type="button"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="menuOpen()"
+        aria-label="Toggle navigation">
         <span></span>
         <span></span>
         <span></span>
@@ -20,30 +32,35 @@
           <li>
             <a routerLink="/app" routerLinkActive="active" class="public-header__link">Beekeeping App</a>
           </li>
+          <li>
+            <a routerLink="/pricing" routerLinkActive="active" class="public-header__link">Pricing</a>
+          </li>
           <li class="public-header__dropdown-wrap">
-            <button class="public-header__link public-header__dropdown-toggle" (click)="toggleDropdown()">
+            <button
+              type="button"
+              class="public-header__link public-header__dropdown-toggle"
+              (click)="toggleDropdown()"
+              [attr.aria-expanded]="dropdownOpen()"
+              aria-haspopup="true">
               How to
+              <svg class="public-header__caret" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 6l4 4 4-4" />
+              </svg>
             </button>
             @if (dropdownOpen()) {
               <ul class="public-header__dropdown">
-                <li><a routerLink="/apiariesandbeehives" class="public-header__dropdown-item">Apiaries & Beehives</a></li>
-                <li><a routerLink="/inspections" class="public-header__dropdown-item">Inspections</a></li>
-                <li><a routerLink="/harvestandfeeding" class="public-header__dropdown-item">Harvest & Feeding</a></li>
-                <li><a routerLink="/financial" class="public-header__dropdown-item">Financial</a></li>
+                @for (item of howTo; track item.link) {
+                  <li><a [routerLink]="item.link" class="public-header__dropdown-item">{{ item.label }}</a></li>
+                }
               </ul>
             }
-          </li>
-          <li>
-            <a href="https://beehivemind.freshdesk.com/support/home" target="_blank" rel="noopener" class="public-header__link">Help</a>
-          </li>
-          <li>
-            <a routerLink="/pages/contact-us" routerLinkActive="active" class="public-header__link">Contact</a>
           </li>
         </ul>
 
         <div class="public-header__actions">
-          <app-link [routerLink]="'/auth/register'" variant="outline" size="md">Get Started</app-link>
-          <app-link [routerLink]="'/auth/login'" variant="primary" size="md">Login</app-link>
+          <app-link routerLink="/auth/register" variant="outline" size="md">Get Started</app-link>
+          <app-link routerLink="/auth/login" variant="primary" size="md">Login</app-link>
         </div>
       </div>
 

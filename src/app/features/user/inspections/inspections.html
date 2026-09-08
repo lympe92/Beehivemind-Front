@@ -1,4 +1,4 @@
-<div class="insp">
+<div class="app-page">
 
   <app-filter-bar
     [apiaries]="apiaries()"
@@ -8,8 +8,8 @@
     [beehiveId]="selectedBeehiveId()"
     (beehiveIdChange)="onBeehiveChange($event)" />
 
-  <app-card title="Inspection Data">
-    <button card-header-end class="insp__btn insp__btn--primary" (click)="startAdd()">+ Add Record</button>
+  <app-card title="Inspection Data" [flush]="true">
+    <button card-header-end type="button" class="app-btn app-btn--primary" (click)="startAdd()">+ Add Record</button>
 
     <app-data-table
       [columns]="columns"
@@ -18,25 +18,29 @@
       [showActions]="true"
       emptyMessage="No inspection records found.">
 
+      <!-- A detection reads red; its absence stays muted, so a scan of the
+           column shows only what needs attention. -->
       <ng-template #cellTpl let-row let-col="col">
         @switch (col.key) {
+          @case ('beehiveId') { <span class="dt__nowrap">{{ beehiveName(row.beehiveId) }}</span> }
+          @case ('date') { <span class="dt__nowrap">{{ row.date | date:'mediumDate' }}</span> }
           @case ('varroa') {
-            <span class="insp__bool" [class.insp__bool--yes]="row.varroa">{{ row.varroa ? 'Yes' : 'No' }}</span>
+            <span class="app-bool" [class.app-bool--yes]="row.varroa">{{ row.varroa ? 'Yes' : 'No' }}</span>
           }
           @case ('american_foulbrood') {
-            <span class="insp__bool" [class.insp__bool--yes]="row.american_foulbrood">{{ row.american_foulbrood ? 'Yes' : 'No' }}</span>
+            <span class="app-bool" [class.app-bool--yes]="row.american_foulbrood">{{ row.american_foulbrood ? 'Yes' : 'No' }}</span>
           }
           @case ('european_foulbrood') {
-            <span class="insp__bool" [class.insp__bool--yes]="row.european_foulbrood">{{ row.european_foulbrood ? 'Yes' : 'No' }}</span>
+            <span class="app-bool" [class.app-bool--yes]="row.european_foulbrood">{{ row.european_foulbrood ? 'Yes' : 'No' }}</span>
           }
           @case ('nosema') {
-            <span class="insp__bool" [class.insp__bool--yes]="row.nosema">{{ row.nosema ? 'Yes' : 'No' }}</span>
+            <span class="app-bool" [class.app-bool--yes]="row.nosema">{{ row.nosema ? 'Yes' : 'No' }}</span>
           }
           @case ('queen_exists') {
-            <span class="insp__bool" [class.insp__bool--yes]="row.queen_exists">{{ row.queen_exists ? 'Yes' : 'No' }}</span>
+            <span class="app-bool" [class.app-bool--yes]="row.queen_exists">{{ row.queen_exists ? 'Yes' : 'No' }}</span>
           }
           @case ('queen_cells') {
-            <span class="insp__bool" [class.insp__bool--yes]="row.queen_cells">{{ row.queen_cells ? 'Yes' : 'No' }}</span>
+            <span class="app-bool" [class.app-bool--yes]="row.queen_cells">{{ row.queen_cells ? 'Yes' : 'No' }}</span>
           }
           @case ('queen_year') { {{ row.queen_year ?? '—' }} }
           @default { {{ row[col.key] ?? '—' }} }
@@ -44,12 +48,11 @@
       </ng-template>
 
       <ng-template #actionsTpl let-row>
-        <button class="insp__btn insp__btn--ghost insp__btn--sm" (click)="startEdit(row)">Edit</button>
-        <button class="insp__btn insp__btn--danger insp__btn--sm" (click)="deleteRow(row)">Delete</button>
+        <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
+        <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
       </ng-template>
 
     </app-data-table>
-
   </app-card>
 
 </div>

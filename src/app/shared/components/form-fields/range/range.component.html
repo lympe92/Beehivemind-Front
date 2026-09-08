@@ -8,28 +8,34 @@
         formControlName="minValue"
         inputType="number"
         placeholder="Min"
+        [noSpinners]="true"
       />
       <app-form-input
         formControlName="maxValue"
         inputType="number"
         placeholder="Max"
+        [noSpinners]="true"
       />
     </div>
     <div class="slider-track">
       <input
         type="range"
         [min]="min" [max]="max" [step]="step"
-        [ngModel]="rangeForm.value.minValue"
+        [ngModel]="rangeForm.value.minValue ?? min"
         (ngModelChange)="rangeForm.patchValue({ minValue: $event })"
         [ngModelOptions]="{ standalone: true }"
+        [disabled]="disabled"
+        aria-label="Minimum"
         class="thumb thumb-min"
       />
       <input
         type="range"
         [min]="min" [max]="max" [step]="step"
-        [ngModel]="rangeForm.value.maxValue"
+        [ngModel]="rangeForm.value.maxValue ?? max"
         (ngModelChange)="rangeForm.patchValue({ maxValue: $event })"
         [ngModelOptions]="{ standalone: true }"
+        [disabled]="disabled"
+        aria-label="Maximum"
         class="thumb thumb-max"
       />
     </div>

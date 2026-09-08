@@ -1,5 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { RequestService } from '../../../core/services/request.service';
+import { AppErrorComponent } from '../../../shared/components/ui/app-error/app-error';
 
 interface DashboardStats {
   users: {
@@ -19,9 +21,8 @@ interface DashboardStats {
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [],
+  imports: [DecimalPipe, AppErrorComponent],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss',
 })
 export class AdminDashboardComponent implements OnInit {
   private request = inject(RequestService);
@@ -31,13 +32,19 @@ export class AdminDashboardComponent implements OnInit {
   error = signal<string | null>(null);
 
   ngOnInit(): void {
+    this.load();
+  }
+
+  load(): void {
+    this.loading.set(true);
+    this.error.set(null);
     this.request.getRequest<DashboardStats>('admin/stats').subscribe({
       next: (res) => {
         this.stats.set(res.data);
         this.loading.set(false);
       },
       error: () => {
-        this.error.set('Failed to load stats');
+        this.error.set('The stats did not load.');
         this.loading.set(false);
       },
     });

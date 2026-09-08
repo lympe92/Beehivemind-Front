@@ -6,6 +6,8 @@ interface ErrorParams {
   maximumLength?: number;
   min?: number;
   max?: number;
+  /** A validator may carry its own copy — `{ message }` — and it wins. */
+  message?: string;
 }
 
 const ERROR_MESSAGES: Record<string, (params?: ErrorParams) => string> = {
@@ -23,12 +25,13 @@ const ERROR_MESSAGES: Record<string, (params?: ErrorParams) => string> = {
   equalTo:            ()  => 'Fields do not match',
   notEqualTo:         ()  => 'Fields must be different',
   notEmpty:           ()  => 'The related field must have a value',
+  pattern:            ()  => 'Check the format',
 };
 
+/** The validation message list. Styles: `.error` in styles/components/forms/forms.css. */
 @Component({
   selector: 'app-form-errors',
   templateUrl: './errors.component.html',
-  styleUrls: ['./errors.component.scss'],
   standalone: true,
 })
 export class ErrorsComponent implements OnChanges {
@@ -44,8 +47,12 @@ export class ErrorsComponent implements OnChanges {
     this.errorMessages = Object.entries(changes['errors'].currentValue)
       .filter(([, value]) => value !== false)
       .map(([key, value]) => {
+        const params = value as ErrorParams;
+        if (params && typeof params === 'object' && typeof params.message === 'string') {
+          return params.message;
+        }
         const fn = ERROR_MESSAGES[key];
-        return fn ? fn(value as ErrorParams) : key;
+        return fn ? fn(params) : key;
       });
   }
 }

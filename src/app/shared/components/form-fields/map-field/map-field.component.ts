@@ -29,12 +29,16 @@ export class MapFieldComponent implements ControlValueAccessor, OnInit {
 
   protected marker: google.maps.LatLngLiteral | null = null;
   protected disabled = false;
-  saFormControlName?: SAFormControlNameDirective | null;
-
+  private _saFormControlName?: SAFormControlNameDirective | null;
+  /** The host FormControlName, resolved on first use: it cannot be injected during construction,
+   *  and resolving it in a microtask left the required marker unrendered under OnPush. */
+  get saFormControlName(): SAFormControlNameDirective | null {
+    if (this._saFormControlName === undefined) {
+      this._saFormControlName = this.injector.get(SAFormControlNameDirective, null);
+    }
+    return this._saFormControlName;
+  }
   constructor(private injector: Injector) {
-    queueMicrotask(() => {
-      this.saFormControlName = this.injector.get(SAFormControlNameDirective, null);
-    });
   }
 
   ngOnInit(): void {}

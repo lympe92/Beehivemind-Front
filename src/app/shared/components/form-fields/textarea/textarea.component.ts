@@ -6,7 +6,6 @@ import { ErrorsComponent } from '../errors/errors.component';
 @Component({
   selector: 'app-form-textarea',
   templateUrl: './textarea.component.html',
-  styleUrls: ['./textarea.component.scss'],
   standalone: true,
   hostDirectives: [
     {
@@ -26,22 +25,27 @@ import { ErrorsComponent } from '../errors/errors.component';
 export class TextareaComponent implements ControlValueAccessor {
   @Input() label!: string;
   @Input() placeholder: string = '';
+  @Input() rows: number = 4;
 
   value: string = '';
   disabled: boolean = false;
-  saFormControlName?: SAFormControlNameDirective | null;
-
+  private _saFormControlName?: SAFormControlNameDirective | null;
+  /** The host FormControlName, resolved on first use: it cannot be injected during construction,
+   *  and resolving it in a microtask left the required marker unrendered under OnPush. */
+  get saFormControlName(): SAFormControlNameDirective | null {
+    if (this._saFormControlName === undefined) {
+      this._saFormControlName = this.injector.get(SAFormControlNameDirective, null);
+    }
+    return this._saFormControlName;
+  }
   constructor(private injector: Injector) {
-    queueMicrotask((): void => {
-      this.saFormControlName = this.injector.get(SAFormControlNameDirective, null);
-    });
   }
 
   onChange: (value: unknown) => void = () => {};
   onTouched: () => void = () => {};
 
   writeValue(value: unknown): void {
-    if (value !== undefined) this.value = value as string;
+    if (value !== undefined) this.value = (value as string) ?? '';
   }
 
   registerOnChange(fn: (value: unknown) => void): void { this.onChange = fn; }

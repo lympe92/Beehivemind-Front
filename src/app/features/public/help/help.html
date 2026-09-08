@@ -1,1 +1,38 @@
-<p>Help</p>
+<main>
+  <section app-page-intro
+    [eyebrow]="page.intro.eyebrow ?? ''"
+    [title]="page.intro.title"
+    [lead]="page.intro.lead ?? ''"></section>
+
+  <!-- level 2: this sits directly under the page h1. -->
+  <section app-text-columns [columns]="page.steps" [level]="2"></section>
+
+  <section class="container">
+    <div class="prose">
+      <h2>The commands</h2>
+      <p>
+        Quantities are always relative to a whole frame. Say a number and
+        what it describes; the order of the phrases does not matter.
+      </p>
+
+      <div class="prose__defs">
+        @for (command of page.commands; track command.term) {
+          <div class="prose__def">
+            <span class="prose__term">“{{ command.term }}”<em>{{ command.hint }}</em></span>
+            <p class="prose__desc">{{ command.desc }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section app-split-accordion
+    [title]="page.troubleshooting.title"
+    [image]="page.troubleshooting.image"
+    [items]="page.troubleshooting.items"></section>
+
+  <section app-cta-banner
+    [title]="page.ctaBanner.title"
+    [description]="page.ctaBanner.description ?? ''"
+    [cta]="page.ctaBanner.cta"></section>
+</main>

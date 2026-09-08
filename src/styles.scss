@@ -1,20 +1,34 @@
 // =============================================================================
 // GLOBAL ENTRY POINT
-// Εδώ φορτώνονται μόνο global styles (reset, typography, utilities)
-// Τα variables/mixins ΔΕΝ παράγουν CSS — φορτώνονται per-component
+// The design system's stylesheets, loaded in the order its own `styles.css`
+// gives: tokens first, base before any component sheet. The files under
+// `styles/tokens` and `styles/components` are the plain-CSS drop-ins from the
+// design handoff — replace them wholesale when the system ships a new version;
+// do not edit them piecemeal.
+//
+// `styles/_modal.scss` is the one repo-owned sheet left: the glue between the
+// system's `.modal-panel` rules and Angular CDK's overlay DOM.
 // =============================================================================
 
-@use 'styles/reset';
-@use 'styles/typography';
-@use 'styles/grid';
-@use 'styles/utilities';
-@use 'styles/buttons';
+@use 'styles/tokens/fonts';
+@use 'styles/tokens/colors';
+@use 'styles/tokens/typography';
+@use 'styles/tokens/spacing';
+@use 'styles/tokens/radius';
+@use 'styles/tokens/shadows';
+@use 'styles/tokens/motion';
+@use 'styles/tokens/layout';
+@use 'styles/tokens/user-theme';
+@use 'styles/tokens/charts';
+@use 'styles/components/base';
+@use 'styles/components/utilities';
+@use 'styles/components/ui/buttons';
+@use 'styles/components/ui/callout';
+@use 'styles/components/ui/tooltip';
+@use 'styles/components/sections';
+@use 'styles/components/layout/public-layout';
+@use 'styles/components/layout/user-layout';
+@use 'styles/components/forms/forms';
+@use 'styles/components/app/app';
 @use 'styles/modal';
-@use 'styles/card';
-@use 'styles/fin';
-
-// Font loaded non-blocking via <link rel="preload"> in index.html
-// TODO: Self-host Montserrat για 100% Lighthouse Performance score
-//       1. Κατέβασε weights 300/400/500/700 (WOFF2 only) από gwfh.mranftl.com/fonts/montserrat
-//       2. Βάλε τα αρχεία στο src/assets/fonts/
-//       3. Αντικατάστησε τα <link> στο index.html με @font-face declarations εδώ
+@use 'styles/app-page';

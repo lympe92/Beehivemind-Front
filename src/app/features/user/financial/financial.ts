@@ -18,7 +18,6 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
   standalone: true,
   imports: [ApexChartComponent, CardComponent, CostCategoriesComponent, CostsComponent],
   templateUrl: './financial.html',
-  styleUrl: './financial.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FinancialComponent implements OnInit {

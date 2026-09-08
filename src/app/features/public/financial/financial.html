@@ -1,30 +1,30 @@
-@if (pageData$ | async; as page) {
-  <app-hero-center-content
+<main>
+  <section app-hero-center-content
     [title]="page.hero.title"
     [subtitle]="page.hero.subtitle"
     [image]="page.hero.image"
     [primaryCta]="page.hero.primaryCta"
-    [secondaryCta]="page.hero.secondaryCta" />
+    [secondaryCta]="page.hero.secondaryCta"></section>
 
   @for (col of page.textCenterColumns; track col.title) {
-    <app-text-center-column
+    <section app-text-center-column
       [title]="col.title"
       [subtitle]="col.subtitle"
-      [image]="col.image" />
+      [image]="col.image"></section>
   }
 
-  <app-features-list-cta
+  <section app-features-list-cta
     [title]="page.featuresListCta.title"
     [items]="page.featuresListCta.items"
     [ctaHref]="page.featuresListCta.ctaHref"
-    [ctaLabel]="page.featuresListCta.ctaLabel" />
+    [ctaLabel]="page.featuresListCta.ctaLabel"></section>
 
-  <app-info-columns
+  <section app-info-columns
     [title]="page.infoColumns.title"
-    [items]="page.infoColumns.items" />
+    [items]="page.infoColumns.items"></section>
 
-  <app-cta-banner
+  <section app-cta-banner
     [title]="page.ctaBanner.title"
-    [description]="page.ctaBanner.description"
-    [cta]="page.ctaBanner.cta" />
-}
+    [description]="page.ctaBanner.description ?? ''"
+    [cta]="page.ctaBanner.cta"></section>
+</main>

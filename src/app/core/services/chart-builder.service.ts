@@ -2,27 +2,35 @@ import { Injectable } from '@angular/core';
 import { ApexOptions, ApexChart } from 'ngx-apexcharts';
 import { BarChartData, LineChartData, PieChartData, RadialBarData } from '../models/chart.model';
 
-// BeehiveMind brand palette
-const BHM_COLORS = ['#F5A623', '#4A90D9', '#7ED321', '#D0021B', '#9B59B6', '#1ABC9C'];
+// A data palette, not a brand palette. With one accent there is no honest
+// categorical scale to build, so series run down the neutral ramp and the
+// orange marks the series being asked about. These are the six steps in
+// styles/tokens/charts.css (ApexCharts needs literal values, not custom
+// properties, because it paints into SVG attributes).
+const CHART_COLORS = ['#f69520', '#212121', '#757575', '#424242', '#e0e0e0', '#f5f5f5'];
+const CHART_FONT = 'Peridot PE, system-ui, sans-serif';
 
 const BASE_CHART_CONFIG: Omit<ApexChart, 'type'> = {
-  fontFamily: 'Montserrat, system-ui, sans-serif',
+  fontFamily: CHART_FONT,
+  // Apex defaults every axis label and legend entry to #373d3f, its own grey.
+  foreColor: '#424242',
   toolbar: { show: false },
   zoom: { enabled: false },
   background: 'transparent',
 };
 
 const BASE_OPTIONS = {
-  colors: BHM_COLORS,
-  grid: { borderColor: '#e8e8e8', strokeDashArray: 4 },
+  colors: CHART_COLORS,
+  grid: { borderColor: '#e0e0e0', strokeDashArray: 4 },
   tooltip: { theme: 'light' as const },
-  legend: { position: 'bottom' as const, fontFamily: 'Montserrat, system-ui, sans-serif' },
+  legend: { position: 'bottom' as const, fontFamily: CHART_FONT },
   dataLabels: { enabled: false },
 };
 
 @Injectable({ providedIn: 'root' })
 export class ChartBuilderService {
 
+  /** Smooth area chart with a fading gradient — the dashboard's time series. */
   line(data: LineChartData, overrides: Partial<ApexOptions> = {}): ApexOptions {
     return this.merge({
       ...BASE_OPTIONS,
@@ -34,6 +42,7 @@ export class ChartBuilderService {
     }, overrides);
   }
 
+  /** Rounded columns at 55% width. */
   bar(data: BarChartData, overrides: Partial<ApexOptions> = {}): ApexOptions {
     return this.merge({
       ...BASE_OPTIONS,
@@ -50,6 +59,7 @@ export class ChartBuilderService {
     }, overrides);
   }
 
+  /** A donut, never a full pie — the hole is 65%. */
   pie(data: PieChartData, overrides: Partial<ApexOptions> = {}): ApexOptions {
     return this.merge({
       ...BASE_OPTIONS,

@@ -1,144 +1,54 @@
-.todo-list {
-  max-width: 720px;
-
-  &__header {
-    margin-bottom: 24px;
-  }
-
-  &__title {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #171717;
-    margin: 0;
-  }
-
-  &__empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 64px 16px;
-    color: #a3a3a3;
-    font-size: 0.95rem;
-
-    p { margin: 0; }
-  }
-
-  &__empty-icon {
-    font-size: 2rem;
-  }
-}
-
-.todo-section {
-  margin-bottom: 28px;
-
-  &__label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #737373;
-    margin-bottom: 10px;
-  }
-
-  &__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #d4d4d4;
-
-    &--overdue {
-      background: #ef4444;
-    }
-  }
-
-  &--overdue .todo-item {
-    border-left-color: #ef4444;
-    background: #fff8f8;
-  }
-
-  &__items {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-}
-
-.todo-item {
+// The to-do row the design system draws inline in its TodoRow: checkbox,
+// title, apiary badge, date. Every value here is a token.
+.todo-row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-left: 3px solid #d4d4d4;
-  border-radius: 8px;
-  transition: box-shadow 0.12s;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--app-border-soft);
+  cursor: pointer;
 
-  &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  &--static {
+    cursor: default;
   }
 
-  &--overdue {
-    border-left-color: #ef4444;
-    background: #fff8f8;
-  }
-
-  &__icon {
-    font-size: 1.2rem;
-    flex-shrink: 0;
-  }
-
-  &__body {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  &__check {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    margin: 0;
+    accent-color: var(--app-accent);
+    cursor: inherit;
   }
 
   &__title {
+    flex: 1;
+    min-width: 0;
     font-size: 0.9rem;
-    font-weight: 600;
-    color: #171717;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: var(--app-text-primary);
   }
 
-  &__sub {
-    font-size: 0.82rem;
-    color: #525252;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  &--done &__title {
+    color: var(--app-text-muted);
+    text-decoration: line-through;
   }
 
   &__date {
-    font-size: 0.78rem;
-    color: #ef4444;
-    font-weight: 500;
-    margin-top: 2px;
-  }
+    flex: none;
+    font-size: 0.75rem;
+    color: var(--app-text-muted);
 
-  &__done {
-    flex-shrink: 0;
-    padding: 5px 12px;
-    border: 1px solid #e5e5e5;
-    border-radius: 5px;
-    background: #ffffff;
-    color: #525252;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: background 0.12s, color 0.12s, border-color 0.12s;
-
-    &:hover {
-      background: #f0fdf4;
-      color: #16a34a;
-      border-color: #bbf7d0;
+    &--overdue {
+      color: var(--app-danger);
+      font-weight: var(--font-weight-medium);
     }
+  }
+}
+
+.todo-done {
+  margin-top: var(--app-gap);
+
+  .app-list {
+    margin-top: 8px;
   }
 }

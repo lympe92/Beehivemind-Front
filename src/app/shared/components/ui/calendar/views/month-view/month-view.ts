@@ -1,14 +1,14 @@
 import { Component, computed, input, output } from '@angular/core';
 import {
   CalendarDay, CalendarEvent,
-  getMonthDays, resolveColor,
+  chipBackground, chipBar, getMonthDays,
 } from '../../calendar.model';
 
+/** Month grid: 6 rows × 7 cols, Monday first, two events per cell then "+N more". */
 @Component({
   selector: 'app-cal-month',
   standalone: true,
   templateUrl: './month-view.html',
-  styleUrl: './month-view.scss',
 })
 export class MonthViewComponent {
   readonly date   = input.required<Date>();
@@ -18,9 +18,10 @@ export class MonthViewComponent {
   readonly dayClick   = output<Date>();
 
   protected readonly WEEKDAYS  = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  protected readonly MAX_PILLS = 3;
+  protected readonly MAX_PILLS = 2;
 
   protected days = computed<CalendarDay[]>(() => getMonthDays(this.date(), this.events()));
 
-  protected color(c?: string): string { return resolveColor(c); }
+  protected chipBg(c?: string): string { return chipBackground(c); }
+  protected chipBar(c?: string): string { return chipBar(c); }
 }

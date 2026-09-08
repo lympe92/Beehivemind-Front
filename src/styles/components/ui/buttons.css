@@ -1,0 +1,99 @@
+/* Buttons — ported from src/styles/_buttons.scss.
+   One global class shared by Button (a <button>) and LinkButton (an <a>), which is
+   why it lives in CSS rather than inside either component: the source does the
+   same so the two can never drift apart. */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  border: 2px solid transparent;
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition-base);
+  white-space: nowrap;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Sizes */
+.btn--sm {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.btn--md {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-base);
+}
+
+.btn--lg {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: var(--font-size-lg);
+}
+
+/* Variants */
+.btn--primary {
+  background-color: var(--color-primary);
+  color: var(--text-on-primary);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+/* Ink, not blue. A secondary action of equal weight to a primary one reads as
+   black against the amber — the same pairing the logo and illustrations use. */
+.btn--secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background-color: var(--color-secondary-hover);
+}
+
+/* Amber hairline, ink label. The border carries the accent; the label does not,
+   because amber text on white is 2.27:1. On hover the fill becomes amber and
+   the label flips to white, which is where the accent gets to be loud. */
+/* The ink label assumes a light ground. On the dark bands it would be #212121
+   on #212121, so those scopes flip it to white — see .cta-banner and
+   .ribbon--dark in sections.css. */
+.btn--outline {
+  background-color: transparent;
+  border-color: var(--color-primary);
+  color: var(--color-secondary);
+}
+
+/* Filling with orange means the label follows the same rule as .btn--primary:
+   ink, not white. Flipping to white here would reintroduce the 2.27:1. */
+.btn--outline:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: var(--text-on-primary);
+}
+
+.btn--full {
+  width: 100%;
+}
+
+/* A pill whose label is longer than a phone is wide ("Discover how our
+   beekeeping App works »" is 368px at 16px) cannot stay on one line without
+   pushing the page sideways. Below 480px it wraps, centred, and never grows
+   past its container. */
+@media (max-width: 479px) {
+  .btn {
+    white-space: normal;
+    max-width: 100%;
+    text-align: center;
+    line-height: 1.25;
+  }
+}

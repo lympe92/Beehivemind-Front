@@ -1,22 +1,19 @@
-<section class="app-download">
-  <div class="container flex-col items-center text-center">
-    <h2>{{ title() }}</h2>
-    <div class="app-download__logo" data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
-      <app-image
-        [src]="logo().src"
-        [alt]="logo().alt"
-        [width]="logo().width"
-        [height]="logo().height"
-        [priority]="logo().priority ?? false" />
-    </div>
-    <h3>{{ subtitle() }}</h3>
-    <div class="app-download__stores flex justify-center"
-         data-aos="fade-up" data-aos-anchor-placement="bottom-bottom">
-      @for (store of storeLinks(); track store.href) {
-        <a [href]="store.href" target="_blank">
-          <img [src]="store.img.src" [alt]="store.img.alt" [width]="store.img.width" [height]="store.img.height">
-        </a>
-      }
-    </div>
+<div class="container flex-col items-center text-center">
+  <h2>{{ title() }}</h2>
+  <div class="app-download__logo">
+    <app-image
+      [src]="logo().src"
+      [alt]="logo().alt"
+      [width]="logo().width"
+      [height]="logo().height"
+      [priority]="logo().priority ?? false" />
   </div>
-</section>
+  <h3>{{ subtitle() }}</h3>
+  <div class="app-download__stores">
+    @for (store of storeLinks(); track store.href + store.img.alt) {
+      <a [href]="store.href" target="_blank" rel="noopener noreferrer">
+        <img [src]="store.img.src" [alt]="store.img.alt" [width]="store.img.width" [height]="store.img.height">
+      </a>
+    }
+  </div>
+</div>

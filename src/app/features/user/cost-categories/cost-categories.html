@@ -1,5 +1,5 @@
-<div class="fin-table__toolbar">
-  <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="startAdd()">+ Add</button>
+<div class="app-toolbar">
+  <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="startAdd()">+ Add</button>
 </div>
 
 <app-data-table
@@ -12,14 +12,14 @@
   <ng-template #cellTpl let-row let-col="col">
     @switch (col.key) {
       @case ('description') { <span class="dt__muted">{{ row.description }}</span> }
-      @case ('type') { <span class="fin-badge fin-badge--{{ row.type }}">{{ row.type }}</span> }
+      @case ('type') { <span class="app-badge app-badge--{{ row.type }}">{{ row.type }}</span> }
       @default { {{ row[col.key] ?? '—' }} }
     }
   </ng-template>
 
   <ng-template #actionsTpl let-row>
-    <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="startEdit(row)">Edit</button>
-    <button class="fin-btn fin-btn--danger fin-btn--sm" (click)="deleteRow(row)">Delete</button>
+    <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
+    <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
   </ng-template>
 
 </app-data-table>

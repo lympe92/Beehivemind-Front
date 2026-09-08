@@ -2,13 +2,14 @@
   <p class="confirm__message">{{ data.message }}</p>
 
   <ng-template #footer>
-    <button class="confirm__btn confirm__btn--cancel" (click)="cancel()">
+    <button type="button" class="app-btn app-btn--ghost" (click)="cancel()">
       {{ data.cancelLabel || 'Cancel' }}
     </button>
     <button
-      class="confirm__btn"
-      [class.confirm__btn--danger]="data.danger"
-      [class.confirm__btn--primary]="!data.danger"
+      type="button"
+      class="app-btn app-btn--ghost"
+      [class.app-btn--danger-solid]="data.danger"
+      [class.app-btn--primary]="!data.danger"
       (click)="confirm()">
       {{ data.confirmLabel || 'Confirm' }}
     </button>

@@ -1,0 +1,40 @@
+<div class="container">
+  <h2 class="pricing__title text-center">{{ title() }}</h2>
+  @if (note()) {
+    <p class="pricing__note">{{ note() }}</p>
+  }
+
+  <div class="pricing__grid">
+    @for (tier of tiers(); track tier.name) {
+      <div class="pricing__tier" [class.pricing__tier--featured]="tier.featured">
+        @if (tier.featured) {
+          <span class="pricing__flag">Most beekeepers</span>
+        }
+
+        <span class="pricing__tier-name">{{ tier.name }}</span>
+        <p class="pricing__price">
+          {{ tier.price }}
+          @if (tier.period) {
+            <span class="pricing__period">{{ tier.period }}</span>
+          }
+        </p>
+        <p class="pricing__for">{{ tier.forWhom }}</p>
+
+        <ul class="pricing__list">
+          @for (line of tier.includes; track line) {
+            <li>{{ line }}</li>
+          }
+        </ul>
+
+        <div class="pricing__action">
+          <app-link
+            [routerLink]="tier.cta.routerLink"
+            [variant]="tier.featured ? 'primary' : 'outline'"
+            size="md">
+            {{ tier.cta.label }}
+          </app-link>
+        </div>
+      </div>
+    }
+  </div>
+</div>

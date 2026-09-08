@@ -1,1 +1,17 @@
-<p>blog works!</p>
+<main>
+  <section app-page-intro
+    [eyebrow]="page.intro.eyebrow ?? ''"
+    [title]="page.intro.title"
+    [lead]="page.intro.lead ?? ''"></section>
+
+  <section app-post-list
+    [posts]="visible()"
+    [tags]="tags"
+    [activeTag]="activeTag()"
+    (filter)="activeTag.set($event)"></section>
+
+  <section app-cta-banner
+    [title]="page.ctaBanner.title"
+    [description]="page.ctaBanner.description ?? ''"
+    [cta]="page.ctaBanner.cta"></section>
+</main>

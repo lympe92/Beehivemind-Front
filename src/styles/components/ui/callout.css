@@ -1,0 +1,166 @@
+/* ---------- Callout ----------
+   An in-page notice: something true about this page that the user did not ask
+   about. It is the third notification surface, and the only one that was
+   missing.
+
+   The line between the three:
+   - A TOAST reports what just happened. Dismissible, time-limited, floats.
+   - An APP-ERROR reports that a request failed. Persists until retried, and
+     lives in the panel whose data is missing.
+   - A CALLOUT is a standing condition — a trial ending, a plan limit reached,
+     a hive not inspected in a month. Nobody triggered it, nothing failed, and
+     it is still true tomorrow.
+
+   This existed already as `.auth-info`, locked inside the auth layer and used
+   for exactly one message. It is generalised here rather than reinvented: the
+   accent variant is the same 12% fill and 40% border, so the auth screens did
+   not change appearance.
+
+   The tint carries the meaning and the label is ink, like every tinted ground
+   in this system. */
+.callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid;
+  border-radius: var(--radius);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+  color: var(--text-body);
+  text-wrap: pretty;
+}
+
+.callout__icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  /* Optically aligned to the first line's cap-height rather than its box. */
+  margin-top: 1px;
+}
+
+.callout__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* A callout heading names a condition, so it takes the structural voice. */
+.callout__title {
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--text-heading);
+}
+
+.callout__text {
+  margin: 0;
+}
+
+/* The action is a link, not a button: a callout is something you may act on,
+   not something asking you to. A filled button here competes with the page's
+   real primary action, which is what the user actually came to do. */
+.callout__action {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-link);
+  text-decoration: underline;
+  text-decoration-color: var(--text-link-underline);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: text-decoration-color var(--transition-speed) var(--transition-easing);
+}
+
+.callout__action:hover {
+  text-decoration-color: var(--color-primary);
+}
+
+/* Dismissable only where the condition is genuinely optional to know. A
+   callout about a plan limit has no business being dismissable. */
+.callout__close {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  margin: -5px -6px -5px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-speed) var(--transition-easing),
+    background var(--transition-speed) var(--transition-easing);
+}
+
+.callout__close svg {
+  width: 12px;
+  height: 12px;
+}
+
+.callout__close:hover {
+  color: var(--text-body);
+  background: color-mix(in srgb, var(--color-dark) 8%, transparent);
+}
+
+/* Accent is the default: most standing conditions are informational, and the
+   accent as a 12% fill is exactly what the accent is for. */
+.callout--accent {
+  background: color-mix(in srgb, var(--color-primary) 12%, #fff);
+  border-color: color-mix(in srgb, var(--color-primary) 40%, #fff);
+}
+
+/* The icon takes ink, not the accent: orange on its own 12% tint measures
+   2.56:1, under the 3:1 a non-text indicator needs — the same reason the focus
+   ring is ink and not accent. The tint is the accent's contribution here. */
+.callout--accent .callout__icon {
+  color: var(--text-body);
+}
+
+.callout--warning {
+  background: color-mix(in srgb, var(--color-warning) 12%, #fff);
+  border-color: color-mix(in srgb, var(--color-warning) 40%, #fff);
+}
+
+.callout--warning .callout__icon {
+  color: var(--color-warning);
+}
+
+.callout--error {
+  background: color-mix(in srgb, var(--color-error) 12%, #fff);
+  border-color: color-mix(in srgb, var(--color-error) 35%, #fff);
+}
+
+.callout--error .callout__icon {
+  color: var(--color-error);
+}
+
+.callout--success {
+  background: color-mix(in srgb, var(--color-success) 12%, #fff);
+  border-color: color-mix(in srgb, var(--color-success) 35%, #fff);
+}
+
+.callout--success .callout__icon {
+  color: var(--color-success);
+}
+
+/* No hue at all. For a condition that is neither good nor bad and is not the
+   accent's business — which is also what the retired info state becomes. */
+.callout--neutral {
+  background: var(--color-light);
+  border-color: var(--border-color);
+}
+
+.callout--neutral .callout__icon {
+  color: var(--color-dark-grey);
+}

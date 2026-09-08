@@ -16,12 +16,18 @@ export interface TablePagination {
   total: number;
 }
 
+/**
+ * Every list in the app. Styles are the global `.dt__*` rules in
+ * styles/components/app/app.css, themed through the `--dt-*` contract.
+ *
+ * `.dt__muted` must sit on a <span> inside a cell — `.dt__table td` is one
+ * specificity step above it, so a `<td class="dt__muted">` renders at full ink.
+ */
 @Component({
   selector: 'app-data-table',
   standalone: true,
   imports: [NgTemplateOutlet],
   templateUrl: './data-table.html',
-  styleUrl: './data-table.scss',
   encapsulation: ViewEncapsulation.None,
 })
 export class DataTableComponent<T = unknown> {

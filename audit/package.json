@@ -1,0 +1,15 @@
+{
+  "name": "beehivemind-front-audit",
+  "private": true,
+  "type": "module",
+  "description": "Runs the design system's audit battery (checks.js) against the dev server at 375/768/1024/1440.",
+  "scripts": {
+    "audit": "node run.mjs",
+    "probe": "node probe.mjs",
+    "shots": "node shots.mjs",
+    "kits": "node static.mjs \"C:/Users/lympe/Desktop/Beehivemind Software (1)/design_handoff_beehivemind_design_system\" 4302"
+  },
+  "dependencies": {
+    "puppeteer-core": "^23.11.1"
+  }
+}

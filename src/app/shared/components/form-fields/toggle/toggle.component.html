@@ -1,12 +1,19 @@
 <div class="form-group">
-  <div class="toggle-row" [class.disabled]="disabled" (click)="toggle()">
-    <div class="toggle-track" [class.checked]="checked" [class.invalid]="isFieldValid()">
-      <div class="toggle-thumb"></div>
-    </div>
+  <button
+    type="button"
+    role="switch"
+    class="toggle-row"
+    [class.disabled]="disabled"
+    [attr.aria-checked]="checked"
+    [disabled]="disabled"
+    (click)="toggle()">
+    <span class="toggle-track" [class.checked]="checked" [class.invalid]="isFieldValid()">
+      <span class="toggle-thumb"></span>
+    </span>
     @if (label) {
       <span class="toggle-label">{{ label }}{{ isRequired ? ' *' : '' }}</span>
     }
-  </div>
+  </button>
   @if (hint) {
     <p class="toggle-hint">{{ hint }}</p>
   }

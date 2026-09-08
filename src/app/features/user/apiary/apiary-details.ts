@@ -18,7 +18,6 @@ import { ApiaryFormModalComponent } from '../../../shared/components/ui/modal/ap
   standalone: true,
   imports: [DatePipe, RouterLink, CardComponent],
   templateUrl: './apiary-details.html',
-  styleUrl: './apiary-details.scss',
 })
 export class ApiaryDetailsComponent implements OnInit {
   private store        = inject(Store);

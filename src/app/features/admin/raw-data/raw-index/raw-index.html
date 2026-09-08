@@ -1,15 +1,20 @@
-<div class="raw-index">
-  <div class="page-header">
-    <h2>Raw Data</h2>
-    <p>Full access to all database models</p>
+<div class="app-page">
+  <div class="app-page-header">
+    <h1 class="app-page-title">Raw data</h1>
   </div>
 
-  <div class="models-grid">
+  <p class="app-page-lead">
+    Direct access to every registered table. A new table appears here by being
+    added to the registry — the list, the columns and the edit form are all
+    derived from that one entry.
+  </p>
+
+  <div class="admin-models">
     @for (m of models; track m.key) {
-      <a [routerLink]="['/admin/raw', m.key]" class="model-card">
-        <div class="model-card__label">{{ m.label }}</div>
-        <div class="model-card__count">{{ getCount(m.key) }}</div>
-        <div class="model-card__action">View all →</div>
+      <a [routerLink]="['/admin/raw', m.key]" class="admin-model">
+        <span class="admin-model__label">{{ m.label }}</span>
+        <span class="admin-model__count">{{ getCount(m.key) | number }}</span>
+        <span class="admin-model__action">View all →</span>
       </a>
     }
   </div>

@@ -52,7 +52,7 @@ export class TreatmentTypeModalComponent implements OnInit {
   });
 
   get isEdit(): boolean { return !!this.data.type; }
-  get title(): string   { return this.isEdit ? 'Edit Treatment Type' : 'New Treatment Type'; }
+  get title(): string   { return this.isEdit ? 'Edit treatment type' : 'New treatment type'; }
   get recurring(): boolean { return this.form.controls.isRecurring.value; }
 
   ngOnInit(): void {

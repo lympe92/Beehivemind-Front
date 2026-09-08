@@ -1,31 +1,25 @@
-@if (hero$ | async; as hero) {
-  <app-hero-center-content
-    [title]="hero.title"
-    [subtitle]="hero.subtitle"
-    [image]="hero.image"
-    [primaryCta]="hero.primaryCta"
-    [secondaryCta]="hero.secondaryCta" />
-}
+<main>
+  <section app-hero-center-content
+    [title]="page.hero.title"
+    [subtitle]="page.hero.subtitle"
+    [image]="page.hero.image"
+    [primaryCta]="page.hero.primaryCta"
+    [secondaryCta]="page.hero.secondaryCta"></section>
 
-@if (splitContents$ | async; as contents) {
-  @for (content of contents; track content.title) {
-    <app-split-content
+  @for (content of page.splitContents; track content.title; let i = $index) {
+    <section app-split-content
       [title]="content.title"
       [description]="content.description"
-      [image]="content.image" />
+      [image]="content.image"
+      [mediaSide]="side(i)"></section>
   }
-}
 
-@if (infoColumns$ | async; as infoColumns) {
-  <app-info-columns
-    [title]="infoColumns.title"
-    [items]="infoColumns.items" />
-}
+  <section app-info-columns
+    [title]="page.infoColumns.title"
+    [items]="page.infoColumns.items"></section>
 
-@if (ctaBanner$ | async; as ctaBanner) {
-  <app-cta-banner
-    [title]="ctaBanner.title"
-    [description]="ctaBanner.description"
-    [cta]="ctaBanner.cta" />
-}
-
+  <section app-cta-banner
+    [title]="page.ctaBanner.title"
+    [description]="page.ctaBanner.description ?? ''"
+    [cta]="page.ctaBanner.cta"></section>
+</main>

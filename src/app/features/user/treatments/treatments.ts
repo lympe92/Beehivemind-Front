@@ -19,7 +19,6 @@ import { TreatmentSessionService } from '../../../core/services/treatment-sessio
   standalone: true,
   imports: [CardComponent],
   templateUrl: './treatments.html',
-  styleUrl: './treatments.scss',
 })
 export class TreatmentsComponent implements OnInit {
   private store          = inject(Store);

@@ -1,12 +1,16 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+/**
+ * A text link. Colour and underline come from the global `a` rule in
+ * styles/components/base.css: ink with a grey underline that goes orange on
+ * hover. Pass `linkClass="public-footer__link"` for the footer treatment.
+ */
 @Component({
   selector: 'app-a-link',
   standalone: true,
   imports: [RouterLink],
   templateUrl: './a-link.component.html',
-  styleUrl: './a-link.component.scss',
 })
 export class ALinkComponent {
   readonly routerLink = input<string[]>();

@@ -1,0 +1,16 @@
+/* Radius — from _variables.scss.
+   Note the divergence between products: the website's buttons are pills
+   (--radius-pill, set in _buttons.scss), while the mobile XD specifies
+   rectangular 6px buttons. Both are recorded; the website value governs the
+   web UI kit and --radius-button-mobile the app kit. */
+
+:root {
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  --radius-button: var(--radius-pill);
+  --radius-button-mobile: 6px;
+}

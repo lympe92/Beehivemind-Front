@@ -1,0 +1,2456 @@
+/* App components — the logged-in web app's primitives.
+   Card, DataTable, Loader, Toast, ModalShell, FilterBar. All read the
+   --app-*, --dt-* and --modal-* contracts from tokens/user-theme.css. */
+
+/* ---------- Card ---------- */
+.card {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--card-border, #e5e5e5);
+  border-radius: var(--card-radius, 8px);
+  box-shadow: var(--card-shadow, 0 1px 3px rgba(0, 0, 0, 0.08));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--card-border, #e5e5e5);
+  flex-shrink: 0;
+}
+
+.card__title {
+  font-size: var(--card-title-size, 0.6875rem);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--card-title-color, #737373);
+}
+
+.card__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--app-pad);
+}
+
+/* A flush card hands its whole body to one child — a table, a map, a chart. */
+.card--flush .card__body {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--card-border, #e5e5e5);
+  flex-shrink: 0;
+}
+
+/* ---------- Data table ---------- */
+.dt__wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dt__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.dt__table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: var(--structural-size-sm);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--dt-text-muted);
+  background: var(--dt-th-bg, transparent);
+  border-bottom: 1px solid var(--dt-border);
+  white-space: nowrap;
+}
+
+.dt__table td {
+  padding: 11px 14px;
+  color: var(--dt-text-primary);
+  border-bottom: 1px solid var(--dt-border-soft);
+  vertical-align: middle;
+}
+
+.dt__table tr:last-child td {
+  border-bottom: none;
+}
+
+.dt__table tr:hover:not(.dt__row--editing) td {
+  background: var(--dt-bg-hover);
+}
+
+.dt__th--actions {
+  width: 1%;
+}
+
+/* An inline-edit row keeps its tint through hover. */
+.dt__row--editing td {
+  background: var(--dt-edit-bg, rgba(0, 0, 0, 0.04)) !important;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.dt__row--clickable {
+  cursor: pointer;
+}
+
+.dt__actions {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.dt__empty {
+  text-align: center;
+  color: var(--dt-text-muted);
+  padding: 24px 0;
+  font-size: 0.875rem;
+}
+
+.dt__loading {
+  text-align: center;
+  padding: 24px 0;
+}
+
+.dt__spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--dt-border);
+  border-top-color: var(--dt-text-muted);
+  border-radius: 50%;
+  animation: app-spin 0.7s linear infinite;
+}
+
+.dt__muted {
+  color: var(--dt-text-muted);
+}
+
+.dt__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 14px;
+  border-top: 1px solid var(--dt-border);
+}
+
+.dt__page-btn {
+  background: transparent;
+  border: 1px solid var(--dt-border);
+  border-radius: 6px;
+  color: var(--dt-text-muted);
+  font-size: 0.875rem;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.dt__page-btn:hover:not(:disabled) {
+  background: var(--dt-bg-hover);
+  color: var(--dt-text-primary);
+}
+
+.dt__page-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.dt__page-info {
+  font-size: 0.875rem;
+  color: var(--dt-text-primary);
+}
+
+.dt__page-muted {
+  color: var(--dt-text-muted);
+}
+
+/* ---------- Loader ---------- */
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 80px;
+}
+
+.loader__spinner {
+  display: block;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 0, 0, 0.08);
+  border-top-color: var(--app-warning);
+  animation: app-spin 0.75s linear infinite;
+}
+
+.loader--sm .loader__spinner {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.loader--md .loader__spinner {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+
+.loader--lg .loader__spinner {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+@keyframes app-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Toast ----------
+   Bottom right, stacked upward, a white card with a 4px semantic left bar.
+   Four invented tints (#f0faf4, #fff5f5, #fffbeb, #eff6ff) and a blue info
+   state lived here through the one-accent pass; they are the card surface and
+   the semantic three now.
+   The container ignores pointer events so it never blocks the page; each
+   toast re-enables them for itself. */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 360px;
+  width: 100%;
+  pointer-events: none;
+}
+
+.toast {
+  /* The label is ink on every type. The semantic colour is in the bar and the
+     icon; a coloured heading would be a fifth and sixth ink. */
+  color: var(--text-body);
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 13px 14px;
+  /* The card radius, not a literal 8. A toast is a card that floats. */
+  border-radius: var(--card-radius);
+  /* Two layers: a tight one that seats it against the page and a wide soft one
+     that lifts it off. The source's single 0 4px 16px/.14 was heavier than
+     anything else in the product and read as a different component library. */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.1);
+  pointer-events: all;
+  animation: toast-in var(--transition-speed) var(--transition-easing);
+}
+
+.toast--success {
+  background: var(--card-bg);
+  border-left: 4px solid var(--color-success);
+}
+
+.toast--success .toast__icon { color: var(--color-success); }
+
+.toast--error {
+  background: var(--card-bg);
+  border-left: 4px solid var(--color-error);
+}
+
+.toast--error .toast__icon { color: var(--color-error); }
+
+.toast--warning {
+  background: var(--card-bg);
+  border-left: 4px solid var(--color-warning);
+}
+
+.toast--warning .toast__icon { color: var(--color-warning); }
+
+/* There is no info state. The class survives only so a type="info" call site
+   does not fall through to an unstyled toast; it is grey, not blue. */
+.toast--info {
+  background: var(--card-bg);
+  border-left: 4px solid var(--color-grey);
+}
+
+.toast--info .toast__icon { color: var(--color-grey); }
+
+.toast__icon {
+  flex-shrink: 0;
+  display: flex;
+  /* Optically aligned to the title's cap-height rather than its line box, so
+     an 18px glyph does not sit high against an 11px structural heading. */
+  padding-top: 1px;
+}
+
+.toast__icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.toast__body {
+  flex: 1;
+  min-width: 0;
+  /* A toast with no title is one line; with a title it is two. The gap belongs
+     between them, not as a margin the message has to cancel. */
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* A toast heading names what happened, so it is structural: caps, 500,
+   positive tracking. 600 was a fourth weight against the 400/500/700 set. */
+.toast__title {
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  font-size: var(--structural-size);
+  color: var(--text-heading);
+}
+
+.toast__message {
+  font-size: 13px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* 44px of target around a 12px mark. Dismiss is the one thing you aim at on a
+   card that is about to disappear, and missing it means reading the whole
+   thing again. Negative margin keeps the visual box the same size. */
+.toast__close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: -5px -5px -5px 0;
+  background: none;
+  border: none;
+  border-radius: var(--app-radius-sm, 6px);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color var(--transition-speed) var(--transition-easing),
+    background var(--transition-speed) var(--transition-easing);
+}
+
+.toast__close svg {
+  width: 12px;
+  height: 12px;
+  display: block;
+}
+
+/* Ink on hover, and a tint under it — the same treatment as every other icon
+   button. Opacity was doing the work before, which makes a grey out of the
+   ink rather than choosing one. */
+.toast__close:hover {
+  color: var(--text-body);
+  background: var(--color-light);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    /* 40px was a slide from off-screen; the stack sits 24px from the edge, so
+       it read as arriving from somewhere else on the page. 12px is the card
+       settling into place. */
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ---------- Modal ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: var(--app-pad-lg);
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.modal-panel {
+  width: 100%;
+  max-width: 520px;
+  /* The backdrop is inset:0 with its own padding, so 100% IS the padded box.
+     This was calc(100vh - 48px) — the same figure written as a literal, which
+     then had to be restated as 92vh on mobile and stopped matching the
+     padding. One expression, and it follows --app-pad-lg. */
+  max-height: 100%;
+  border-radius: var(--app-radius);
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+  /* The panel is the flex column, not .mshell. The panel has a max-height and
+     never a definite height, so .mshell's `height: 100%` resolved against an
+     auto containing block — that is, to `auto` — and the shell grew to its
+     content instead of adopting the panel's used height. With no constrained
+     height there was nothing for the body to shrink into, so it never
+     scrolled and `overflow: hidden` clipped the form's actions off the bottom.
+     Sizing the child against the panel's USED height is what fixes it. */
+  display: flex;
+  flex-direction: column;
+}
+
+/* The modal layer used to reach for --modal-bg / --modal-text /
+   --modal-text-muted / --modal-border / --modal-hover, none of which is
+   declared anywhere — nine uses, every one falling through to a hardcoded
+   literal, and #737373 among them is not on the ramp. Pointed at the app
+   tokens they were pretending to alias. */
+.mshell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--app-bg-panel);
+  color: var(--app-text-primary);
+}
+
+.mshell__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--app-pad-sm);
+  padding: var(--app-pad) var(--app-pad-lg) var(--app-pad-sm);
+  border-bottom: 1px solid var(--app-border);
+  flex-shrink: 0;
+}
+
+.mshell__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* The website's heading voice: weight 400, negative tracking. This was the last
+   heading in the system still at 700 with normal tracking. */
+.mshell__title {
+  font-size: 1.1rem;
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--h5-tracking);
+  margin: 0;
+  color: var(--app-text-primary);
+}
+
+.mshell__subtitle {
+  font-size: 0.8rem;
+  color: var(--app-text-muted);
+  margin: 0;
+}
+
+/* 2px of padding round a 12px glyph gave a 25×20 target — the smallest
+   control in the system, and the one that dismisses a dialog. Same treatment as
+   the sidebar toggle: a real target at every width, the full 44 on a phone. */
+.mshell__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--app-text-muted);
+  padding: 0;
+  min-width: 36px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+@media (max-width: 767px) {
+  .mshell__close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+.mshell__close:hover {
+  color: var(--app-text-primary);
+  background: var(--app-bg-hover);
+}
+
+.mshell__body {
+  flex: 1;
+  /* min-height is what lets this shrink below its content and scroll — but
+     only because .modal-panel is now the flex column above it. */
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--app-pad) var(--app-pad-lg);
+}
+
+.mshell__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding: var(--app-pad-sm) var(--app-pad-lg);
+  border-top: 1px solid var(--app-border);
+  flex-shrink: 0;
+}
+
+.confirm__message {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--app-gray-600);
+  line-height: 1.5;
+}
+
+/* .confirm__btn used to live here: a 6px/weight-600 button that duplicated
+   .app-btn for no reason. Removed — modal footers use .app-btn. */
+
+/* ---------- Filter bar ---------- */
+.fb {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--app-gap);
+  padding: var(--app-pad-sm) var(--app-pad);
+  background: var(--app-bg-panel);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  flex-wrap: wrap;
+}
+
+/* ---------- App button ----------
+   The source duplicates this exact button set under six different prefixes:
+   .apiary__btn, .bh__btn, .insp__btn, .feeding__btn, .harvest__btn,
+   .treatments__btn, .td__btn and .fin-btn — same padding, same 6px radius,
+   same primary/ghost/danger/sm modifiers, eight copies. Unified here as one
+   class, which is exactly the kind of duplication a design system exists to
+   remove.
+
+   ⚠ One faithful-but-broken value corrected: the source's danger variant uses
+   `color: #fca5a5`, a light red that reads at about 1.9:1 on the white content
+   area — a leftover from when the app was themed dark. Here the text is
+   --app-danger, which is legible. Documented in AppButton.prompt.md. */
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--app-radius-sm);
+  border: none;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+
+.app-btn--primary {
+  background: var(--app-accent);
+  color: var(--app-accent-fg);
+}
+
+.app-btn--primary:hover:not(:disabled) {
+  background: var(--app-accent-hover);
+}
+
+.app-btn--ghost {
+  background: transparent;
+  border: 1px solid var(--app-border);
+  color: var(--app-text-muted);
+}
+
+.app-btn--ghost:hover:not(:disabled) {
+  background: var(--app-bg-hover);
+  color: var(--app-text-primary);
+}
+
+/* Filled destructive — a modal's confirming button, where the action is the
+   point of the dialog. Row-level deletes use the outlined --danger below. */
+.app-btn--danger-solid {
+  background: var(--app-danger-fill);
+  color: var(--text-on-primary);
+}
+
+/* The fill stays and the opacity carries the hover. Swapping in a darker red
+   would put the ink label under 4.5:1 — the fill is light because the label is
+   ink, and that does not stop being true on hover. */
+.app-btn--danger-solid:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.app-btn--danger {
+  background: transparent;
+  /* Mixed from the token, never from a literal. */
+  border: 1px solid color-mix(in srgb, var(--app-danger) 40%, transparent);
+  color: var(--app-danger);
+}
+
+/* The tint behind the label is the state. The label does not shift. */
+.app-btn--danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--app-danger) 12%, transparent);
+}
+
+.app-btn--sm {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+}
+
+.app-btn--block {
+  width: 100%;
+  justify-content: center;
+}
+
+.app-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- App input ----------
+   The inline-edit field used inside table rows and filter bars. Tinted fill,
+   accent border on focus — the dashboard's field, not the forms layer's. */
+.app-input {
+  background: var(--app-bg-hover);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-sm);
+  color: var(--app-text-primary);
+  font-family: inherit;
+  font-size: 0.875rem;
+  padding: 6px 10px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.app-input:focus {
+  outline: none;
+  border-color: var(--app-accent);
+}
+
+.app-input--sm {
+  padding: 4px 8px;
+  width: auto;
+  min-width: 70px;
+}
+
+/* ---------- Weather card ----------
+   The source's card is a blue gradient with white text. On a one-accent
+   palette with no blue it is a .card like every other dashboard panel, and the
+   dashboard stays clear of dark bands by rule. The accent marks the current
+   condition — a fill, which is what the accent is for. */
+.wc__state {
+  text-align: center;
+  color: var(--app-text-muted);
+  font-size: 0.9rem;
+  padding: var(--app-pad-lg) var(--app-pad);
+}
+
+.wc__state span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--app-gray-600);
+  margin-top: 4px;
+}
+
+.wc__current {
+  padding: var(--app-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wc__now {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* The one accent mark on the card, and the only place its hue appears. */
+.wc__now-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+.wc__now-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* A recorded value, so 700 — the source's 300 is not in the set at all. */
+.wc__temp {
+  font-size: 2.5rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--app-text-primary);
+}
+
+.wc__location {
+  font-size: 0.85rem;
+  color: var(--app-text-muted);
+}
+
+.wc__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+
+.wc__metric {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.wc__mi {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  color: var(--app-gray-500);
+}
+
+.wc__metric-value {
+  font-size: 0.8rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--app-text-primary);
+}
+
+/* Each metric names a quantity, so the unit takes the structural voice. */
+.wc__metric-label {
+  font-size: var(--structural-size-sm);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.wc__expand-btn {
+  align-self: flex-start;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+}
+
+.wc__chevron {
+  width: 14px;
+  height: 14px;
+  transition: transform var(--transition-speed) var(--transition-easing);
+}
+
+.wc__chevron--open {
+  transform: rotate(180deg);
+}
+
+.wc__hourly {
+  border-top: 1px solid var(--app-border);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.wc__h-time {
+  font-weight: var(--font-weight-medium);
+}
+
+.wc__h-temp {
+  font-weight: var(--font-weight-medium);
+}
+
+.wc__h-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  color: var(--app-gray-600);
+}
+
+/* The source colours a wet hour blue (#60a5fa, weight 600). There is no blue
+   and no 600, and orange cannot carry text — so a wet hour is simply a figure
+   at full ink weight against muted neighbours. */
+.wc__h-rain--high {
+  font-weight: var(--font-weight-bold);
+  color: var(--app-text-primary);
+}
+
+.wc__forecast {
+  display: flex;
+  border-top: 1px solid var(--app-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.wc__forecast::-webkit-scrollbar {
+  display: none;
+}
+
+.wc__day {
+  flex: 1;
+  min-width: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border-right: 1px solid var(--app-border);
+  transition: background var(--transition-speed) var(--transition-easing);
+}
+
+.wc__day:last-child {
+  border-right: none;
+}
+
+.wc__day:hover {
+  background: var(--app-bg-hover);
+}
+
+.wc__day-label {
+  font-size: var(--structural-size-sm);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.wc__day-icon {
+  width: 26px;
+  height: 26px;
+  color: var(--app-gray-600);
+  margin: 2px 0;
+}
+
+.wc__day-temps {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.wc__day-high {
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--app-text-primary);
+}
+
+.wc__day-low {
+  font-size: 0.78rem;
+  color: var(--app-gray-600);
+}
+
+.wc__day-rain,
+.wc__day-sun,
+.wc__day-wind {
+  font-size: 0.7rem;
+  color: var(--app-gray-600);
+  white-space: nowrap;
+}
+
+/* ---------- Notification bell ---------- */
+.notif-bell {
+  position: relative;
+}
+
+.notif-bell__btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-sm);
+  background: var(--app-bg-panel);
+  color: var(--app-text-muted);
+  cursor: pointer;
+  transition: color var(--transition-speed) var(--transition-easing),
+    border-color var(--transition-speed) var(--transition-easing),
+    background var(--transition-speed) var(--transition-easing);
+}
+
+.notif-bell__btn:hover,
+.notif-bell__btn--active {
+  color: var(--app-text-primary);
+  border-color: var(--app-gray-300);
+  background: var(--app-bg-hover);
+}
+
+.notif-bell__icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* White on #ef4444 in the source. The rule is light fill, ink label, so this
+   is the destructive FILL — the lighter red — with #212121 on it. */
+.notif-bell__badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--app-danger-fill);
+  color: var(--text-on-primary);
+  border: 1px solid var(--app-bg-panel);
+  border-radius: 9px;
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 16px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.notif-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(360px, calc(100vw - 32px));
+  background: var(--app-bg-panel);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  box-shadow: var(--card-shadow, 0 8px 24px rgba(0, 0, 0, 0.12));
+  z-index: 1000;
+  overflow: hidden;
+  animation: notif-drop var(--transition-speed) var(--transition-easing);
+}
+
+.notif-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px var(--app-pad);
+  border-bottom: 1px solid var(--app-border);
+}
+
+/* Names a region, so structural — not the source's 0.9rem/600. */
+.notif-panel__title {
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--app-text-primary);
+}
+
+.notif-panel__read-all {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--app-text-muted);
+  text-decoration: underline;
+  text-decoration-color: var(--app-gray-300);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--transition-speed) var(--transition-easing);
+}
+
+/* A hover is carried by the rule, not by the label — the same as every other
+   link in the system. */
+.notif-panel__read-all:hover {
+  text-decoration-color: var(--color-primary);
+}
+
+.notif-panel__body {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notif-panel__empty {
+  padding: var(--app-pad-lg) var(--app-pad);
+  text-align: center;
+  color: var(--app-text-muted);
+  font-size: 0.875rem;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 12px var(--app-pad);
+  border: none;
+  border-bottom: 1px solid var(--app-border);
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-speed) var(--transition-easing);
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item:hover {
+  background: var(--app-bg-hover);
+}
+
+/* The unread tint and the dot are the accent as a fill and as a mark, which is
+   what it is for. Both well inside the 15% budget. */
+.notif-item--unread {
+  background: color-mix(in srgb, var(--color-primary) 8%, #fff);
+}
+
+.notif-item--unread:hover {
+  background: color-mix(in srgb, var(--color-primary) 14%, #fff);
+}
+
+.notif-item__dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  margin-top: 6px;
+}
+
+/* The dot holds its column on a read item so the two rows align. */
+.notif-item__dot--read {
+  background: transparent;
+}
+
+.notif-item__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notif-item__title {
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--app-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notif-item__msg {
+  font-size: 0.8rem;
+  color: var(--app-gray-600);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notif-item__date {
+  font-size: 0.75rem;
+  color: var(--app-text-muted);
+  margin-top: 2px;
+}
+
+/* Muted grey is 4.6:1 on white but 4.32:1 on the unread tint, so on a tint it
+   steps to the darker grey. The same rule as muted text in the tables. */
+.notif-item--unread .notif-item__date {
+  color: var(--app-gray-600);
+}
+
+@keyframes notif-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Admin stat cards ----------
+   Eleven figures on one screen. They are all the same neutral card: the
+   figure carries the emphasis at weight 700, and the three that are states
+   carry a small semantic dot. No filled variants — the source has
+   --accent, --warn and --danger fills, and eleven coloured cards would put
+   the accent well past its 15% budget and stop it meaning anything. */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--app-gap);
+}
+
+.admin-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--app-pad);
+  background: var(--app-bg-panel);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+}
+
+.admin-stat__label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.admin-stat__dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--app-gray-300);
+}
+
+.admin-stat__dot--accent {
+  background: var(--color-primary);
+}
+
+.admin-stat__dot--success {
+  background: var(--app-success);
+}
+
+.admin-stat__dot--warning {
+  background: var(--app-warning);
+}
+
+.admin-stat__dot--danger {
+  background: var(--app-danger);
+}
+
+.admin-stat__value {
+  font-size: 2rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--app-text-primary);
+}
+
+.admin-stat__sub {
+  font-size: 0.8rem;
+  color: var(--app-gray-600);
+}
+
+/* ---------- Raw-data model cards ---------- */
+.admin-models {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--app-gap);
+}
+
+.admin-model {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--app-pad);
+  background: var(--app-bg-panel);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  text-decoration: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color var(--transition-speed) var(--transition-easing),
+    background var(--transition-speed) var(--transition-easing);
+}
+
+/* --app-bg-hover is #e0e0e0 — the BORDER step, and much heavier than any
+   other hover here; the dashboard's own row hover is #fafafa. On it the muted
+   label measured 3.49:1, so the ground lightens and the label steps down. */
+.admin-model:hover {
+  background: var(--app-gray-50);
+  border-color: var(--app-gray-300);
+}
+
+.admin-model__label {
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  /* Not --app-text-muted: this label sits on a tinted hover ground, where the
+     muted step falls under 4.5:1. Same rule as everywhere else. */
+  color: var(--app-gray-600);
+}
+
+.admin-model__count {
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  color: var(--app-text-primary);
+}
+
+/* "View all →" in the source. The arrow is the affordance and the label is
+   ink; the row does not turn orange on hover, the border does the work. */
+.admin-model__action {
+  font-size: 0.8rem;
+  color: var(--app-gray-600);
+}
+
+/* A monospace code, for coupon codes and raw ids. */
+.admin-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  padding: 2px 6px;
+  border-radius: var(--app-radius-sm);
+  background: var(--app-gray-50);
+  color: var(--app-text-primary);
+}
+
+/* ---------- Drawer ----------
+   The side panel. Same chrome and the same keyboard contract as the Modal —
+   it calls the same hook — so the two cannot drift apart. What differs is
+   where it comes from and what it leaves visible. */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  animation: drawer-fade var(--transition-speed) var(--transition-easing);
+}
+
+.drawer-backdrop--right {
+  justify-content: flex-end;
+}
+
+.drawer-panel {
+  height: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--app-bg-panel);
+  /* Square against its own edge and rounded on the inside one: the panel is
+     attached to the side of the screen, and rounding all four corners would
+     float it there like a misplaced dialog. */
+  border-radius: 0;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.16);
+  overflow-y: auto;
+  animation: drawer-in var(--transition-speed) var(--transition-easing);
+}
+
+.drawer-panel--left {
+  animation-name: drawer-in-left;
+}
+
+.drawer-panel:focus {
+  outline: none;
+}
+
+/* The shell inside a drawer stretches instead of hugging its content, so its
+   footer sits at the bottom of the screen rather than under the last field. */
+.drawer-panel > .mshell {
+  flex: 1;
+  min-height: 0;
+}
+
+@keyframes drawer-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes drawer-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes drawer-in-left {
+  from { transform: translateX(-24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ---------- Popover ----------
+   An anchored surface, positioned by measurement from its trigger. It was
+   CSS-only first — absolute in a relative wrapper — and that is clipped by any
+   ancestor with `overflow: hidden`, which the component's own main use case
+   has three of: an ActionMenu in a DataTable inside a Card. `position: fixed`
+   is the only strategy that escapes an ancestor's overflow. */
+.pop {
+  position: relative;
+  display: inline-flex;
+}
+
+.pop__panel {
+  position: fixed;
+  z-index: 1000;
+  min-width: 160px;
+  padding: 4px;
+  background: var(--app-bg-panel);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  /* The toast's two-layer shadow, so every floating surface in the product
+     sits at the same apparent height. */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.1);
+  animation: pop-in var(--transition-speed) var(--transition-easing);
+}
+
+/* `align` decides which edge of the trigger the panel lines up with; the
+   arithmetic is in the component, since it needs the panel's own width. */
+
+.pop__trigger {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-sm);
+  background: none;
+  color: var(--app-text-muted);
+  cursor: pointer;
+  transition: color var(--transition-speed) var(--transition-easing),
+    background var(--transition-speed) var(--transition-easing);
+}
+
+.pop__trigger svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pop__trigger:hover,
+.pop__trigger[aria-expanded="true"] {
+  color: var(--app-text-primary);
+  background: var(--app-gray-100);
+}
+
+.pop__item {
+  display: block;
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--app-radius-sm);
+  background: none;
+  font-family: inherit;
+  /* Sentence case, not the structural voice: a menu row does something, which
+     makes it a button rather than a label. */
+  font-size: 0.85rem;
+  line-height: 1.3;
+  color: var(--app-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-speed) var(--transition-easing);
+}
+
+.pop__item:hover:not(:disabled) {
+  background: var(--app-bg-hover);
+}
+
+.pop__item:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* The destructive row writes in red on white — 4.60:1 — and takes a tint only
+   on hover. A permanently red row in a list of four reads as broken rather
+   than as dangerous. */
+.pop__item--danger {
+  color: var(--app-danger);
+}
+
+.pop__item--danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--app-danger) 10%, #fff);
+}
+
+.pop__divider {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--app-border);
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Responsive ----------
+   The dashboard was authored at desktop width. These are the rules that make
+   it survive a phone; the layout shell's own breakpoint is in
+   `user-layout.css`.
+
+   The principle throughout: a table scrolls, a grid re-flows, and a dialog
+   grows to fill the screen. Nothing is hidden — a dashboard whose columns
+   disappear on a phone is a dashboard you cannot check from an apiary, which
+   is where this product is used. */
+@media (max-width: 767px) {
+  /* A table is the one thing that cannot re-flow honestly: dropping columns
+     hides data, and wrapping them turns a row into a paragraph. It scrolls,
+     and the min-width is what makes the scroll happen instead of six columns
+     crushing to 40px each. */
+  .dt__table {
+    min-width: 560px;
+  }
+
+  .dt__table th,
+  .dt__table td {
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+
+  /* The page header stacks: a title and an action side by side at 375px
+     leaves the action 90px, which is not a button. */
+  .app-page-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .app-page-header > *:last-child:not(:first-child) {
+    margin-left: 0;
+  }
+
+  /* Each filter takes the full width rather than three stumps in a row. */
+  .fb__group {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  /* A dialog is the screen on a phone. 16px of margin keeps it from looking
+     like a broken full-page view.
+
+     It used to also set align-items: flex-end, which pinned the panel to the
+     bottom — half a bottom sheet, with 16px of inset and a full radius still
+     on it, reading as a card shoved downwards rather than a sheet. The
+     dashboard is not the mobile app; a real bottom sheet is the mobile
+     surface's own BottomSheet component. Centred at every width. */
+  .modal-backdrop {
+    padding: 16px;
+  }
+
+  .modal-panel {
+    max-width: 100%;
+  }
+
+  .mshell__header,
+  .mshell__body,
+  .mshell__footer {
+    padding-inline: 16px;
+  }
+
+  /* The footer's buttons go full width and stack: two 50% buttons at 343px
+     with a gap gives 165px each, and "Delete account" does not fit. */
+  .mshell__footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .mshell__footer .app-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Full width, because a 440px drawer on a 375px screen is a modal with the
+     wrong animation. */
+  .drawer-panel {
+    width: 100% !important;
+  }
+
+  /* A popover wider than the screen is worse than one that wraps. */
+  .pop__panel {
+    max-width: calc(100vw - 16px);
+  }
+
+  .toast-container {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .toast {
+    max-width: 100%;
+  }
+}
+
+/* Between phone and desktop the sidebar is already an overlay, so the content
+   has the full width — what it needs is the tighter page padding, since
+   `--app-page-x` is sized for a page that gave 240px to the nav. */
+@media (max-width: 991px) {
+  /* :is() because the base .app-page-title rule is declared further down the
+     file at equal specificity, so the plain selector lost on order and the
+     title never stepped down. :is(), never :where(), which would zero it. */
+  .app-page-title:is(.app-page-title) {
+    font-size: 1.25rem;
+  }
+}
+
+
+/* ---------- Badges and pills ---------- */
+.app-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: var(--structural-size-sm);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  background: var(--app-gray-100);
+  /* The base ground is a tint too, so the label is not the muted step. */
+  color: var(--app-gray-600);
+}
+
+/* Admin badge tones — declared AFTER .app-badge, which is the whole point.
+   These four sat above the base rule at equal specificity (0,1,0), so the
+   base's `color: var(--app-text-muted)` won on order and every one of them
+   rendered #757575 on its own tint — 4.23:1, and the ink label the comment
+   describes never appeared. Fourth failure of this shape in the system: when a
+   rule has no visible effect, check where it is declared before rewriting it.
+
+   Status is a state, so it takes its semantic hue as a tint with an ink label.
+   Plan and role are NOT states: a plan is a fact about an account and a role is
+   a fact about an employee, so both are the outlined neutral badge, which also
+   keeps them distinct from the status column beside them. */
+.app-badge--active {
+  background: color-mix(in srgb, var(--app-success) 14%, #fff);
+  color: var(--app-text-primary);
+}
+
+.app-badge--suspended {
+  background: color-mix(in srgb, var(--app-warning) 14%, #fff);
+  color: var(--app-text-primary);
+}
+
+.app-badge--banned {
+  background: color-mix(in srgb, var(--app-danger) 14%, #fff);
+  color: var(--app-text-primary);
+}
+
+.app-badge--neutral {
+  background: transparent;
+  border: 1px solid var(--app-border);
+  color: var(--app-gray-600);
+}
+
+/* The tint carries the meaning and ink carries the text — the same rule as a
+   filled button. These four badges were the last of the retired Tailwind
+   palette in the app: #15803d, #b91c1c and #1d4ed8, the last of them a blue
+   info state that the one-accent pass had already abolished. */
+.app-badge--income {
+  background: color-mix(in srgb, var(--app-success) 14%, #fff);
+  color: var(--app-text-primary);
+}
+
+.app-badge--outcome {
+  background: color-mix(in srgb, var(--app-danger) 14%, #fff);
+  color: var(--app-text-primary);
+}
+
+.app-badge--disease {
+  background: color-mix(in srgb, var(--app-danger) 14%, #fff);
+  color: var(--app-text-primary);
+}
+
+/* A schedule is neutral information, and there is no info state to give it.
+   An outline keeps it distinct from the filled neutral badges without a hue. */
+.app-badge--recurring {
+  background: transparent;
+  border: 1px solid var(--app-border);
+  color: var(--app-gray-600);
+}
+
+.app-badge--single,
+.app-badge--apiary {
+  background: var(--app-gray-100);
+  color: var(--app-gray-600);
+}
+
+/* Yes/No cell in the inspections table — a detection reads red, its absence
+   stays muted, so a scan of the column shows only what matters. */
+.app-bool {
+  font-weight: 500;
+  color: var(--app-text-muted);
+}
+
+.app-bool--yes {
+  color: var(--app-danger);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ---------- Page scaffolding ---------- */
+/* Page-level rhythm is the shared band scale at its tight end — see the
+   spacing block in tokens/user-theme.css. */
+.app-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap);
+}
+
+.app-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.app-page-title {
+  margin: 0;
+  /* Converged to the website's heading voice: light weight, negative tracking.
+     Kept small — a dashboard page title competes with the data below it. */
+  font-size: var(--h4-size);
+  font-weight: var(--heading-weight-sm);
+  letter-spacing: var(--h4-tracking);
+  color: var(--app-text-primary);
+}
+
+.app-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 12px;
+}
+
+/* The one-line "Loading…" / "No apiaries yet" line used by the card-list
+   pages, which don't go through DataTable's own empty state. */
+.app-state {
+  padding: 28px 0;
+  text-align: center;
+  color: var(--app-text-muted);
+  font-size: 0.875rem;
+}
+
+/* ---------- Failed to load ----------
+   The seventh state, and the one the system was missing: not a field that
+   failed validation but a request that did not come back.
+
+   It stays INSIDE the card it belongs to. A failed panel is one panel — the
+   nav, the header and the other four cards on the page are all still usable,
+   and replacing the whole page with an error throws away five working things
+   to report one broken one. The only exception is a route whose entire reason
+   for existing failed to load.
+
+   Not a toast either: a toast is dismissible and time-limited, and this
+   condition persists until someone retries. */
+.app-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px var(--app-pad);
+  text-align: center;
+}
+
+/* Ink, not red. Red is for a value you can correct; a request that failed is
+   not the user's mistake, and a red panel among four normal ones reads as
+   damage rather than as one thing to retry. The red would also be carrying
+   text on a tint the moment anyone gave this a background. */
+.app-error__text {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--app-text-primary);
+  text-wrap: pretty;
+}
+
+/* The reason, when there is one worth printing. Never a stack trace or a
+   status code on its own — "500" tells a beekeeper nothing. */
+.app-error__detail {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--app-gray-600);
+}
+
+.app-row--2col {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--app-gap);
+}
+
+.app-row--3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--app-gap);
+}
+
+@media (max-width: 900px) {
+  .app-row--2col { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 1024px) {
+  .app-row--3col { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+  .app-row--3col { grid-template-columns: 1fr; }
+}
+
+.app-scroll-body {
+  overflow-y: auto;
+  max-height: 420px;
+}
+
+.app-link {
+  color: var(--app-link);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.app-link:hover {
+  color: var(--app-link-hover);
+  text-decoration: underline;
+}
+
+/* ---------- Field list (apiary details cards) ---------- */
+.app-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px 20px;
+}
+
+.app-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.app-field__label {
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.app-field__value {
+  font-size: 0.9rem;
+  color: var(--app-text-primary);
+}
+
+.app-field__value--mono {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+}
+
+/* ---------- Treatment type cards ---------- */
+.app-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.app-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-bg-panel);
+}
+
+.app-tile__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.app-tile__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.app-tile__name {
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--app-text-primary);
+}
+
+.app-tile__actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.app-tile__meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--app-text-muted);
+}
+
+.app-tile__sep {
+  color: var(--app-gray-300);
+}
+
+/* Tiles in a row hold different amounts of meta, so the action was landing at
+   three different heights. Pinning it to the bottom aligns the row. */
+.app-tile > .app-btn:last-child {
+  margin-top: auto;
+}
+
+.app-tile__notes {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--app-text-muted);
+}
+
+/* ---------- Treatment session instances ----------
+   A run of scheduled doses. The dot carries the status, so the row stays
+   scannable without a legend. */
+.app-instances {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 4px;
+}
+
+.app-instance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: var(--app-radius-sm);
+  background: var(--app-gray-50);
+  font-size: 0.8rem;
+  color: var(--app-text-primary);
+}
+
+.app-instance__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--app-warning);
+}
+
+.app-instance--done .app-instance__dot {
+  background: var(--app-success);
+}
+
+.app-instance--skipped .app-instance__dot {
+  background: var(--app-gray-300);
+}
+
+/* The muted step is 4.6:1 on white but 4.4:1 on the row's own near-white, so a
+   done row steps to the darker grey rather than sitting just under AA. */
+.app-instance--done {
+  color: var(--app-gray-600);
+}
+
+/* Was --app-gray-400: 2.57:1 on the row's tint, the kit never rendered a
+   skipped dose so it was never measured. The same darker grey as a done row;
+   the strike-through and the grey dot carry "skipped". */
+.app-instance--skipped {
+  color: var(--app-gray-600);
+  text-decoration: line-through;
+}
+
+.app-instance--skipped .app-instance__status {
+  text-decoration: none;
+}
+
+/* Both of these sit inside .app-instance, whose ground is a tint rather than
+   white — the muted step measures 4.41:1 there. Same correction as the
+   notification date and .app-instance--done before them. */
+.app-instance__actual {
+  color: var(--app-gray-600);
+}
+
+.app-instance__status {
+  margin-left: auto;
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--app-gray-600);
+}
+
+.app-session {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--app-border-soft);
+}
+
+.app-session:last-child {
+  border-bottom: none;
+}
+
+.app-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- Calendar ----------
+   Own custom properties so a page can retheme it without touching the
+   component. Note --cal-accent is the forms layer's orange, not the
+   dashboard's near-black — the calendar sits between the two languages. */
+.cal {
+  /* These were seven literals — #ffffff, #e5e5e5, #212121, #737373, #fafafa,
+     #f5f5f5, #f69520 — a private copy of the palette, and #fafafa was an
+     eighth step on a six-step ramp besides. A component that restates the
+     palette is how drift starts: it keeps rendering the old values after the
+     palette moves, and nothing reports it. */
+  --cal-bg: var(--app-bg-panel);
+  --cal-border: var(--app-border);
+  --cal-text: var(--app-text-primary);
+  --cal-text-muted: var(--app-text-muted);
+  --cal-other-month: var(--app-gray-50);
+  --cal-hover: var(--app-bg-hover);
+  --cal-accent: var(--color-primary);
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--cal-bg);
+  border: 1px solid var(--cal-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--cal-border);
+  gap: 1rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.cal__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cal__nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--cal-border);
+  background: var(--cal-bg);
+  color: var(--cal-text);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cal__nav-btn:hover {
+  background: var(--cal-hover);
+}
+
+.cal__today-btn {
+  height: 32px;
+  padding: 0 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--cal-border);
+  background: var(--cal-bg);
+  color: var(--cal-text);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cal__today-btn:hover {
+  background: var(--cal-hover);
+}
+
+.cal__period {
+  margin-left: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--cal-text);
+  white-space: nowrap;
+}
+
+/* A segmented control on a tinted track — the active tab is the one that
+   looks raised, not the one that looks filled. */
+.cal__view-switcher {
+  display: flex;
+  gap: 2px;
+  background: var(--cal-hover);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.cal__view-btn {
+  padding: 0.3rem 0.75rem;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  /* Not the muted step: the group sits on a #e0e0e0 track, where muted grey
+     measures 3.49:1. A tint is not white. */
+  color: var(--app-gray-600);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.cal__view-btn:hover {
+  color: var(--cal-text);
+}
+
+.cal__view-btn--active {
+  background: var(--cal-bg);
+  color: var(--cal-text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.cal__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Month grid — 6 rows x 7 cols, Monday first. */
+.cal-month__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--cal-border);
+  flex-shrink: 0;
+}
+
+.cal-month__weekday {
+  padding: 8px 10px;
+  font-size: 0.7rem;
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--cal-text-muted);
+}
+
+.cal-month__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: 1fr;
+  flex: 1;
+  min-height: 0;
+}
+
+.cal-month__day {
+  border-right: 1px solid var(--cal-border);
+  border-bottom: 1px solid var(--cal-border);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 78px;
+  min-width: 0;
+  cursor: pointer;
+  background: var(--cal-bg);
+  transition: background 0.15s;
+  text-align: left;
+  font-family: inherit;
+}
+
+.cal-month__day:hover {
+  background: var(--cal-hover);
+}
+
+.cal-month__day:nth-child(7n) {
+  border-right: none;
+}
+
+.cal-month__day--other {
+  background: var(--cal-other-month);
+}
+
+.cal-month__num {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--cal-text);
+  align-self: flex-start;
+}
+
+/* An other-month cell has --cal-other-month as its ground, which is a tint,
+   so the muted step measures 4.41:1 there. */
+.cal-month__day--other .cal-month__num {
+  color: var(--app-gray-600);
+}
+
+/* Today is a filled circle on the number, not a border on the cell. */
+.cal-month__num--today {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--cal-accent);
+  /* An accent fill takes an ink label. White here was 2.27:1 — the today
+     marker was the one place in the calendar still writing on honey. */
+  color: var(--text-on-primary);
+  font-weight: 700;
+}
+
+.cal-event {
+  display: block;
+  width: 100%;
+  padding: 2px 5px;
+  border-radius: 3px;
+  border: none;
+  font-family: inherit;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  text-align: left;
+  /* Ink, not white. White on the seven event hues measured 2.27:1 (orange) to
+     3.96:1 (purple) — the orange figure is the same one that put "orange never
+     carries text" in the palette. The hue stays; the fill goes lighter and the
+     label goes ink, which is the rule the destructive button already follows.
+     Calendar.jsx tints the fill and keeps the hue at full strength as an inset
+     rule down the left edge. */
+  color: var(--app-text-primary);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.cal-event:hover {
+  opacity: 0.85;
+}
+
+.cal-month__more {
+  font-size: 0.65rem;
+  color: var(--cal-text-muted);
+  padding-left: 5px;
+}
+
+/* Week view — seven columns of a day list, not an hour grid. */
+.cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  flex: 1;
+  min-height: 0;
+}
+
+.cal-week__col {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--cal-border);
+  min-width: 0;
+}
+
+.cal-week__col:last-child {
+  border-right: none;
+}
+
+.cal-week__head {
+  padding: 8px;
+  border-bottom: 1px solid var(--cal-border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  cursor: pointer;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: inherit;
+  text-align: left;
+}
+
+.cal-week__head:hover {
+  background: var(--cal-hover);
+}
+
+.cal-week__dow {
+  font-size: var(--structural-size-sm);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--cal-text-muted);
+}
+
+.cal-week__events {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Day view — a single agenda list, wider events with their times. */
+.cal-day {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.cal-day__event {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--app-radius-sm);
+  border: none;
+  border-left: 4px solid var(--cal-accent);
+  background: var(--cal-hover);
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--cal-text);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.cal-day__event:hover {
+  background: var(--app-gray-200);
+}
+
+/* ---------- Calendar, narrow ----------
+   A week view is seven day-lists side by side. At 375px each column is 53px,
+   which fits a weekday abbreviation and nothing else — every event title
+   ellipses to two characters.
+
+   So the week scrolls sideways, on the same reasoning as the data table: seven
+   days is the unit, and dropping days or stacking them into one long list
+   would stop it being a week. 110px a column is where an event title becomes a
+   word rather than a letter.
+
+   The month view does NOT scroll. A month grid is read as a whole shape, and
+   scrolling it horizontally destroys the one thing it is for — so it keeps its
+   seven columns and tightens instead, with the "+N more" affordance it already
+   has carrying the overflow. Tapping a day opens that day, which is the
+   component's existing behaviour rather than a mobile compromise. */
+/* Declared AFTER the calendar's base rules, and that is the whole reason it
+   sits down here rather than with the other narrow-viewport blocks. Every rule
+   in it is a single class — the same specificity as the base it overrides — so
+   at the file's midpoint it lost on order and all six declarations were dead.
+   Which is why the month grid still clipped at 375 after being "fixed" once.
+   Fifth failure of this shape in the system. */
+@media (max-width: 767px) {
+  /* `overflow-x: auto` alone left overflow-y at `hidden` from the base
+     shorthand, so the month grid — 503px of rows in a 455px box at 375 — was
+     clipped with no way to reach the last week. Both axes scroll here. */
+  .cal__body {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cal-week {
+    min-width: 770px;
+  }
+
+  /* The header wraps rather than squeezing the view switcher into the nav. */
+  .cal__header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .cal__period {
+    margin-left: 0;
+    order: -1;
+    width: 100%;
+  }
+
+  .cal-month__cell {
+    padding: 4px 3px;
+    min-height: 64px;
+  }
+
+  .cal-event {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+  }
+}
+
+.cal-day__time {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--cal-text-muted);
+  flex-shrink: 0;
+  min-width: 76px;
+}
+
+.cal-day__empty {
+  padding: 32px 0;
+  text-align: center;
+  color: var(--cal-text-muted);
+  font-size: 0.875rem;
+}
+
+/* ---------- Map placeholder ----------
+   The real app renders Leaflet here. The design system ships the frame and
+   the chrome; the tiles need a map library and an API key. */
+.app-map {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  flex: 1;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  overflow: hidden;
+  background:
+    linear-gradient(0deg, rgba(0, 0, 0, 0.045) 1px, transparent 1px) 0 0 / 100% 32px,
+    linear-gradient(90deg, rgba(0, 0, 0, 0.045) 1px, transparent 1px) 0 0 / 32px 100%,
+    var(--app-gray-100);
+}
+
+.app-map__note {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.92);
+  border-top: 1px solid var(--app-border);
+  font-size: 0.75rem;
+  color: var(--app-text-muted);
+}
+
+.app-map__pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+.app-map__pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--app-warning);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.app-map__pin-label {
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-medium);
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--app-text-primary);
+  white-space: nowrap;
+}
+
+/* ---------- AI chat ---------- */
+.app-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+
+.app-chat__log {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.app-msg {
+  display: flex;
+  gap: 10px;
+  max-width: 78%;
+}
+
+.app-msg--user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.app-msg__bubble {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.app-msg--assistant .app-msg__bubble {
+  background: var(--app-gray-100);
+  color: var(--app-text-primary);
+  border-top-left-radius: 4px;
+}
+
+.app-msg--user .app-msg__bubble {
+  background: var(--app-accent);
+  color: var(--app-accent-fg);
+  border-top-right-radius: 4px;
+}
+
+.app-chat__composer {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.app-chat__composer .app-input {
+  flex: 1;
+}
+
+.fb__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fb__label {
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+  white-space: nowrap;
+}
+
+.fb__select {
+  background: var(--app-bg-hover);
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  color: var(--app-text-primary);
+  font-size: 0.875rem;
+  padding: 6px 10px 6px 10px;
+  padding-right: 28px;
+  appearance: none;
+  background-image: var(--app-select-arrow);
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.fb__select:focus {
+  outline: none;
+  border-color: var(--app-accent);
+}

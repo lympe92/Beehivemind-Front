@@ -1,11 +1,10 @@
-<app-modal-shell title="Apply Treatment" (close)="close()">
+<app-modal-shell title="Apply treatment" [subtitle]="selectedType ? selectedType.name + ' · ' + selectedType.disease : ''" (close)="close()">
 
-  <form [formGroup]="form" (ngSubmit)="submit()" class="tsm-form">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form-stack" novalidate>
 
-    <!-- Treatment Type -->
-    <div class="tsm-form__row">
-      <label class="tsm-form__label">Treatment Type *</label>
-      <select class="tsm-form__input" formControlName="treatmentTypeId">
+    <div class="form-group">
+      <label class="form-label" for="tsm-type">Treatment type *</label>
+      <select id="tsm-type" class="form-select" formControlName="treatmentTypeId">
         <option [value]="null">— Select type —</option>
         @for (t of data.types; track t.id) {
           <option [value]="t.id">{{ t.name }} ({{ t.disease }})</option>
@@ -15,44 +14,40 @@
 
     @if (selectedType) {
       <div class="tsm-type-info">
-        <span class="tsm-type-info__item">{{ selectedType.product }}</span>
+        <span>{{ selectedType.product }}</span>
         @if (selectedType.dose) {
-          <span class="tsm-type-info__sep">·</span>
-          <span class="tsm-type-info__item">{{ selectedType.dose }}</span>
+          <span class="app-tile__sep">·</span>
+          <span>{{ selectedType.dose }}</span>
         }
         @if (selectedType.isRecurring) {
-          <span class="tsm-type-info__sep">·</span>
-          <span class="tsm-type-info__item tsm-type-info__item--badge">
+          <span class="app-tile__sep">·</span>
+          <span class="app-badge app-badge--recurring">
             {{ (selectedType.repetitions ?? 0) + 1 }}× every {{ selectedType.intervalDays }}d
           </span>
         }
       </div>
     }
 
-    <!-- Start Date -->
-    <div class="tsm-form__row">
-      <label class="tsm-form__label">Start Date *</label>
-      <input class="tsm-form__input" type="date" formControlName="startDate" />
+    <div class="form-group">
+      <label class="form-label" for="tsm-date">Start date *</label>
+      <input id="tsm-date" class="form-control" type="date" formControlName="startDate" />
     </div>
 
-    <!-- Apiary filter -->
-    <div class="tsm-form__row">
-      <label class="tsm-form__label">Apiary</label>
-      <select class="tsm-form__input"
-        (change)="onApiaryChange($any($event.target).value)">
-        <option value="all">All Apiaries</option>
+    <div class="form-group">
+      <label class="form-label" for="tsm-apiary">Apiary</label>
+      <select id="tsm-apiary" class="form-select" (change)="onApiaryChange($any($event.target).value)">
+        <option value="all">All apiaries</option>
         @for (a of apiaries(); track a.id) {
           <option [value]="a.id">{{ a.name }}</option>
         }
       </select>
     </div>
 
-    <!-- Beehives checklist -->
-    <div class="tsm-form__row">
-      <div class="tsm-form__label-row">
-        <label class="tsm-form__label">Beehives *</label>
-        <span class="tsm-form__count">{{ checkedBeehiveIds().size }} selected</span>
-      </div>
+    <div class="form-group">
+      <span class="form-label">
+        <span>Beehives *</span>
+        <span class="tsm-count">{{ checkedBeehiveIds().size }} selected</span>
+      </span>
 
       @if (filteredBeehives().length === 0) {
         <p class="tsm-empty">No beehives in this apiary.</p>
@@ -61,14 +56,14 @@
           <label class="tsm-beehives__all">
             <input type="checkbox" [checked]="allChecked"
               (change)="toggleAll($any($event.target).checked)" />
-            Select all
+            {{ allChecked ? 'Clear all' : 'Select all' }}
           </label>
-          <div class="tsm-beehives__list">
+          <div class="checkbox-group__options row tsm-beehives__list">
             @for (b of filteredBeehives(); track b.id) {
-              <label class="tsm-beehives__item">
+              <label class="checkbox-group__option">
                 <input type="checkbox" [checked]="isChecked(b.id)"
                   (change)="toggleBeehive(b.id, $any($event.target).checked)" />
-                {{ b.name }}
+                <span class="checkbox-group__option--label">{{ b.name }}</span>
               </label>
             }
           </div>
@@ -76,21 +71,20 @@
       }
     </div>
 
-    <!-- Notes -->
-    <div class="tsm-form__row">
-      <label class="tsm-form__label">Notes</label>
-      <textarea class="tsm-form__textarea" formControlName="notes" rows="2"
-        placeholder="Optional session notes…"></textarea>
+    <div class="form-group">
+      <label class="form-label" for="tsm-notes">Notes</label>
+      <textarea id="tsm-notes" class="form-control" formControlName="notes" rows="2"
+        placeholder="Anything worth recording about this session…"></textarea>
     </div>
 
   </form>
 
   <ng-template #footer>
-    <button type="button" class="tsm-btn tsm-btn--ghost" (click)="close()">Cancel</button>
-    <button type="button" class="tsm-btn tsm-btn--primary"
+    <button type="button" class="app-btn app-btn--ghost" (click)="close()">Cancel</button>
+    <button type="button" class="app-btn app-btn--primary"
       [disabled]="checkedBeehiveIds().size === 0"
       (click)="submit()">
-      Apply Treatment
+      Apply treatment
     </button>
   </ng-template>
 

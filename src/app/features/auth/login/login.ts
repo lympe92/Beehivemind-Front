@@ -13,13 +13,14 @@ import {
   selectRetryAfterMinutes,
 } from '../../../store/auth/auth.selectors';
 import { environment } from '../../../../environments/environment';
+import { AuthCardComponent } from '../../../shared/components/forms/auth-card/auth-card';
+import { InputComponent } from '../../../shared/components/form-fields/input/input.component';
 
 @Component({
   selector: 'app-auth-login',
   standalone: true,
-  imports: [ReactiveFormsModule, AsyncPipe, RouterLink],
+  imports: [ReactiveFormsModule, AsyncPipe, RouterLink, AuthCardComponent, InputComponent],
   templateUrl: './login.html',
-  styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent implements OnInit {

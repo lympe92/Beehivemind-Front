@@ -1,0 +1,44 @@
+/* Spacing — 4px base scale from _variables.scss. */
+
+:root {
+  --spacing-xs: 0.25rem;  /*  4px */
+  --spacing-sm: 0.5rem;   /*  8px */
+  --spacing-md: 1rem;     /* 16px */
+  --spacing-lg: 1.5rem;   /* 24px */
+  --spacing-xl: 2rem;     /* 32px */
+  --spacing-2xl: 3rem;    /* 48px */
+  --spacing-3xl: 4rem;    /* 64px */
+  --spacing-4xl: 6rem;    /* 96px */
+
+  /* ---------- Band rhythm ----------
+     The space between sections used to come from three places at once, which
+     is why it read badly:
+
+     - percentages — .ribbon 3%, .hero 13%, .section-divider 5% — which are
+       percentages of WIDTH, so a band collapsed to 11px on a phone and drifted
+       past 90px on a wide monitor, and no two bands ever matched;
+     - a few disagreeing fixed values (3xl on one band, 2xl on the next);
+     - on most sections, nothing at all. Half of them are a bare
+       <section class="container"> whose vertical space was whatever the last
+       child's margin happened to leave behind.
+
+     Six values replace all of it. They are fixed-and-fluid rather than
+     percentage: a floor for phones, a ceiling so a 27" monitor does not pull
+     bands apart, and no dependence on the container's width.
+
+     Each band owns the space above and below its own content, so two adjacent
+     bands read as double — that is the intended gap between two white
+     sections, and it is what lets a coloured band's background reach its own
+     edges. */
+  --band-y: clamp(2.5rem, 4.5vw, 4.5rem);       /* 40 → 72  the standard band */
+  --band-y-sm: clamp(1.5rem, 2.5vw, 2.5rem);    /* 24 → 40  ribbons, intros */
+  --band-y-lg: clamp(4rem, 7vw, 7rem);          /* 64 → 112 heroes, closing CTA */
+
+  --band-gap-x: clamp(2rem, 4vw, 4rem);         /* 32 → 64  between columns */
+  --band-gap-y: clamp(1.5rem, 2.5vw, 2.5rem);   /* 24 → 40  between wrapped rows */
+  --gutter: clamp(1.25rem, 4vw, 2rem);          /* 20 → 32  side gutter */
+
+  /* .public-header is fixed: 52px logo + 10px padding either side. Heroes
+     clear this, and nothing else needs to know it. */
+  --header-height: 72px;
+}

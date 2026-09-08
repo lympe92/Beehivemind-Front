@@ -1,62 +1,53 @@
-<div class="apiary-details">
+<div class="app-page">
 
-  <div class="apiary-details__page-header">
-    <h2 class="apiary-details__page-title">Apiaries Details</h2>
-    <button class="apiary-details__btn apiary-details__btn--primary" (click)="startAdd()">+ Add Apiary</button>
+  <div class="app-page-header">
+    <h2 class="app-page-title">Apiaries Details</h2>
+    <button type="button" class="app-btn app-btn--primary" (click)="startAdd()">+ Add Apiary</button>
   </div>
 
   @if (loading()) {
-    <div class="apiary-details__state">Loading…</div>
+    <div class="app-state">Loading…</div>
   } @else if (apiaries().length === 0) {
-    <div class="apiary-details__state">No apiaries yet. Add one to get started.</div>
+    <div class="app-state">No apiaries yet. Add one to get started.</div>
   } @else {
-    <div class="apiary-details__list">
+    <div class="app-cards-list">
       @for (apiary of apiaries(); track apiary.id) {
-        <app-card>
-
-          <div card-header-end class="apiary-details__card-actions">
-            <button class="apiary-details__btn apiary-details__btn--ghost apiary-details__btn--sm"
-              (click)="startEdit(apiary)">Edit</button>
-            <button class="apiary-details__btn apiary-details__btn--danger apiary-details__btn--sm"
-              (click)="deleteApiary(apiary)">Delete</button>
+        <app-card title=" ">
+          <div card-header-end class="app-tile__actions">
+            <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(apiary)">Edit</button>
+            <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteApiary(apiary)">Delete</button>
           </div>
 
-          <!-- Clickable name as card title -->
-          <div class="apiary-details__card-title">
-            <a class="apiary-details__name-link" [routerLink]="['/user/apiary', apiary.id]">
+          <div style="margin-bottom: 14px">
+            <a class="app-link" style="font-size: 1.05rem; font-weight: 500" [routerLink]="['/user/apiary', apiary.id]">
               {{ apiary.name }}
             </a>
           </div>
 
-          <div class="apiary-details__fields">
-
-            <div class="apiary-details__field">
-              <span class="apiary-details__label">Hives</span>
-              <span class="apiary-details__value">{{ apiary.hivesNumber }}</span>
+          <div class="app-fields">
+            <div class="app-field">
+              <span class="app-field__label">Hives</span>
+              <span class="app-field__value">{{ apiary.hivesNumber }}</span>
             </div>
-
-            <div class="apiary-details__field">
-              <span class="apiary-details__label">Location</span>
-              <span class="apiary-details__value">{{ apiary.location || '—' }}</span>
+            <div class="app-field">
+              <span class="app-field__label">Location</span>
+              <span class="app-field__value">{{ apiary.location || '—' }}</span>
             </div>
-
-            <div class="apiary-details__field">
-              <span class="apiary-details__label">Date Established</span>
-              <span class="apiary-details__value">
+            <div class="app-field">
+              <span class="app-field__label">Date Established</span>
+              <span class="app-field__value">
                 {{ apiary.dateEstablished ? (apiary.dateEstablished | date:'mediumDate') : '—' }}
               </span>
             </div>
-
-            <div class="apiary-details__field">
-              <span class="apiary-details__label">Last Visited</span>
-              <span class="apiary-details__value">
+            <div class="app-field">
+              <span class="app-field__label">Last Visited</span>
+              <span class="app-field__value">
                 {{ apiary.lastVisited ? (apiary.lastVisited | date:'mediumDate') : '—' }}
               </span>
             </div>
-
-            <div class="apiary-details__field">
-              <span class="apiary-details__label">Coordinates</span>
-              <span class="apiary-details__value apiary-details__value--mono">
+            <div class="app-field">
+              <span class="app-field__label">Coordinates</span>
+              <span class="app-field__value app-field__value--mono">
                 @if (apiary.latitude && apiary.longitude) {
                   {{ apiary.latitude }}, {{ apiary.longitude }}
                 } @else {
@@ -64,17 +55,15 @@
                 }
               </span>
             </div>
-
           </div>
 
           @if (todosMap()[apiary.id] > 0) {
-            <div class="apiary-details__todos">
-              <a class="apiary-details__todos-badge" [routerLink]="['/user/todo/list']">
+            <div style="margin-top: 14px">
+              <a class="app-badge app-badge--recurring" style="text-decoration: none" routerLink="/user/todo/list">
                 {{ todosMap()[apiary.id] }} pending to-do{{ todosMap()[apiary.id] > 1 ? 's' : '' }}
               </a>
             </div>
           }
-
         </app-card>
       }
     </div>

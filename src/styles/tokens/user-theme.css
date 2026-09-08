@@ -1,0 +1,115 @@
+/* User-theme — the logged-in web app.
+   ---------------------------------------------------------------------------
+   Originally the THIRD design language: the source's `_user-theme.scss` gave
+   the dashboard a near-black #171717 accent over a Tailwind neutral ramp,
+   diverging from both the website's #ec861f and the auth layer's #f59e0b.
+   All three are retired: one accent (#f69520), one ink (#212121).
+
+   **Converged to the website's language** (user decision, 5 Sep 2026): the
+   accent is now the brand honey and the ramp is the website's six-step grey.
+   What was NOT changed is the density — compact buttons, small type, tight
+   rows. A dashboard shows twelve columns of numbers; the website's 24px pills
+   do not fit in a table row, and widening the rows to suit them would cost
+   half the data on screen.
+
+   Colour therefore still carries meaning here (danger, success, warning)
+   rather than decoration, but the hues are the website's.
+
+   The app components read these as --dt-*, --card-*, --modal-* custom
+   properties, so a scope can retheme a table or a card without touching the
+   component. That indirection is the source's own, and it is worth keeping. */
+
+:root {
+  /* ---------- Neutral ramp ----------
+     Mapped onto the website's six-step ramp from tokens/colors.css. The three
+     steps the website has no equivalent for (300, 400, 700) are interpolated,
+     and 50 stays a near-white the website never needed. */
+  --app-gray-50: #fafafa;
+  --app-gray-100: var(--color-light);        /* #f5f5f5 */
+  --app-gray-200: var(--color-light-grey);   /* #e0e0e0 */
+  --app-gray-300: #cccccc;
+  --app-gray-400: #9e9e9e;
+  --app-gray-500: var(--color-grey);         /* #757575 */
+  --app-gray-600: var(--color-dark-grey);    /* #424242 */
+  /* No 700 or 800. #333333 and #2a2a2a were declared and never referenced
+     once — two steps of a ramp that is six steps by decision. */
+  --app-gray-900: var(--color-dark);         /* #212121 */
+
+
+  /* ---------- Semantic ---------- */
+  --app-accent: var(--color-primary);
+  --app-accent-hover: var(--color-primary-hover);
+  --app-accent-fg: var(--text-on-primary);
+  /* Links follow the website: ink plus an underline. Orange is the action
+     navigation colour, and a table full of orange links would compete with
+     every primary button on the page. So dashboard links are ink too, and the
+     underline does the work. */
+  --app-link: var(--color-secondary);
+  --app-link-hover: var(--color-secondary-hover);
+
+  /* One dark surface value across the whole system — the website's ink. */
+  --app-bg-dark: var(--color-dark);
+  --app-bg-panel: var(--color-white);
+  --app-bg-hover: var(--app-gray-200);
+
+  --app-border: var(--border-color);
+  /* a softer rule for row separators inside a table */
+  --app-border-soft: var(--app-gray-100);
+  --app-text-primary: var(--text-body);
+  --app-text-muted: var(--text-muted);
+
+  --app-danger: var(--color-error);
+  /* The filled destructive button uses the lighter fill so its ink label
+     clears AA; the outlined --danger keeps the darker text red. */
+  --app-danger-fill: var(--color-error-fill);
+  /* No --app-danger-hover. It was #e53935, the same value as --app-danger, so
+     it changed nothing; darkening it now would push the outlined button's label
+     off the ramp and the solid button's fill under its ink label. A hover is
+     carried by a rule — the tint that appears behind the label — not by the
+     label's own colour. */
+  --app-success: var(--color-success);
+  --app-warning: var(--color-warning);
+
+  --app-radius: var(--radius);
+  --app-radius-sm: var(--radius-sm);
+
+  /* ---------- Spacing ----------
+     The dashboard had no spacing contract at all. Page padding was a literal
+     24px, every page-level gap a literal 20px (.app-page, .app-row--2col,
+     .app-row--3col, .dashboard, .dashboard__grid, .fb), and panel padding
+     16/20/14px depending on the panel. All of it sat in the rules, so there
+     was nothing to change in one place.
+
+     The page level now comes from the same band scale the website uses, and
+     the panel level from two density steps named here. Density is still the
+     dashboard's own — this is the tight end of one scale, not a second scale.
+     A dashboard gap that no longer grows with the window was the actual
+     complaint: at 1600px the website breathed and the dashboard did not. */
+  --app-page-y: var(--band-y-sm);   /* 24 → 40  content area, top and bottom */
+  --app-page-x: var(--gutter);      /* 20 → 32  content area, sides */
+  --app-gap: var(--band-gap-y);     /* 24 → 40  between cards, rows, page blocks */
+  --app-pad: var(--spacing-md);     /* 16  panel and sidebar padding */
+  --app-pad-lg: var(--spacing-lg);  /* 24  a modal's side padding */
+  /* The one sub-16 step the dashboard needs: header/footer bars that sit
+     tighter than the body they frame. */
+  --app-pad-sm: 12px;
+
+  /* ---------- Component contracts ----------
+     Each app component reads its own prefix so it can be rethemed in place. */
+  --dt-border: var(--app-border);
+  --dt-border-soft: var(--app-border-soft);
+  --dt-text-primary: var(--app-text-primary);
+  --dt-text-muted: var(--app-text-muted);
+  --dt-bg-hover: var(--app-gray-50);
+  --dt-th-bg: transparent;
+  --dt-edit-bg: rgba(0, 0, 0, 0.04);
+
+  --modal-bg: #ffffff;
+  --modal-text: var(--app-text-primary);
+  --modal-text-muted: var(--app-text-muted);
+  --modal-border: var(--app-border);
+  --modal-hover: var(--app-bg-hover);
+
+  /* The select chevron, fill matched to --app-text-muted. */
+  --app-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+}

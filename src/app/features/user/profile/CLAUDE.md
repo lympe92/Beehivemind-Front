@@ -18,9 +18,10 @@ User account settings: personal info, password change, and two-factor authentica
   - When `tfaOtpauth()` arrives (browser only) → generate a QR via the `qrcode` lib into `tfaQrDataUrl`, move to `'setup'` step.
   - When `backupCodes()` arrive → move to `'backup'` step.
   - When 2FA gets disabled → return to `'idle'`.
-- **`tfaStep` signal** = `'idle' | 'setup' | 'backup' | 'disable'` — a local state machine for the 2FA wizard.
+- **`tfaStep` signal** = `'idle' | 'setup' | 'backup' | 'disable'` — a local state machine for the 2FA wizard, rendered inline under the Security row.
 - **SSR-safe:** QR generation guarded with `isPlatformBrowser(PLATFORM_ID)`.
-- Local forms use `FormsModule` + `[(ngModel)]`; client-side validation before dispatch (`toast.error`).
+- **Layout is the design system's profile page:** Account card (initials, name, "beekeeper · country"), Details card (`.app-field` grid with a disabled Email, footer "Save changes"), Security card with two rows. **Change password is a dialog** — `openChangePassword()` opens `FormModalComponent` with a `DynamicField[]` config (current password only when `has_password`; new password with `pattern` validators; confirm with `crossFieldValidators.equalTo`) and dispatches `changePassword` with the result. Details use `FormsModule` + `[(ngModel)]`.
+- Not built, because the API has no endpoint for them: the kit's "Change photo" button and "Danger zone" (delete account) card.
 
 ## Related
 [Root](../../../../../CLAUDE.md) · `store/profile/` · auth feature (login/2FA-verify) · qrcode lib.

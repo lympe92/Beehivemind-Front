@@ -15,18 +15,18 @@ A low-level admin tool to browse and edit any registered model/table directly �
 - **`raw-data.models.ts`** is the registry: `RAW_MODELS: Record<string, ModelConfig>`. Each `ModelConfig` declares `endpoint`, `fields` (with `type`, `createOnly`), and `displayColumns`. **Add a new manageable table by adding an entry here** — the list/form/columns are all derived from it.
 - `RawListComponent` reads `:model` from the route, looks up `config = RAW_MODELS[key]`, and generically:
   - builds `tableColumns` from `displayColumns`,
-  - renders a dynamic form from `fields` (`visibleFields` hides `createOnly` fields when editing),
+  - maps each registry `FieldConfig` to a `DynamicField` (`toDynamicField`: select→`select` with `of(options)`, boolean→`toggle`, date/datetime→`date`, textarea, email, password, number, text) and opens it in `FormModalComponent` (`createOnly` fields are dropped when editing),
   - calls `GET/POST/PUT/DELETE admin/raw/:endpoint[/:id]` via `RequestService`.
 
 ## State & Data
-- Direct `RequestService`; server-side pagination (`{ data, total, last_page }`).
-- Heavy use of `signal` + `computed` (`config`, `visibleFields`, `tableColumns`, `tablePagination`). Route param subscription uses `takeUntilDestroyed`.
-- Form is a generic `formData = signal<Record<string, unknown>>` with `getField`/`setField`.
+- Direct `RequestService`; server-side pagination (`{ data, meta }`).
+- `signal` + `computed` (`config`, `isTokens`, `tableColumns`, `tablePagination`). Route param subscription uses `takeUntilDestroyed`.
 
 ## Gotchas
-- **Custom confirm modal** (in-component `showModal`/`deleteConfirmId` signals, not `ModalService`).
-- **`tokens` model is special:** delete calls `POST admin/raw/tokens/:id/revoke` instead of `DELETE`.
-- `formError` is populated from `err.error.message` on failed submit.
+- Delete/revoke goes through `ModalService.confirm({ danger: true })`; the message says the write is direct ("nothing here checks what else points at this row").
+- **`tokens` model is special:** the action is "Revoke" and calls `POST admin/raw/tokens/:id/revoke` instead of `DELETE`.
+- A failed create/save surfaces `err.error.message` through `ToastService.error`.
+- Index cards are `<a class="admin-model">` links; `id` cells render as `.admin-code`.
 
 ## Related
 [Root](../../../../CLAUDE.md) · [User Management](../user-management/CLAUDE.md) (admin conventions) · `raw-data.models.ts` (the registry).

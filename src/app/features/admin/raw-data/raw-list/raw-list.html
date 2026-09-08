@@ -1,125 +1,70 @@
-<div class="raw-list">
+<div class="app-page">
   @if (config(); as cfg) {
-    <div class="page-header">
-      <div class="page-header__left">
-        <a routerLink="/admin/raw" class="back-link">← Raw Data</a>
-        <h2>{{ cfg.label }}</h2>
-        <span class="total">{{ total() }} records</span>
+    <div class="app-page-header">
+      <div class="app-page-header__stack">
+        <a routerLink="/admin/raw" class="app-page-back">← Raw data</a>
+        <h1 class="app-page-title">{{ cfg.label }}</h1>
       </div>
+      <span class="app-page-meta">{{ total() | number }} records</span>
       @if (!cfg.noCreate) {
-        <button class="btn btn--primary" (click)="openCreate()">+ New {{ cfg.singularLabel }}</button>
+        <span class="app-page-header__end">
+          <button type="button" class="app-btn app-btn--primary" (click)="openCreate()">+ New {{ cfg.singularLabel.toLowerCase() }}</button>
+        </span>
       }
     </div>
 
     <!-- Search -->
-    <div class="toolbar">
-      <input
-        type="text"
-        [(ngModel)]="search"
-        (keyup.enter)="onSearch()"
-        [placeholder]="cfg.searchPlaceholder"
-        class="search-input"
-      />
-      <button class="btn btn--secondary" (click)="onSearch()">Search</button>
+    <div class="fb">
+      <div class="fb__group">
+        <label class="fb__label" for="raw-search">Search</label>
+        <input
+          id="raw-search"
+          type="search"
+          class="app-input"
+          [(ngModel)]="search"
+          (keyup.enter)="onSearch()"
+          [placeholder]="cfg.searchPlaceholder" />
+      </div>
+      <div class="fb__group fb__group--end">
+        <button type="button" class="app-btn app-btn--ghost" (click)="onSearch()">Search</button>
+      </div>
     </div>
 
-    @if (loading()) {
-      <div class="state-msg">Loading...</div>
-    } @else if (error()) {
-      <div class="state-msg state-msg--error">{{ error() }}</div>
+    @if (error()) {
+      <app-error [message]="error()!" [retry]="true" (retried)="loadData()" />
     } @else {
-      <div class="table-wrap">
+      <app-card [flush]="true">
         <app-data-table
           [columns]="tableColumns()"
           [rows]="rows()"
+          [loading]="loading()"
           [pagination]="tablePagination()"
           (pageChange)="goToPage($event)"
           emptyMessage="No records found.">
 
           <ng-template #cellTpl let-row let-col="col">
-            <span [title]="formatCell(row[col.key])">{{ formatCell(row[col.key]) }}</span>
+            @if (col.key === 'id') {
+              <code class="admin-code">{{ row[col.key] }}</code>
+            } @else if (row[col.key] === false) {
+              <span class="dt__muted">false</span>
+            } @else {
+              <span [title]="rawValue(row[col.key])">{{ formatCell(row[col.key]) }}</span>
+            }
           </ng-template>
 
           <ng-template #actionsTpl let-row>
             @if (!cfg.noEdit) {
-              <button class="btn btn--sm btn--secondary" (click)="openEdit(row)">Edit</button>
+              <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="openEdit(row)">Edit</button>
             }
-            @if (modelKey() === 'tokens') {
-              <button class="btn btn--sm btn--warn" (click)="confirmDelete(row.id)">Revoke</button>
-            } @else {
-              <button class="btn btn--sm btn--danger" (click)="confirmDelete(row.id)">Delete</button>
-            }
+            <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="confirmDelete(row)">
+              {{ isTokens() ? 'Revoke' : 'Delete' }}
+            </button>
           </ng-template>
 
         </app-data-table>
-      </div>
+      </app-card>
     }
   } @else {
-    <div class="state-msg state-msg--error">Unknown model</div>
+    <app-error message="There is no table by that name." detail="Pick one from the raw data index." />
   }
 </div>
-
-<!-- Create / Edit Modal -->
-@if (showModal() && config(); as cfg) {
-  <div class="modal-overlay" (click)="showModal.set(false)">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h3>{{ isEditing() ? 'Edit ' + cfg.singularLabel : 'New ' + cfg.singularLabel }}</h3>
-
-      @if (formError()) {
-        <div class="form-error">{{ formError() }}</div>
-      }
-
-      <div class="modal-form">
-        @for (field of visibleFields(); track field.key) {
-          <div class="form-group" [class.form-group--full]="field.type === 'textarea'">
-            <label>{{ field.label }}{{ field.required ? ' *' : '' }}</label>
-
-            @if (field.type === 'select') {
-              <select [value]="getField(field.key)" (change)="setField(field.key, $any($event.target).value)">
-                <option value="">— Select —</option>
-                @for (opt of field.options; track opt.value) {
-                  <option [value]="opt.value" [selected]="getField(field.key) === opt.value">{{ opt.label }}</option>
-                }
-              </select>
-            } @else if (field.type === 'boolean') {
-              <div class="checkbox-wrap">
-                <input type="checkbox" [checked]="getField(field.key)" (change)="setField(field.key, $any($event.target).checked)" />
-              </div>
-            } @else if (field.type === 'textarea') {
-              <textarea [value]="getField(field.key)" (input)="setField(field.key, $any($event.target).value)" rows="3"></textarea>
-            } @else {
-              <input
-                [type]="field.type === 'datetime' ? 'datetime-local' : field.type"
-                [value]="getField(field.key)"
-                (input)="setField(field.key, $any($event.target).value)"
-              />
-            }
-          </div>
-        }
-      </div>
-
-      <div class="modal__actions">
-        <button class="btn btn--secondary" (click)="showModal.set(false)">Cancel</button>
-        <button class="btn btn--primary" (click)="submitForm()" [disabled]="formLoading()">
-          {{ formLoading() ? 'Saving...' : (isEditing() ? 'Save' : 'Create') }}
-        </button>
-      </div>
-    </div>
-  </div>
-}
-
-<!-- Delete Confirm -->
-@if (deleteConfirmId() !== null) {
-  <div class="modal-overlay" (click)="cancelDelete()">
-    <div class="modal modal--sm" (click)="$event.stopPropagation()">
-      <h3>{{ modelKey() === 'tokens' ? 'Revoke Token?' : 'Delete Record?' }}</h3>
-      <p>{{ modelKey() === 'tokens' ? 'This will immediately invalidate the token.' : 'This action cannot be undone.' }}</p>
-      <div class="modal__actions">
-        <button class="btn btn--secondary" (click)="cancelDelete()">Cancel</button>
-        <button class="btn btn--danger" (click)="doDelete()">
-          {{ modelKey() === 'tokens' ? 'Revoke' : 'Delete' }}
-        </button>
-      </div>
-    </div>
-  </div>
-}

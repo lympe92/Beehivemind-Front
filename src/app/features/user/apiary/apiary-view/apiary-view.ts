@@ -1,56 +1,76 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
 import { ApiaryService } from '../../../../core/services/apiary.service';
 import { AgendaService } from '../../../../core/services/agenda.service';
 import { InspectionService } from '../../../../core/services/inspection.service';
+import { TreatmentSessionService } from '../../../../core/services/treatment-session.service';
 import { Apiary } from '../../../../core/models/apiary.model';
 import { Inspection } from '../../../../core/models/inspection.model';
 import { AgendaItem } from '../../../../core/models/agenda-item.model';
+import { TreatmentSession } from '../../../../core/models/treatment-session.model';
 import { WeatherCardComponent } from '../../../../shared/components/ui/weather-card/weather-card';
 import { CardComponent } from '../../../../shared/components/ui/card/card';
+import { CalloutComponent } from '../../../../shared/components/ui/callout/callout';
+import { ColumnDef, DataTableComponent } from '../../../../shared/components/ui/data-table/data-table';
+import { ApiaryFormModalComponent } from '../../../../shared/components/ui/modal/apiary-form-modal/apiary-form-modal';
+import { ToastService } from '../../../../shared/components/ui/toast/toast.service';
+import { ModalService } from '../../../../core/modal/modal.service';
 import { selectAllTreatmentSessions } from '../../../../store/treatment-sessions/treatment-sessions.selectors';
 import { TreatmentSessionsActions } from '../../../../store/treatment-sessions/treatment-sessions.actions';
-import { TreatmentInstanceService } from '../../../../core/services/treatment-instance.service';
-import { NotificationsActions } from '../../../../store/notifications/notifications.actions';
+import { selectAllBeehives } from '../../../../store/beehives/beehives.selectors';
+import { BeehivesActions } from '../../../../store/beehives/beehives.actions';
+import { ApiariesActions } from '../../../../store/apiaries/apiaries.actions';
 
+/**
+ * One apiary: the weather where it stands, two figures (hives, pending
+ * to-dos), its recent inspections and its treatment sessions — the same shape
+ * as the design system's ApiaryViewPage.
+ */
 @Component({
   selector: 'app-apiary-view',
   standalone: true,
-  imports: [DatePipe, RouterLink, WeatherCardComponent, CardComponent],
+  imports: [DatePipe, WeatherCardComponent, CardComponent, CalloutComponent, DataTableComponent],
   templateUrl: './apiary-view.html',
-  styleUrl: './apiary-view.scss',
 })
 export class ApiaryViewComponent implements OnInit {
   private route             = inject(ActivatedRoute);
   private apiaryService     = inject(ApiaryService);
   private agendaService     = inject(AgendaService);
   private inspectionService = inject(InspectionService);
-  private instanceService   = inject(TreatmentInstanceService);
+  private sessionService    = inject(TreatmentSessionService);
   private store             = inject(Store);
-  private sanitizer         = inject(DomSanitizer);
+  private toast             = inject(ToastService);
+  private modal             = inject(ModalService);
 
-  today       = new Date().toISOString().slice(0, 10);
+  readonly inspectionColumns: ColumnDef[] = [
+    { key: 'beehiveId', label: 'Beehive', width: '30%' },
+    { key: 'date', label: 'Date' },
+    { key: 'population', label: 'Population' },
+    { key: 'honey', label: 'Honey' },
+  ];
+
   apiary      = signal<Apiary | null>(null);
   inspections = signal<Inspection[]>([]);
   todos       = signal<AgendaItem[]>([]);
-  doneIds     = signal<Set<number>>(new Set());
   loading     = signal(true);
 
-  allSessions   = this.store.selectSignal(selectAllTreatmentSessions);
-  sessions      = computed(() =>
+  private beehives  = this.store.selectSignal(selectAllBeehives);
+  private allSessions = this.store.selectSignal(selectAllTreatmentSessions);
+
+  readonly sessions = computed(() =>
     this.allSessions().filter(s => s.apiaryId === this.apiary()?.id)
   );
 
-  pendingTodos = computed(() =>
-    this.todos().filter(t => !this.doneIds().has(t.entityId))
-  );
-
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
     this.store.dispatch(TreatmentSessionsActions.load());
+    this.store.dispatch(BeehivesActions.load());
+    this.load();
+  }
+
+  private load(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
 
     this.apiaryService.getApiary(id).subscribe(res => {
       this.apiary.set(res.data);
@@ -59,29 +79,79 @@ export class ApiaryViewComponent implements OnInit {
 
     this.inspectionService.getInspectionsOfApiary(id).subscribe(res => {
       this.inspections.set(
-        [...(res.data ?? [])].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10)
+        [...(res.data ?? [])].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5)
       );
     });
 
-    this.agendaService.getByApiary(id).subscribe(items => {
-      this.todos.set(items);
-    });
+    this.agendaService.getByApiary(id).subscribe(items => this.todos.set(items));
   }
 
-  markDone(item: AgendaItem): void {
-    if (item.entityType !== 'treatment_instance') return;
-    this.instanceService.update(item.entityId, { status: 'done' }).subscribe({
-      next: () => {
-        this.doneIds.update(s => new Set([...s, item.entityId]));
-        this.store.dispatch(NotificationsActions.reload());
+  beehiveName(id: number): string {
+    return this.beehives().find(b => b.id === id)?.name ?? `#${id}`;
+  }
+
+  instancesDone(session: TreatmentSession): number {
+    return session.instances.filter(i => i.status === 'done').length;
+  }
+
+  async edit(): Promise<void> {
+    const apiary = this.apiary();
+    if (!apiary) return;
+
+    const value = await this.modal.open<{
+      name: string;
+      hivesNumber: number;
+      latitude: number;
+      longitude: number;
+      location?: string | null;
+      dateEstablished?: string | null;
+    }>(ApiaryFormModalComponent, {
+      type: 'center',
+      width: '640px',
+      data: { apiary },
+    });
+    if (!value) return;
+
+    this.apiaryService.updateApiary(apiary.id, {
+      name: value.name.trim(),
+      hivesNumber: Number(value.hivesNumber) || 0,
+      latitude: value.latitude,
+      longitude: value.longitude,
+      location: value.location || null,
+      dateEstablished: value.dateEstablished || null,
+    }).subscribe({
+      next: res => {
+        if (res.success) {
+          this.store.dispatch(ApiariesActions.reload());
+          this.load();
+          this.toast.success('Apiary updated.');
+        } else {
+          this.toast.error('Something went wrong. Please try again.');
+        }
       },
+      error: () => {},
     });
   }
 
-  typeIcon(type: string): SafeHtml {
-    const svg = type === 'treatment'
-      ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>`
-      : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>`;
-    return this.sanitizer.bypassSecurityTrustHtml(svg);
+  async deleteSession(session: TreatmentSession): Promise<void> {
+    const confirmed = await this.modal.confirm({
+      title: 'Delete Session',
+      message: 'Delete this treatment session? All instances will be removed.',
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!confirmed) return;
+
+    this.sessionService.delete(session.id).subscribe({
+      next: res => {
+        if (res.success) {
+          this.store.dispatch(TreatmentSessionsActions.reload());
+          this.toast.success('Session deleted.');
+        } else {
+          this.toast.error('Something went wrong. Please try again.');
+        }
+      },
+      error: () => {},
+    });
   }
 }

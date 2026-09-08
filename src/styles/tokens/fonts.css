@@ -1,0 +1,19 @@
+/* Peridot PE is the brand typeface across both products.
+   Bundled rather than linked: the mobile client ships it as a local file because
+   a Capacitor WebView has no network on a cold start in the field, and a CDN font
+   would silently fall back to Roboto.
+
+   ONE request. Peridot's widths are separate families, so this is the normal
+   width only — no Condensed, no Extended, no italics. One variable file covers
+   the whole 400-700 axis; see CLAUDE.md for the weight roles.
+
+   Currently the desktop variable OTF (CFF2), hence format("opentype"). Swap in
+   the foundry's woff2 for production — same declaration, ~half the bytes. */
+
+@font-face {
+  font-family: "Peridot PE";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/assets/fonts/fonnts.com-Peridot_PE_Variable_Regular.otf") format("opentype");
+}

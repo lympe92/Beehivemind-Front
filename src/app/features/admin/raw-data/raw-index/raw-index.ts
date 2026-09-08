@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { RequestService } from '../../../../core/services/request.service';
 import { RAW_MODELS } from '../raw-data.models';
@@ -6,9 +7,8 @@ import { RAW_MODELS } from '../raw-data.models';
 @Component({
   selector: 'app-raw-index',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DecimalPipe],
   templateUrl: './raw-index.html',
-  styleUrl: './raw-index.scss',
 })
 export class RawIndexComponent implements OnInit {
   private request = inject(RequestService);

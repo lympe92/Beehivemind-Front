@@ -1,0 +1,9 @@
+<div class="app-error" role="alert">
+  <p class="app-error__text">{{ message() }}</p>
+  @if (detail()) {
+    <p class="app-error__detail">{{ detail() }}</p>
+  }
+  @if (retry()) {
+    <button type="button" class="app-btn app-btn--ghost" (click)="retried.emit()">{{ retryLabel() }}</button>
+  }
+</div>

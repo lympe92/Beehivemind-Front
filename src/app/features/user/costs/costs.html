@@ -1,5 +1,5 @@
-<div class="fin-table__toolbar">
-  <button class="fin-btn fin-btn--primary fin-btn--sm" (click)="startAdd()">+ Add</button>
+<div class="app-toolbar">
+  <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="startAdd()">+ Add</button>
 </div>
 
 <app-data-table
@@ -11,14 +11,16 @@
 
   <ng-template #cellTpl let-row let-col="col">
     @switch (col.key) {
+      @case ('date') { {{ row.date | date:'mediumDate' }} }
       @case ('category') { <span class="dt__muted">{{ categoryName()(row.category_id) }}</span> }
+      @case ('amount') { €{{ row.amount | number:'1.0-2' }} }
       @default { {{ row[col.key] ?? '—' }} }
     }
   </ng-template>
 
   <ng-template #actionsTpl let-row>
-    <button class="fin-btn fin-btn--ghost fin-btn--sm" (click)="startEdit(row)">Edit</button>
-    <button class="fin-btn fin-btn--danger fin-btn--sm" (click)="deleteRow(row)">Delete</button>
+    <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
+    <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
   </ng-template>
 
 </app-data-table>

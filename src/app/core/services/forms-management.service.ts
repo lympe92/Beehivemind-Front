@@ -67,26 +67,31 @@ export class FormManagementService {
     );
   }
 
+  /**
+   * Re-evaluates every `conditions.disabled` rule against the trigger's current
+   * value and disables or enables the *target* field (the one carrying the
+   * rule). A disabled control is left out of `form.value`, which is what a
+   * caller submitting the value expects.
+   */
   disableFieldsIfNeeded(form: FormGroup, fields: DynamicField[]): void {
     fields.forEach(f => {
-      const triggerField = f.conditions?.disabled?.[0].triggerField;
+      const condition = f.conditions?.disabled?.[0];
+      if (!condition) return;
 
-      if (!triggerField) return;
-      const formControl = form.get(triggerField);
-      if (!formControl) return;
-      if (!f.conditions?.disabled?.[0]) return;
+      const trigger = form.get(condition.triggerField);
+      const target = form.get(f.name);
+      if (!trigger || !target) return;
 
-      if (
-        this.evaluateCondition(
-          f.conditions?.disabled[0]?.operator ?? 'equals',
-          formControl.value,
-          form.get(f.name)?.value,
-        )
-      ) {
-        formControl.setValue(null, { emitEvent: false });
-        formControl.disable({ emitEvent: false });
-      } else {
-        formControl.enable({ emitEvent: false });
+      const shouldDisable = this.evaluateCondition(
+        condition.operator ?? 'equals',
+        condition.triggerValue,
+        trigger.value,
+      );
+
+      if (shouldDisable && target.enabled) {
+        target.disable({ emitEvent: false });
+      } else if (!shouldDisable && target.disabled) {
+        target.enable({ emitEvent: false });
       }
     });
   }

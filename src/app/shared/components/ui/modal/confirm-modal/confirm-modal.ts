@@ -3,12 +3,15 @@ import { DialogRef } from '@angular/cdk/dialog';
 import { MODAL_DATA, ConfirmConfig } from '../../../../../core/modal/modal.types';
 import { ModalShellComponent } from '../modal-shell/modal-shell';
 
+/**
+ * The yes/no dialog. Reach for it only when the action is destructive or
+ * irreversible, and write the message as the consequence, not the question.
+ */
 @Component({
   selector: 'app-confirm-modal',
   standalone: true,
   imports: [ModalShellComponent],
   templateUrl: './confirm-modal.html',
-  styleUrl: './confirm-modal.scss',
 })
 export class ConfirmModalComponent {
   private dialogRef = inject(DialogRef<boolean>);

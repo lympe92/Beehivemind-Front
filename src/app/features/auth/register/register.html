@@ -1,90 +1,87 @@
-<div class="auth-page">
-  <div class="auth-card">
-    <div class="auth-card__header">
-      <h1>Create account</h1>
-      <p>Start managing your beehives with BeehiveMind</p>
+<app-auth-card title="Create account" subtitle="Start managing your beehives with BeehiveMind">
+  @if (success()) {
+    <div class="auth-info">
+      Account created! Check your email to confirm your account before signing in.
     </div>
 
-    @if (success()) {
-      <div class="auth-info">
-        Account created! Check your email to confirm your account before signing in.
-      </div>
-
-      @if (resendMessage()) {
-        <div class="auth-info auth-info--muted">{{ resendMessage() }}</div>
-      } @else {
-        <p class="auth-card__footer">
-          Didn't receive an email?
-          <button type="button" class="auth-link-btn" (click)="resendConfirmation()" [disabled]="resendLoading()">
-            {{ resendLoading() ? 'Sending...' : 'Resend confirmation email' }}
-          </button>
-        </p>
-      }
-
-      <p class="auth-card__footer">
-        <a routerLink="/auth/login">Back to login</a>
-      </p>
+    @if (resendMessage()) {
+      <div class="auth-info auth-info--muted">{{ resendMessage() }}</div>
     } @else {
-      <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
-        @if (error()) {
-          <div class="auth-form__error">{{ error() }}</div>
-        }
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>First Name</label>
-            <input type="text" formControlName="name" placeholder="John" autocomplete="given-name" />
-          </div>
-          <div class="form-group">
-            <label>Last Name</label>
-            <input type="text" formControlName="surname" placeholder="Doe" autocomplete="family-name" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" formControlName="email" placeholder="you@example.com" autocomplete="email" />
-        </div>
-
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" formControlName="password" placeholder="Min. 8 characters" autocomplete="new-password" />
-          @if (form.controls['password'].touched) {
-            @for (rule of passwordErrors; track rule.key) {
-              <small class="form-error">{{ rule.message }}</small>
-            }
-          }
-        </div>
-
-        <div class="form-group">
-          <label>Country <span class="form-optional">(optional)</span></label>
-          <select (change)="onCountryChange($event)" class="form-select">
-            <option value="">Select your country</option>
-            @for (c of countries; track c.code) {
-              <option [value]="c.code">{{ c.name }}</option>
-            }
-          </select>
-        </div>
-
-        <button type="submit" class="auth-btn" [disabled]="form.invalid || loading()">
-          {{ loading() ? 'Creating account...' : 'Create Account' }}
-        </button>
-      </form>
-
-      <div class="auth-divider">
-        <span>or</span>
-      </div>
-
-      <div id="google-signup-btn" class="auth-google-btn">
-        <button type="button" class="auth-google-placeholder" disabled>
-          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.566 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
-          Sign up with Google
-        </button>
-      </div>
-
       <p class="auth-card__footer">
-        Already have an account? <a routerLink="/auth/login">Sign in</a>
+        Didn't receive an email?
+        <button type="button" class="auth-link-btn" (click)="resendConfirmation()" [disabled]="resendLoading()">
+          {{ resendLoading() ? 'Sending...' : 'Resend confirmation email' }}
+        </button>
       </p>
     }
-  </div>
-</div>
+
+    <p class="auth-card__footer">
+      <a routerLink="/auth/login">Back to login</a>
+    </p>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+      @if (error()) {
+        <div class="auth-form__error" role="alert">{{ error() }}</div>
+      }
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="reg-name">First Name</label>
+          <input id="reg-name" class="form-control" type="text" formControlName="name"
+                 placeholder="John" autocomplete="given-name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-surname">Last Name</label>
+          <input id="reg-surname" class="form-control" type="text" formControlName="surname"
+                 placeholder="Doe" autocomplete="family-name" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="reg-email">Email</label>
+        <input id="reg-email" class="form-control" type="email" formControlName="email"
+               placeholder="you@example.com" autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="reg-password">Password</label>
+        <app-form-input inputType="password" formControlName="password"
+                        placeholder="Min. 8 characters" autocomplete="new-password" [displayErrors]="false" />
+        @if (form.controls['password'].touched) {
+          @for (rule of passwordErrors; track rule.key) {
+            <div class="error">{{ rule.message }}</div>
+          }
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="reg-country">
+          <span>Country <span class="form-optional">(optional)</span></span>
+        </label>
+        <select id="reg-country" class="form-select" (change)="onCountryChange($event)" autocomplete="country-name">
+          <option value="">Select your country</option>
+          @for (c of countries; track c.code) {
+            <option [value]="c.code">{{ c.name }}</option>
+          }
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn--md btn--primary btn--full" [disabled]="form.invalid || loading()">
+        {{ loading() ? 'Creating account...' : 'Create Account' }}
+      </button>
+    </form>
+
+    <div class="auth-divider"><span>or</span></div>
+
+    <div id="google-signup-btn" class="auth-google-btn">
+      <button type="button" class="auth-google-placeholder" disabled>
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.566 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+        Sign up with Google
+      </button>
+    </div>
+
+    <p class="auth-card__footer">
+      Already have an account? <a routerLink="/auth/login">Sign in</a>
+    </p>
+  }
+</app-auth-card>

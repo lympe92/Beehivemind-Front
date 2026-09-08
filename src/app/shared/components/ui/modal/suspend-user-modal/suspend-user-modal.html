@@ -1,0 +1,27 @@
+<app-modal-shell [title]="'Suspend ' + data.name" (close)="cancel()">
+  <div class="form-stack">
+    <div class="radio-group column" role="radiogroup" aria-labelledby="suspend-mode-label">
+      <span class="radio-group__label" id="suspend-mode-label">For how long</span>
+      <label class="radio-group__option">
+        <input type="radio" name="suspend_mode" value="indefinite" [checked]="mode() === 'indefinite'" (change)="mode.set('indefinite')" />
+        <span class="radio-group__option--label">Indefinitely</span>
+      </label>
+      <label class="radio-group__option">
+        <input type="radio" name="suspend_mode" value="until" [checked]="mode() === 'until'" (change)="mode.set('until')" />
+        <span class="radio-group__option--label">Until a specific date</span>
+      </label>
+    </div>
+
+    @if (mode() === 'until') {
+      <div class="form-group">
+        <label class="form-label" for="suspend-until">Suspended until</label>
+        <input id="suspend-until" class="form-control" type="date" [(ngModel)]="until" name="suspend_until" />
+      </div>
+    }
+  </div>
+
+  <ng-template #footer>
+    <button type="button" class="app-btn app-btn--ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="app-btn app-btn--primary" [disabled]="!canConfirm" (click)="confirm()">Suspend</button>
+  </ng-template>
+</app-modal-shell>

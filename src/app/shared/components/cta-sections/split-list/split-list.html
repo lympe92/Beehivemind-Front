@@ -1,15 +1,17 @@
-<section class="container">
-  <div class="flex-col lg:flex-row items-center">
-    <div class="w-full lg:w-1/2">
+<div class="container">
+  <div class="split-list__row" [class.split-list__row--media-start]="mediaSide() === 'start'">
+    <div class="split-list__body">
       <h2>{{ title() }}</h2>
-      <div class="split-list">
+      <div class="split-list__items">
         @for (item of items(); track item.title) {
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.description }}</p>
+          <div>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+          </div>
         }
       </div>
     </div>
-    <div class="w-full lg:w-1/2" data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
+    <div class="split-list__media">
       <app-image
         [src]="image().src"
         [alt]="image().alt"
@@ -18,7 +20,7 @@
         [priority]="image().priority ?? false" />
     </div>
   </div>
-  <div class="text-center" data-aos="fade-up" data-aos-anchor-placement="bottom-bottom">
+  <div class="text-center split-list__cta">
     <app-link
       [routerLink]="cta().routerLink"
       [variant]="cta().variant ?? 'outline'"
@@ -26,4 +28,4 @@
       {{ cta().label }}
     </app-link>
   </div>
-</section>
+</div>

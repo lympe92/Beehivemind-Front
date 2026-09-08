@@ -17,6 +17,29 @@ import { CardComponent } from '../../../shared/components/ui/card/card';
 
 export type FilterLevel = 'user' | 'apiary' | 'beehive';
 
+/** Averages come back as long floats; a chart tick reads to one decimal. */
+const round1 = (v: number | null | undefined): number => Math.round((Number(v) || 0) * 10) / 10;
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/**
+ * ISO dates become short month labels — "Mar" — the way the design system's
+ * dashboard reads them. When the series spans more than one year the year
+ * comes along ("Mar 25"); a day that is not the first of a month keeps its
+ * day ("4 Sep") so per-visit series stay honest.
+ */
+function monthLabels(dates: string[]): string[] {
+  const parsed = dates.map(d => new Date(d + (d.length === 10 ? 'T00:00:00' : '')));
+  const years = new Set(parsed.map(d => d.getFullYear()));
+  const monthly = parsed.every(d => d.getDate() === 1);
+  return parsed.map((d, i) => {
+    if (isNaN(d.getTime())) return dates[i];
+    const month = MONTHS[d.getMonth()];
+    const year = years.size > 1 ? ' ' + String(d.getFullYear()).slice(2) : '';
+    return monthly ? month + year : `${d.getDate()} ${month}${year}`;
+  });
+}
+
 interface DetectionRow {
   no_queen: number | string;
   varroa: number | string;
@@ -30,7 +53,6 @@ interface DetectionRow {
   standalone: true,
   imports: [ApexChartComponent, FilterBarComponent, CardComponent],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss',
 })
 export class UserDashboardComponent implements OnInit {
   private store = inject(Store);
@@ -105,12 +127,12 @@ export class UserDashboardComponent implements OnInit {
     if (!data.length) return null;
     return this.chartBuilder.line({
       series: [
-        { name: 'Pollen',       data: data.map(v => v.pollen) },
-        { name: 'Honey',        data: data.map(v => v.honey) },
-        { name: 'Open Brood',   data: data.map(v => v.opened_brood) },
-        { name: 'Closed Brood', data: data.map(v => v.closed_brood) },
+        { name: 'Pollen',       data: data.map(v => round1(v.pollen)) },
+        { name: 'Honey',        data: data.map(v => round1(v.honey)) },
+        { name: 'Open Brood',   data: data.map(v => round1(v.opened_brood)) },
+        { name: 'Closed Brood', data: data.map(v => round1(v.closed_brood)) },
       ],
-      categories: data.map(v => v.date),
+      categories: monthLabels(data.map(v => v.date)),
     });
   });
 
@@ -119,10 +141,10 @@ export class UserDashboardComponent implements OnInit {
     if (!data.length) return null;
     return this.chartBuilder.line({
       series: [
-        { name: 'Population', data: data.map(v => v.population) },
-        { name: 'Frames',     data: data.map(v => v.frame_space) },
+        { name: 'Population', data: data.map(v => round1(v.population)) },
+        { name: 'Frames',     data: data.map(v => round1(v.frame_space)) },
       ],
-      categories: data.map(v => v.date),
+      categories: monthLabels(data.map(v => v.date)),
     });
   });
 
@@ -131,7 +153,7 @@ export class UserDashboardComponent implements OnInit {
     if (!data.length) return null;
     const last = data[data.length - 1];
     return this.chartBuilder.bar({
-      series: [{ name: 'Value', data: [last.population, last.pollen, last.honey, last.opened_brood, last.closed_brood] }],
+      series: [{ name: 'Value', data: [last.population, last.pollen, last.honey, last.opened_brood, last.closed_brood].map(round1) }],
       categories: ['Population', 'Pollen', 'Honey', 'Open Brood', 'Closed Brood'],
     });
   });
@@ -141,7 +163,7 @@ export class UserDashboardComponent implements OnInit {
     if (!data.length) return null;
     const last = data[data.length - 1];
     return this.chartBuilder.pie({
-      values: [last.opened_brood, last.closed_brood],
+      values: [round1(last.opened_brood), round1(last.closed_brood)],
       labels: ['Opened Brood', 'Closed Brood'],
     });
   });

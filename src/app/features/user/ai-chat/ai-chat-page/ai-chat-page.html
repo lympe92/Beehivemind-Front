@@ -1,137 +1,81 @@
-<div class="ai-chat">
+<div class="app-page ai-chat">
+  <div class="app-row--2col ai-chat__row">
 
-  <!-- ── Sidebar ──────────────────────────────────────────────── -->
-  <aside class="ai-chat__sidebar">
-    <div class="ai-chat__sidebar-header">
-      <button class="ai-chat__new-btn" (click)="newConversation()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-        New Chat
-      </button>
-    </div>
-    <div class="ai-chat__sidebar-body">
-      <app-conversation-list
-        [activeId]="activeConversationId()"
-        (selected)="selectConversation($event)" />
-    </div>
-  </aside>
+    <!-- Conversations -->
+    <app-card title="Conversations" class="ai-chat__side">
+      <button card-header-end type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="newConversation()">+ New chat</button>
+      <div class="app-scroll-body">
+        <app-conversation-list
+          [activeId]="activeConversationId()"
+          (selected)="selectConversation($event)" />
+      </div>
+    </app-card>
 
-  <!-- ── Main ─────────────────────────────────────────────────── -->
-  <div class="ai-chat__main">
-
-    <!-- Header -->
-    <header class="ai-chat__header">
+    <!-- Chat -->
+    <app-card title="AI Assistant" class="ai-chat__main">
       @if (activeConversation(); as conv) {
-        <div class="ai-chat__header-title">{{ conv.title }}</div>
-        <div class="ai-chat__header-meta">
-          Started {{ conv.created_at | date:'d MMM yyyy' }}
-        </div>
+        <span card-header-end class="ai-chat__meta">{{ conv.title }} · started {{ conv.created_at | date:'d MMM yyyy' }}</span>
       } @else {
-        <div class="ai-chat__header-title">AI Assistant</div>
-        <div class="ai-chat__header-meta">BeehiveMind AI &mdash; powered by Beehive Pilot</div>
+        <span card-header-end class="ai-chat__meta">BeehiveMind AI — powered by Beehive Pilot</span>
       }
-    </header>
 
-    <!-- Messages -->
-    <div class="ai-chat__messages" #messagesContainer>
+      <div class="app-chat">
+        <div class="app-chat__log ai-chat__log" #messagesContainer>
 
-      <!-- Loading history -->
-      @if (isLoadingHistory()) {
-        <div class="ai-chat__state">
-          <div class="ai-chat__spinner"></div>
-          <p>Loading conversation…</p>
+          @if (isLoadingHistory()) {
+            <div class="app-state">Loading conversation…</div>
+          }
+
+          @if (!isLoadingHistory() && visibleMessages().length === 0 && !isSending()) {
+            <div class="ai-chat__empty">
+              <div class="ai-chat__empty-title">How can I help you today?</div>
+              <p class="ai-chat__empty-sub">Ask me anything about your hives. Try one of these:</p>
+              <div class="ai-chat__prompts">
+                @for (prompt of examplePrompts; track prompt) {
+                  <button type="button" class="app-btn app-btn--ghost" (click)="tryPrompt(prompt)">{{ prompt }}</button>
+                }
+              </div>
+            </div>
+          }
+
+          @for (msg of visibleMessages(); track trackById($index, msg)) {
+            <app-chat-message [message]="msg" />
+          }
+
+          @if (isSending()) {
+            <div class="app-msg app-msg--assistant" aria-live="polite">
+              <div class="app-msg__bubble ai-chat__thinking">
+                <span class="ai-chat__dots" aria-hidden="true"><span></span><span></span><span></span></span>
+                Thinking… this may take up to 30 seconds.
+              </div>
+            </div>
+          }
         </div>
-      }
 
-      <!-- Empty state -->
-      @if (!isLoadingHistory() && visibleMessages().length === 0 && !isSending()) {
-        <div class="ai-chat__empty">
-          <div class="ai-chat__empty-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"/>
-              <path d="M8 12h8M12 8v8"/>
-            </svg>
-          </div>
-          <h3 class="ai-chat__empty-title">How can I help you today?</h3>
-          <p class="ai-chat__empty-sub">Ask me anything about your hives. Try one of these:</p>
-          <div class="ai-chat__prompts">
-            @for (prompt of examplePrompts; track prompt) {
-              <button class="ai-chat__prompt-btn" (click)="tryPrompt(prompt)">
-                {{ prompt }}
-              </button>
-            }
-          </div>
+        @if (sendError()) {
+          <app-callout tone="error" title="Message not sent">{{ sendError() }}</app-callout>
+        }
+
+        <div class="app-chat__composer">
+          <textarea
+            #composer
+            class="app-input ai-chat__textarea"
+            [value]="inputMessage()"
+            (input)="onInput($event)"
+            (keydown)="onKeydown($event)"
+            [disabled]="isSending()"
+            aria-label="Message"
+            placeholder="Ask about your hives…"
+            title="Enter sends, Shift+Enter adds a line"
+            rows="1"
+            maxlength="4000"></textarea>
+          <button type="button" class="app-btn app-btn--primary" [disabled]="!canSend()" (click)="sendMessage()">Send</button>
         </div>
-      }
-
-      <!-- Message list -->
-      @for (msg of visibleMessages(); track trackById($index, msg)) {
-        <app-chat-message [message]="msg" />
-      }
-
-      <!-- Thinking indicator -->
-      @if (isSending()) {
-        <div class="ai-chat__thinking">
-          <div class="ai-chat__thinking-dots">
-            <span></span><span></span><span></span>
-          </div>
-          <p class="ai-chat__thinking-label">
-            Thinking… This may take up to 30 seconds.
-          </p>
-        </div>
-      }
-    </div>
-
-    <!-- Error banner -->
-    @if (sendError()) {
-      <div class="ai-chat__error">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        {{ sendError() }}
-      </div>
-    }
-
-    <!-- Input -->
-    <div class="ai-chat__input-wrap">
-      <div class="chat-input" [class.chat-input--warn]="charWarning()">
-        <textarea
-          class="chat-input__textarea"
-          [value]="inputMessage()"
-          (input)="onInput($event)"
-          (keydown)="onKeydown($event)"
-          [disabled]="isSending()"
-          placeholder="Ask about your hives… (Enter to send, Shift+Enter for new line)"
-          rows="3"
-          maxlength="4000">
-        </textarea>
-        <div class="chat-input__footer">
-          <span
-            class="chat-input__counter"
-            [class.chat-input__counter--warn]="charWarning()">
-            {{ characterCount() }}&nbsp;/&nbsp;4000
-          </span>
-          <button
-            class="chat-input__send"
-            [disabled]="!canSend()"
-            (click)="sendMessage()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-            </svg>
-            Send
-          </button>
+        <div class="ai-chat__counter" [class.ai-chat__counter--warn]="charWarning()">
+          {{ characterCount() }} / 4000
         </div>
       </div>
-    </div>
+    </app-card>
 
-  </div><!-- /.ai-chat__main -->
-</div><!-- /.ai-chat -->
+  </div>
+</div>

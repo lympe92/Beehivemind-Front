@@ -4,10 +4,16 @@ import { SAFormControlNameDirective } from '../../../../core/directives/dynamic-
 import { ErrorsComponent } from '../errors/errors.component';
 import { FieldOption } from '../../../../core/models/form-fields.model';
 
+let radioGroupSeq = 0;
+
+/**
+ * A radio group. The native input is the control — it takes the accent through
+ * `accent-color` in styles/components/forms/forms.css. Pass `name` when more
+ * than one group shares a form; otherwise one is generated.
+ */
 @Component({
   selector: 'app-form-radio',
   templateUrl: './radio.component.html',
-  styleUrls: ['./radio.component.scss'],
   standalone: true,
   hostDirectives: [
     {
@@ -27,16 +33,27 @@ import { FieldOption } from '../../../../core/models/form-fields.model';
 export class RadioComponent implements ControlValueAccessor {
   @Input() label!: string;
   @Input() options!: FieldOption[];
-  @Input() direction: 'row' | 'column' = 'column';
+  @Input() direction: 'row' | 'column' = 'row';
+  @Input() name?: string;
 
   value!: string | number | boolean | null;
   disabled: boolean = false;
-  saFormControlName?: SAFormControlNameDirective | null;
+  private _saFormControlName?: SAFormControlNameDirective | null;
+  /** The host FormControlName, resolved on first use: it cannot be injected during construction,
+   *  and resolving it in a microtask left the required marker unrendered under OnPush. */
+  get saFormControlName(): SAFormControlNameDirective | null {
+    if (this._saFormControlName === undefined) {
+      this._saFormControlName = this.injector.get(SAFormControlNameDirective, null);
+    }
+    return this._saFormControlName;
+  }
+  private readonly generatedName = `radio-group-${++radioGroupSeq}`;
+
+  get groupName(): string {
+    return this.name || this.generatedName;
+  }
 
   constructor(private injector: Injector) {
-    queueMicrotask((): void => {
-      this.saFormControlName = this.injector.get(SAFormControlNameDirective, null);
-    });
   }
 
   onChange: (value: unknown) => void = () => {};
@@ -48,7 +65,8 @@ export class RadioComponent implements ControlValueAccessor {
   setDisabledState(isDisabled: boolean): void { this.disabled = isDisabled; }
 
   onUpdateValue(id: string | number | boolean | null): void {
-    this.value = this.value !== id ? id : null;
+    if (this.disabled) return;
+    this.value = id;
     this.onChange(this.value);
     this.onTouched();
   }

@@ -1,0 +1,75 @@
+/* Layout utilities — from _grid.scss. Tailwind-shaped, deliberately small: there
+   is no row/col system, and components write their own layout in their own file.
+   These exist so section markup can express a two-up or three-up without each
+   one inventing a grid. */
+
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+.self-center { align-self: center; }
+.order-last { order: 999; }
+
+.grid { display: grid; }
+/* Unconditional column counts. `.grid-cols-4` on a phone is four 80px columns,
+   so below 768 they all collapse to one and the `md:`/`lg:` variants below are
+   what put the columns back. A utility that cannot be undone at a breakpoint
+   is a utility that has to be avoided on anything fluid. */
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 767px) {
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4 { grid-template-columns: 1fr; }
+}
+
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+.gap-lg { gap: var(--spacing-lg); }
+.gap-xl { gap: var(--spacing-xl); }
+.gap-2xl { gap: var(--spacing-2xl); }
+
+/* Band-level splits — the two-up and three-up layouts a section is built from.
+   Columns take the band's column gap, wrapped rows its (tighter) row gap. The
+   .gap-* utilities above stay for component internals. */
+.gap-band { gap: var(--band-gap-y) var(--band-gap-x); }
+
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+.w-half { width: 50%; }
+
+.mx-auto { margin-inline: auto; }
+.ml-auto { margin-left: auto; }
+.mr-auto { margin-right: auto; }
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.text-justify { text-align: justify; }
+
+@media (min-width: 768px) {
+  .md\:flex { display: flex; }
+  .md\:flex-row { display: flex; flex-direction: row; }
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .md\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .md\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .md\:w-full { width: 100%; }
+  .md\:w-half { width: 50%; }
+}
+
+@media (min-width: 992px) {
+  .lg\:flex { display: flex; }
+  .lg\:flex-row { display: flex; flex-direction: row; }
+  .lg\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .lg\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .lg\:w-full { width: 100%; }
+  .lg\:w-half { width: 50%; }
+}

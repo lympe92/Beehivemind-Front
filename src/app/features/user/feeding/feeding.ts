@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import {
@@ -28,9 +29,8 @@ import { syncValidators } from '../../../shared/components/ui/form/validators.co
 @Component({
   selector: 'app-feeding',
   standalone: true,
-  imports: [DataTableComponent, CardComponent, FilterBarComponent],
+  imports: [DataTableComponent, CardComponent, FilterBarComponent, DatePipe],
   templateUrl: './feeding.html',
-  styleUrl: './feeding.scss',
 })
 export class FeedingComponent implements OnInit {
   private store = inject(Store);
@@ -39,15 +39,20 @@ export class FeedingComponent implements OnInit {
   private modal = inject(ModalService);
 
   readonly columns: ColumnDef[] = [
+    { key: 'beehiveId', label: 'Beehive', width: '30%' },
     { key: 'date', label: 'Date' },
-    { key: 'feeding_type', label: 'Feeding Type' },
-    { key: 'food_type', label: 'Food Type' },
-    { key: 'food_quantity', label: 'Qty / Beehive' },
-    { key: 'unit', label: 'Unit' },
+    { key: 'feeding_type', label: 'Feeding type' },
+    { key: 'food_type', label: 'Food type' },
+    { key: 'food_quantity', label: 'Quantity' },
   ];
 
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);
+
+  beehiveName(beehiveId: number | null): string {
+    if (!beehiveId) return 'All beehives';
+    return this.allBeehives().find(b => b.id === beehiveId)?.name ?? '—';
+  }
   private allFeeding = this.store.selectSignal(selectAllFeeding);
   loading = this.store.selectSignal(selectFeedingLoading);
 

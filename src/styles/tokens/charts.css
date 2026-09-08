@@ -1,0 +1,25 @@
+/* Charts — a data palette, deliberately NOT the brand palette.
+   The old six-colour set (#F5A623, blue, green, red, purple, teal) was a
+   rainbow with no relation to the artwork, and its own comment called it the
+   "BeehiveMind brand palette". With one brand hue there is nothing to build a
+   categorical scale from, so series run down the neutral ramp and the orange
+   marks the one series being asked about — the same six steps
+   components/app/ApexChart.jsx carries, and nothing off the ramp.
+
+   Still ordered rather than semantic — series take colours in sequence — so put
+   the series you want read first. */
+
+:root {
+  --chart-1: var(--color-primary);
+  --chart-2: var(--color-dark);
+  --chart-3: var(--color-grey);
+  --chart-4: var(--color-dark-grey);
+  --chart-5: var(--color-light-grey);
+  --chart-6: var(--color-light);
+
+  /* Apex defaults every axis label and legend entry to #373d3f, its own grey.
+     One value puts them all on the ramp. */
+  --chart-fore: var(--color-dark-grey);
+  --chart-grid: var(--color-light-grey);
+  --chart-font: "Peridot PE", system-ui, sans-serif;
+}

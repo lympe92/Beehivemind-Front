@@ -1,11 +1,11 @@
 import { Component, computed, input, output } from '@angular/core';
-import { CalendarEvent, eventsForDay, resolveColor, toDate } from '../../calendar.model';
+import { CalendarEvent, eventsForDay, resolveColor } from '../../calendar.model';
 
+/** Day view: a plain agenda list with times in a fixed gutter. */
 @Component({
   selector: 'app-cal-day',
   standalone: true,
   templateUrl: './day-view.html',
-  styleUrl: './day-view.scss',
 })
 export class DayViewComponent {
   readonly date   = input.required<Date>();
@@ -21,6 +21,6 @@ export class DayViewComponent {
 
   protected timeRange(ev: CalendarEvent): string {
     if (!ev.startTime) return '';
-    return ev.endTime ? `${ev.startTime} – ${ev.endTime}` : ev.startTime;
+    return ev.endTime ? `${ev.startTime}–${ev.endTime}` : ev.startTime;
   }
 }

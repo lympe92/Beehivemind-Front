@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
   EventEmitter,
@@ -13,10 +12,10 @@ import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/f
 import { SAFormControlNameDirective } from '../../../../core/directives/dynamic-field.directive';
 import { ErrorsComponent } from '../errors/errors.component';
 
+/** The workhorse text field. Styles: `.form-group` / `.form-control` in styles/components/forms/forms.css. */
 @Component({
   selector: 'app-form-input',
   templateUrl: './input.component.html',
-  styleUrls: ['./input.component.scss'],
   standalone: true,
   hostDirectives: [
     {
@@ -33,7 +32,7 @@ import { ErrorsComponent } from '../errors/errors.component';
   ],
   imports: [ErrorsComponent],
 })
-export class InputComponent implements ControlValueAccessor, AfterViewInit {
+export class InputComponent implements ControlValueAccessor {
   @Input() label!: string;
   @Input() inputType: 'text' | 'number' | 'email' | 'password' | 'date' = 'text';
   @Input() placeholder: string = '';
@@ -47,21 +46,23 @@ export class InputComponent implements ControlValueAccessor, AfterViewInit {
   protected value: string | number = '';
   protected disabled: boolean = false;
   isPasswordVisible: boolean = false;
-  saFormControlName?: SAFormControlNameDirective | null;
-
-  constructor(private injector: Injector) {
-    queueMicrotask((): void => {
-      this.saFormControlName = this.injector.get(SAFormControlNameDirective, null);
-    });
+  private _saFormControlName?: SAFormControlNameDirective | null;
+  /** The host FormControlName, resolved on first use: it cannot be injected during construction,
+   *  and resolving it in a microtask left the required marker unrendered under OnPush. */
+  get saFormControlName(): SAFormControlNameDirective | null {
+    if (this._saFormControlName === undefined) {
+      this._saFormControlName = this.injector.get(SAFormControlNameDirective, null);
+    }
+    return this._saFormControlName;
   }
-
-  ngAfterViewInit(): void {}
+  constructor(private injector: Injector) {
+  }
 
   onChange: (value: unknown) => void = () => {};
   onTouched: () => void = () => {};
 
   writeValue(value: unknown): void {
-    if (value !== undefined) this.value = value as string | number;
+    if (value !== undefined) this.value = (value as string | number) ?? '';
   }
 
   registerOnChange(fn: (value: unknown) => void): void { this.onChange = fn; }

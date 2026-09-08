@@ -1,19 +1,17 @@
-<section class="container">
-  <div class="flex flex-wrap">
-    @for (item of items(); track item.title) {
-      <div class="w-full md:w-1/4">
-        <h3 class="text-center">{{ item.title }}</h3>
-        <h6 class="text-justify">{{ item.description }}</h6>
-      </div>
-    }
-  </div>
+<div class="features-row__grid">
+  @for (item of items(); track item.title) {
+    <div class="features-row__item">
+      <h3 class="text-center">{{ item.title }}</h3>
+      <p>{{ item.description }}</p>
+    </div>
+  }
+</div>
 
-  <div class="flex justify-center">
-    <app-link
-      [routerLink]="cta().routerLink"
-      [variant]="cta().variant ?? 'primary'"
-      [size]="cta().size ?? 'md'">
-      {{ cta().label }}
-    </app-link>
-  </div>
-</section>
+<div class="flex justify-center">
+  <app-link
+    [routerLink]="cta().routerLink"
+    [variant]="cta().variant ?? 'primary'"
+    [size]="cta().size ?? 'md'">
+    {{ cta().label }}
+  </app-link>
+</div>

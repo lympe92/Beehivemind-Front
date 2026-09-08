@@ -1,12 +1,12 @@
-import { Component, forwardRef, Injector, Input, OnInit } from '@angular/core';
+import { Component, forwardRef, Injector, Input } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SAFormControlNameDirective } from '../../../../core/directives/dynamic-field.directive';
 import { ErrorsComponent } from '../errors/errors.component';
 
+/** A switch, label on the right. The whole row is the hit target. */
 @Component({
   selector: 'app-form-toggle',
   templateUrl: './toggle.component.html',
-  styleUrls: ['./toggle.component.scss'],
   standalone: true,
   hostDirectives: [
     {
@@ -23,21 +23,23 @@ import { ErrorsComponent } from '../errors/errors.component';
   ],
   imports: [ErrorsComponent],
 })
-export class ToggleComponent implements ControlValueAccessor, OnInit {
+export class ToggleComponent implements ControlValueAccessor {
   @Input() label!: string;
   @Input() hint?: string;
 
   protected checked = false;
   protected disabled = false;
-  saFormControlName?: SAFormControlNameDirective | null;
-
-  constructor(private injector: Injector) {
-    queueMicrotask(() => {
-      this.saFormControlName = this.injector.get(SAFormControlNameDirective, null);
-    });
+  private _saFormControlName?: SAFormControlNameDirective | null;
+  /** The host FormControlName, resolved on first use: it cannot be injected during construction,
+   *  and resolving it in a microtask left the required marker unrendered under OnPush. */
+  get saFormControlName(): SAFormControlNameDirective | null {
+    if (this._saFormControlName === undefined) {
+      this._saFormControlName = this.injector.get(SAFormControlNameDirective, null);
+    }
+    return this._saFormControlName;
   }
-
-  ngOnInit(): void {}
+  constructor(private injector: Injector) {
+  }
 
   onChange: (value: boolean) => void = () => {};
   onTouched: () => void = () => {};

@@ -1,30 +1,35 @@
-<section class="container hero">
-  <div class="flex-col lg:flex-row">
-    <div class="md:w-full lg:w-1/2 self-center">
-      <h1>{{ title() }}</h1>
-      <h4>{{ subtitle() }}</h4>
-      <div data-aos="fade-up" data-aos-anchor-placement="bottom-bottom">
-        <app-link
-          [routerLink]="primaryCta().routerLink"
-          [variant]="primaryCta().variant ?? 'primary'"
-          [size]="primaryCta().size ?? 'md'">
-          {{ primaryCta().label }}
-        </app-link>
-        <app-link
-          [routerLink]="secondaryCta().routerLink"
-          [variant]="secondaryCta().variant ?? 'outline'"
-          [size]="secondaryCta().size ?? 'md'">
-          {{ secondaryCta().label }}
-        </app-link>
-      </div>
+<div class="flex-col lg:flex-row gap-band">
+  <div class="md:w-full lg:w-half self-center">
+    <h1>{{ title() }}</h1>
+    <p class="hero-left__subtitle">{{ subtitle() }}</p>
+    <div class="hero-left__actions">
+      <app-link
+        [routerLink]="primaryCta().routerLink"
+        [variant]="primaryCta().variant ?? 'primary'"
+        [size]="primaryCta().size ?? 'md'">
+        {{ primaryCta().label }}
+      </app-link>
+      <app-link
+        [routerLink]="secondaryCta().routerLink"
+        [variant]="secondaryCta().variant ?? 'outline'"
+        [size]="secondaryCta().size ?? 'md'">
+        {{ secondaryCta().label }}
+      </app-link>
     </div>
-    <div class="md:w-full lg:w-1/2 order-1" data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
-      <app-image
-        [src]="image().src"
-        [alt]="image().alt"
-        [width]="image().width"
-        [height]="image().height"
-        [priority]="image().priority ?? false" />
-    </div>
+    @if (proof().length) {
+      <ul class="hero-left__proof">
+        @for (item of proof(); track item) {
+          <li>{{ item }}</li>
+        }
+      </ul>
+    }
   </div>
-</section>
+  <div class="md:w-full lg:w-half hero-left__media">
+    <app-image
+      [src]="image().src"
+      [alt]="image().alt"
+      [width]="image().width"
+      [height]="image().height"
+      [priority]="image().priority ?? false" />
+  </div>
+</div>

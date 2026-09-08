@@ -1,14 +1,12 @@
-<section class="container">
-  <div class="flex-col items-center">
-    <h2 class="text-center">{{ title() }}</h2>
-    <p class="text-center-column__subtitle text-center">{{ subtitle() }}</p>
-    <div class="text-center-column__image" data-aos="zoom-in" data-aos-anchor-placement="center-bottom">
-      <app-image
-        [src]="image().src"
-        [alt]="image().alt"
-        [width]="image().width"
-        [height]="image().height"
-        [priority]="image().priority ?? false" />
-    </div>
+<div class="flex-col items-center">
+  <h2 class="text-center">{{ title() }}</h2>
+  <p class="text-center-column__subtitle text-center">{{ subtitle() }}</p>
+  <div class="text-center-column__image">
+    <app-image
+      [src]="image().src"
+      [alt]="image().alt"
+      [width]="image().width"
+      [height]="image().height"
+      [priority]="image().priority ?? false" />
   </div>
-</section>
+</div>

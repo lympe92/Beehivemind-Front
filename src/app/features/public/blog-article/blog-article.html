@@ -1,1 +1,47 @@
-<p>blog-article works!</p>
+<main>
+  @if (post(); as post) {
+    <article class="container hero">
+      <header class="article__header">
+        <div class="post-list__meta">
+          @if (post.tag) {
+            <span class="post-list__tag">{{ post.tag }}</span>
+            <span class="post-list__dot">·</span>
+          }
+          <span>{{ post.date }}</span>
+          @if (post.readingTime) {
+            <span class="post-list__dot">·</span>
+            <span>{{ post.readingTime }}</span>
+          }
+        </div>
+        <h1 class="article__title">{{ post.title }}</h1>
+        <p class="lead">{{ post.excerpt }}</p>
+      </header>
+
+      @if (post.image) {
+        <div class="article__hero">
+          <img [src]="post.image.src" [alt]="post.image.alt" [width]="post.image.width" [height]="post.image.height" />
+        </div>
+      }
+
+      <div class="prose">
+        @for (block of post.body; track $index) {
+          @if (block.type === 'h2') {
+            <h2>{{ block.text }}</h2>
+          } @else {
+            <p>{{ block.text }}</p>
+          }
+        }
+
+        <a class="article__back" routerLink="/blog">« All posts</a>
+      </div>
+    </article>
+  } @else {
+    <article class="container hero">
+      <div class="prose">
+        <h1>Post not found</h1>
+        <p>There is no post at this address. It may have moved.</p>
+        <a class="article__back" routerLink="/blog">« All posts</a>
+      </div>
+    </article>
+  }
+</main>

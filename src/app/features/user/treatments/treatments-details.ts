@@ -13,14 +13,14 @@ import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
+import { TooltipDirective } from '../../../shared/components/ui/tooltip/tooltip.directive';
 import { TreatmentSessionModalComponent } from '../../../shared/components/ui/modal/treatment-session-modal/treatment-session-modal';
 
 @Component({
   selector: 'app-treatments-details',
   standalone: true,
-  imports: [DatePipe, CardComponent],
+  imports: [DatePipe, CardComponent, TooltipDirective],
   templateUrl: './treatments-details.html',
-  styleUrl: './treatments-details.scss',
 })
 export class TreatmentsDetailsComponent implements OnInit {
   private store          = inject(Store);

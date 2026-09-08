@@ -18,6 +18,13 @@ export const adminRoutes: Routes = [
       import('./user-management/user-management').then((m) => m.UserManagementComponent),
   },
   {
+    // The sidebar has linked here for moderators since before the route existed.
+    path: 'moderation',
+    canActivate: [employeeRoleGuard('moderator')],
+    loadComponent: () =>
+      import('./moderation/moderation').then((m) => m.AdminModerationComponent),
+  },
+  {
     path: 'employees',
     canActivate: [employeeRoleGuard('admin')],
     loadComponent: () =>
@@ -28,6 +35,12 @@ export const adminRoutes: Routes = [
     canActivate: [employeeRoleGuard('admin')],
     loadComponent: () =>
       import('./coupons/coupons').then((m) => m.CouponsComponent),
+  },
+  {
+    path: 'ai-responses',
+    canActivate: [employeeRoleGuard('admin')],
+    loadComponent: () =>
+      import('./ai-responses/ai-responses').then((m) => m.AiResponsesComponent),
   },
   {
     path: 'raw',

@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Inspection } from '../../../core/models/inspection.model';
@@ -41,9 +42,8 @@ interface InspectionFormValue {
 @Component({
   selector: 'app-inspections',
   standalone: true,
-  imports: [DataTableComponent, CardComponent, FilterBarComponent],
+  imports: [DataTableComponent, CardComponent, FilterBarComponent, DatePipe],
   templateUrl: './inspections.html',
-  styleUrl: './inspections.scss',
 })
 export class InspectionsComponent implements OnInit {
   private store = inject(Store);
@@ -52,24 +52,31 @@ export class InspectionsComponent implements OnInit {
   private modal = inject(ModalService);
 
   readonly columns: ColumnDef[] = [
+    // The design system's short headers ("Pop.", "Q. year"): fourteen readings
+    // plus the hive have to fit one row, and the reading is the data.
+    { key: 'beehiveId', label: 'Beehive' },
     { key: 'date', label: 'Date' },
     { key: 'frame_space', label: 'Frames' },
-    { key: 'population', label: 'Population' },
+    { key: 'population', label: 'Pop.' },
     { key: 'pollen', label: 'Pollen' },
     { key: 'honey', label: 'Honey' },
-    { key: 'opened_brood', label: 'Egg' },
-    { key: 'closed_brood', label: 'Closed Brood' },
+    { key: 'opened_brood', label: 'Eggs' },
+    { key: 'closed_brood', label: 'Closed' },
     { key: 'varroa', label: 'Varroa' },
     { key: 'american_foulbrood', label: 'AFB' },
     { key: 'european_foulbrood', label: 'EFB' },
     { key: 'nosema', label: 'Nosema' },
-    { key: 'queen_exists', label: 'Queen Seen' },
-    { key: 'queen_cells', label: 'Queen Cells' },
-    { key: 'queen_year', label: 'Queen Year' },
+    { key: 'queen_exists', label: 'Queen' },
+    { key: 'queen_cells', label: 'Q. cells' },
+    { key: 'queen_year', label: 'Q. year' },
   ];
 
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);
+
+  beehiveName(beehiveId: number): string {
+    return this.allBeehives().find(b => b.id === beehiveId)?.name ?? '—';
+  }
   private allInspections = this.store.selectSignal(selectAllInspections);
   loading = this.store.selectSignal(selectInspectionsLoading);
 

@@ -7,13 +7,13 @@ import { AuthActions } from '../../../store/auth/auth.actions';
 import { selectPendingUser, selectPendingToken } from '../../../store/auth/auth.selectors';
 import { COUNTRIES, Country } from '../../../core/data/countries';
 import { environment } from '../../../../environments/environment';
+import { AuthCardComponent } from '../../../shared/components/forms/auth-card/auth-card';
 
 @Component({
   selector: 'app-complete-profile',
   standalone: true,
-  imports: [],
+  imports: [AuthCardComponent],
   templateUrl: './complete-profile.html',
-  styleUrl: './complete-profile.scss',
 })
 export class CompleteProfileComponent implements OnInit {
   private store = inject(Store);

@@ -1,15 +1,15 @@
-<div class="financial">
+<div class="app-page">
 
   <!-- CRUD tables -->
-  <div class="financial__row financial__row--2col">
+  <div class="app-row--2col">
     <app-card title="Cost Categories">
-      <div class="financial__scroll-body">
+      <div class="app-scroll-body">
         <app-cost-categories (categoriesChange)="onCategoriesChange($event)" />
       </div>
     </app-card>
 
     <app-card title="Costs">
-      <div class="financial__scroll-body">
+      <div class="app-scroll-body">
         <app-costs [costCategories]="costCategories()" (costsChange)="onCostsChange()" />
       </div>
     </app-card>
@@ -21,7 +21,7 @@
   </app-card>
 
   <!-- Three pies -->
-  <div class="financial__row financial__row--3col">
+  <div class="app-row--3col">
     <app-card title="Income / Outgoing">
       <app-apex-chart [options]="summaryPieOptions()" [loading]="chartsLoading()" height="260" />
     </app-card>

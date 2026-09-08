@@ -1,33 +1,35 @@
-@if (pageData$ | async; as page) {
-  <app-hero-center-content
+<main>
+  <section app-hero-center-content
     [title]="page.hero.title"
     [subtitle]="page.hero.subtitle"
     [image]="page.hero.image"
     [primaryCta]="page.hero.primaryCta"
-    [secondaryCta]="page.hero.secondaryCta" />
+    [secondaryCta]="page.hero.secondaryCta"></section>
 
-  @for (list of page.splitListsPre; track list.title) {
-    <app-split-list
+  @for (list of page.splitListsPre; track list.title; let i = $index) {
+    <section app-split-list
       [title]="list.title"
       [image]="list.image"
       [items]="list.items"
-      [cta]="list.cta" />
+      [cta]="list.cta"
+      [mediaSide]="side(i)"></section>
   }
 
-  <app-ribbon
+  <section app-ribbon
     [mode]="page.ribbon.mode"
-    [quote]="page.ribbon.quote" />
+    [quote]="page.ribbon.quote"></section>
 
-  @for (list of page.splitListsPost; track list.title) {
-    <app-split-list
+  @for (list of page.splitListsPost; track list.title; let i = $index) {
+    <section app-split-list
       [title]="list.title"
       [image]="list.image"
       [items]="list.items"
-      [cta]="list.cta" />
+      [cta]="list.cta"
+      [mediaSide]="side(i, page.splitListsPre.length)"></section>
   }
 
-  <app-cta-banner
+  <section app-cta-banner
     [title]="page.ctaBanner.title"
-    [description]="page.ctaBanner.description"
-    [cta]="page.ctaBanner.cta" />
-}
+    [description]="page.ctaBanner.description ?? ''"
+    [cta]="page.ctaBanner.cta"></section>
+</main>

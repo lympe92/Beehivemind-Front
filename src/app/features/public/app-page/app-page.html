@@ -1,44 +1,44 @@
-@if (pageData$ | async; as page) {
-  <app-hero-left-content
+<main>
+  <section app-hero-left-content
     [title]="page.hero.title"
     [subtitle]="page.hero.subtitle"
     [image]="page.hero.image"
     [primaryCta]="page.hero.primaryCta"
-    [secondaryCta]="page.hero.secondaryCta" />
+    [secondaryCta]="page.hero.secondaryCta"></section>
 
-  <app-ribbon
+  <section app-ribbon
     [mode]="page.ribbon.mode"
-    [quote]="page.ribbon.quote" />
+    [quote]="page.ribbon.quote"></section>
 
-  <app-split-content
+  <section app-split-content
     [title]="page.splitContent.title"
     [description]="page.splitContent.description"
-    [image]="page.splitContent.image" />
+    [image]="page.splitContent.image"></section>
 
-  <app-text-columns [columns]="page.textColumns" />
+  <section app-text-columns [columns]="page.textColumns"></section>
 
-  <app-split-accordion
+  <section app-split-accordion
     [title]="page.splitAccordion1.title"
     [image]="page.splitAccordion1.image"
-    [items]="page.splitAccordion1.items" />
+    [items]="page.splitAccordion1.items"></section>
 
-  <app-application-download
+  <section app-application-download
     [title]="page.applicationDownload.title"
     [subtitle]="page.applicationDownload.subtitle"
     [logo]="page.applicationDownload.logo"
-    [storeLinks]="page.applicationDownload.storeLinks" />
+    [storeLinks]="page.applicationDownload.storeLinks"></section>
 
-  <app-split-accordion
+  <section app-split-accordion
     [title]="page.splitAccordion2.title"
     [image]="page.splitAccordion2.image"
-    [items]="page.splitAccordion2.items" />
+    [items]="page.splitAccordion2.items"></section>
 
-  <app-info-columns
+  <section app-info-columns
     [title]="page.infoColumns.title"
-    [items]="page.infoColumns.items" />
+    [items]="page.infoColumns.items"></section>
 
-  <app-cta-banner
+  <section app-cta-banner
     [title]="page.ctaBanner.title"
-    [description]="page.ctaBanner.description"
-    [cta]="page.ctaBanner.cta" />
-}
+    [description]="page.ctaBanner.description ?? ''"
+    [cta]="page.ctaBanner.cta"></section>
+</main>

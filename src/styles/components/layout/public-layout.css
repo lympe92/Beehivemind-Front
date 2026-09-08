@@ -1,0 +1,491 @@
+/* Public layout — the fixed header and the footer that bracket every public page.
+   The header is `position: fixed`, which is why every hero carries the .hero
+   top margin. */
+
+.public-header {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  padding: 10px 0;
+  background-color: var(--color-white);
+  box-shadow: 0 10px 30px 0 rgba(138, 155, 165, 0.15);
+  transition: all 0.3s ease-out;
+}
+
+/* Past 10px of scroll the bar tightens and the logo shrinks. */
+.public-header.scroll-on {
+  padding: 5px 0;
+  box-shadow: 0 5px 10px 0 rgba(138, 155, 165, 0.15);
+}
+
+.public-header.scroll-on .public-header__brand img {
+  height: 28px;
+}
+
+.public-header__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.public-header__brand img {
+  height: 52px;
+  width: auto;
+  display: block;
+  transition: all 0.3s ease-out;
+}
+
+/* The bars are 24×17; the TARGET is 44×44. This is the only control in the
+   header at mobile widths, and it was 17px tall — the same shape-versus-target
+   confusion the badge and the switch had. The padding grows the button without
+   moving the bars, and the negative margin keeps the mark optically aligned to
+   the container edge rather than pushed 10px past it. */
+.public-header__toggler {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 17px;
+  box-sizing: content-box;
+  padding: 13.5px 10px;
+  margin-right: -10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.public-header__toggler span {
+  display: block;
+  width: 24px;
+  height: 1px;
+  background-color: var(--color-dark);
+  transition: all 300ms linear;
+}
+
+/* The hamburger folds into a cross rather than cross-fading to a new icon. */
+.public-header__toggler.is-open span:nth-child(1) {
+  transform: translateY(8px) rotate(-45deg);
+}
+
+.public-header__toggler.is-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.public-header__toggler.is-open span:nth-child(3) {
+  transform: translateY(-8px) rotate(45deg);
+}
+
+.public-header__collapse {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+}
+
+.public-header__links {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* The one nav item that opens rather than navigates. It had no affordance at
+   all — it read as a fifth destination that did nothing when tapped. */
+.public-header__dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.public-header__caret {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  transition: transform var(--transition-speed) var(--transition-easing);
+}
+
+.public-header__dropdown-toggle[aria-expanded="true"] .public-header__caret {
+  transform: rotate(180deg);
+}
+
+.public-header__link {
+  position: relative;
+  display: inline-block;
+  padding: 5px 0;
+  color: var(--color-dark);
+  font-size: 0.75rem;
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 200ms linear;
+}
+
+/* The underline slides up from below rather than fading in place. */
+.public-header__link::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-primary);
+  opacity: 0;
+  transition: all 200ms linear;
+}
+
+/* Ink on hover, not orange — orange text is 2.27:1. The 2px orange bar above
+   already signals the hover, so the label only has to darken. */
+.public-header__link:hover {
+  color: var(--color-dark);
+}
+
+.public-header__link:hover::after {
+  bottom: 0;
+  opacity: 1;
+}
+
+/* The current page reads grey and refuses the underline. */
+.public-header__link.active {
+  color: var(--color-grey);
+}
+
+.public-header__link.active:hover::after {
+  opacity: 0;
+}
+
+.public-header__dropdown-wrap {
+  position: relative;
+}
+
+.public-header__dropdown {
+  position: absolute;
+  top: calc(100% + var(--spacing-sm));
+  left: 0;
+  min-width: 200px;
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius);
+  list-style: none;
+  padding: var(--spacing-sm) 0;
+  margin: 0;
+  z-index: 10;
+}
+
+.public-header__dropdown-item {
+  display: block;
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-dark);
+  text-decoration: none;
+  transition: background-color 200ms linear;
+}
+
+.public-header__dropdown-item:hover {
+  background-color: var(--color-light);
+  color: var(--color-dark);
+}
+
+.public-header__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+@media (max-width: 991px) {
+  .public-header__toggler { display: flex; }
+
+  /* The menu is a PANEL, not a second row in the bar.
+
+     It was authored as a row item, which meant the open menu grew the fixed
+     header to 524px — the wordmark floated to the middle of the page and the
+     last action was clipped at the scroll edge. Growing the chrome to hold a
+     menu is the wrong shape for the job: the bar should stay a bar.
+
+     `top: 100%` is measured against `.public-header`, which is fixed and so is
+     the positioning ancestor — the panel tracks the bar's real height,
+     including the shrink past 10px of scroll. A `--header-height` offset would
+     be wrong the moment the bar tightens. */
+  .public-header__collapse {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--spacing-sm) var(--gutter) var(--spacing-lg);
+    background: var(--color-white);
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    /* dvh, not vh: on a phone `vh` is the address-bar-collapsed height, so a
+       vh panel is taller than the screen while the bar is showing. */
+    max-height: calc(100dvh - var(--header-height));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .public-header__collapse.is-open { display: flex; }
+
+  .public-header__actions {
+    width: 100%;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .public-header__links {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    /* The desktop gap is 24px between words in a bar. Stacked, it put 72px
+       between rows and five items no longer fitted a phone. The rows are 48px
+       tall and hairline-separated, so the separation is the rule, not space. */
+    gap: 0;
+  }
+
+  .public-header__links > li + li {
+    border-top: 1px solid var(--color-light);
+  }
+
+  /* A nav link in the desktop bar is a word you click with a mouse; in the
+     open menu it is a row you tap with a thumb. 48px, and full width so the
+     target is the row rather than the label. */
+  .public-header__links li {
+    width: 100%;
+  }
+
+  .public-header__link {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 48px;
+  }
+
+  /* The sliding underline is a mouse affordance and there is no hover here;
+     in a stacked column it would also draw a rule under every row. */
+  .public-header__link::after {
+    display: none;
+  }
+
+  .public-header__dropdown {
+    position: static;
+    box-shadow: none;
+    /* No ground and no rule. The tinted band was a heavy box for four short
+       links, and the 2px border before it was the left-accent trope. The
+       hierarchy is carried by the type instead — the parent is a tracked
+       uppercase label, the children are sentence-case body — which is the same
+       pair of voices the rest of the system uses. */
+    padding: 0 0 var(--spacing-xs) var(--spacing-md);
+  }
+
+  .public-header__dropdown-toggle {
+    justify-content: space-between;
+  }
+
+  .public-header__dropdown-item {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  /* No hairlines between the children: they sit inside a row that already has
+     one above and below it, and four more would make a second table of a
+     submenu. */
+
+  /* Two pills stacked, each full width — side by side they were sharing a
+     phone's width between a label and a border radius. */
+  .public-header__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* The scrim sits OUTSIDE the header, at 999 to the bar's 1000. Inside it, the
+   header's z-index makes a stacking context and a negative-z child paints over
+   the bar's own background rather than behind it: the bar went grey and the
+   logo's white artwork stood out as a bright box on it. It is rendered only
+   while the menu is open, and only below 992. */
+.public-header__scrim {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  .public-header__scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.35);
+    animation: header-scrim-in var(--transition-speed) var(--transition-easing);
+  }
+}
+
+@keyframes header-scrim-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---------- Footer ----------
+   Four columns, each headed by an uppercase bold label over a short teal rule.
+   That rule is the accent colour's main job on the site. */
+.public-footer {
+  padding-top: var(--spacing-3xl);
+  color: var(--color-dark-grey);
+}
+
+.public-footer__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xl);
+}
+
+/* Below 768 the four columns become one, which stacks three lists of four or
+   five short words into about 900px of mostly empty footer. The blurb is the
+   only part that needs the full width; the link lists are short enough to sit
+   side by side even on a phone, which roughly halves the footer.
+
+   The brand block spans; the lists share the row. */
+/* One column below 992. Two- and three-up were tried and read as a cramped
+   grid: "Apiaries & Hives" wraps at 171px and three 107px columns wrap most of
+   the labels. A single column is taller, but it is a LIST — which is what a
+   footer is on a phone — and the height is rows rather than empty space now
+   that the link rows are 40px with no gap between them. */
+@media (max-width: 991px) {
+  .public-footer__grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  /* The blurb's justification is handled at its own rule below — an override
+     declared up here loses to the base rule, which comes later. */
+}
+
+/* The four-up footer needs a container wide enough to justify into. At 768 it
+   gave the blurb a 224px column — about 28 characters of justified text, which
+   is the very problem the single-column rule above fixes. So the four columns
+   start at 992; below that the footer is one column. */
+@media (min-width: 992px) {
+  .public-footer__grid {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+  }
+}
+
+/* Was 16px/700 with no tracking — the last label in the system still shouting
+   by weight instead of by caps and tracking. */
+.public-footer__heading {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: var(--structural-weight);
+  text-transform: uppercase;
+  letter-spacing: var(--structural-tracking);
+  color: var(--color-dark);
+}
+
+.public-footer__rule {
+  display: inline-block;
+  width: 60px;
+  height: 2px;
+  border: 0;
+  margin: var(--spacing-sm) 0 var(--spacing-lg);
+  background-color: var(--color-accent);
+}
+
+/* 60px of accent under a 12px label reads as a heading's underline on a wide
+   column and as a loose bar on a narrow one. */
+@media (max-width: 767px) {
+  .public-footer__rule {
+    width: 32px;
+    margin-bottom: var(--spacing-md);
+  }
+}
+
+/* Justified only where there is a measure to justify into. Narrower than about
+   fifty characters, justification opens word gaps wide enough to read as
+   errors and hyphenation starts breaking short words — the same reason the
+   four-up feature row got a breakpoint. */
+.public-footer__blurb {
+  margin: 0;
+  text-align: left;
+  font-size: var(--font-size-base);
+  hyphens: manual;
+}
+
+@media (min-width: 992px) {
+  .public-footer__blurb {
+    text-align: justify;
+    hyphens: auto;
+  }
+}
+
+.public-footer__links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Below 768 the footer nav becomes the same thing the header menu is on a
+   phone: full-width rows, hairline-separated. That is the answer to the empty
+   space beside a four-word link — the space belongs to the row, so it is a
+   target rather than a void.
+
+   Phone only. At 768–991 the footer is still one column, but a row list there
+   is a lot of rules for a pointer that does not need a 44px target, so the
+   tablet keeps the plain gapped list.
+
+   Centring the labels would be the wrong fix at any width: a list is scanned
+   down one edge, and centred the eye has to re-find the start of every line —
+   and the accent rule above each heading is left-anchored, so the block would
+   lose its spine. The copyright is the one line that centres, because it is
+   not a list. */
+@media (max-width: 767px) {
+  .public-footer__links {
+    gap: 0;
+  }
+
+  .public-footer__link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    border-bottom: 1px solid var(--color-light);
+  }
+
+  .public-footer__links li:last-child .public-footer__link {
+    border-bottom: none;
+  }
+}
+
+/* .colbl in the source — footer links sit in body colour and fade on hover
+   instead of changing hue. */
+.public-footer__link {
+  color: var(--color-dark);
+  font-size: var(--font-size-base);
+  text-decoration: none;
+  transition: opacity 200ms linear;
+}
+
+.public-footer__link:hover {
+  color: var(--color-dark);
+  opacity: 0.6;
+}
+
+.public-footer__copyright {
+  margin-top: var(--spacing-2xl);
+  padding: var(--spacing-md) 0;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-grey);
+}

@@ -1,11 +1,18 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SlicePipe } from '@angular/common';
+import { DecimalPipe, SlicePipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RequestService } from '../../../core/services/request.service';
 import { Store } from '@ngrx/store';
 import { selectIsAtLeastModerator, selectIsAtLeastAdmin } from '../../../store/employee-auth/employee-auth.selectors';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
+import { CardComponent } from '../../../shared/components/ui/card/card';
+import { AppErrorComponent } from '../../../shared/components/ui/app-error/app-error';
+import { ModalService } from '../../../core/modal/modal.service';
+import {
+  SuspendUserModalComponent,
+  SuspendUserResult,
+} from '../../../shared/components/ui/modal/suspend-user-modal/suspend-user-modal';
 
 interface AdminUser {
   id: number;
@@ -21,13 +28,13 @@ interface AdminUser {
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [FormsModule, SlicePipe, DataTableComponent],
+  imports: [FormsModule, SlicePipe, DecimalPipe, DataTableComponent, CardComponent, AppErrorComponent],
   templateUrl: './user-management.html',
-  styleUrl: './user-management.scss',
 })
 export class UserManagementComponent implements OnInit {
   private request = inject(RequestService);
   private store = inject(Store);
+  private modal = inject(ModalService);
 
   isAtLeastModerator = toSignal(this.store.select(selectIsAtLeastModerator), { initialValue: false });
   isAtLeastAdmin = toSignal(this.store.select(selectIsAtLeastAdmin), { initialValue: false });
@@ -41,10 +48,6 @@ export class UserManagementComponent implements OnInit {
   search = '';
   statusFilter = '';
   planFilter = '';
-
-  suspendModalFor = signal<AdminUser | null>(null);
-  suspendMode: 'indefinite' | 'until' = 'indefinite';
-  suspendUntil = '';
 
   readonly columns: ColumnDef[] = [
     { key: 'name', label: 'Name' },
@@ -61,6 +64,7 @@ export class UserManagementComponent implements OnInit {
 
   loadUsers(): void {
     this.loading.set(true);
+    this.error.set(null);
     const params = new URLSearchParams({ page: String(this.page()) });
     if (this.search) params.set('search', this.search);
     if (this.statusFilter) params.set('status', this.statusFilter);
@@ -73,7 +77,7 @@ export class UserManagementComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.error.set('Failed to load users');
+        this.error.set('The user list did not load.');
         this.loading.set(false);
       },
     });
@@ -93,22 +97,25 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  openSuspend(user: AdminUser): void {
-    this.suspendModalFor.set(user);
-    this.suspendMode = 'indefinite';
-    this.suspendUntil = '';
+  async openSuspend(user: AdminUser): Promise<void> {
+    const result = await this.modal.open<SuspendUserResult>(SuspendUserModalComponent, {
+      type: 'center',
+      width: '440px',
+      data: { name: `${user.name} ${user.surname}` },
+    });
+    if (!result) return;
+    this.updateStatus(user.id, 'suspended', result.until);
   }
 
-  closeSuspendModal(): void {
-    this.suspendModalFor.set(null);
-  }
-
-  confirmSuspend(): void {
-    const user = this.suspendModalFor();
-    if (!user) return;
-    const until = this.suspendMode === 'until' && this.suspendUntil ? this.suspendUntil : null;
-    this.updateStatus(user.id, 'suspended', until);
-    this.closeSuspendModal();
+  async banUser(user: AdminUser): Promise<void> {
+    const confirmed = await this.modal.confirm({
+      title: 'Ban this account?',
+      message: `${user.name} ${user.surname} is signed out and cannot sign in again until an admin activates the account.`,
+      confirmLabel: 'Ban',
+      danger: true,
+    });
+    if (!confirmed) return;
+    this.updateStatus(user.id, 'banned');
   }
 
   forceConfirm(userId: number): void {
@@ -117,8 +124,15 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  deleteUser(user: AdminUser): void {
-    if (!confirm(`Permanently delete ${user.name} ${user.surname} (${user.email})? This cannot be undone — all their apiaries, beehives, and records will be deleted too.`)) return;
+  /** A native confirm cannot carry the sentence that matters: what else is deleted. */
+  async deleteUser(user: AdminUser): Promise<void> {
+    const confirmed = await this.modal.confirm({
+      title: 'Delete this account?',
+      message: `Permanently delete ${user.name} ${user.surname} (${user.email}). Their apiaries, beehives and every record they hold go with it. This cannot be undone.`,
+      confirmLabel: 'Delete account',
+      danger: true,
+    });
+    if (!confirmed) return;
     this.request.deleteRequest(`admin/users/${user.id}`).subscribe({
       next: () => this.loadUsers(),
     });

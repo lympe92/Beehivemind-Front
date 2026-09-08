@@ -1,65 +1,82 @@
-<form [formGroup]="form" class="form-container" [class.loading]="loading()">
-  @for (field of fields(); track field.name) {
-    <div [ngClass]="field.size" class="field-wrap">
-      @if (field.type === 'text' || field.type === 'number' || field.type === 'email' || field.type === 'password' || field.type === 'date') {
-        <app-form-input
-          [label]="field.label"
-          [inputType]="field.type"
-          [formControlName]="field.name"
-        />
-      }
-      @if (field.type === 'textarea') {
-        <app-form-textarea
-          [label]="field.label"
-          [formControlName]="field.name"
-        />
-      }
-      @if (field.type === 'select') {
-        <app-form-select
-          [formControlName]="field.name"
-          [label]="field.label"
-          [options]="field.options"
-          [cascadeFrom]="field.cascadeFrom"
-          [isMultiple]="!!field.isMultiple"
-        />
-      }
-      @if (field.type === 'radio') {
-        <app-form-radio
-          [label]="field.label"
-          [options]="($any(field.options) | async) ?? []"
-          [formControlName]="field.name"
-        />
-      }
-      @if (field.type === 'checkbox') {
-        <app-form-checkboxes
-          [label]="field.label"
-          [options]="($any(field.options) | async) ?? []"
-          [formControlName]="field.name"
-        />
-      }
-      @if (field.type === 'range') {
-        <app-form-range
-          [label]="field.label"
-          [formControlName]="field.name"
-        />
-      }
-      @if (field.type === 'toggle') {
-        <app-form-toggle
-          [label]="field.label"
-          [formControlName]="field.name"
-        />
-      }
-      @if (field.type === 'map') {
-        <app-form-map
-          [label]="field.label"
-          [formControlName]="field.name"
-        />
-      }
-    </div>
-  }
-  <div class="button-container">
-    <app-button variant="primary" type="submit" (click)="submit()">
-      {{ submitLabel() }}
-    </app-button>
+<form [formGroup]="form" class="dform" (ngSubmit)="submit()" novalidate>
+  <div class="dform__grid">
+    @for (field of fields(); track field.name) {
+      <div
+        class="dform__field"
+        [class.dform__field--half]="field.size === 'half'"
+        [class.dform__field--third]="field.size === 'third'"
+        [class.dform__field--two-thirds]="field.size === 'two-thirds'">
+        @if (field.type === 'text' || field.type === 'number' || field.type === 'email' || field.type === 'password' || field.type === 'date') {
+          <app-form-input
+            [label]="field.label"
+            [inputType]="field.type"
+            [placeholder]="field.placeholder ?? ''"
+            [noSpinners]="field.type === 'number'"
+            [formControlName]="field.name"
+          />
+        }
+        @if (field.type === 'textarea') {
+          <app-form-textarea
+            [label]="field.label"
+            [placeholder]="field.placeholder ?? ''"
+            [formControlName]="field.name"
+          />
+        }
+        @if (field.type === 'select') {
+          <app-form-select
+            [formControlName]="field.name"
+            [label]="field.label"
+            [placeholder]="field.placeholder ?? ''"
+            [options]="field.options"
+            [cascadeFrom]="field.cascadeFrom"
+            [isMultiple]="!!field.isMultiple"
+          />
+        }
+        @if (field.type === 'radio') {
+          <app-form-radio
+            [label]="field.label"
+            [options]="($any(field.options) | async) ?? []"
+            [formControlName]="field.name"
+          />
+        }
+        @if (field.type === 'checkbox') {
+          <app-form-checkboxes
+            [label]="field.label"
+            [options]="($any(field.options) | async) ?? []"
+            [formControlName]="field.name"
+          />
+        }
+        @if (field.type === 'range') {
+          <app-form-range
+            [label]="field.label"
+            [formControlName]="field.name"
+          />
+        }
+        @if (field.type === 'toggle') {
+          <app-form-toggle
+            [label]="field.label"
+            [hint]="field.placeholder"
+            [formControlName]="field.name"
+          />
+        }
+        @if (field.type === 'map') {
+          <app-form-map
+            [label]="field.label"
+            [formControlName]="field.name"
+          />
+        }
+      </div>
+    }
+  </div>
+
+  <ng-content />
+
+  <div class="dform__actions">
+    @if (cancelLabel()) {
+      <button type="button" [class]="ghostClass()" (click)="cancel.emit()">{{ cancelLabel() }}</button>
+    }
+    <button type="submit" [class]="submitClass()" [disabled]="loading()">
+      {{ loading() ? 'Saving…' : submitLabel() }}
+    </button>
   </div>
 </form>

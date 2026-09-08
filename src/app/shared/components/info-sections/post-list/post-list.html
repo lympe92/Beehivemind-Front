@@ -1,0 +1,54 @@
+@if (tags().length > 1) {
+  <div class="post-filter" role="group" aria-label="Filter posts by category">
+    @for (tag of tags(); track tag) {
+      <button
+        type="button"
+        class="post-filter__chip"
+        [attr.aria-pressed]="tag === activeTag()"
+        (click)="filter.emit(tag)">
+        {{ tag }}
+      </button>
+    }
+  </div>
+}
+
+<div class="post-list">
+  @for (post of posts(); track post.slug) {
+    <article class="post-list__item">
+      @if (post.image) {
+        <a class="post-list__media" [routerLink]="['/blog', post.slug]" [attr.aria-label]="post.title">
+          <img
+            [src]="post.image.src"
+            [alt]="post.image.alt"
+            [width]="post.image.width"
+            [height]="post.image.height"
+            loading="lazy" />
+        </a>
+      }
+
+      <div class="post-list__body">
+        <div class="post-list__meta">
+          @if (post.tag) {
+            <span class="post-list__tag">{{ post.tag }}</span>
+            <span class="post-list__dot">·</span>
+          }
+          <span>{{ post.date }}</span>
+          @if (post.readingTime) {
+            <span class="post-list__dot">·</span>
+            <span>{{ post.readingTime }}</span>
+          }
+        </div>
+
+        <h2 class="post-list__title">
+          <a [routerLink]="['/blog', post.slug]">{{ post.title }}</a>
+        </h2>
+
+        <p class="post-list__excerpt">{{ post.excerpt }}</p>
+
+        <a [routerLink]="['/blog', post.slug]">Read the post »</a>
+      </div>
+    </article>
+  } @empty {
+    <p class="text-muted">No posts in this category yet.</p>
+  }
+</div>

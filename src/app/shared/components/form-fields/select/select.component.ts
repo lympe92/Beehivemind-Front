@@ -17,7 +17,6 @@ import { FieldOption } from '../../../../core/models/form-fields.model';
 @Component({
   selector: 'app-form-select',
   templateUrl: './select.component.html',
-  styleUrls: ['./select.component.scss'],
   standalone: true,
   hostDirectives: [
     {
@@ -44,7 +43,15 @@ export class SelectComponent implements ControlValueAccessor {
   resolvedOptions: FieldOption[] = [];
   value: string = '';
   disabled: boolean = false;
-  saFormControlName?: SAFormControlNameDirective | null;
+  private _saFormControlName?: SAFormControlNameDirective | null;
+  /** The host FormControlName, resolved on first use: it cannot be injected during construction,
+   *  and resolving it in a microtask left the required marker unrendered under OnPush. */
+  get saFormControlName(): SAFormControlNameDirective | null {
+    if (this._saFormControlName === undefined) {
+      this._saFormControlName = this.injector.get(SAFormControlNameDirective, null);
+    }
+    return this._saFormControlName;
+  }
   form!: FormGroup;
 
   private destroyRef = inject(DestroyRef);
@@ -53,10 +60,7 @@ export class SelectComponent implements ControlValueAccessor {
     private injector: Injector,
     private formBuilder: FormBuilder,
   ) {
-    queueMicrotask(() => {
-      this.saFormControlName = this.injector.get(SAFormControlNameDirective, null);
-      this.setupOptions();
-    });
+    queueMicrotask(() => this.setupOptions());
 
     this.form = this.formBuilder.group({
       select: [this.isMultiple ? [] : null],
@@ -93,13 +97,19 @@ export class SelectComponent implements ControlValueAccessor {
   writeValue(value: unknown): void {
     if (value !== undefined) {
       this.value = value as string;
-      this.form.get('select')?.patchValue(value);
+      this.form.get('select')?.patchValue(value, { emitEvent: false });
     }
   }
 
   registerOnChange(fn: (value: unknown) => void): void { this.onChange = fn; }
   registerOnTouched(fn: () => void): void { this.onTouched = fn; }
-  setDisabledState(isDisabled: boolean): void { this.disabled = isDisabled; }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
+    const control = this.form.get('select');
+    if (isDisabled) control?.disable({ emitEvent: false });
+    else control?.enable({ emitEvent: false });
+  }
 
   isFieldValid(): boolean {
     if (!this.saFormControlName?.errors) return false;

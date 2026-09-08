@@ -5,6 +5,5 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './request-password.html',
-  styleUrl: './request-password.scss',
 })
 export class RequestPasswordComponent {}

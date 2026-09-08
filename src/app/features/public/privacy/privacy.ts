@@ -1,10 +1,16 @@
 import { Component } from '@angular/core';
+import { PageIntroComponent } from '../../../shared/components/info-sections/page-intro/page-intro';
 
+/**
+ * ⚠ The structure and the plain-language explanations are grounded in what the
+ * app demonstrably collects. The wording is NOT legal advice and has not been
+ * reviewed. Three paragraphs marked in muted grey need real values — the
+ * lawful basis, the processor list, the retention periods — before this ships.
+ */
 @Component({
   selector: 'app-privacy',
   standalone: true,
-  imports: [],
+  imports: [PageIntroComponent],
   templateUrl: './privacy.html',
-  styleUrl: './privacy.scss',
 })
 export class PrivacyComponent {}

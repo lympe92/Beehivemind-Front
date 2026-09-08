@@ -4,12 +4,17 @@ import { LinkButtonComponent } from '../../ui/link-button/link-button';
 import { ImageConfig } from '../../ui/image/image.model';
 import { CtaLink } from '../../ui/link-button/link-button.model';
 
+/**
+ * The centred page opener: headline, a lead-size subtitle, the two calls to
+ * action, then artwork below. Same content model as HeroLeftContent.
+ * Usage: `<section app-hero-center-content …></section>`.
+ */
 @Component({
-  selector: 'app-hero-center-content',
+  selector: 'section[app-hero-center-content]',
   standalone: true,
   imports: [ImageComponent, LinkButtonComponent],
   templateUrl: './hero-center-content.html',
-  styleUrl: './hero-center-content.scss',
+  host: { class: 'container hero' },
 })
 export class HeroCenterContentComponent {
   title = input.required<string>();

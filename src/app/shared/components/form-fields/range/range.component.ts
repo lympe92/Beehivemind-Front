@@ -22,10 +22,10 @@ import { ErrorsComponent } from '../errors/errors.component';
 import { FormManagementService } from '../../../../core/services/forms-management.service';
 import { InputComponent } from '../input/input.component';
 
+/** A min/max filter: two number fields over a dual-thumb track. Styles in forms.css. */
 @Component({
   selector: 'app-form-range',
   templateUrl: './range.component.html',
-  styleUrls: ['./range.component.scss'],
   standalone: true,
   hostDirectives: [
     {
@@ -52,18 +52,21 @@ export class RangeComponent implements OnInit, ControlValueAccessor {
 
   @Output() inputChanged = new EventEmitter<string | number>();
 
-  protected value: string | number = '';
   protected disabled: boolean = false;
-  saFormControlName?: SAFormControlNameDirective | null;
-
+  private _saFormControlName?: SAFormControlNameDirective | null;
+  /** The host FormControlName, resolved on first use: it cannot be injected during construction,
+   *  and resolving it in a microtask left the required marker unrendered under OnPush. */
+  get saFormControlName(): SAFormControlNameDirective | null {
+    if (this._saFormControlName === undefined) {
+      this._saFormControlName = this.injector.get(SAFormControlNameDirective, null);
+    }
+    return this._saFormControlName;
+  }
   constructor(
     private injector: Injector,
     private formManagementService: FormManagementService,
     private destroyRef: DestroyRef,
   ) {
-    queueMicrotask((): void => {
-      this.saFormControlName = this.injector.get(SAFormControlNameDirective, null);
-    });
   }
 
   ngOnInit(): void {
@@ -71,12 +74,10 @@ export class RangeComponent implements OnInit, ControlValueAccessor {
 
     this.rangeForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(x => {
       const { minValue, maxValue } = x;
-      if (minValue > maxValue) {
+      if (minValue != null && maxValue != null && minValue > maxValue) {
         this.rangeForm.patchValue({ maxValue: minValue }, { emitEvent: false });
       }
-      if (maxValue < minValue) {
-        this.rangeForm.patchValue({ minValue: maxValue }, { emitEvent: false });
-      }
+      this.onChange(this.rangeForm.getRawValue());
     });
   }
 
@@ -84,7 +85,9 @@ export class RangeComponent implements OnInit, ControlValueAccessor {
   onTouched: () => void = () => {};
 
   writeValue(value: unknown): void {
-    if (value !== undefined) this.value = value as string | number;
+    if (value && typeof value === 'object' && this.rangeForm) {
+      this.rangeForm.patchValue(value as Record<string, unknown>, { emitEvent: false });
+    }
   }
 
   registerOnChange(fn: (value: unknown) => void): void { this.onChange = fn; }

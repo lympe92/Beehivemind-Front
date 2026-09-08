@@ -1,0 +1,74 @@
+/* Repo-owned helpers for the dashboard/admin page header. The design system
+   draws these inline in its React kit (a meta count beside the title, a back
+   link above it, a lead paragraph under it); Angular templates need a class.
+   Every value is a token from styles/tokens. */
+
+.app-page-meta {
+  font-size: 0.85rem;
+  color: var(--app-text-muted);
+}
+
+.app-page-header__end {
+  margin-left: auto;
+}
+
+.app-page-header__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.app-page-back {
+  align-self: flex-start;
+  font-size: 0.8rem;
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--app-gray-600);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--app-text-primary);
+    text-decoration: underline;
+  }
+}
+
+.app-page-lead {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--app-gray-600);
+  max-width: 64ch;
+  text-wrap: pretty;
+}
+
+.app-page-narrow {
+  max-width: 520px;
+}
+
+/* A single figure in a card — the apiary view's "Hives" and "Pending to-dos"
+   tiles. Light weight and negative tracking, the dashboard's heading voice. */
+.app-stat {
+  font-size: 2.25rem;
+  font-weight: 400;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.app-stat__sub {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: var(--app-text-muted);
+}
+
+/* A filter-bar cell that holds a button rather than a field: bottom-aligned
+   with the fields beside it. */
+.fb__group--end {
+  justify-content: flex-end;
+}
+
+/* A cell whose value is a name or a date: it reads as one token, never as
+   three lines, however many columns sit beside it (the inspections table). */
+.dt__nowrap {
+  white-space: nowrap;
+}

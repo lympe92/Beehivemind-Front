@@ -1,4 +1,4 @@
-<div class="harvest">
+<div class="app-page">
 
   <app-filter-bar
     [apiaries]="apiaries()"
@@ -8,11 +8,11 @@
     [beehiveId]="selectedBeehiveId()"
     (beehiveIdChange)="onBeehiveChange($event)" />
 
-  <app-card title="Harvest Data">
-    <button card-header-end class="harvest__btn harvest__btn--primary" (click)="startAdd()">+ Add Record</button>
+  <app-card title="Harvest Data" [flush]="true">
+    <button card-header-end type="button" class="app-btn app-btn--primary" (click)="startAdd()">+ Add Record</button>
 
     <app-data-table
-      [columns]="columns()"
+      [columns]="columns"
       [rows]="harvest()"
       [loading]="loading()"
       [showActions]="true"
@@ -20,19 +20,21 @@
 
       <ng-template #cellTpl let-row let-col="col">
         @switch (col.key) {
-          @case ('honey_description') { {{ row.honey_description || '—' }} }
           @case ('beehiveId') { {{ getBeehiveName(row.beehiveId) }} }
+          @case ('date') { {{ row.date | date:'mediumDate' }} }
+          <!-- The source uses || rather than ??, so an empty string also falls back to the dash. -->
+          @case ('honey_description') { {{ row.honey_description || '—' }} }
+          @case ('food_quantity') { {{ row.food_quantity }} {{ row.unit }} }
           @default { {{ row[col.key] ?? '—' }} }
         }
       </ng-template>
 
       <ng-template #actionsTpl let-row>
-        <button class="harvest__btn harvest__btn--ghost harvest__btn--sm" (click)="startEdit(row)">Edit</button>
-        <button class="harvest__btn harvest__btn--danger harvest__btn--sm" (click)="deleteRow(row)">Delete</button>
+        <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
+        <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
       </ng-template>
 
     </app-data-table>
-
   </app-card>
 
 </div>

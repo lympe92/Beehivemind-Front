@@ -1,0 +1,32 @@
+/* Layout — breakpoints from _variables.scss, container widths from _utilities.scss.
+   The container is stepped, not fluid: it snaps to a fixed max-width per
+   breakpoint so the side gutters grow rather than the measure. */
+
+:root {
+  --bp-sm: 576px;
+  --bp-md: 768px;
+  --bp-lg: 992px;
+  --bp-xl: 1200px;
+  --bp-xxl: 1400px;
+  --bp-xxxl: 1600px;
+
+  --container-sm: 540px;
+  --container-md: 720px;
+  --container-lg: 960px;
+  --container-xl: 1140px;
+  --container-xxl: 1320px;
+  --container-xxxl: 1520px;
+  --container-padding: var(--gutter);
+
+  /* Heroes clear the fixed header and then take --band-y-lg of their own.
+     Was a flat 120px loosening to 13% at lg — a percentage of width deciding
+     how far the first headline sat from the top of the page. */
+  --hero-offset: var(--header-height);
+
+  /* .section-divider draws a 2px primary rule with --band-y above and below */
+  --divider-height: 2px;
+  --divider-color: var(--color-primary);
+
+  /* mobile app content column — global.scss caps ion-content at 480px */
+  --app-content-max: 480px;
+}

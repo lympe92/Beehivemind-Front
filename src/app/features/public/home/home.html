@@ -1,42 +1,62 @@
-@if (pageData$ | async; as page) {
-  <app-hero-left-content
+<main>
+  <section app-hero-left-content
     [title]="page.hero.title"
     [subtitle]="page.hero.subtitle"
     [image]="page.hero.image"
     [primaryCta]="page.hero.primaryCta"
-    [secondaryCta]="page.hero.secondaryCta" />
+    [secondaryCta]="page.hero.secondaryCta"
+    [proof]="page.hero.proof ?? []"></section>
 
-  <app-ribbon
+  <section app-ribbon
     [mode]="page.ribbon1.mode"
     [quote]="page.ribbon1.quote"
-    [author]="page.ribbon1.author" />
+    [author]="page.ribbon1.author"></section>
 
-  <app-split-accordion
+  <section app-split-content
+    [title]="page.productShot.title"
+    [description]="page.productShot.description"
+    [steps]="page.productShot.steps ?? []"
+    [image]="page.productShot.image"
+    mediaSide="end"></section>
+
+  <section app-split-accordion
     [title]="page.splitAccordion.title"
     [image]="page.splitAccordion.image"
-    [items]="page.splitAccordion.items" />
+    [items]="page.splitAccordion.items"></section>
 
-  <app-features-row
+  <section app-features-row
     [items]="page.featuresRow.items"
-    [cta]="page.featuresRow.cta" />
+    [cta]="page.featuresRow.cta"></section>
 
-  <app-ribbon
+  <section app-ribbon
     [mode]="page.ribbon2.mode"
-    [quote]="page.ribbon2.quote" />
+    [quote]="page.ribbon2.quote"
+    [author]="page.ribbon2.author"></section>
 
-  <app-split-list
+  <section app-split-list
     [title]="page.splitList.title"
     [items]="page.splitList.items"
     [image]="page.splitList.image"
-    [cta]="page.splitList.cta" />
+    [cta]="page.splitList.cta"></section>
 
-  <app-info-columns
-    [mode]="page.infoColumns.mode"
+  <section app-pricing-tiers
+    [title]="page.pricing.title"
+    [note]="page.pricing.note ?? ''"
+    [tiers]="page.pricing.tiers"></section>
+
+  <section app-application-download
+    [title]="page.applicationDownload.title"
+    [subtitle]="page.applicationDownload.subtitle"
+    [logo]="page.applicationDownload.logo"
+    [storeLinks]="page.applicationDownload.storeLinks"></section>
+
+  <section app-info-columns
+    [mode]="page.infoColumns.mode ?? 'default'"
     [title]="page.infoColumns.title"
-    [items]="page.infoColumns.items" />
+    [items]="page.infoColumns.items"></section>
 
-  <app-cta-banner
+  <section app-cta-banner
     [title]="page.ctaBanner.title"
-    [description]="page.ctaBanner.description"
-    [cta]="page.ctaBanner.cta" />
-}
+    [description]="page.ctaBanner.description ?? ''"
+    [cta]="page.ctaBanner.cta"></section>
+</main>

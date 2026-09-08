@@ -1,4 +1,4 @@
-<div class="feeding">
+<div class="app-page">
 
   <app-filter-bar
     [apiaries]="apiaries()"
@@ -8,8 +8,8 @@
     [beehiveId]="selectedBeehiveId()"
     (beehiveIdChange)="onBeehiveChange($event)" />
 
-  <app-card title="Feeding Data">
-    <button card-header-end class="feeding__btn feeding__btn--primary" (click)="startAdd()">+ Add Record</button>
+  <app-card title="Feeding Data" [flush]="true">
+    <button card-header-end type="button" class="app-btn app-btn--primary" (click)="startAdd()">+ Add Record</button>
 
     <app-data-table
       [columns]="columns"
@@ -18,13 +18,21 @@
       [showActions]="true"
       emptyMessage="No feeding records found.">
 
+      <ng-template #cellTpl let-row let-col="col">
+        @switch (col.key) {
+          @case ('beehiveId') { {{ beehiveName(row.beehiveId) }} }
+          @case ('date') { {{ row.date | date:'mediumDate' }} }
+          @case ('food_quantity') { {{ row.food_quantity }} {{ row.unit }} }
+          @default { {{ row[col.key] ?? '—' }} }
+        }
+      </ng-template>
+
       <ng-template #actionsTpl let-row>
-        <button class="feeding__btn feeding__btn--ghost feeding__btn--sm" (click)="startEdit(row)">Edit</button>
-        <button class="feeding__btn feeding__btn--danger feeding__btn--sm" (click)="deleteRow(row)">Delete</button>
+        <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
+        <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
       </ng-template>
 
     </app-data-table>
-
   </app-card>
 
 </div>

@@ -1,42 +1,39 @@
-<section class="container section-divider">
-  <div class="flex-col lg:flex-row">
-    <div class="w-full lg:w-1/2 rightp">
-      <h2>{{ title() }}</h2>
-      <app-image
-        [src]="image().src"
-        [alt]="image().alt"
-        [width]="image().width"
-        [height]="image().height"
-        [priority]="image().priority ?? false" />
-    </div>
-    <div class="w-full lg:w-1/2">
-      <div role="tablist" id="accordion-1">
-        @for (item of items(); track item.title; let i = $index) {
-          <div class="card">
-            <div class="card-header" role="tab">
-              <h3 class="mb-0">
-                <a data-toggle="collapse"
-                   [attr.aria-expanded]="i === 0"
-                   [attr.aria-controls]="'accordion-1 .item-' + (i + 1)"
-                   [attr.href]="'div#accordion-1 .item-' + (i + 1)"
-                   class="colbl">
-                  {{ item.title }}
-                  <span style="color:#ec861f;">»</span>
-                </a>
-              </h3>
-            </div>
-            <div [class]="'collapse' + (i === 0 ? ' show' : '') + ' item-' + (i + 1)"
-                 role="tabpanel" data-parent="#accordion-1">
-              <div class="card-body">
-                <h5 class="card-text text-justify">{{ item.body }}</h5>
-                @if (item.linkHref) {
-                  <a class="colport" [href]="item.linkHref">{{ item.linkLabel }}</a>
+<div class="flex-col lg:flex-row gap-band">
+  <div class="w-full lg:w-half">
+    <h2>{{ title() }}</h2>
+    <app-image
+      [src]="image().src"
+      [alt]="image().alt"
+      [width]="image().width"
+      [height]="image().height"
+      [priority]="image().priority ?? false" />
+  </div>
+  <div class="w-full lg:w-half">
+    <div>
+      @for (item of items(); track item.title; let i = $index) {
+        <div class="split-accordion__row">
+          <button
+            type="button"
+            class="split-accordion__header"
+            [attr.aria-expanded]="open() === i"
+            (click)="toggle(i)">
+            <span>{{ item.title }}</span>
+            <span class="split-accordion__chevron" aria-hidden="true">»</span>
+          </button>
+          @if (open() === i) {
+            <div class="split-accordion__body">
+              <p>{{ item.body }}</p>
+              @if (item.linkHref) {
+                @if (isExternal(item.linkHref)) {
+                  <a [href]="item.linkHref" target="_blank" rel="noopener noreferrer">{{ item.linkLabel }}</a>
+                } @else {
+                  <a [routerLink]="item.linkHref">{{ item.linkLabel }}</a>
                 }
-              </div>
+              }
             </div>
-          </div>
-        }
-      </div>
+          }
+        </div>
+      }
     </div>
   </div>
-</section>
+</div>

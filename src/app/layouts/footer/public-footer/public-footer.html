@@ -1,107 +1,41 @@
-<footer>
-  <!-- Footer Links -->
-  <div class="container text-center text-md-left mt-5">
-
-    <!-- Grid row -->
-    <div class="row mt-3 dark-grey-text">
-
-      <!-- Grid column -->
-      <div class="col-md-3 col-lg-4 col-xl-3 mb-4">
-
-        <!-- Content -->
-        <h6 class="text-uppercase font-weight-bold">Beehivemind</h6>
-        <hr class="teal accent-3 mb-4 mt-0 d-inline-block mx-auto lineft">
-        <h6 class="text-justify">BeehiveMind bee&shy;kee&shy;ping soft&shy;wa&shy;re ma&shy;kes inte&shy;gra&shy;ted
-          bee&shy;kee&shy;ping ma&shy;na&shy;ge&shy;ment possi&shy;ble through a va&shy;rie&shy;ty of fea&shy;tu&shy;res
-          that allows you to work sma&shy;rter, fa&shy;ster and chea&shy;per.</h6>
-
+<footer class="public-footer">
+  <div class="container">
+    <div class="public-footer__grid">
+      <div>
+        <h6 class="public-footer__heading">Beehivemind</h6>
+        <hr class="public-footer__rule">
+        <p class="public-footer__blurb">
+          BeehiveMind beekeeping software makes integrated beekeeping management
+          possible through a variety of features that allows you to work smarter,
+          faster and cheaper.
+        </p>
       </div>
-      <!-- Grid column -->
 
-      <!-- Grid column -->
-      <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
-
-        <!-- Links -->
-        <h6 class="text-uppercase font-weight-bold">Software</h6>
-        <hr class="teal accent-3 mb-4 mt-0 d-inline-block mx-auto lineft">
-        <h6>
-          <a class="colbl" href="/features">Features</a>
-        </h6>
-        <h6>
-          <a class="colbl" href="/app">App</a>
-        </h6>
-
-        <h6>
-          <a class="colbl" target="_blank" href="https://play.google.com/store/apps/details?id=org.beehivemindR">Android
-            App</a>
-        </h6>
-        <h6>
-          <a class="colbl" target="_blank" href="https://play.google.com/store/apps/details?id=org.beehivemindR">IOS
-            App</a>
-        </h6>
-        <h6>
-          <a class="colbl" target="_blank" href="https://beehivemind.freshdesk.com/support/home">Help</a>
-        </h6>
-      </div>
-      <!-- Grid column -->
-
-      <!-- Grid column -->
-      <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-4">
-
-        <!-- Links -->
-        <h6 class="text-uppercase font-weight-bold">How to</h6>
-        <hr class="teal accent-3 mb-4 mt-0 d-inline-block mx-auto lineft">
-
-        <h6>
-          <a class="colbl" href="/inspections">Inspections</a>
-        </h6>
-        <h6>
-          <a class="colbl" href="/apiariesandbeehives">Apiaries & Hives</a>
-        </h6>
-        <h6>
-          <a class="colbl" href="/harvestandfeeding">Harvest & Feeding</a>
-        </h6>
-        <h6>
-          <a class="colbl" href="/financial">Financial</a>
-        </h6>
-
-      </div>
-      <!-- Grid column -->
-
-      <!-- Grid column -->
-      <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-md-0 mb-4">
-
-        <!-- Links -->
-        <h6 class="text-uppercase font-weight-bold">Follow us</h6>
-        <hr class="teal accent-3 mb-4 mt-0 d-inline-block mx-auto lineft">
-        <h6>
-          <a class="colbl" target="_blank" href="https://www.facebook.com/beehivemind.org">Facebook</a>
-        </h6>
-        <h6>
-          <a class="colbl" target="_blank" href="https://www.instagram.com/beehivemind_org">Instagram</a>
-        </h6>
-        <h6>
-          <a class="colbl" target="_blank" href="https://twitter.com/Beehivemind_org">Twitter</a>
-        </h6><h6>
-        <a class="colbl" target="_blank" href="https://www.linkedin.com/company/beehivemind-beekeeping-software">Linkedin</a>
-      </h6><h6>
-        <a class="colbl" target="_blank"
-           href="https://www.youtube.com/channel/UCSacxrpIMgWoWhLORBY5HcQ">Youtube</a>
-      </h6>
-
-      </div>
-      <!-- Grid column -->
-
+      @for (column of columns; track column.heading) {
+        <div>
+          <h6 class="public-footer__heading">{{ column.heading }}</h6>
+          <hr class="public-footer__rule">
+          <ul class="public-footer__links">
+            @for (link of column.links; track link.label) {
+              <li>
+                @if (link.external) {
+                  <a class="public-footer__link" [href]="link.href" target="_blank" rel="noopener noreferrer">{{ link.label }}</a>
+                } @else {
+                  <a class="public-footer__link" [routerLink]="link.href">{{ link.label }}</a>
+                }
+              </li>
+            }
+          </ul>
+        </div>
+      }
     </div>
-    <!-- Grid row -->
 
+    <div class="public-footer__copyright">
+      <a routerLink="/privacy">Privacy</a>
+      ·
+      <a routerLink="/terms">Terms</a>
+      ·
+      © {{ year }} Copyright: <a href="https://beehivemind.org/">Beehivemind</a>
+    </div>
   </div>
-  <!-- Footer Links -->
-
-  <!-- Copyright -->
-  <div class="footer-copyright text-center text-black-50 py-3">© 2021 Copyright:
-    <a class="dark-grey-text" href="https://beehivemind.org/"> Beehivemind</a>
-  </div>
-  <!-- Copyright -->
-
 </footer>

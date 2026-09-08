@@ -1,0 +1,17 @@
+<main>
+  <section app-page-intro
+    [title]="page.intro.title"
+    [lead]="page.intro.lead ?? ''"></section>
+
+  <section app-pricing-tiers
+    [title]="page.pricing.title"
+    [tiers]="page.pricing.tiers"></section>
+
+  <!-- level 2: the section sits under the page h1 with no heading between. -->
+  <section app-text-columns [columns]="page.questions" [level]="2"></section>
+
+  <section app-cta-banner
+    [title]="page.ctaBanner.title"
+    [description]="page.ctaBanner.description ?? ''"
+    [cta]="page.ctaBanner.cta"></section>
+</main>

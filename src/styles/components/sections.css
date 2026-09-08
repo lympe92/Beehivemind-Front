@@ -1,0 +1,1082 @@
+/* Section-level styles — the per-component SCSS from shared/components, gathered
+   into one file. Sections are full-bleed bands; the .container inside them is
+   what holds the measure. Vertical rhythm is expressed in percentages rather
+   than the spacing scale, which is how the source does it. */
+
+/* Heroes clear the fixed public header, then take the loosest band above their
+   headline and a standard one below. */
+.hero {
+  margin-top: var(--hero-offset);
+  padding-block: var(--band-y-lg) var(--band-y);
+}
+
+/* ---------- Ribbon ----------
+   A full-bleed pull quote. The default mode is transparent with white text, so
+   it only reads on a dark parent; --dark carries its own charcoal. */
+.ribbon {
+  color: var(--color-white);
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  /* A pull quote is two lines; it takes the tight band, not the standard one. */
+  padding-block: var(--band-y-sm);
+}
+
+/* The two headings that are COPY rather than labels, so they keep the
+   editorial 400 while h4-h6 step to 500. See the role note in
+   tokens/typography.css — this is the complete opt-out list.
+
+   The hero subtitle carries a class of its own precisely because an unclassed
+   element selector is what let it drift in the first place. */
+/* The hero subtitle keeps the h4 setting it used to inherit from being an h4.
+   It is a paragraph now — see HeroLeftContent.jsx — so it needs the size
+   stated, and weight 400 comes from body copy rather than from an opt-out. */
+.hero-left__subtitle {
+  font-size: var(--h4-size-sm);
+  letter-spacing: var(--h4-tracking);
+  line-height: var(--line-height-heading);
+  color: var(--text-lead);
+  margin-bottom: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .hero-left__subtitle {
+    font-size: var(--h4-size);
+  }
+}
+
+/* ---------- Split content ----------
+   A grid, not the w-half utilities. Those step to 50% at 768px, which put the
+   24px description in a 310px column running 25 characters a line — the same
+   measure defect already ruled out three times in this file (features-row at
+   146px/18 characters, pricing at 194px/13, TextColumns). Two-up at 992. */
+.split-content__row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--band-gap-y) var(--band-gap-x);
+  /* Centre BOTH columns. Only the text column was centred before, so the media
+     column stretched to the text's height and left 596px of dead space around
+     a 138px image — 81% of its own column empty, and worse once the steps made
+     the text taller. */
+  align-items: center;
+}
+
+@media (min-width: 992px) {
+  .split-content__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* The media's side is the caller's call, by column placement rather than a
+     reversed row — so the DOM keeps its reading order and the stacked layout
+     below 992 is unaffected. */
+  .split-content__row--media-end .split-content__media {
+    order: 2;
+  }
+}
+
+/* SplitContent's description is a real paragraph now, so it needs the h4 size
+   it used to get from being an h4. */
+.split-content__description {
+  font-size: var(--h4-size-sm);
+  letter-spacing: var(--h4-tracking);
+  line-height: var(--line-height-base);
+  color: var(--text-lead);
+}
+
+/* No `text-justify` here any more: justified text in a half-column measure
+   opens rivers, and Peridot at 20px with negative tracking shows them. */
+
+.split-content__steps {
+  counter-reset: step;
+  list-style: none;
+  margin: var(--spacing-xl) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.split-content__steps li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 34px;
+}
+
+/* The numeral is the mark, so it takes the accent — a fill would be a second
+   coloured ground in a band that already has the screen recording in it. */
+.split-content__steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 22px;
+  font-size: var(--structural-size);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--structural-tracking);
+  color: var(--color-primary-hover);
+}
+
+.split-content__step-title {
+  display: block;
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--text-heading);
+}
+
+.split-content__step-body {
+  display: block;
+  margin-top: 4px;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+  color: var(--text-lead);
+  text-wrap: pretty;
+}
+
+@media (min-width: 768px) {
+  .split-content__description {
+    font-size: var(--h4-size);
+  }
+}
+
+/* The pull quote is a blockquote now, not an h4 plus an h5 — so nothing here
+   has to opt out of a heading rule it should never have matched. It keeps the
+   h4 setting, because the design wants a pull quote at 20px. */
+.ribbon__quote {
+  margin: 0;
+  text-align: center;
+}
+
+.ribbon__quote p {
+  margin: 0;
+  font-size: var(--h4-size-sm);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--h4-tracking);
+  line-height: var(--line-height-heading);
+}
+
+/* The quotation marks live here, so the page data stays a plain sentence and
+   nobody has to remember to type them. */
+.ribbon__quote p::before { content: "\201C"; }
+.ribbon__quote p::after { content: "\201D"; }
+
+/* A cite is italic by default; this is a person, not the title of a work, so
+   it reads upright at the h5 size it had. */
+.ribbon__author {
+  display: block;
+  margin-top: var(--spacing-sm);
+  font-size: var(--h5-size-sm);
+  font-style: normal;
+  letter-spacing: var(--h5-tracking);
+}
+
+@media (min-width: 768px) {
+  .ribbon__quote p { font-size: var(--h4-size); }
+  .ribbon__author { font-size: var(--h5-size); }
+}
+
+.ribbon--dark {
+  background-color: var(--surface-ribbon-dark);
+  color: var(--color-white);
+}
+
+/* The base heading rule sets an explicit --text-heading, which beat the band's
+   inherited white: every dark-band pull quote was #212121 on #212121, so the
+   quote was invisible and the band read as an empty stripe. Headings on the
+   dark bands inherit. */
+.ribbon--dark :where(h1, h2, h3, h4, h5, h6),
+.cta-banner :where(h1, h2, h3, h4, h5, h6) {
+  color: inherit;
+}
+
+/* ---------- Info columns ---------- */
+.info-columns--light {
+  background-color: var(--surface-section-light);
+}
+
+/* A section title over a 3-up grid is a band-level relationship, so it takes
+   the band gap rather than a heading's default margin. Removing the item's
+   vertical padding was right at the band edge and wrong here — it had been
+   supplying this space by accident. */
+.info-columns__title {
+  font-size: 56px;
+  letter-spacing: -2px;
+  margin-bottom: var(--band-gap-y);
+  /* 400 like every other heading. The 500 here was the system's one stated
+     exception to "all headings are 400", and it was carrying an optical claim
+     (that 400 goes faint on grey) that #212121 on #f5f5f5 at 15.3:1 does not
+     support. */
+  font-weight: var(--font-weight-normal);
+}
+
+@media (max-width: 767px) {
+  .info-columns__title {
+    font-size: 32px;
+  }
+}
+
+/* No vertical padding. The item sat inside a band that already owns its space
+   and a grid that already has `gap-band` between its rows, so its own 24px top
+   and bottom were a third layer doing page-level work with a component token —
+   which is what the spacing rule forbids. Below the last figure it added 24px
+   to the band's own padding, and that is most of why the boundary with the
+   closing banner still read as a hole after the band padding was halved.
+
+   The inline padding stays: it keeps a three-digit figure off the column edge
+   when the grid is tight. */
+.info-columns__item {
+  padding-inline: var(--spacing-md);
+}
+
+/* A recorded figure, so 700 — the same rule as the dashboard's emphasised
+   numbers and the mobile value rows. It carried a phantom `h2` class and
+   rendered at 16px/400, identical to its own label.
+
+   h3, not h2. `.info-columns__title` is itself an h2 at 56px, so a 56px figure
+   at 700 out-shouted the heading of the band it sits in — four competing 56px
+   lines in one band, and 87px of extra band height for the same content. One
+   step down is unmistakably dominant over an 11px label and clearly
+   subordinate to the title. */
+.info-columns__figure {
+  margin: 0;
+  font-size: var(--h3-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--h3-tracking);
+  line-height: 1.1;
+  color: var(--text-heading);
+}
+
+/* The label names the figure, so it is the structural voice — the same
+   treatment a metric label gets on the weather card. */
+.info-columns__label {
+  margin: 6px 0 0;
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Muted grey is 4.61:1 on white but 4.23:1 on this band's tint, so on the
+   tinted variant it steps to the darker grey. The rule is the system's own and
+   this is its fourth application — see CLAUDE.md, screen sweep. */
+.info-columns--light .info-columns__label {
+  color: var(--color-dark-grey);
+}
+
+@media (min-width: 768px) {
+  .info-columns__figure {
+    font-size: var(--h3-size);
+  }
+}
+
+/* ---------- Hero, centred variant ---------- */
+.hero-center__subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--text-lead);
+  max-width: 46ch;
+  margin-inline: auto;
+}
+
+.hero-center__actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-block: var(--spacing-lg);
+}
+
+.hero-center__image {
+  margin-top: var(--spacing-xl);
+}
+
+.hero-center__image img {
+  margin-inline: auto;
+}
+
+/* ---------- Hero, left-content variant ---------- */
+.hero-left__actions {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-lg);
+}
+
+/* On mobile the artwork comes first; from lg it sits in the right column. */
+.hero-left__media {
+  order: -1;
+}
+
+@media (min-width: 992px) {
+  .hero-left__media {
+    order: 0;
+  }
+}
+
+.hero-left__media img {
+  margin-inline: auto;
+}
+
+/* ---------- Split accordion ----------
+   Copy and artwork on the left, an expanding list on the right. Rows are
+   separated by hairlines rather than boxed as cards. */
+.split-accordion__row {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.split-accordion__header {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-family-heading);
+  font-size: var(--h3-size-sm);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--h3-tracking);
+  color: var(--text-heading);
+  transition: var(--transition-base);
+}
+
+/* The label holds its ink; the orange guillemet beside it and the underline
+   carry the hover. */
+.split-accordion__header:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--color-primary);
+  text-underline-offset: 3px;
+}
+
+/* The guillemet reads as a glyph at 26px, not as a mark, so it follows the
+   text rule and stays ink rather than orange. */
+/* An outline button on a dark band: keep the orange hairline, flip the ink
+   label to white. Hover is unchanged — orange fill, white label — so the accent
+   still does the loud part. Without this the label is #212121 on #212121.
+   The .ribbon--dark half is defensive; today's dark ribbons are text-only. */
+.cta-banner .btn--outline,
+.ribbon--dark .btn--outline {
+  color: var(--color-white);
+}
+
+.split-accordion__chevron {
+  color: var(--color-secondary);
+  flex: none;
+}
+
+.split-accordion__body {
+  padding-bottom: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.split-accordion__body p {
+  margin: 0;
+  text-align: justify;
+  font-size: var(--h5-size-sm);
+  line-height: var(--line-height-base);
+  color: var(--text-body);
+}
+
+/* ---------- Features row ----------
+   Four equal columns of title-over-justified-copy, then one centred CTA. */
+.features-row__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--band-gap-y) var(--band-gap-x);
+  margin-bottom: var(--band-gap-y);
+}
+
+/* Four columns is a 1200px layout. At 768 it put a justified paragraph in a
+   146px measure — about eighteen characters a line. Two-up until the container
+   is wide enough to carry four. */
+@media (min-width: 768px) {
+  .features-row__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .features-row__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.features-row__item h3 {
+  margin-bottom: var(--spacing-sm);
+}
+
+.features-row__item p {
+  text-align: justify;
+  font-size: var(--h6-size-sm);
+  letter-spacing: var(--h6-tracking);
+  line-height: var(--line-height-base);
+  margin: 0;
+}
+
+/* ---------- Split list ----------
+   Its own grid rather than the w-half utilities, for the same reason as
+   SplitContent: those step to 50% at 768px, and a two-up at that width puts a
+   heading and three labelled items in a ~310px measure. Two-up at 992. */
+.split-list__row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--band-gap-y) var(--band-gap-x);
+  align-items: center;
+}
+
+@media (min-width: 992px) {
+  .split-list__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Inside the breakpoint only — below it the column stacks in DOM order,
+     text then image, whichever side the media takes on a wide screen. That is
+     what keeps a repeated series identical on a phone. */
+  .split-list__row--media-start .split-list__media {
+    order: -1;
+  }
+}
+
+.split-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.split-list__items h3 {
+  margin-bottom: var(--spacing-xs);
+}
+
+.split-list__items p {
+  margin: 0;
+}
+
+.split-list__cta {
+  margin-top: var(--spacing-xl);
+}
+
+/* ---------- Hero proof strip ----------
+   Three short facts under the hero actions. Not a feature list and not cards:
+   the moment this gets icons or boxes it becomes a section, and it has to stay
+   a footnote to the actions above it. Separated by a rule between items, which
+   is what keeps three phrases from reading as one sentence. */
+.hero-left__proof {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px var(--spacing-md);
+  margin: var(--spacing-lg) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-left__proof li {
+  display: flex;
+  align-items: center;
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--color-dark-grey);
+}
+
+.hero-left__proof li + li::before {
+  content: "";
+  width: 1px;
+  height: 11px;
+  margin-right: var(--spacing-md);
+  background: var(--color-light-grey);
+}
+
+/* ---------- Pricing ---------- */
+/* The space under the title belonged to `.pricing__note`, which is optional —
+   the homepage passes one and the plans page does not, so on /pricing the
+   heading sat 8px above the cards with nothing between them. A gap that a
+   region needs cannot be carried by a child that may not exist.
+
+   So the title owns it, and tightens only when a note is actually there to
+   absorb it. */
+.pricing__title {
+  margin-bottom: var(--band-gap-y);
+}
+
+.pricing__title:has(+ .pricing__note) {
+  margin-bottom: var(--spacing-sm);
+}
+
+.pricing__note {
+  max-width: 56ch;
+  margin: 0 auto var(--band-gap-y);
+  text-align: center;
+  color: var(--text-lead);
+  text-wrap: pretty;
+}
+
+.pricing__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--band-gap-y) var(--band-gap-x);
+  align-items: start;
+}
+
+/* Three tiers, one column until there is measure for three.
+
+   Not at 768: three columns there are 194px wide, which puts a five-line
+   bullet list in a 13-character measure — narrower than the two cases already
+   rejected in this file (`features-row` at 146px/18 characters, the footer at
+   224px/28), and this card holds more text than either. And a 2-up step is no
+   use for three tiers, it strands one card. At 992 a column is about 300px. */
+@media (min-width: 992px) {
+  .pricing__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pricing__tier {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: var(--color-white);
+}
+
+/* The common choice is marked by a 2px ink edge, not an accent fill: the fill
+   belongs to the action inside the card, and two accent grounds compete. */
+.pricing__tier--featured {
+  border: 2px solid var(--color-dark);
+  padding-block: calc(var(--spacing-xl) - 1px);
+}
+
+.pricing__flag {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-dark);
+  color: var(--color-white);
+  font-size: var(--structural-size-sm);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pricing__tier-name {
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* A price is a recorded figure, so 700 — the same rule as the info figures. */
+.pricing__price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 6px 0 0;
+  font-size: var(--h3-size);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--h3-tracking);
+  line-height: 1.1;
+  color: var(--text-heading);
+}
+
+.pricing__period {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: 0;
+  color: var(--text-muted);
+}
+
+.pricing__for {
+  margin: var(--spacing-sm) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-lead);
+  text-wrap: pretty;
+}
+
+.pricing__list {
+  margin: var(--spacing-lg) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.pricing__list li {
+  position: relative;
+  padding-left: 20px;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+}
+
+/* The accent as a mark, which is what the accent is for. */
+.pricing__list li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.55em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+/* margin-top: auto so three cards of unequal copy still line their buttons up
+   — the same fix the dashboard tiles needed. */
+.pricing__action {
+  margin-top: auto;
+  padding-top: var(--spacing-xl);
+}
+
+.pricing__action .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ---------- Where two filled bands meet ----------
+   A band owns its space above and below, so two adjacent bands read as double.
+   On paper that is breathing room and it is intended — the white between them
+   is the page.
+
+   Between two FILLED bands it is not. "Trusted partner" ends, then 72px of
+   grey, then 112px of black, then the closing question: 184px in which nothing
+   happens except the colour changing. The double is invisible on paper and
+   very visible once both halves are painted.
+
+   So at a shared edge each side gives up most of its half. The boundary still
+   reads, because the colour change IS the boundary — which is also why
+   CLAUDE.md forbids a dark ribbon directly against the cta-banner: there the
+   colour does not change, so nothing would be left to read it by.
+
+   `:is()`, not `:where()`. A band override has to out-rank both
+   `main > section` (0,0,2) and the band's own class rule (0,1,0), and
+   `:where()` zeroes its argument's specificity — so the same rules written
+   with it matched correctly and lost every time. `:is()` takes the specificity
+   of its most specific argument, making these (0,2,0). */
+:is(.info-columns--light, .ribbon--dark, .cta-banner)
+  + :is(.info-columns--light, .ribbon--dark, .cta-banner) {
+  padding-top: var(--band-y-sm);
+}
+
+:is(.info-columns--light, .ribbon--dark, .cta-banner):has(
+    + :is(.info-columns--light, .ribbon--dark, .cta-banner)
+  ) {
+  padding-bottom: var(--band-y-sm);
+}
+
+/* ---------- CTA banner ----------
+   The page's closing band: ink, centred, one action. One per page. */
+.cta-banner {
+  background-color: var(--surface-band-dark);
+  color: var(--color-white);
+  padding-block: var(--band-y-lg);
+}
+
+.cta-banner__title,
+.cta-banner__text {
+  text-align: center;
+  color: var(--color-white);
+}
+
+.cta-banner__text {
+  max-width: 60ch;
+  margin-inline: auto;
+}
+
+/* The space between a band's copy and its action, on the action — not as a
+   margin-bottom on the text, which is where it used to be and never applied:
+   the text is `:last-child` of its wrapper, so the band's trailing-margin
+   reset (0,1,2) out-ranked `.cta-banner__text` (0,1,0) and zeroed it. The
+   button sat flush against the sentence above it.
+
+   A band token, not `--spacing-xl`: copy-to-action inside a band is
+   page-level space, the same call as the section title over the info grid. */
+.cta-banner__action {
+  margin-top: var(--band-gap-y);
+  text-align: center;
+}
+
+/* ---------- Application download ---------- */
+.app-download {
+  padding-block: var(--band-y);
+}
+
+.app-download__logo {
+  margin-block: var(--spacing-lg);
+}
+
+.app-download__stores {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-lg);
+}
+
+.app-download__stores img {
+  height: 48px;
+  width: auto;
+}
+
+/* ---------- Features list CTA ---------- */
+.features-list-cta__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--band-gap-y) var(--band-gap-x);
+  margin-block: var(--band-gap-y);
+}
+
+@media (min-width: 768px) {
+  .features-list-cta__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .features-list-cta__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.features-list-cta__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.features-list-cta__item p {
+  margin: 0;
+  text-align: justify;
+}
+
+/* ---------- Split content / text-center column / text columns ---------- */
+.text-center-column__subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--text-lead);
+  max-width: 46ch;
+  margin-inline: auto;
+}
+
+.text-center-column__image {
+  margin-top: var(--spacing-xl);
+}
+
+.text-center-column__image img {
+  margin-inline: auto;
+}
+
+/* Vertical padding comes from the band rule in base.css. */
+.text-columns {
+  padding-block: var(--band-y);
+}
+
+.text-columns h3 {
+  margin-bottom: var(--spacing-sm);
+}
+
+.text-columns p {
+  margin: 0;
+}
+
+/* ---------- Prose ----------
+   Long-form body copy for the pages that are words rather than sections:
+   privacy, help articles, blog posts. Kept in the website's vocabulary —
+   light headings, orange accents, hairline rules, no cards. */
+.prose {
+  max-width: 68ch;
+  margin-inline: auto;
+}
+
+.prose > * + * {
+  margin-top: var(--spacing-md);
+}
+
+.prose h2 {
+  margin-top: var(--spacing-2xl);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--h3-size-sm);
+  letter-spacing: var(--h3-tracking);
+}
+
+.prose h3 {
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--h4-size);
+  letter-spacing: var(--h4-tracking);
+}
+
+.prose p,
+.prose li {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-base);
+  text-wrap: pretty;
+}
+
+/* Bulleted lists need their markers back — the reset strips them site-wide. */
+.prose ul {
+  list-style: disc;
+  padding-left: 1.35em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.prose ul li::marker {
+  color: var(--color-primary);
+}
+
+.prose strong {
+  font-weight: var(--font-weight-bold);
+}
+
+/* A definition row — used for the voice command reference and any
+   term-then-explanation pair. */
+.prose__defs {
+  display: flex;
+  flex-direction: column;
+}
+
+.prose__def {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  padding: var(--spacing-md) 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.prose__def:last-child {
+  border-bottom: none;
+}
+
+@media (min-width: 768px) {
+  .prose__def {
+    grid-template-columns: 15rem 1fr;
+    gap: var(--spacing-lg);
+    align-items: baseline;
+  }
+}
+
+.prose__term {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-heading);
+}
+
+/* A gloss under a term: small running text, so it takes the muted grey.
+   It used to be orange, which is 2.4:1 on white at 14px. */
+.prose__term em {
+  display: block;
+  font-style: normal;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.prose__desc {
+  margin: 0;
+  color: var(--text-lead);
+}
+
+/* The dateline above a legal or editorial document. */
+.doc-meta {
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ---------- Page intro ----------
+   A lighter opener than a hero, for pages that are documents rather than
+   pitches: no artwork, no calls to action. */
+.page-intro {
+  padding-block: var(--band-y-lg) var(--band-y-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.page-intro__lead {
+  max-width: 60ch;
+  margin-block: var(--spacing-md) 0;
+}
+
+/* ---------- Post list ----------
+   Hairline-separated rows rather than cards, matching SplitAccordion's
+   vocabulary. Cards would be the first shadowed box on the whole site. */
+/* ---------- Post filter ----------
+   The chips filter the list they sit above, so they live inside the list's
+   band — a filter is part of the list, not a band of its own. They are labels
+   of the same kind as .post-list__tag, so they take the structural voice, not
+   a button voice: the row names categories, it does not act. Pill radius
+   because every control on the marketing site is a pill. */
+.post-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--band-gap-y);
+}
+
+.post-filter__chip {
+  font-family: inherit;
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--color-dark-grey);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+/* Ink border on hover, matching the body-link rule: the state is a rule
+   change, never a shift in the label's own colour. */
+.post-filter__chip:hover {
+  border-color: var(--color-secondary);
+  color: var(--text-heading);
+}
+
+/* Selected is an ink fill, which is the one ground on this site that carries a
+   white label. Not orange: orange never carries text. */
+.post-filter__chip[aria-pressed="true"] {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: var(--color-white);
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-list__item {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  padding-block: var(--spacing-xl);
+  border-bottom: 1px solid var(--border-color);
+}
+
+@media (min-width: 768px) {
+  .post-list__item {
+    grid-template-columns: 16rem 1fr;
+    gap: var(--band-gap-x);
+  }
+}
+
+.post-list__media {
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+  aspect-ratio: 16 / 10;
+}
+
+.post-list__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  margin: 0;
+}
+
+.post-list__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+.post-list__title {
+  margin: 0;
+  font-size: var(--h4-size);
+  letter-spacing: var(--h4-tracking);
+}
+
+.post-list__title a {
+  color: var(--text-heading);
+}
+
+/* The body-link rule: ink label, underline turns orange. */
+.post-list__title a:hover {
+  text-decoration-color: var(--color-primary);
+}
+
+.post-list__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* A structural-voice label: uppercase, weight 500, positive tracking. Grey,
+   not orange — see the "orange never carries text" rule. */
+.post-list__tag {
+  color: var(--text-muted);
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+}
+
+.post-list__dot {
+  color: var(--color-light-grey);
+}
+
+.post-list__excerpt {
+  margin: 0;
+  color: var(--text-lead);
+  text-wrap: pretty;
+}
+
+/* ---------- Article ---------- */
+.article__header {
+  max-width: 68ch;
+  margin-inline: auto;
+  padding-block: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.article__title {
+  margin-block: var(--spacing-sm) var(--spacing-md);
+}
+
+.article__hero {
+  /* Pinned to the same 68ch measure as .article__header and .prose. Without
+     this it takes the full stepped container — up to 1520px — while the text
+     stays at 720px, upscaling a 512px source nearly 3×. */
+  max-width: min(68ch, 100%);
+  margin-inline: auto;
+  margin-block: var(--spacing-lg) var(--spacing-2xl);
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+}
+
+/* Never upscale: the image sits at its natural width and only shrinks. */
+.article__hero img {
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+.article__back {
+  display: inline-block;
+  margin-top: var(--spacing-2xl);
+  font-size: var(--font-size-sm);
+}

@@ -1,50 +1,61 @@
-<div class="user-management">
-  <div class="page-header">
-    <h2>Users</h2>
-    <span class="page-header__total">{{ total() }} total</span>
+<div class="app-page">
+  <div class="app-page-header">
+    <h1 class="app-page-title">Users</h1>
+    <span class="app-page-meta">{{ total() | number }} total</span>
   </div>
 
   <!-- Filters -->
-  <div class="filters">
-    <input
-      type="text"
-      placeholder="Search by name or email..."
-      [(ngModel)]="search"
-      (keyup.enter)="onSearch()"
-      class="filters__input"
-    />
-    <select [(ngModel)]="statusFilter" (change)="onSearch()" class="filters__select">
-      <option value="">All statuses</option>
-      <option value="active">Active</option>
-      <option value="suspended">Suspended</option>
-      <option value="banned">Banned</option>
-    </select>
-    <select [(ngModel)]="planFilter" (change)="onSearch()" class="filters__select">
-      <option value="">All plans</option>
-      <option value="free">Free</option>
-      <option value="pro">Pro</option>
-      <option value="enterprise">Enterprise</option>
-    </select>
+  <div class="fb">
+    <div class="fb__group">
+      <label class="fb__label" for="users-search">Search</label>
+      <input
+        id="users-search"
+        type="search"
+        class="app-input"
+        placeholder="Name or email"
+        [(ngModel)]="search"
+        (keyup.enter)="onSearch()" />
+    </div>
+    <div class="fb__group">
+      <label class="fb__label" for="users-status">Status</label>
+      <select id="users-status" class="fb__select" [(ngModel)]="statusFilter" (change)="onSearch()">
+        <option value="">All statuses</option>
+        <option value="active">Active</option>
+        <option value="suspended">Suspended</option>
+        <option value="banned">Banned</option>
+      </select>
+    </div>
+    <div class="fb__group">
+      <label class="fb__label" for="users-plan">Plan</label>
+      <select id="users-plan" class="fb__select" [(ngModel)]="planFilter" (change)="onSearch()">
+        <option value="">All plans</option>
+        <option value="free">Free</option>
+        <option value="pro">Pro</option>
+        <option value="enterprise">Enterprise</option>
+      </select>
+    </div>
   </div>
 
-  @if (loading()) {
-    <div class="state-msg">Loading...</div>
-  } @else if (error()) {
-    <div class="state-msg state-msg--error">{{ error() }}</div>
+  @if (error()) {
+    <app-error [message]="error()!" [retry]="true" (retried)="loadUsers()" />
   } @else {
-    <div class="table-wrap">
+    <app-card [flush]="true">
       <app-data-table
         [columns]="columns"
         [rows]="users()"
+        [loading]="loading()"
         [showActions]="isAtLeastModerator()"
-        emptyMessage="No users found.">
+        emptyMessage="No users match those filters.">
 
         <ng-template #cellTpl let-row let-col="col">
           @switch (col.key) {
             @case ('name') { {{ row.name }} {{ row.surname }} }
-            @case ('plan') { <span class="badge badge--plan badge--{{ row.plan }}">{{ row.plan }}</span> }
-            @case ('status') { <span class="badge badge--status badge--{{ row.status }}">{{ row.status }}</span> }
-            @case ('email_verified') { {{ row.email_verified ? '✓' : '—' }} }
+            <!-- A plan is a fact about an account, not a state: the outlined neutral badge. -->
+            @case ('plan') { <span class="app-badge app-badge--neutral">{{ row.plan }}</span> }
+            @case ('status') { <span class="app-badge app-badge--{{ row.status }}">{{ row.status }}</span> }
+            @case ('email_verified') {
+              @if (row.email_verified) { Yes } @else { <span class="dt__muted">No</span> }
+            }
             @case ('created_at') { {{ row.created_at | slice:0:10 }} }
             @default { {{ row[col.key] ?? '—' }} }
           }
@@ -52,50 +63,20 @@
 
         <ng-template #actionsTpl let-row>
           @if (!row.email_verified) {
-            <button class="btn btn--sm btn--info" (click)="forceConfirm(row.id)" title="Force confirm email">✓ Confirm</button>
+            <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="forceConfirm(row.id)">Confirm email</button>
           }
           @if (row.status !== 'active') {
-            <button class="btn btn--sm btn--success" (click)="updateStatus(row.id, 'active')">Activate</button>
-          }
-          @if (row.status === 'active') {
-            <button class="btn btn--sm btn--warn" (click)="openSuspend(row)">Suspend</button>
-            <button class="btn btn--sm btn--danger" (click)="updateStatus(row.id, 'banned')">Ban</button>
+            <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="updateStatus(row.id, 'active')">Activate</button>
+          } @else {
+            <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="openSuspend(row)">Suspend</button>
+            <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="banUser(row)">Ban</button>
           }
           @if (isAtLeastAdmin()) {
-            <button class="btn btn--sm btn--danger" (click)="deleteUser(row)">Delete</button>
+            <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteUser(row)">Delete</button>
           }
         </ng-template>
 
       </app-data-table>
-    </div>
-  }
-
-  @if (suspendModalFor(); as user) {
-    <div class="modal-overlay" (click)="closeSuspendModal()">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <h3>Suspend {{ user.name }} {{ user.surname }}</h3>
-
-        <div class="form-group form-group--inline">
-          <input type="radio" id="suspend_indefinite" name="suspend_mode" value="indefinite" [(ngModel)]="suspendMode" />
-          <label for="suspend_indefinite">Indefinitely</label>
-        </div>
-        <div class="form-group form-group--inline">
-          <input type="radio" id="suspend_until" name="suspend_mode" value="until" [(ngModel)]="suspendMode" />
-          <label for="suspend_until">Until a specific date</label>
-        </div>
-
-        @if (suspendMode === 'until') {
-          <div class="form-group">
-            <label>Suspended until</label>
-            <input type="datetime-local" [(ngModel)]="suspendUntil" />
-          </div>
-        }
-
-        <div class="modal__actions">
-          <button class="btn btn--secondary" (click)="closeSuspendModal()">Cancel</button>
-          <button class="btn btn--warn" (click)="confirmSuspend()" [disabled]="suspendMode === 'until' && !suspendUntil">Suspend</button>
-        </div>
-      </div>
-    </div>
+    </app-card>
   }
 </div>
