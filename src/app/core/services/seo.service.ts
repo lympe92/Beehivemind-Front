@@ -45,7 +45,10 @@ export class SeoService {
     this.metaService.updateTag({ property: 'og:image:width', content: '1200' });
     this.metaService.updateTag({ property: 'og:image:height', content: '630' });
     this.metaService.updateTag({ property: 'og:url', content: seo.canonical_url });
-    this.metaService.updateTag({ property: 'og:locale', content: seo.og_locale ?? 'el_GR' });
+    // en_US, matching <html lang="en">. The site is English throughout; a page
+    // that forgets to set this must not declare a different language than the
+    // one it is written in.
+    this.metaService.updateTag({ property: 'og:locale', content: seo.og_locale ?? 'en_US' });
     this.metaService.updateTag({ property: 'og:site_name', content: seo.og_site_name ?? environment.appName });
 
     // Twitter
