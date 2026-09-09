@@ -30,11 +30,16 @@
    which is how this was pinned down.
 
    So the fallback is made to occupy exactly the space Peridot will. The numbers
-   are measured, not guessed: Peridot's advance width over the same string is
-   91.33% of Arial's, and its ascent and descent are 89.10% and 21.60% of the em
-   — divided by the size-adjust here, because the overrides apply to the scaled
-   face. Arial was the better base of the two candidates; system-ui's line box
-   is 1.33em against Peridot's 1.15em, Arial's is 1.15em exactly.
+   are measured, not guessed: Peridot's advance width over a long sample is
+   105.63% of Arial's, and its ascent and descent are 100% and 23% of the em —
+   each divided by the size-adjust here, because the overrides apply to the
+   already-scaled face.
+
+   Arial rather than system-ui, even though system-ui's raw line box is closer:
+   the overrides pin the line box anyway, so the base is chosen on width, and
+   system-ui resolves to Segoe UI, SF or Roboto depending on the machine. One
+   ratio cannot be right for all three. Arial's metrics are fixed everywhere,
+   and Helvetica and Liberation Sans are metric clones of it.
 
    Re-measure with tools/font-metrics.mjs if the typeface is ever rebuilt. */
 @font-face {
@@ -42,8 +47,8 @@
   font-style: normal;
   font-weight: 400 700;
   src: local("Arial"), local("Helvetica"), local("Liberation Sans");
-  size-adjust: 91.33%;
-  ascent-override: 97.56%;
-  descent-override: 23.65%;
+  size-adjust: 105.63%;
+  ascent-override: 94.67%;
+  descent-override: 21.77%;
   line-gap-override: 0%;
 }
