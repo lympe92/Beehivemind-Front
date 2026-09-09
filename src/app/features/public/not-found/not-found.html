@@ -1,0 +1,11 @@
+<main>
+  <section app-page-intro
+    [eyebrow]="page.intro.eyebrow ?? ''"
+    [title]="page.intro.title"
+    [lead]="page.intro.lead ?? ''"></section>
+
+  <section app-cta-banner
+    [title]="page.cta.title"
+    [description]="page.cta.description ?? ''"
+    [cta]="page.cta.cta"></section>
+</main>

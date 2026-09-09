@@ -16,7 +16,9 @@ export interface DynamicField {
     | 'date'
     | 'range'
     | 'toggle'
-    | 'map';
+    | 'map'
+    /** Value is a `RichTextValue` — `{ html, json }`, not a string. */
+    | 'richtext';
   label: string;
   isMultiple?: boolean;
   placeholder?: string;

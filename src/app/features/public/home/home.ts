@@ -92,7 +92,7 @@ export class HomeComponent {
       // Not `priority`: the band sits below the first screen on every width,
       // and an eager 83 KB GIF competed with the hero image for bandwidth.
       image: {
-        src: 'assets/img/inspections.gif',
+        src: 'assets/img/inspections.webp',
         alt: 'The Beehivemind inspection table, with a row being edited in place',
         width: 477,
         height: 213,

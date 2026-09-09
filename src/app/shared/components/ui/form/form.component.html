@@ -59,6 +59,13 @@
             [formControlName]="field.name"
           />
         }
+        @if (field.type === 'richtext') {
+          <app-form-richtext
+            [label]="field.label"
+            [placeholder]="field.placeholder ?? ''"
+            [formControlName]="field.name"
+          />
+        }
         @if (field.type === 'map') {
           <app-form-map
             [label]="field.label"

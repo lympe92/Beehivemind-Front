@@ -25,6 +25,13 @@ const AUTH_PATHS = [
 ];
 
 /**
+ * Public reads whose failure the page itself renders. A blog slug that does not
+ * exist is a 404 *page*, not a notification floating over one — and on the
+ * server render there is nobody to read a toast anyway.
+ */
+const SILENT_PATHS = ['blog/posts', 'blog/categories'];
+
+/**
  * Single source of truth for HTTP-error toasts. Components no longer toast on
  * HTTP failures — they rely on this interceptor, which surfaces:
  *  - 401 → the session expired, so sign the user out.
@@ -43,6 +50,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (AUTH_PATHS.some((p) => req.url.includes(p))) {
+        return throwError(() => error);
+      }
+
+      if (SILENT_PATHS.some((p) => req.url.includes(p))) {
         return throwError(() => error);
       }
 

@@ -48,8 +48,10 @@ interface AppPageConfig {
 export class AppPageComponent {
   readonly page: AppPageConfig = {
     hero: {
-      title: 'Manage your beehives instantly',
-      subtitle: 'By utilizing the latest innovations in digital mapping, we offer you the best mapping system to depict your apiaries.',
+      // Was the apiaries page's hero, copied verbatim — two indexed pages
+      // competing for the same phrase. This one is about the app.
+      title: 'The beekeeping app that records while you work',
+      subtitle: 'Describe a hive out loud and the app writes the inspection down. It runs offline, so an apiary with no signal changes nothing.',
       image: { src: 'assets/img/jar2.webp', alt: 'Jar', width: 473, height: 473, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },
       secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline' },

@@ -41,7 +41,8 @@ export interface SEOModel {
   article_section?: string;
   article_tags?: string[];
 
-  schema: SchemaModel;
+  /** One node, or several — each is emitted as its own `ld+json` script. */
+  schema: SchemaModel | SchemaModel[];
 }
 
 // --- Schema.org discriminated union ---
@@ -79,8 +80,10 @@ export interface BlogPostingSchema extends BaseSchema {
   image?: string[];
   datePublished: string;
   dateModified: string;
+  // Posts written under the company byline use Organization; a named byline
+  // (the CMS shape in `convertArticleToSeoModel`) uses Person.
   author: {
-    '@type': 'Person';
+    '@type': 'Person' | 'Organization';
     name: string;
   };
   publisher: {
@@ -91,4 +94,82 @@ export interface BlogPostingSchema extends BaseSchema {
   articleSection?: string;
 }
 
-export type SchemaModel = WebSiteSchema | WebPageSchema | CollectionPageSchema | BlogPostingSchema;
+/** One plan. Schema.org wants a price on an Offer, so a "talk to us" tier has none. */
+export interface OfferSchema {
+  '@type': 'Offer';
+  name: string;
+  price: string;
+  priceCurrency: string;
+  url?: string;
+  category?: string;
+}
+
+/**
+ * The product itself, as an entity rather than a page. This is the node answer
+ * engines read for "what is it, what does it run on, what does it cost".
+ */
+export interface SoftwareApplicationSchema extends BaseSchema {
+  '@type': 'SoftwareApplication';
+  name: string;
+  description: string;
+  url: string;
+  applicationCategory: string;
+  operatingSystem: string;
+  offers: OfferSchema[];
+  featureList?: string[];
+  publisher?: { '@type': 'Organization'; name: string; url?: string };
+}
+
+export interface QuestionSchema {
+  '@type': 'Question';
+  name: string;
+  acceptedAnswer: { '@type': 'Answer'; text: string };
+}
+
+/**
+ * Only for pages where the questions and answers are both visible on the page —
+ * Google drops the markup otherwise.
+ */
+export interface FAQPageSchema extends BaseSchema {
+  '@type': 'FAQPage';
+  name: string;
+  url: string;
+  description?: string;
+  mainEntity: QuestionSchema[];
+}
+
+/**
+ * The trail a reader (and a crawler) walked to reach the page. Emitted on the
+ * blog's article and archive pages, where the path is real: Home › Blog ›
+ * Category › Article.
+ */
+export interface BreadcrumbListSchema extends BaseSchema {
+  '@type': 'BreadcrumbList';
+  itemListElement: {
+    '@type': 'ListItem';
+    position: number;
+    name: string;
+    item: string;
+  }[];
+}
+
+/** The articles on an index or archive page, in the order they are shown. */
+export interface ItemListSchema extends BaseSchema {
+  '@type': 'ItemList';
+  itemListElement: {
+    '@type': 'ListItem';
+    position: number;
+    url: string;
+    name: string;
+  }[];
+}
+
+export type SchemaModel =
+  | WebSiteSchema
+  | WebPageSchema
+  | CollectionPageSchema
+  | BlogPostingSchema
+  | SoftwareApplicationSchema
+  | FAQPageSchema
+  | BreadcrumbListSchema
+  | ItemListSchema;

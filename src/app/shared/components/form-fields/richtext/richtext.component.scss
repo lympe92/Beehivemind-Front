@@ -1,0 +1,129 @@
+/* The design system has no rich-text kit, so this is the one place the editor
+   chrome is drawn. Tokens only — no literal colours, and nothing here should
+   ever look like a second button family: the toolbar is a text control's
+   furniture, not an action bar. */
+
+:host {
+  display: block;
+}
+
+.rte {
+  border: 1px solid var(--border-color);
+  border-radius: var(--app-radius);
+  background: var(--surface-card);
+  overflow: hidden;
+}
+
+/* The field's own focus ring, moved out to the box: the editable area is a
+   contenteditable div, and a ring on that would sit inside the border. */
+.rte:focus-within {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.rte--disabled {
+  opacity: 0.5;
+}
+
+.rte__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 6px var(--app-pad-sm);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--app-gray-50);
+}
+
+.rte__group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* A separator rather than a rule: one hairline between groups reads as
+   grouping, a full set of rules reads as a table. */
+.rte__group + .rte__group {
+  margin-left: var(--spacing-xs);
+  padding-left: var(--spacing-xs);
+  border-left: 1px solid var(--border-color);
+}
+
+.rte__group--end {
+  margin-left: auto;
+}
+
+.rte__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 32px: below the 44px hit target the audit asks of primary actions, which
+     is correct for a dense formatting bar — these sit inside a text field. */
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--app-radius-sm);
+  background: transparent;
+  color: var(--app-text);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rte__btn:hover:not(:disabled) {
+  background: var(--app-gray-200);
+}
+
+.rte__btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Active state is the ink ground, not the accent: the accent is reserved for
+   things that submit or navigate. */
+.rte__btn.is-active {
+  background: var(--app-gray-900);
+  color: var(--color-white);
+}
+
+.rte__btn--bold {
+  font-weight: 700;
+}
+
+.rte__btn--italic {
+  font-style: italic;
+}
+
+.rte__body {
+  padding: var(--app-pad);
+  /* Roughly fifteen lines: enough that an article does not feel typed into a
+     slot, short enough that the sidebar stays in view. */
+  min-height: 420px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* ProseMirror creates the contenteditable element at runtime, so emulated
+   encapsulation never stamps it. ::ng-deep, kept under .rte__body so it cannot
+   reach past this field. */
+.rte__body ::ng-deep .ProseMirror {
+  outline: none;
+  min-height: 100%;
+}
+
+.rte__body ::ng-deep .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.rte__body ::ng-deep .ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--app-radius-sm);
+}

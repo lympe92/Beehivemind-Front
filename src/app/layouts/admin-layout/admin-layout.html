@@ -49,6 +49,11 @@
           <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a2 2 0 0 1 2-2V6H2v4a2 2 0 0 1 0 4v4h20v-4a2 2 0 0 1-2-2z"/><path d="M12 6v12"/></svg>
           @if (sidebarOpen()) { <span>Coupons</span> }
         </a>
+        <a routerLink="/admin/blog" routerLinkActive="active" class="sidebar__link"
+           [appTip]="tip('Blog')" [attr.aria-label]="sidebarOpen() ? null : 'Blog'">
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h11l5 5v11H4z"/><path d="M15 4v5h5"/><path d="M8 13h8M8 17h5"/></svg>
+          @if (sidebarOpen()) { <span>Blog</span> }
+        </a>
         <a routerLink="/admin/ai-responses" routerLinkActive="active" class="sidebar__link"
            [appTip]="tip('AI Responses')" [attr.aria-label]="sidebarOpen() ? null : 'AI Responses'">
           <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg>

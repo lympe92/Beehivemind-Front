@@ -1,0 +1,25 @@
+<main>
+  @if (category(); as cat) {
+    <section app-page-intro
+      eyebrow="Blog"
+      [title]="cat.name"
+      [lead]="cat.description ?? ''"></section>
+
+    <section app-post-list
+      [posts]="posts()"
+      [chips]="chips()"
+      emptyMessage="Nothing published in this category yet."></section>
+  } @else if (loaded()) {
+    <section app-page-intro
+      eyebrow="Blog"
+      title="Category not found"
+      lead="There is no category at this address. It may have been renamed."></section>
+
+    <section app-post-list [chips]="chips()"></section>
+  }
+
+  <section app-cta-banner
+    [title]="ctaBanner.title"
+    [description]="ctaBanner.description ?? ''"
+    [cta]="ctaBanner.cta"></section>
+</main>

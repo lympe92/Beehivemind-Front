@@ -1,8 +1,41 @@
-import { SEOModel } from '../models/seo.model';
+import { SEOModel, SoftwareApplicationSchema } from '../models/seo.model';
 import { environment } from '../../../environments/environment';
 
 const BASE = environment.appUrl;
 const SITE = environment.appName;
+
+/**
+ * The product as an entity, shared by `/` and `/pricing`. Answer engines read
+ * this for "what is it, what does it run on, what does it cost" — none of which
+ * a WebPage node carries.
+ *
+ * The prices mirror what `pricing.ts` puts on screen; structured data must not
+ * disagree with the visible page. Enterprise is deliberately absent: it is
+ * "Talk to us", and an Offer without a price is not one.
+ */
+const SOFTWARE_APPLICATION: SoftwareApplicationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: SITE,
+  description:
+    'Beehive management software for working beekeepers. Record inspections, harvest, feeding, treatments and costs by voice, offline, from the apiary.',
+  url: `${BASE}/`,
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Android, iOS, Web',
+  featureList: [
+    'Voice-recorded hive inspections',
+    'Offline recording with later sync',
+    'Apiary and beehive management',
+    'Harvest and feeding records',
+    'Treatment schedules and reminders',
+    'Cost and income tracking',
+  ],
+  offers: [
+    { '@type': 'Offer', name: 'Free',  price: '0', priceCurrency: 'EUR', category: 'free',         url: `${BASE}/pricing` },
+    { '@type': 'Offer', name: 'Pro',   price: '9', priceCurrency: 'EUR', category: 'subscription', url: `${BASE}/pricing` },
+  ],
+  publisher: { '@type': 'Organization', name: SITE, url: BASE },
+};
 
 export const SEO_CONFIG: Record<string, SEOModel> = {
   home: {
@@ -20,13 +53,16 @@ export const SEO_CONFIG: Record<string, SEOModel> = {
     twitter_card: 'summary_large_image',
     twitter_title: `${SITE} | Beehive Management Platform`,
     twitter_description: 'Track inspections, production, and colony health all in one place.',
-    schema: {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: SITE,
-      url: `${BASE}/`,
-      description: 'Beehive management platform for modern beekeepers',
-    },
+    schema: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: SITE,
+        url: `${BASE}/`,
+        description: 'Beehive management platform for modern beekeepers',
+      },
+      SOFTWARE_APPLICATION,
+    ],
   },
 
   features: {
@@ -229,12 +265,15 @@ export const SEO_CONFIG: Record<string, SEOModel> = {
     twitter_card: 'summary',
     twitter_title: `Plans | ${SITE}`,
     twitter_description: 'Compare the Free, Pro and Enterprise plans.',
-    schema: {
-      '@context': 'https://schema.org',
-      '@type': 'WebPage',
-      name: `Plans | ${SITE}`,
-      url: `${BASE}/pricing`,
-    },
+    schema: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: `Plans | ${SITE}`,
+        url: `${BASE}/pricing`,
+      },
+      SOFTWARE_APPLICATION,
+    ],
   },
 
   about: {

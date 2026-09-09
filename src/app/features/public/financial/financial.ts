@@ -22,7 +22,7 @@ interface FinancialPageConfig {
 }
 
 const LOGO: ImageConfig = { src: 'assets/img/logo1.webp', alt: 'Logo', width: 105, height: 105 };
-const FINANCIAL_GIF: ImageConfig = { src: 'assets/img/financial.gif', alt: 'Financial', width: 477, height: 213 };
+const FINANCIAL_GIF: ImageConfig = { src: 'assets/img/financial.webp', alt: 'Financial', width: 477, height: 213 };
 
 @Component({
   selector: 'app-financial',

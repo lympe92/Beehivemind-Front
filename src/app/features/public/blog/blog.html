@@ -5,10 +5,9 @@
     [lead]="page.intro.lead ?? ''"></section>
 
   <section app-post-list
-    [posts]="visible()"
-    [tags]="tags"
-    [activeTag]="activeTag()"
-    (filter)="activeTag.set($event)"></section>
+    [posts]="posts()"
+    [chips]="chips()"
+    emptyMessage="No posts yet."></section>
 
   <section app-cta-banner
     [title]="page.ctaBanner.title"

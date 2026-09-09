@@ -6,9 +6,40 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Feed autodiscovery. Served by /rss.xml in server.ts, built from the
+       console's published posts. -->
+  <link rel="alternate" type="application/rss+xml" title="BeehiveMind blog" href="/rss.xml">
   <!-- Peridot PE is self-hosted: one variable file, declared in styles/tokens/fonts.css. -->
   <link rel="preload" as="font" type="font/woff2" crossorigin
         href="assets/fonts/peridot-pe-variable.woff2">
+  <!-- The company as an entity, sitewide. It carries no `data-seo` attribute on
+       purpose: SeoService only clears its own nodes, so this one survives every
+       navigation and is present even on the client-rendered signed-in routes.
+       `sameAs` are the profiles listed in the footer. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "BeehiveMind",
+    "url": "https://beehivemind.tech",
+    "logo": "https://beehivemind.tech/assets/img/logo.webp",
+    "description": "Beehive management software for working beekeepers, recorded by voice and usable offline from the apiary.",
+    "foundingDate": "2019",
+    "address": { "@type": "PostalAddress", "addressCountry": "GR" },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "url": "https://beehivemind.freshdesk.com/support/home"
+    },
+    "sameAs": [
+      "https://www.facebook.com/beehivemind.org",
+      "https://www.instagram.com/beehivemind_org",
+      "https://twitter.com/Beehivemind_org",
+      "https://www.linkedin.com/company/beehivemind-beekeeping-software",
+      "https://www.youtube.com/channel/UCSacxrpIMgWoWhLORBY5HcQ"
+    ]
+  }
+  </script>
 </head>
 <body>
   <app-root></app-root>

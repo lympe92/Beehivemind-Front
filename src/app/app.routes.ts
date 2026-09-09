@@ -3,14 +3,6 @@ import { authGuard } from './core/guards/auth.guard';
 import { employeeGuard } from './core/guards/employee.guard';
 
 export const routes: Routes = [
-  // Public pages
-  {
-    path: '',
-    loadComponent: () =>
-      import('./layouts/public-layout/public-layout').then((m) => m.PublicLayoutComponent),
-    loadChildren: () =>
-      import('./features/public/public.routes').then((m) => m.publicRoutes),
-  },
   // User pages (beekeeper)
   {
     path: 'user',
@@ -42,5 +34,22 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./features/admin/admin.routes').then((m) => m.adminRoutes),
   },
-  { path: '**', redirectTo: '' },
+  // Public pages, and the catch-all with them.
+  //
+  // LAST on purpose. `path: ''` matches a zero-segment prefix of every URL, so
+  // once its children are consulted the `**` at the end of publicRoutes answers
+  // anything — including `/user/…` and `/admin/…`. First in the array, it made
+  // the whole signed-in half of the app render the public 404. The zones above
+  // therefore get first refusal, and only what none of them claims falls here.
+  //
+  // There is deliberately no `{ path: '**', redirectTo: '' }` after this: the
+  // 404 renders in place, because redirecting made every broken link a 302 to
+  // the home page — a soft 404 to a crawler.
+  {
+    path: '',
+    loadComponent: () =>
+      import('./layouts/public-layout/public-layout').then((m) => m.PublicLayoutComponent),
+    loadChildren: () =>
+      import('./features/public/public.routes').then((m) => m.publicRoutes),
+  },
 ];

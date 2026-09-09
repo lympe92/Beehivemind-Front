@@ -1,0 +1,95 @@
+<div class="app-page">
+  <div class="app-page-header">
+    <div>
+      <h1 class="app-page-title">Blog</h1>
+      <p class="app-page-meta">{{ posts().length }} shown of {{ total() }}</p>
+    </div>
+    <div class="fb__group fb__group--end">
+      <a class="app-btn app-btn--ghost" routerLink="/admin/blog/categories">Categories</a>
+      <button type="button" class="app-btn app-btn--primary" (click)="create()">+ New post</button>
+    </div>
+  </div>
+
+  <div class="fb">
+    <div class="fb__group">
+      <label class="fb__label" for="blog-search">Search</label>
+      <input
+        id="blog-search"
+        class="app-input app-input--sm"
+        type="search"
+        placeholder="Title or slug"
+        [(ngModel)]="search"
+        (keyup.enter)="applyFilters()" />
+    </div>
+
+    <div class="fb__group">
+      <label class="fb__label" for="blog-status">Status</label>
+      <select id="blog-status" class="fb__select" [(ngModel)]="statusFilter" (change)="applyFilters()">
+        <option value="">All</option>
+        <option value="draft">Draft</option>
+        <option value="scheduled">Scheduled</option>
+        <option value="published">Published</option>
+      </select>
+    </div>
+
+    <div class="fb__group">
+      <label class="fb__label" for="blog-category">Category</label>
+      <select id="blog-category" class="fb__select" [(ngModel)]="categoryFilter" (change)="applyFilters()">
+        <option value="">All</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="fb__group fb__group--end">
+      <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="applyFilters()">Apply</button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <app-error [message]="error()!" [retry]="true" (retried)="load()" />
+  } @else {
+    <app-card [flush]="true">
+      <app-data-table
+        [columns]="columns"
+        [rows]="posts()"
+        [loading]="loading()"
+        [pagination]="tablePagination()"
+        (pageChange)="goToPage($event)"
+        emptyMessage="Nothing written yet.">
+
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('title') {
+              <a [routerLink]="['/admin/blog', row.id]">{{ row.title }}</a>
+            }
+            @case ('category_name') {
+              @if (row.category_name) { {{ row.category_name }} } @else { <span class="dt__muted">—</span> }
+            }
+            @case ('status') {
+              <span [class]="'app-badge ' + statusClass(row)">{{ statusLabel(row) }}</span>
+            }
+            @case ('published_at') {
+              @if (row.published_at) { {{ row.published_at | slice:0:10 }} } @else { <span class="dt__muted">—</span> }
+            }
+            @case ('updated_at') { {{ row.updated_at | slice:0:10 }} }
+            @default { {{ row[col.key] ?? '—' }} }
+          }
+        </ng-template>
+
+        <ng-template #actionsTpl let-row>
+          <a class="app-btn app-btn--ghost app-btn--sm" [routerLink]="['/admin/blog', row.id]">Edit</a>
+          @if (row.is_live) {
+            <a class="app-btn app-btn--ghost app-btn--sm" [href]="publicUrl(row)" target="_blank" rel="noopener">View</a>
+          }
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="togglePublish(row)">
+            {{ row.status === 'published' ? 'Unpublish' : 'Publish' }}
+          </button>
+          <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="remove(row)">Delete</button>
+        </ng-template>
+
+      </app-data-table>
+    </app-card>
+  }
+</div>

@@ -1,0 +1,37 @@
+<div class="app-page">
+  <div class="app-page-header">
+    <div>
+      <a class="app-page-back" routerLink="/admin/blog">« Posts</a>
+      <h1 class="app-page-title">Blog categories</h1>
+      <p class="app-page-lead">Each category is a public archive page, so it carries its own title and description.</p>
+    </div>
+    <button type="button" class="app-btn app-btn--primary" (click)="openCreate()">+ New category</button>
+  </div>
+
+  @if (error()) {
+    <app-error [message]="error()!" [retry]="true" (retried)="load()" />
+  } @else {
+    <app-card [flush]="true">
+      <app-data-table
+        [columns]="columns"
+        [rows]="categories()"
+        [loading]="loading()"
+        emptyMessage="No categories yet.">
+
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('slug') { <code class="admin-code">{{ row.slug }}</code> }
+            @case ('post_count') { {{ row.post_count ?? 0 }} }
+            @default { {{ row[col.key] ?? '—' }} }
+          }
+        </ng-template>
+
+        <ng-template #actionsTpl let-row>
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="openEdit(row)">Edit</button>
+          <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="remove(row)">Delete</button>
+        </ng-template>
+
+      </app-data-table>
+    </app-card>
+  }
+</div>

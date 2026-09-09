@@ -931,6 +931,11 @@
 }
 
 .post-filter__chip {
+  /* The chips are links now — each category is its own page — so the chip has
+     to switch off the sitewide underline and sit as a block. Everything below
+     is the kit's chip unchanged. */
+  display: inline-block;
+  text-decoration: none;
   font-family: inherit;
   font-size: var(--structural-size);
   font-weight: var(--structural-weight);
@@ -950,11 +955,13 @@
 .post-filter__chip:hover {
   border-color: var(--color-secondary);
   color: var(--text-heading);
+  text-decoration: none;
 }
 
 /* Selected is an ink fill, which is the one ground on this site that carries a
    white label. Not orange: orange never carries text. */
-.post-filter__chip[aria-pressed="true"] {
+.post-filter__chip[aria-pressed="true"],
+.post-filter__chip[aria-current="page"] {
   background-color: var(--color-secondary);
   border-color: var(--color-secondary);
   color: var(--color-white);
@@ -1033,6 +1040,19 @@
   font-weight: var(--structural-weight);
   letter-spacing: var(--structural-tracking);
   text-transform: uppercase;
+}
+
+/* On the article page the tag is a link to the category archive. It keeps the
+   structural voice — the underline arrives only on hover, so the meta line
+   still reads as one row of labels rather than a row of links. */
+a.post-list__tag {
+  text-decoration: none;
+}
+
+a.post-list__tag:hover {
+  color: var(--text-heading);
+  text-decoration: underline;
+  text-decoration-color: var(--text-link-underline-hover);
 }
 
 .post-list__dot {

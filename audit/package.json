@@ -7,7 +7,9 @@
     "audit": "node run.mjs",
     "probe": "node probe.mjs",
     "shots": "node shots.mjs",
-    "kits": "node static.mjs \"C:/Users/lympe/Desktop/Beehivemind Software (1)/design_handoff_beehivemind_design_system\" 4302"
+    "kits": "node static.mjs \"C:/Users/lympe/Desktop/Beehivemind Software (1)/design_handoff_beehivemind_design_system\" 4302",
+    "routes": "node routes-check.mjs",
+    "editor": "node editor-smoke.mjs"
   },
   "dependencies": {
     "puppeteer-core": "^23.11.1"

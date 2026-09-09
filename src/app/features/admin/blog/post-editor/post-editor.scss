@@ -1,0 +1,190 @@
+/* Page layout only. The design system draws the editor's chrome inline in its
+   kit rather than as classes, so the two columns, the repeaters and the search
+   preview live here — tokens only, no literal colours. */
+
+.pe {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--app-gap);
+  align-items: start;
+}
+
+/* The sidebar earns its own column only once the main one still has a usable
+   measure beside it. */
+@media (min-width: 1100px) {
+  .pe {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+
+  .pe__side {
+    position: sticky;
+    top: var(--app-page-y);
+  }
+}
+
+.pe__main,
+.pe__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap);
+  min-width: 0;
+}
+
+.pe__lead {
+  margin: 0 0 var(--app-pad);
+  color: var(--app-text-muted);
+}
+
+/* The slug field and its "Change" button share a line; the button sits on the
+   input's baseline rather than on the label's. */
+.pe__slug {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+}
+
+.pe__slug > app-form-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.pe__hint {
+  margin: calc(var(--spacing-xs) * -1) 0 var(--app-pad);
+  color: var(--app-text-muted);
+  font-size: var(--structural-size);
+  overflow-wrap: anywhere;
+}
+
+/* Over a length limit is a warning, never an error: the post still publishes. */
+.pe__hint--warn {
+  color: var(--app-warning);
+}
+
+.pe__repeater {
+  margin: 0 0 var(--app-pad);
+  padding: 0;
+  border: 0;
+}
+
+.pe__legend {
+  padding: 0;
+  margin-bottom: var(--app-pad-sm);
+  color: var(--app-text-muted);
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+}
+
+.pe__row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--app-pad-sm);
+}
+
+.pe__row > .app-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.pe__faq {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-items: flex-start;
+  padding: var(--app-pad-sm);
+  margin-bottom: var(--app-pad-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--app-radius-sm);
+}
+
+.pe__faq > .app-input {
+  width: 100%;
+}
+
+.pe__answer {
+  font-family: inherit;
+  resize: vertical;
+}
+
+/* The file input the editor toolbar clicks. Off-screen rather than
+   display:none so the click still reaches it. */
+.pe__file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pe__drop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--app-pad-lg);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--app-radius-sm);
+  color: var(--app-text-muted);
+  cursor: pointer;
+}
+
+.pe__drop:hover {
+  border-color: var(--app-gray-900);
+  color: var(--app-text);
+}
+
+.pe__drop input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.pe__thumb {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: var(--app-pad-sm);
+  border-radius: var(--app-radius-sm);
+}
+
+/* A plain rendering of the three lines a result is made of — not a mock of
+   Google's own styling, which would be a second visual language on the page. */
+.pe__serp {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--app-pad-sm);
+  margin-bottom: var(--app-pad);
+  border: 1px solid var(--border-color);
+  border-radius: var(--app-radius-sm);
+  background: var(--app-gray-50);
+}
+
+/* The tint is the ground here, and a tinted ground takes ink labels — the
+   muted grey lands at 4.41:1 on it. Hierarchy comes from size and weight
+   instead, which is what separates the three lines anyway. */
+.pe__serp-url {
+  color: var(--app-gray-600);
+  font-size: var(--structural-size);
+  overflow-wrap: anywhere;
+}
+
+.pe__serp-title {
+  color: var(--app-text);
+  font-weight: 500;
+}
+
+.pe__serp-desc {
+  color: var(--app-gray-600);
+  font-size: 0.8125rem;
+}
+
+.pe__check {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--app-pad);
+  cursor: pointer;
+}

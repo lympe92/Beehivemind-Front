@@ -6,7 +6,9 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import compression from 'compression';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { environment } from './environments/environment';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -14,6 +16,175 @@ const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 app.use(compression());
+
+/* ------------------------------------------------------------------ sitemap */
+
+interface SitemapEntry {
+  loc: string;
+  lastmod: string | null;
+}
+
+/**
+ * The static half, resolved at build time by tools/build-sitemap.mjs: which
+ * pages are indexable, and when each was last changed. Neither can be worked
+ * out in production — there is no git checkout and no source on the droplet.
+ */
+const staticPages = (): { base: string; pages: SitemapEntry[] } => {
+  try {
+    return JSON.parse(readFileSync(join(import.meta.dirname, '../sitemap-pages.json'), 'utf8'));
+  } catch {
+    // A dev server run straight from source has no manifest. The blog half
+    // below still works, so serve what we have rather than a 500.
+    return { base: 'https://beehivemind.tech', pages: [] };
+  }
+};
+
+/**
+ * The dynamic half: everything the console has published. Fetched rather than
+ * bundled, because a post that goes up between deploys has to appear here
+ * without one.
+ *
+ * A failure returns nothing rather than throwing. A sitemap missing its
+ * articles for an hour is a small problem; a 500 on /sitemap.xml is the kind a
+ * crawler remembers.
+ */
+interface BlogIndex {
+  posts: { slug: string; updated_at: string; published_at: string | null }[];
+  categories: { slug: string; updated_at: string }[];
+}
+
+const blogIndex = async (): Promise<BlogIndex> => {
+  try {
+    const response = await fetch(`${environment.apiUrl}blog/sitemap`);
+    if (!response.ok) return { posts: [], categories: [] };
+
+    const body = (await response.json()) as { data?: Partial<BlogIndex> };
+    return { posts: body.data?.posts ?? [], categories: body.data?.categories ?? [] };
+  } catch {
+    return { posts: [], categories: [] };
+  }
+};
+
+const articleEntries = async (base: string): Promise<SitemapEntry[]> => {
+  const { posts, categories } = await blogIndex();
+
+  return [
+    // /blog itself belongs here rather than in the static half: it stopped
+    // being prerendered when its content moved to the console, so it is no
+    // longer in prerendered-routes.json. Its lastmod is the newest post on it.
+    { loc: `${base}/blog`, lastmod: posts[0]?.updated_at ?? null },
+    ...categories.map((c) => ({ loc: `${base}/blog/category/${c.slug}`, lastmod: c.updated_at })),
+    ...posts.map((p) => ({ loc: `${base}/blog/${p.slug}`, lastmod: p.updated_at })),
+  ];
+};
+
+const SITEMAP_TTL_MS = 60 * 60 * 1000;
+let sitemapCache: { xml: string; builtAt: number } | null = null;
+
+const buildSitemap = async (): Promise<string> => {
+  const { base, pages } = staticPages();
+  const entries = [...pages, ...(await articleEntries(base))];
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...entries.map(
+      (e) =>
+        '  <url>\n' +
+        `    <loc>${e.loc}</loc>\n` +
+        (e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>\n` : '') +
+        '  </url>',
+    ),
+    '</urlset>',
+    '',
+  ].join('\n');
+};
+
+/* Before express.static, so it wins even if a stale sitemap.xml is ever
+   left in the browser folder. */
+app.get('/sitemap.xml', async (_req, res, next) => {
+  try {
+    if (!sitemapCache || Date.now() - sitemapCache.builtAt > SITEMAP_TTL_MS) {
+      sitemapCache = { xml: await buildSitemap(), builtAt: Date.now() };
+    }
+    res.type('application/xml').set('Cache-Control', 'public, max-age=3600').send(sitemapCache.xml);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/* ---------------------------------------------------------------------- rss */
+
+/**
+ * A feed of the last twenty posts. Cheap to serve, and it is how readers,
+ * aggregators and several answer engines subscribe to a blog without polling
+ * the index. Cached like the sitemap.
+ */
+const FEED_SIZE = 20;
+let feedCache: { xml: string; builtAt: number } | null = null;
+
+const escapeXml = (value: string): string =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+interface FeedPost {
+  title: string;
+  slug: string;
+  excerpt: string;
+  published_at: string;
+}
+
+const buildFeed = async (): Promise<string> => {
+  const base = staticPages().base;
+  let posts: FeedPost[] = [];
+
+  try {
+    const response = await fetch(`${environment.apiUrl}blog/posts?per_page=${FEED_SIZE}`);
+    if (response.ok) {
+      const body = (await response.json()) as { data?: FeedPost[] };
+      posts = body.data ?? [];
+    }
+  } catch {
+    // An empty feed is a valid feed; a 500 is not.
+  }
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+    '<channel>',
+    `  <title>${escapeXml(environment.appName)} blog</title>`,
+    `  <link>${base}/blog</link>`,
+    '  <description>Notes on keeping bees with better records.</description>',
+    '  <language>en</language>',
+    `  <atom:link href="${base}/rss.xml" rel="self" type="application/rss+xml"/>`,
+    ...posts.flatMap((post) => [
+      '  <item>',
+      `    <title>${escapeXml(post.title)}</title>`,
+      `    <link>${base}/blog/${post.slug}</link>`,
+      `    <guid isPermaLink="true">${base}/blog/${post.slug}</guid>`,
+      `    <description>${escapeXml(post.excerpt)}</description>`,
+      `    <pubDate>${new Date(post.published_at).toUTCString()}</pubDate>`,
+      '  </item>',
+    ]),
+    '</channel>',
+    '</rss>',
+    '',
+  ].join('\n');
+};
+
+app.get('/rss.xml', async (_req, res, next) => {
+  try {
+    if (!feedCache || Date.now() - feedCache.builtAt > SITEMAP_TTL_MS) {
+      feedCache = { xml: await buildFeed(), builtAt: Date.now() };
+    }
+    res.type('application/rss+xml').set('Cache-Control', 'public, max-age=3600').send(feedCache.xml);
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * Example Express Rest API endpoints can be defined here.
@@ -39,12 +210,46 @@ app.use(
 );
 
 /**
+ * A page that only discovers while rendering that its record is missing — a
+ * blog slug that no longer exists — says so with this meta tag, because
+ * `ServerRoute.status` is fixed per route and cannot tell a real slug from an
+ * invented one. See `SeoService.markNotFound()`.
+ */
+const NOT_FOUND_MARKER = 'name="x-render-status" content="404"';
+
+/**
  * Handle all other requests by rendering the Angular application.
  */
 app.use((req, res, next) => {
   angularApp
     .handle(req)
-    .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
+    .then(async (response) => {
+      if (!response) {
+        return next();
+      }
+
+      const isHtml = (response.headers.get('content-type') ?? '').includes('text/html');
+      if (isHtml) {
+        const body = await response.text();
+        // Only a 200 can be demoted; a route that already declared its status
+        // (the catch-all 404, the /pages/contact-us 301) keeps it.
+        const status =
+          response.status === 200 && body.includes(NOT_FOUND_MARKER) ? 404 : response.status;
+        const headers = new Headers(response.headers);
+        // Rendered HTML carried no Cache-Control at all, which leaves caches to
+        // guess — and a wrong guess serves a stale page. Five minutes is short
+        // enough that a deploy propagates on its own, long enough to be worth a
+        // CDN. Set here rather than in nginx, where a location-level add_header
+        // would also overwrite the year-long cache on the static assets.
+        headers.set(
+          'Cache-Control',
+          status === 200 ? 'public, max-age=300, must-revalidate' : 'no-store',
+        );
+        return writeResponseToNodeResponse(new Response(body, { status, headers }), res);
+      }
+
+      return writeResponseToNodeResponse(response, res);
+    })
     .catch(next);
 });
 

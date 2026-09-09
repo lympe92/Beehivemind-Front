@@ -1,17 +1,10 @@
 User-agent: *
 Allow: /
-Allow: /features
-Allow: /app
-Allow: /apiariesandbeehives
-Allow: /financial
-Allow: /harvestandfeeding
-Allow: /inspections
-Allow: /help
-Allow: /blog
-Allow: /blog/
 
+# Signed-in zones. All three are guarded, so a crawler only ever gets an empty
+# shell from them — keep them out of the crawl budget entirely.
 Disallow: /auth/
 Disallow: /admin/
-Disallow: /dashboard/
+Disallow: /user/
 
 Sitemap: https://beehivemind.tech/sitemap.xml

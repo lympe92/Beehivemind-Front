@@ -37,6 +37,31 @@ export const adminRoutes: Routes = [
       import('./coupons/coupons').then((m) => m.CouponsComponent),
   },
   {
+    path: 'blog',
+    canActivate: [employeeRoleGuard('admin')],
+    loadComponent: () =>
+      import('./blog/posts/blog-posts').then((m) => m.BlogPostsComponent),
+  },
+  {
+    // Before `blog/:id`, or "categories" is read as a post id.
+    path: 'blog/categories',
+    canActivate: [employeeRoleGuard('admin')],
+    loadComponent: () =>
+      import('./blog/categories/blog-categories').then((m) => m.BlogCategoriesComponent),
+  },
+  {
+    path: 'blog/new',
+    canActivate: [employeeRoleGuard('admin')],
+    loadComponent: () =>
+      import('./blog/post-editor/post-editor').then((m) => m.PostEditorComponent),
+  },
+  {
+    path: 'blog/:id',
+    canActivate: [employeeRoleGuard('admin')],
+    loadComponent: () =>
+      import('./blog/post-editor/post-editor').then((m) => m.PostEditorComponent),
+  },
+  {
     path: 'ai-responses',
     canActivate: [employeeRoleGuard('admin')],
     loadComponent: () =>

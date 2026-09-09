@@ -59,6 +59,8 @@ Top-level routes in `app.routes.ts`, all lazy-loaded. Four zones, each with its 
 
 `employeeRoleGuard('admin' \| 'superadmin')` gates individual admin routes (e.g. `raw` is superadmin-only).
 
+> **The public route is declared last in `app.routes.ts`, on purpose.** `path: ''` matches a zero-segment prefix of every URL, so once its children are consulted the `**` at the end of `publicRoutes` answers anything — `/user/…` and `/admin/…` included. Declared first, it renders the public 404 for the whole signed-in app, silently and with no console error. `audit/routes-check.mjs` guards this.
+
 ---
 
 ## Code Conventions
@@ -178,7 +180,7 @@ Each row links to that feature's own `CLAUDE.md`.
 
 | Feature | Route | Store slice(s) | Docs |
 |---------|-------|----------------|------|
-| Public site | `/`, `/features`, `/app`, `/pricing`, `/inspections`, `/apiariesandbeehives`, `/harvestandfeeding`, `/financial`, `/help`, `/about`, `/contact`, `/privacy`, `/terms`, `/blog` (+ `/:slug`) | — (static page configs) | [↗](src/app/features/public/CLAUDE.md) |
+| Public site | `/`, `/features`, `/app`, `/pricing`, `/inspections`, `/apiariesandbeehives`, `/harvestandfeeding`, `/financial`, `/help`, `/about`, `/contact`, `/privacy`, `/terms`, `/blog` (+ `/:slug`, `/category/:slug`) | — (static configs; the blog reads the API) | [↗](src/app/features/public/CLAUDE.md) |
 | Dashboard | `/user/dashboard` | `apiaries`, `beehives`, `inspections` | [↗](src/app/features/user/dashboard/CLAUDE.md) |
 | Apiaries | `/user/apiary` (+ `/details`, `/map`, `/:id`) | `apiaries`, `beehives` | [↗](src/app/features/user/apiary/CLAUDE.md) |
 | Beehives | `/user/beehives` | `beehives` | [↗](src/app/features/user/beehives/CLAUDE.md) |
@@ -194,6 +196,7 @@ Each row links to that feature's own `CLAUDE.md`.
 | Admin · Employees | `/admin/employees` | — | [↗](src/app/features/admin/employee-management/CLAUDE.md) |
 | Admin · Coupons | `/admin/coupons` | — | [↗](src/app/features/admin/coupons/CLAUDE.md) |
 | Admin · AI Responses | `/admin/ai-responses` | — (direct `RequestService`) | [↗](src/app/features/admin/ai-responses/CLAUDE.md) |
+| Admin · Blog | `/admin/blog` (+ `/new`, `/:id`, `/categories`) | — (direct `RequestService`) | [↗](src/app/features/admin/blog/CLAUDE.md) |
 | Admin · Moderation | `/admin/moderation` | — (placeholder page; no brief yet) | `features/admin/moderation/` |
 | Admin · Raw Data | `/admin/raw` (+ `/:model`) | — | [↗](src/app/features/admin/raw-data/CLAUDE.md) |
 
@@ -227,7 +230,7 @@ The visual language is the Beehivemind design system, ported as-is. `DECISIONS.m
 - **Two button families, one brand:** `.btn.btn--md.btn--primary|--outline` on the website and auth screens; `.app-btn[.app-btn--primary|--ghost|--danger|--danger-solid][.app-btn--sm|--block]` in the dashboard and admin. Density, not brand.
 - **Disabled is `opacity: .5`**, the focus ring is ink, and every colour on screen resolves to a token.
 - **Public pages** are `readonly page = {…}` configs + a `<main>` of `<section app-…>` elements (see [`features/public/CLAUDE.md`](src/app/features/public/CLAUDE.md)). Sections are attribute-selector components so the `main > section` band rule matches the DOM.
-- **Audit:** the handoff's `audit/checks.js` battery (overflow, weights, contrast, off-palette, disabled opacity, hit targets, clipping, measure, dialog contract) is run against every route at 375/768/1024/1440 and must report zero findings. The harness is in `audit/`: `cd audit && npm install`, start `ng serve --port 4301`, then `npm run audit` (all routes; `-- --only=/user/beehives,admin` narrows, `--dialogs=0` skips the dialog contract) or `npm run probe -- <path> <width> [user|admin]` to list what overflows on one page. It drives the system Chrome through puppeteer-core, mocks `localhost:8000/api/*` from `mocks.mjs`, and seeds `localStorage.bhm_auth` for the user/admin zones. Known blind spot: `color-mix()` grounds (calendar chips) come back as `color(srgb …)`, which the battery cannot parse, so they are not measured.
+- **Audit:** the handoff's `audit/checks.js` battery (overflow, weights, contrast, off-palette, disabled opacity, hit targets, clipping, measure, dialog contract) is run against every route at 375/768/1024/1440 and must report zero findings. The harness is in `audit/`: `cd audit && npm install`, start `ng serve --port 4301`, then `npm run audit` (all routes; `-- --only=/user/beehives,admin` narrows, `--dialogs=0` skips the dialog contract) or `npm run probe -- <path> <width> [user|admin]` to list what overflows on one page. It drives the system Chrome through puppeteer-core, mocks `localhost:8000/api/*` from `mocks.mjs`, and seeds `localStorage.bhm_auth` for the user/admin zones. Known blind spot: `color-mix()` grounds (calendar chips) come back as `color(srgb …)`, which the battery cannot parse, so they are not measured. A second blind spot to be aware of: the battery finds nothing on a page that never rendered, so a **404 passes** — `npm run routes` (`audit/routes-check.mjs`) asserts that every zone lands on its own layout before the visual run means anything. `npm run editor` (`audit/editor-smoke.mjs`) drives the blog editor for the parts a static check cannot see: TipTap booting, the toolbar acting on a selection, and the OG card being drawn.
 - **Visual comparison against the kits:** `npm run kits` serves the handoff folder on port 4302, then `npm run shots` (same `--only`/`--widths` flags) writes `audit/shots/<n>-<page>-<width>.png` — the app on the left, the design system's `ui_kits` page on the right, for every route at every width. Look at them; that is how the fidelity pass was done. `npm run probe -- <path> <width>` and `node inspect.mjs` are the two debugging aids.
 
 ---

@@ -21,6 +21,7 @@ import { CheckboxesComponent } from '../../form-fields/checkboxes/checkboxes.com
 import { RangeComponent } from '../../form-fields/range/range.component';
 import { ToggleComponent } from '../../form-fields/toggle/toggle.component';
 import { MapFieldComponent } from '../../form-fields/map-field/map-field.component';
+import { RichTextComponent } from '../../form-fields/richtext/richtext.component';
 
 /** `app` uses the dashboard's compact button, `website` the marketing pill. */
 export type FormVariant = 'app' | 'website';
@@ -44,6 +45,7 @@ export type FormVariant = 'app' | 'website';
     RangeComponent,
     ToggleComponent,
     MapFieldComponent,
+    RichTextComponent,
   ],
   templateUrl: './form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

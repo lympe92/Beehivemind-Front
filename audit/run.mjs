@@ -30,7 +30,7 @@ const PAGES = [
   ['none', '/'], ['none', '/features'], ['none', '/app'], ['none', '/pricing'],
   ['none', '/apiariesandbeehives'], ['none', '/financial'], ['none', '/harvestandfeeding'],
   ['none', '/inspections'], ['none', '/help'], ['none', '/about'], ['none', '/contact'],
-  ['none', '/privacy'], ['none', '/terms'], ['none', '/blog'], ['none', '/blog/reading-closed-brood'],
+  ['none', '/privacy'], ['none', '/terms'], ['none', '/blog'], ['none', '/blog/reading-closed-brood'], ['none', '/blog/category/inspections'],
   ['none', '/auth/login'], ['none', '/auth/register'], ['none', '/auth/reset-password'],
   ['none', '/auth/reset-password?token=x'], ['none', '/auth/confirmation'],
   ['user', '/user/dashboard'], ['user', '/user/apiary'], ['user', '/user/apiary/details'],
@@ -42,6 +42,8 @@ const PAGES = [
   ['none', '/admin/login'],
   ['admin', '/admin/dashboard'], ['admin', '/admin/users'], ['admin', '/admin/moderation'],
   ['admin', '/admin/employees'], ['admin', '/admin/coupons'], ['admin', '/admin/ai-responses'],
+  ['admin', '/admin/blog'], ['admin', '/admin/blog/categories'],
+  ['admin', '/admin/blog/new'], ['admin', '/admin/blog/1'],
   ['admin', '/admin/raw'], ['admin', '/admin/raw/users'], ['admin', '/admin/profile'],
 ].filter(([, p]) => !ONLY || ONLY.split(',').some(o => p === o || (o !== '/' && p.includes(o))));
 

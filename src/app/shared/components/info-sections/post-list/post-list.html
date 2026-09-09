@@ -1,15 +1,14 @@
-@if (tags().length > 1) {
-  <div class="post-filter" role="group" aria-label="Filter posts by category">
-    @for (tag of tags(); track tag) {
-      <button
-        type="button"
+@if (chips().length > 1) {
+  <nav class="post-filter" aria-label="Post categories">
+    @for (chip of chips(); track chip.routerLink) {
+      <a
         class="post-filter__chip"
-        [attr.aria-pressed]="tag === activeTag()"
-        (click)="filter.emit(tag)">
-        {{ tag }}
-      </button>
+        [routerLink]="chip.routerLink"
+        [attr.aria-current]="chip.active ? 'page' : null">
+        {{ chip.label }}
+      </a>
     }
-  </div>
+  </nav>
 }
 
 <div class="post-list">
@@ -49,6 +48,6 @@
       </div>
     </article>
   } @empty {
-    <p class="text-muted">No posts in this category yet.</p>
+    <p class="text-muted">{{ emptyMessage() }}</p>
   }
 </div>

@@ -8,8 +8,12 @@
     <div class="flex-col lg:flex-row gap-band">
       <div class="w-full lg:w-half">
         @if (sent()) {
-          <app-callout tone="success" title="Message sent">
-            Thanks — we have your note and will reply to {{ form.controls.email.value }}.
+          <!-- TODO(backend): when `submit()` posts to a real endpoint, this
+               becomes tone="success" / "Message sent" / "Thanks — we have your
+               note and will reply to {{ '{{' }} form.controls.email.value {{ '}}' }}." -->
+          <app-callout tone="warning" title="Not sent yet">
+            This form is not connected yet, so your message has not reached us. Please send it
+            through the support portal below — it reaches the same people.
           </app-callout>
         } @else {
           <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()" novalidate>

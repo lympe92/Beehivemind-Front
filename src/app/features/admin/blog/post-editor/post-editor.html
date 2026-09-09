@@ -1,0 +1,180 @@
+<div class="app-page">
+  <div class="app-page-header">
+    <div>
+      <a class="app-page-back" routerLink="/admin/blog">« All posts</a>
+      <h1 class="app-page-title">{{ postId() ? 'Edit post' : 'New post' }}</h1>
+    </div>
+    <div class="fb__group fb__group--end">
+      <button type="button" class="app-btn app-btn--ghost" [disabled]="saving()" (click)="save(true)">
+        Save draft
+      </button>
+      <button type="button" class="app-btn app-btn--primary" [disabled]="saving()" (click)="save()">
+        {{ primaryLabel() }}
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <app-error [message]="error()!" />
+  } @else if (!loading()) {
+    <form class="pe" [formGroup]="form" (ngSubmit)="save()" novalidate>
+
+      <!-- ------------------------------------------------------ the article -->
+      <div class="pe__main">
+        <app-card title="Article">
+          <app-form-input label="Title" formControlName="title" placeholder="What the post is called" />
+
+          <div class="pe__slug">
+            <app-form-input label="Slug" formControlName="slug" [displayErrors]="false"
+                            (inputChanged)="checkSlug()" />
+            @if (slugLocked()) {
+              <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="unlockSlug()">Change</button>
+            }
+          </div>
+          <p class="pe__hint" [class.pe__hint--warn]="slugTaken()">
+            {{ slugTaken() ? 'That address is already taken.' : previewUrl() }}
+          </p>
+
+          <app-form-textarea label="Summary" formControlName="excerpt"
+                             placeholder="One or two sentences. Used on the index, in the search result and in shares." />
+          <p class="pe__hint" [class.pe__hint--warn]="over(form.value.excerpt ?? '', limits.metaDescription)">
+            {{ (form.value.excerpt ?? '').length }} characters — a search result shows about {{ limits.metaDescription }}.
+          </p>
+
+          <app-form-richtext label="Body" formControlName="body" (imageRequested)="pickBodyImage()" />
+          <!-- Off-screen rather than hidden: the toolbar's image button clicks it. -->
+          <input #bodyFile class="pe__file" type="file" accept="image/jpeg,image/png,image/webp"
+                 (change)="onFile($event, 'body')" aria-hidden="true" tabindex="-1" />
+        </app-card>
+
+        <!-- The two things an answer engine lifts. Both are rendered on the
+             published page, which is what makes the markup eligible. -->
+        <app-card title="Answers">
+          <p class="pe__lead">
+            Shown on the page as “In short” and “Common questions”, and emitted as structured data.
+            Google ignores FAQ markup whose answers are not visible, so these are content.
+          </p>
+
+          <fieldset class="pe__repeater" formArrayName="key_takeaways">
+            <legend class="pe__legend">Key takeaways</legend>
+            @for (control of takeaways.controls; track $index) {
+              <div class="pe__row">
+                <input class="app-input" type="text" [formControlName]="$index"
+                       placeholder="One sentence a reader could quote." />
+                <button type="button" class="app-btn app-btn--ghost app-btn--sm"
+                        (click)="removeTakeaway($index)" aria-label="Remove takeaway">Remove</button>
+              </div>
+            } @empty {
+              <p class="pe__hint">Three or four lines that answer the article’s question on their own.</p>
+            }
+            <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="addTakeaway()">+ Add takeaway</button>
+          </fieldset>
+
+          <fieldset class="pe__repeater" formArrayName="faq">
+            <legend class="pe__legend">Questions</legend>
+            @for (group of faq.controls; track $index) {
+              <div class="pe__faq" [formGroupName]="$index">
+                <input class="app-input" type="text" formControlName="question" placeholder="The question, as someone would ask it" />
+                <textarea class="app-input pe__answer" formControlName="answer" rows="3"
+                          placeholder="The answer, in two or three sentences."></textarea>
+                <button type="button" class="app-btn app-btn--ghost app-btn--sm"
+                        (click)="removeFaq($index)" aria-label="Remove question">Remove</button>
+              </div>
+            } @empty {
+              <p class="pe__hint">Optional. Only add questions the article really answers.</p>
+            }
+            <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="addFaq()">+ Add question</button>
+          </fieldset>
+        </app-card>
+      </div>
+
+      <!-- ----------------------------------------------------- the sidebar -->
+      <aside class="pe__side">
+        <app-card title="Publish">
+          <app-form-select label="Status" formControlName="status" [options]="statusOptions" />
+          <label class="form-label" for="pe-date">Publish date</label>
+          <input id="pe-date" class="app-input" type="datetime-local" formControlName="published_at" />
+          <p class="pe__hint">
+            A scheduled post appears by itself once this time passes. Left blank, publishing uses now.
+          </p>
+        </app-card>
+
+        <app-card title="Organise">
+          <app-form-select label="Category" formControlName="category_id" [options]="categoryOptions()" />
+          <label class="form-label" for="pe-tags">Tags</label>
+          <input id="pe-tags" class="app-input" type="text" formControlName="tags" placeholder="Comma separated" />
+        </app-card>
+
+        <app-card title="Featured image">
+          @if (featuredImage(); as image) {
+            <img class="pe__thumb" [src]="image.url" [alt]="image.alt ?? ''" />
+            <p class="pe__hint">{{ image.alt }} — {{ image.width }}×{{ image.height }}</p>
+            <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="removeFeatured()">Remove</button>
+          } @else {
+            <label class="pe__drop">
+              <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onFile($event, 'featured')" />
+              <span>{{ uploading() === 'featured' ? 'Uploading…' : 'Choose an image' }}</span>
+            </label>
+            <p class="pe__hint">Shown on the index row and at the top of the article. JPEG, PNG or WebP, up to 4 MB.</p>
+          }
+        </app-card>
+
+        <app-card title="Search result">
+          <!-- The same fallbacks the API applies, so what is drawn here is what
+               a crawler will read. -->
+          <div class="pe__serp">
+            <span class="pe__serp-url">{{ previewUrl() }}</span>
+            <span class="pe__serp-title">{{ previewTitle() || 'Untitled post' }}</span>
+            <span class="pe__serp-desc">{{ previewDescription() || 'No summary yet.' }}</span>
+          </div>
+
+          <app-form-input label="Meta title" formControlName="meta_title" placeholder="Falls back to the title" />
+          <p class="pe__hint" [class.pe__hint--warn]="over(form.value.meta_title ?? '', limits.metaTitle)">
+            {{ (form.value.meta_title ?? '').length }} / {{ limits.metaTitle }} before Google truncates.
+          </p>
+
+          <app-form-textarea label="Meta description" formControlName="meta_description"
+                             placeholder="Falls back to the summary" />
+          <p class="pe__hint" [class.pe__hint--warn]="over(form.value.meta_description ?? '', limits.metaDescription)">
+            {{ (form.value.meta_description ?? '').length }} / {{ limits.metaDescription }}.
+          </p>
+
+          <app-form-input label="Focus keyword" formControlName="focus_keyword"
+                          placeholder="The phrase this post is for" />
+          <app-form-input label="Canonical URL" formControlName="canonical_url"
+                          placeholder="Only if this post exists elsewhere first" />
+
+          <label class="pe__check">
+            <input type="checkbox" formControlName="noindex" />
+            <span>Keep out of search results</span>
+          </label>
+        </app-card>
+
+        <app-card title="Social card">
+          @if (ogImage(); as card) {
+            <img class="pe__thumb" [src]="card.url" alt="The post’s social card" />
+          } @else {
+            <p class="pe__hint">
+              Without one, every share of this post uses the site’s generic blog image.
+            </p>
+          }
+
+          <div class="pe__row">
+            <button type="button" class="app-btn app-btn--ghost app-btn--sm"
+                    [disabled]="uploading() === 'og'" (click)="generateOgCard()">
+              {{ uploading() === 'og' ? 'Drawing…' : (ogImage() ? 'Regenerate' : 'Generate card') }}
+            </button>
+            @if (ogImage()) {
+              <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="clearOgCard()">Remove</button>
+            }
+          </div>
+
+          <app-form-input label="Share title" formControlName="og_title" placeholder="Falls back to the title" />
+          <app-form-textarea label="Share description" formControlName="og_description"
+                             placeholder="Falls back to the summary" />
+        </app-card>
+      </aside>
+
+    </form>
+  }
+</div>

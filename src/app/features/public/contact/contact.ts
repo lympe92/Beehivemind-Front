@@ -15,8 +15,10 @@ interface ContactPageConfig {
  * phone number or response-time commitment anywhere in the source, so none
  * is stated here — add the real ones before this ships.
  *
- * TODO(backend): the form has no endpoint yet; submitting shows the sent
- * state only. Wire it to a `contact` API call when one exists.
+ * TODO(backend): the form has no endpoint yet. `submit()` only flips `sent`,
+ * so until it posts somewhere the success callout must not claim the message
+ * arrived — it used to, and every enquiry was being discarded silently. The
+ * copy to restore is in the template, next to the callout.
  */
 @Component({
   selector: 'app-contact',

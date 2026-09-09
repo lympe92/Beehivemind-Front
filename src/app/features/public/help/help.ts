@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { PageIntroComponent } from '../../../shared/components/info-sections/page-intro/page-intro';
 import { TextColumnsComponent } from '../../../shared/components/info-sections/text-columns/text-columns';
 import { SplitAccordionComponent } from '../../../shared/components/cta-sections/split-accordion/split-accordion';
 import { CtaBannerComponent } from '../../../shared/components/cta-sections/cta-banner/cta-banner';
 import { CtaBannerConfig, PageIntroConfig, SplitAccordionConfig, TextColumnsConfig } from '../public-page.model';
+import { SeoService } from '../../../core/services/seo.service';
+import { SEO_CONFIG } from '../../../core/services/seo.config';
+import { FAQPageSchema } from '../../../core/models/seo.model';
+import { environment } from '../../../../environments/environment';
 
 interface VoiceCommand {
   term: string;
@@ -24,6 +28,11 @@ interface HelpPageConfig {
  * The ten commands are real, taken from the mobile client's parser
  * (features/voice/parsing/command-parser.ts). It hands off to the portal at
  * the end.
+ *
+ * The page applies its own SEO rather than going through the route's `seoKey`,
+ * because the FAQPage node is built from `troubleshooting` — keeping the
+ * questions in one place, where they cannot drift from what the page shows.
+ * The route carries no `seoKey`, so `PublicLayoutComponent` leaves this alone.
  */
 @Component({
   selector: 'app-help',
@@ -32,6 +41,8 @@ interface HelpPageConfig {
   templateUrl: './help.html',
 })
 export class HelpComponent {
+  private seoService = inject(SeoService);
+
   readonly page: HelpPageConfig = {
     intro: {
       eyebrow: 'Help',
@@ -81,4 +92,27 @@ export class HelpComponent {
       cta: { label: 'Open the support portal', routerLink: 'https://beehivemind.freshdesk.com/support/home', variant: 'outline' },
     },
   };
+
+  constructor() {
+    // In the constructor, not ngOnInit, so the tags are part of the prerender.
+    const base = SEO_CONFIG['help'];
+    const pageSchema = Array.isArray(base.schema) ? base.schema : [base.schema];
+    this.seoService.applySEO({ ...base, schema: [...pageSchema, this.faqSchema()] });
+  }
+
+  /** Built from the accordion, so every question and answer is visible on the page. */
+  private faqSchema(): FAQPageSchema {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      name: `Help | ${environment.appName}`,
+      url: `${environment.appUrl}/help`,
+      description: SEO_CONFIG['help'].meta_description,
+      mainEntity: this.page.troubleshooting.items.map(item => ({
+        '@type': 'Question' as const,
+        name: item.title,
+        acceptedAnswer: { '@type': 'Answer' as const, text: item.body },
+      })),
+    };
+  }
 }

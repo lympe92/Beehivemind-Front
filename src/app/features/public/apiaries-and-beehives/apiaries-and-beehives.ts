@@ -25,7 +25,7 @@ const FLOWER: ImageConfig = { src: 'assets/img/flower.webp', alt: 'Flower', widt
 export class ApiariesAndBeehivesComponent {
   readonly page: ApiariesPageConfig = {
     hero: {
-      title: 'Manage your beehives instantly',
+      title: 'Organise your apiaries and beehives on one map',
       subtitle: 'By utilizing the latest innovations in digital mapping, we offer you the best mapping system to depict your apiaries.',
       image: { src: 'assets/img/jar2.webp', alt: 'Jar', width: 473, height: 473, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary', size: 'md' },

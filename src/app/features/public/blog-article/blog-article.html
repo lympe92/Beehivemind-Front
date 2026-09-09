@@ -3,32 +3,54 @@
     <article class="container hero">
       <header class="article__header">
         <div class="post-list__meta">
-          @if (post.tag) {
-            <span class="post-list__tag">{{ post.tag }}</span>
+          @if (post.category) {
+            <a class="post-list__tag" [routerLink]="['/blog/category', post.category.slug]">{{ post.category.name }}</a>
             <span class="post-list__dot">·</span>
           }
-          <span>{{ post.date }}</span>
-          @if (post.readingTime) {
-            <span class="post-list__dot">·</span>
-            <span>{{ post.readingTime }}</span>
-          }
+          <!-- The machine-readable date lives in the BlogPosting node; this is
+               the one a reader sees. -->
+          <span>{{ displayDate(post.published_at) }}</span>
+          <span class="post-list__dot">·</span>
+          <span>{{ post.reading_minutes }} min read</span>
         </div>
         <h1 class="article__title">{{ post.title }}</h1>
         <p class="lead">{{ post.excerpt }}</p>
       </header>
 
-      @if (post.image) {
+      @if (post.featured_image; as image) {
         <div class="article__hero">
-          <img [src]="post.image.src" [alt]="post.image.alt" [width]="post.image.width" [height]="post.image.height" />
+          <img
+            [src]="image.url"
+            [alt]="image.alt"
+            [attr.width]="image.width"
+            [attr.height]="image.height" />
         </div>
       }
 
       <div class="prose">
-        @for (block of post.body; track $index) {
-          @if (block.type === 'h2') {
-            <h2>{{ block.text }}</h2>
-          } @else {
-            <p>{{ block.text }}</p>
+        <!-- The summary an answer engine lifts, and the first thing a reader in
+             a hurry wants. On the page, not only in the markup: Google ignores
+             structured data whose content is not visible. -->
+        @if (post.key_takeaways.length) {
+          <aside class="callout" aria-labelledby="in-short">
+            <p id="in-short" class="callout__title">In short</p>
+            <ul>
+              @for (takeaway of post.key_takeaways; track $index) {
+                <li>{{ takeaway }}</li>
+              }
+            </ul>
+          </aside>
+        }
+
+        <!-- Allowlisted on the server when the post was saved, and sanitized
+             again by Angular on the way in. -->
+        <div [innerHTML]="post.content"></div>
+
+        @if (post.faq.length) {
+          <h2>Common questions</h2>
+          @for (entry of post.faq; track $index) {
+            <h3>{{ entry.question }}</h3>
+            <p>{{ entry.answer }}</p>
           }
         }
 

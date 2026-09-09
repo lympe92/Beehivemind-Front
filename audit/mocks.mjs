@@ -160,6 +160,95 @@ const PENDING_AI = [
   { message_id: 15, conversation_id: 2, user_question: 'When should I treat my hives for Varroa?', ai_response: 'Your last mite counts were taken on 28 August. With the thyme flow finished, a formic course now and an oxalic drip in the broodless window is the usual sequence.', tool_calls: null, created_at: '2026-09-02T18:40:00Z' },
 ];
 
+/* --- blog ---------------------------------------------------------------
+   The public pages and the console both read these. The SEO block is finished
+   server-side in production, so it is finished here too — the audit checks the
+   rendered head, not the fields it was built from. */
+
+const SITE = 'http://localhost:4301';
+
+const BLOG_CATEGORIES = [
+  { id: 1, name: 'Inspections', slug: 'inspections', description: 'Reading a colony, and what the numbers you write down are worth later.', meta_title: 'Beehive inspections | BeehiveMind blog', meta_description: 'How to read a colony and what the readings you record are worth weeks later.', sort_order: 0, post_count: 1 },
+  { id: 2, name: 'The app', slug: 'the-app', description: 'How BeehiveMind is built, and why it works the way it does.', meta_title: null, meta_description: null, sort_order: 1, post_count: 1 },
+  { id: 3, name: 'Treatments', slug: 'treatments', description: 'Varroa, courses, intervals and the doses that get missed.', meta_title: null, meta_description: null, sort_order: 2, post_count: 1 },
+];
+
+const blogPost = (id, slug, title, excerpt, category, published, html, takeaways = [], faq = []) => ({
+  id, title, slug, excerpt,
+  content: html,
+  featured_image: null,
+  author: { id: 1, name: 'Anna Ioannou' },
+  category,
+  tags: [category.name],
+  reading_minutes: 5,
+  key_takeaways: takeaways,
+  faq,
+  published_at: published,
+  updated_at: published,
+  seo: {
+    canonical_url: `${SITE}/blog/${slug}`,
+    focus_keyword: category.name.toLowerCase(),
+    meta_title: `${title} | BeehiveMind`,
+    meta_description: excerpt,
+    og_title: title,
+    og_description: excerpt,
+    og_type: 'article',
+    robots: 'index, follow',
+    twitter_card: 'summary_large_image',
+    twitter_title: title,
+    twitter_description: excerpt,
+    image_url: `${SITE}/assets/images/og-blog.jpg`,
+  },
+});
+
+const BLOG_POSTS = [
+  blogPost(1, 'reading-closed-brood', 'What closed brood tells you three weeks early',
+    'Recording capped brood separately from eggs is the single most useful thing you can do in an inspection.',
+    BLOG_CATEGORIES[0], '2026-08-28T09:00:00Z',
+    '<p>A frame of capped brood is a promise. The bees inside it will emerge in roughly twelve days, and they will start foraging about a week after that.</p><h2>Reading the pair together</h2><p>High open brood with low closed brood usually means the queen has only recently come into her stride.</p><ul><li>Count frames, not cells.</li><li>Record the two figures separately.</li></ul>',
+    ['Capped brood forecasts the workforce three weeks out.', 'Open and closed brood are two readings, not one.'],
+    [{ question: 'How often should I inspect?', answer: 'Every seven to ten days through the build-up, less once the flow is on.' }]),
+  blogPost(2, 'hands-free-inspections', 'Why we built the app to be used without looking at it',
+    'Every second spent tapping a phone over an open hive is a second the bees are getting warmer.',
+    BLOG_CATEGORIES[1], '2026-08-12T09:00:00Z',
+    '<p>An inspection is a two-handed job.</p><h2>The checklist problem</h2><p>The traditional answer is a paper checklist and a pencil in your veil.</p>'),
+  blogPost(3, 'treatment-schedules', 'Recurring treatments, and the doses people forget',
+    'A formic acid course is three applications a week apart. The third is the one that gets missed.',
+    BLOG_CATEGORIES[2], '2026-07-30T09:00:00Z',
+    '<p>Most varroa treatments are not a single event.</p><h2>Scheduling the whole course at once</h2><p>Day 0, day 7, day 14.</p>'),
+];
+
+const ADMIN_BLOG_POSTS = BLOG_POSTS.map((p, i) => ({
+  id: p.id,
+  title: p.title,
+  slug: p.slug,
+  excerpt: p.excerpt,
+  content_html: p.content,
+  content_json: null,
+  status: i === 2 ? 'draft' : 'published',
+  is_live: i !== 2,
+  published_at: i === 2 ? null : p.published_at,
+  reading_minutes: p.reading_minutes,
+  category_id: p.category.id,
+  category_name: p.category.name,
+  tags: p.tags,
+  author_name: 'Anna Ioannou',
+  featured_image: null,
+  og_image: null,
+  meta_title: null,
+  meta_description: null,
+  focus_keyword: null,
+  canonical_url: null,
+  robots: 'index, follow',
+  og_title: null,
+  og_description: null,
+  twitter_card: 'summary_large_image',
+  faq: p.faq,
+  key_takeaways: p.key_takeaways,
+  created_at: p.published_at ?? '2026-07-01T09:00:00Z',
+  updated_at: p.updated_at,
+}));
+
 const ok = (data, meta) => ({ success: true, code: 200, message: 'OK', data, ...(meta ? { meta } : {}) });
 const page = (items) => ok(items, { page: 1, per_page: 25, total: items.length, total_pages: 1 });
 
@@ -195,6 +284,22 @@ export function mock(method, path) {
   if (route === 'weather') return ok(WEATHER);
   if (route === 'ai/conversations') return ok(CONVERSATIONS);
   if (/^ai\/conversations\/\d+$/.test(route)) return ok(CONVERSATION_1);
+  if (route === 'blog/posts') return page(
+    q.get('category') ? BLOG_POSTS.filter(p => p.category.slug === q.get('category')) : BLOG_POSTS,
+  );
+  if (route === 'blog/categories') return ok(BLOG_CATEGORIES);
+  if (route.startsWith('blog/posts/')) {
+    const found = BLOG_POSTS.find(p => p.slug === route.split('/')[2]);
+    return found ? ok(found) : { status: 404, body: { success: false, message: 'Not found' } };
+  }
+
+  if (route === 'admin/blog/posts/slug-available') return ok({ available: true });
+  if (route === 'admin/blog/posts') return page(ADMIN_BLOG_POSTS);
+  if (/^admin\/blog\/posts\/\d+$/.test(route)) {
+    return ok(ADMIN_BLOG_POSTS.find(p => p.id === Number(route.split('/')[3])) ?? ADMIN_BLOG_POSTS[0]);
+  }
+  if (route === 'admin/blog/categories') return ok(BLOG_CATEGORIES);
+
   if (route === 'admin/stats') return ok(ADMIN_STATS);
   if (route === 'admin/users') return page(ADMIN_USERS);
   if (route === 'admin/employees') return ok(ADMIN_EMPLOYEES);
