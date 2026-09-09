@@ -16,13 +16,14 @@ export class SeoService {
   ) {}
 
   /**
-   * Read by server.ts, which promotes it to a real 404 response status.
+   * Read by server.ts, which turns it into the real response status.
    *
    * `ServerRoute.status` is fixed per route, so it cannot help a route whose
-   * content is looked up at render time — a blog slug, once posts come from the
-   * console. Such a page calls `markNotFound()` after `applySEO()`.
+   * content is looked up at render time: a real blog slug and an invented one
+   * share a route, and so does a slug the API simply failed to answer for.
+   * Such a page calls `markNotFound()` or `markUnavailable()` after `applySEO()`.
    */
-  static readonly NOT_FOUND_MARKER = 'x-render-status';
+  static readonly RENDER_STATUS_MARKER = 'x-render-status';
 
   applySEO(seo: SEOModel): void {
     // Cleared on every page so a marker cannot outlive the page that set it.
@@ -66,13 +67,33 @@ export class SeoService {
     this.addSchema(seo.schema);
   }
 
-  /** Call after `applySEO()` when the record behind the route does not exist. */
+  /**
+   * The record behind the route genuinely does not exist — deleted, or never
+   * existed. A 404 tells Google to drop it, which is what we want here.
+   */
   markNotFound(): void {
-    this.metaService.updateTag({ name: SeoService.NOT_FOUND_MARKER, content: '404' });
+    this.setRenderStatus(404);
+  }
+
+  /**
+   * The record could not be looked up: the API is down, timed out, or answered
+   * 5xx. Emphatically not a 404 — that would ask Google to remove a page that
+   * still exists, and a few hours of downtime would cost the whole blog its
+   * indexing. 503 is the "try again later" that costs nothing.
+   */
+  markUnavailable(): void {
+    this.setRenderStatus(503);
+  }
+
+  private setRenderStatus(status: 404 | 503): void {
+    this.metaService.updateTag({
+      name: SeoService.RENDER_STATUS_MARKER,
+      content: String(status),
+    });
   }
 
   private clearNotFound(): void {
-    this.metaService.removeTag(`name="${SeoService.NOT_FOUND_MARKER}"`);
+    this.metaService.removeTag(`name="${SeoService.RENDER_STATUS_MARKER}"`);
   }
 
   /**

@@ -9,6 +9,13 @@
       [posts]="posts()"
       [chips]="chips()"
       emptyMessage="Nothing published in this category yet."></section>
+  } @else if (unavailable()) {
+    <!-- The category may well exist; we could not reach the API. The response
+         is a 503, and the wording has to match that rather than claim a 404. -->
+    <section app-page-intro
+      eyebrow="Blog"
+      title="Temporarily unavailable"
+      lead="This page could not be loaded just now. Please try again shortly."></section>
   } @else if (loaded()) {
     <section app-page-intro
       eyebrow="Blog"

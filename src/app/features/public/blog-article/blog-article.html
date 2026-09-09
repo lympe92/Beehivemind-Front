@@ -57,6 +57,16 @@
         <a class="article__back" routerLink="/blog">« All posts</a>
       </div>
     </article>
+  } @else if (isUnavailable()) {
+    <!-- The post may well exist; we could not reach the API. Saying "not found"
+         here would be wrong, and the response is a 503, not a 404. -->
+    <article class="container hero">
+      <div class="prose">
+        <h1>Temporarily unavailable</h1>
+        <p>This post could not be loaded just now. Please try again shortly.</p>
+        <a class="article__back" routerLink="/blog">« All posts</a>
+      </div>
+    </article>
   } @else {
     <article class="container hero">
       <div class="prose">

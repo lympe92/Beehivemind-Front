@@ -210,12 +210,17 @@ app.use(
 );
 
 /**
- * A page that only discovers while rendering that its record is missing — a
- * blog slug that no longer exists — says so with this meta tag, because
- * `ServerRoute.status` is fixed per route and cannot tell a real slug from an
- * invented one. See `SeoService.markNotFound()`.
+ * A page that only discovers while rendering how its request went says so with
+ * this meta tag, because `ServerRoute.status` is fixed per route and cannot
+ * tell a real blog slug from an invented one — nor either of those from a slug
+ * the API failed to answer for.
+ *
+ * `404` the record is gone; drop it from the index.
+ * `503` the lookup failed; come back later and change nothing.
+ *
+ * See `SeoService.markNotFound()` and `markUnavailable()`.
  */
-const NOT_FOUND_MARKER = 'name="x-render-status" content="404"';
+const RENDER_STATUS_MARKER = /<meta\s+name="x-render-status"\s+content="(404|503)"/;
 
 /**
  * Handle all other requests by rendering the Angular application.
@@ -233,9 +238,14 @@ app.use((req, res, next) => {
         const body = await response.text();
         // Only a 200 can be demoted; a route that already declared its status
         // (the catch-all 404, the /pages/contact-us 301) keeps it.
-        const status =
-          response.status === 200 && body.includes(NOT_FOUND_MARKER) ? 404 : response.status;
+        const marked = response.status === 200 ? RENDER_STATUS_MARKER.exec(body) : null;
+        const status = marked ? Number(marked[1]) : response.status;
         const headers = new Headers(response.headers);
+        if (status === 503) {
+          // Without this a crawler decides for itself when to come back. Two
+          // minutes is longer than a restart and shorter than a recrawl cycle.
+          headers.set('Retry-After', '120');
+        }
         // Rendered HTML carried no Cache-Control at all, which leaves caches to
         // guess — and a wrong guess serves a stale page. Five minutes is short
         // enough that a deploy propagates on its own, long enough to be worth a

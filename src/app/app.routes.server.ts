@@ -28,7 +28,8 @@ export const serverRoutes: ServerRoute[] = [
   //
   // That means this route cannot carry a static `status`, since a real slug and
   // an invented one share it. BlogArticleComponent marks the missing case at
-  // render time and server.ts turns that into a 404 — see NOT_FOUND_MARKER.
+  // render time — and the API being unreachable as a third — and server.ts
+  // turns that into the status. See RENDER_STATUS_MARKER.
   { path: 'blog/:slug', renderMode: RenderMode.Server },
 
   // The old marketing URL. It is a router redirect, so it needs a redirect

@@ -41,6 +41,8 @@ export class BlogCategoryComponent {
   readonly posts    = signal<Post[]>([]);
   readonly chips    = signal<PostChip[]>([]);
   readonly loaded   = signal(false);
+  /** The lookup failed, as opposed to the category not existing. */
+  readonly unavailable = signal(false);
 
   readonly ctaBanner: CtaBannerConfig = {
     title: 'Start keeping better records',
@@ -77,10 +79,13 @@ export class BlogCategoryComponent {
           this.seoService.applySEO(current ? this.toSeo(current, articles) : this.notFoundSeo());
           if (!current) this.seoService.markNotFound();
         },
+        // The category may well exist — the lookup failed. A 404 here would ask
+        // Google to drop an archive that is fine, so this is a 503 instead.
         error: () => {
           this.loaded.set(true);
-          this.seoService.applySEO(this.notFoundSeo());
-          this.seoService.markNotFound();
+          this.unavailable.set(true);
+          this.seoService.applySEO(this.unavailableSeo());
+          this.seoService.markUnavailable();
         },
       });
   }
@@ -129,6 +134,44 @@ export class BlogCategoryComponent {
   }
 
   /** An invented category must not be indexed, and must not borrow the last one's tags. */
+  /**
+   * The canonical stays on this archive's own address, not `/blog` — pointing
+   * at the index would say this URL is a duplicate, when all that happened is
+   * that the lookup failed.
+   */
+  private unavailableSeo(): SEOModel {
+    const slug = this.route.snapshot.paramMap.get('slug') ?? '';
+    const url = `${environment.appUrl}/blog/category/${slug}`;
+    const title = `Temporarily unavailable | ${environment.appName}`;
+    const text = 'This page could not be loaded just now. Please try again shortly.';
+
+    return {
+      meta_title: title,
+      meta_description: text,
+      focus_keyword: '',
+      canonical_url: url,
+      robots: 'noindex, follow',
+      image_url: `${environment.appUrl}/assets/images/og-blog.jpg`,
+
+      og_title: title,
+      og_description: text,
+      og_type: 'website',
+      og_locale: 'en_US',
+      og_site_name: environment.appName,
+
+      twitter_card: 'summary',
+      twitter_title: title,
+      twitter_description: text,
+
+      schema: {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: title,
+        url,
+      },
+    };
+  }
+
   private notFoundSeo(): SEOModel {
     const url = `${environment.appUrl}/blog`;
     const title = `Category not found | ${environment.appName}`;
