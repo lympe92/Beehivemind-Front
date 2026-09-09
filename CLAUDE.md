@@ -132,7 +132,21 @@ getAll(): Observable<ApiResponse<TreatmentSession[]>> {
 
 - **`RequestService`** (`core/services/request.service.ts`) — thin wrapper: `getRequest / postRequest / putRequest / patchRequest / deleteRequest`, prefixes `environment.apiUrl`, types everything as `ApiResponse<T>`.
 - **`ApiResponse<T>`** (`core/models/api-response.model.ts`) — every response has `success` + `data`. Components branch on `res.success`.
-- **Interceptors** (registered in `app.config.ts`): `authInterceptor` attaches the token; `errorInterceptor` catches HTTP errors and surfaces them (hence empty `error: () => {}` in components).
+- **Interceptors** (registered in `app.config.ts`): `authInterceptor` attaches the token; `errorInterceptor` catches HTTP errors and surfaces them (hence empty `error: () => {}` in components); `analyticsInterceptor` turns successful creation POSTs into GA4 events (see [Analytics](#analytics)).
+
+---
+
+## Analytics
+
+GA4 (`environment.googleAnalyticsId`, prod only) plus an empty GTM container. Three files, one rule: **application code never calls `gtag` directly**.
+
+| File | Role |
+|------|------|
+| `core/services/google-analytics.service.ts` | Loads gtag.js after idle, sends `page_view` on every `NavigationEnd` (a microtask later, so the title is the new page's), attaches `user_id` + user properties from the auth store, skips driven browsers (`navigator.webdriver` — the audit harness must not count as users) |
+| `core/services/analytics.service.ts` | `event(name, params)`, `setUser(user \| null)`, `trackClicks()` (store badges → `app_store_click`, links to `/auth/register` → `cta_click`). No-op on the server and without a measurement id, so callers never guard |
+| `core/interceptors/analytics.interceptor.ts` | Maps successful creation POSTs to `create_apiary`, `create_beehive`, `create_inspection` / `create_feeding` / `create_harvest` (from the `records` body `type`), `create_treatment_type`, `create_treatment_session`, `create_cost`, `create_cost_category`, `ai_message`, `enable_2fa`. A new entity is one line in its table |
+
+Funnel events fired by hand: `sign_up {method}` (register success; Google sign-in when the API says `is_new_user`), `email_confirmed`, `login {method}` (`AuthEffects`), `complete_profile {skipped}`, `generate_lead {form}` (contact). **No PII**: the user id is the numeric key, user properties are `country` and `auth_method`. Key events, data retention and the Search Console link are GA4 admin settings, not code. The growth/SEO audit that defined these events lives outside the repo (this repo is public) in the `Beehivemind Software` folder on the Desktop.
 
 ---
 

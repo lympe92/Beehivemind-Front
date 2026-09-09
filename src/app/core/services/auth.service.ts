@@ -62,14 +62,17 @@ export class AuthService {
   loginWithGoogle(credential: string): Observable<{
     user?: User; token?: string;
     requires_2fa?: boolean; twoFactorToken?: string;
+    /** True when this credential created the account — a sign-up, not a sign-in. */
+    isNewUser?: boolean;
   }> {
     return this.request
-      .postRequest<{ token?: string; user?: User; requires_2fa?: boolean; two_factor_token?: string }>('user/auth/google', { credential })
+      .postRequest<{ token?: string; user?: User; requires_2fa?: boolean; two_factor_token?: string; is_new_user?: boolean }>('user/auth/google', { credential })
       .pipe(map((res) => ({
         user: res.data.user,
         token: res.data.token,
         requires_2fa: res.data.requires_2fa,
         twoFactorToken: res.data.two_factor_token,
+        isNewUser: res.data.is_new_user,
       })));
   }
 

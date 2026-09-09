@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { AnalyticsService } from '../../../core/services/analytics.service';
 import { AuthCardComponent } from '../../../shared/components/forms/auth-card/auth-card';
 
 @Component({
@@ -12,6 +13,7 @@ import { AuthCardComponent } from '../../../shared/components/forms/auth-card/au
 export class ConfirmationComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
+  private analytics = inject(AnalyticsService);
 
   state = signal<'loading' | 'success' | 'error'>('loading');
 
@@ -24,7 +26,11 @@ export class ConfirmationComponent implements OnInit {
     }
 
     this.authService.confirmEmail(token).subscribe({
-      next: () => this.state.set('success'),
+      next: () => {
+        this.state.set('success');
+        // The step between sign_up and login that an unconfirmed account never reaches.
+        this.analytics.event('email_confirmed');
+      },
       error: () => this.state.set('error'),
     });
   }

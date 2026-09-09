@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { take } from 'rxjs';
 import { AuthActions } from '../../../store/auth/auth.actions';
+import { AnalyticsService } from '../../../core/services/analytics.service';
 import { selectPendingUser, selectPendingToken } from '../../../store/auth/auth.selectors';
 import { COUNTRIES, Country } from '../../../core/data/countries';
 import { environment } from '../../../../environments/environment';
@@ -19,6 +20,7 @@ export class CompleteProfileComponent implements OnInit {
   private store = inject(Store);
   private router = inject(Router);
   private http = inject(HttpClient);
+  private analytics = inject(AnalyticsService);
 
   countries: Country[] = COUNTRIES;
   selectedCountry: Country | null = null;
@@ -56,6 +58,7 @@ export class CompleteProfileComponent implements OnInit {
       country_longitude: this.selectedCountry.longitude,
     }, { headers }).subscribe({
       next: () => {
+        this.analytics.event('complete_profile', { skipped: false });
         this.pendingUser$.pipe(take(1)).subscribe(user => {
           this.loading.set(false);
           if (user) {
@@ -75,6 +78,7 @@ export class CompleteProfileComponent implements OnInit {
   }
 
   skip(): void {
+    this.analytics.event('complete_profile', { skipped: true });
     this.pendingUser$.pipe(take(1)).subscribe(user => {
       if (user) {
         this.store.dispatch(AuthActions.loginSuccess({

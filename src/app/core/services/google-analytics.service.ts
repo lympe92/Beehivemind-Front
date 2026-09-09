@@ -1,9 +1,12 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { distinctUntilChanged, filter } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { runWhenIdle } from '../utils/run-when-idle';
+import { selectCurrentUser } from '../../store/auth/auth.selectors';
+import { AnalyticsService } from './analytics.service';
 
 declare global {
   interface Window {
@@ -12,13 +15,23 @@ declare global {
   }
 }
 
+/**
+ * Loads gtag.js and reports page views. Everything else that reaches GA4 goes
+ * through `AnalyticsService`, which this wires up once the stub exists.
+ */
 @Injectable({ providedIn: 'root' })
 export class GoogleAnalyticsService {
   private platformId = inject(PLATFORM_ID);
   private router     = inject(Router);
+  private store      = inject(Store);
+  private analytics  = inject(AnalyticsService);
 
   init(): void {
     if (!isPlatformBrowser(this.platformId) || !environment.googleAnalyticsId) return;
+
+    // The audit harness, and any other driven browser, announce themselves
+    // here. Keeping them out is what makes "users" mean people.
+    if (navigator.webdriver) return;
 
     const measurementId = environment.googleAnalyticsId;
 
@@ -35,9 +48,24 @@ export class GoogleAnalyticsService {
 
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe(event => {
-        window.gtag!('event', 'page_view', { page_path: event.urlAfterRedirects });
+      .subscribe(() => {
+        // A microtask later, so the title a page sets on this same
+        // NavigationEnd is the one reported, not the previous page's.
+        queueMicrotask(() => {
+          window.gtag!('event', 'page_view', {
+            page_location: location.href,
+            page_title: document.title,
+          });
+        });
       });
+
+    // The restored session, every login and every logout, in one place.
+    this.store
+      .select(selectCurrentUser)
+      .pipe(distinctUntilChanged((a, b) => a?.id === b?.id))
+      .subscribe((user) => this.analytics.setUser(user));
+
+    this.analytics.trackClicks();
 
     runWhenIdle(() => {
       const script = document.createElement('script');

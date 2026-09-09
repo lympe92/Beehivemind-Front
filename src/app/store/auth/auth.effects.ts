@@ -3,19 +3,25 @@ import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, exhaustMap, map, of, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
+import { AnalyticsService } from '../../core/services/analytics.service';
 import { AuthActions } from './auth.actions';
 
 @Injectable()
 export class AuthEffects {
   private actions$ = inject(Actions);
   private authService = inject(AuthService);
+  private analytics = inject(AnalyticsService);
   private router = inject(Router);
+
+  /** Which door the sign-in came through, reported on the `login` event. */
+  private loginMethod: 'email' | 'google' = 'email';
 
   login$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.login),
-      exhaustMap(({ email, password }) =>
-        this.authService.login(email, password).pipe(
+      exhaustMap(({ email, password }) => {
+        this.loginMethod = 'email';
+        return this.authService.login(email, password).pipe(
           map((res) => {
             if (res.requires_2fa) {
               return AuthActions.loginRequires2FA({ twoFactorToken: res.twoFactorToken! });
@@ -28,19 +34,25 @@ export class AuthEffects {
               retryAfterMinutes: err?.error?.retry_after_minutes ?? undefined,
             })),
           ),
-        ),
-      ),
+        );
+      }),
     ),
   );
 
   loginWithGoogle$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.loginWithGoogle),
-      exhaustMap(({ credential }) =>
-        this.authService.loginWithGoogle(credential).pipe(
+      exhaustMap(({ credential }) => {
+        this.loginMethod = 'google';
+        return this.authService.loginWithGoogle(credential).pipe(
           map((res) => {
             if (res.requires_2fa) {
               return AuthActions.loginRequires2FA({ twoFactorToken: res.twoFactorToken! });
+            }
+            // The Google button is also the sign-up form: the API says whether
+            // this credential just created the account.
+            if (res.isNewUser) {
+              this.analytics.event('sign_up', { method: 'google' });
             }
             const user = res.user!;
             const token = res.token!;
@@ -51,9 +63,20 @@ export class AuthEffects {
           catchError((err) =>
             of(AuthActions.loginFailure({ error: err?.error?.message ?? 'Google sign-in failed' })),
           ),
-        ),
-      ),
+        );
+      }),
     ),
+  );
+
+  // The user id itself is attached by GoogleAnalyticsService, which watches
+  // the store; this is only the event that a sign-in happened.
+  loginSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.loginSuccess),
+        tap(() => this.analytics.event('login', { method: this.loginMethod })),
+      ),
+    { dispatch: false },
   );
 
   loginNeedsCountry$ = createEffect(

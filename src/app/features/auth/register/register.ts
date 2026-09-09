@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AuthService } from '../../../core/services/auth.service';
+import { AnalyticsService } from '../../../core/services/analytics.service';
 import { AuthActions } from '../../../store/auth/auth.actions';
 import { selectIsLoggedIn } from '../../../store/auth/auth.selectors';
 import { environment } from '../../../../environments/environment';
@@ -22,6 +23,7 @@ import { InputComponent } from '../../../shared/components/form-fields/input/inp
 })
 export class RegisterComponent implements OnInit {
   private authService = inject(AuthService);
+  private analytics = inject(AnalyticsService);
   private store = inject(Store);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -74,6 +76,7 @@ export class RegisterComponent implements OnInit {
         this.loading.set(false);
         this.registeredEmail.set(this.form.value.email);
         this.success.set(true);
+        this.analytics.event('sign_up', { method: 'email' });
       },
       error: (err) => {
         this.loading.set(false);

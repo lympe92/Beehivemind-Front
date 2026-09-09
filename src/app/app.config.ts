@@ -13,6 +13,7 @@ import { routes } from './app.routes';
 import { appReducers, appEffects } from './store';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { analyticsInterceptor } from './core/interceptors/analytics.interceptor';
 import { createHydrationMetaReducer } from './store/hydration.meta-reducer';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
@@ -20,7 +21,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, analyticsInterceptor])),
     provideStore(appReducers),
     {
       provide: META_REDUCERS,
