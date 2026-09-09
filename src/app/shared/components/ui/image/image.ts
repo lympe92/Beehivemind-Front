@@ -6,6 +6,7 @@ import { NgOptimizedImage, isPlatformServer } from '@angular/common';
   standalone: true,
   imports: [NgOptimizedImage],
   templateUrl: './image.html',
+  styleUrl: './image.scss',
 })
 export class ImageComponent implements OnInit {
   private doc        = inject(DOCUMENT);

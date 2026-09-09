@@ -1,0 +1,10 @@
+/* The host wraps a replaced element, and an inline box is shrink-to-fit: until
+   the image's intrinsic size is known the `max-width: 100%` on the img resolves
+   against a narrower box, so the picture lays out small and then jumps to its
+   real width. On /financial that was a 0.102 layout shift — a failed Core Web
+   Vital — which Lighthouse misattributes to the web font that happens to land
+   at the same moment.
+   `map-picker` sets its host the same way, for the same structural reason. */
+:host {
+  display: block;
+}
