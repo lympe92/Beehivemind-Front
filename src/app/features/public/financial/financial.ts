@@ -62,8 +62,8 @@ export class FinancialComponent {
         { img: LOGO, title: 'Income/Outgoing Pie', description: 'Keep an eye on income/outgoing pie to see the balance between income and expenses of your business.' },
         { img: LOGO, title: 'Financial Reports', description: 'Filter your costs by period and category, then export the summary to keep your bookkeeping in order.' },
       ],
-      ctaHref: 'https://beehivemind.freshdesk.com/support/home',
-      ctaLabel: 'Explore the docs',
+      ctaHref: '/help',
+      ctaLabel: 'Read the help page',
     },
     infoColumns: {
       title: 'Trusted partner',

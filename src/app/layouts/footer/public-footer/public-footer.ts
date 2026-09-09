@@ -41,11 +41,13 @@ export class PublicFooterComponent {
     { label: 'Financial', href: '/financial' },
   ];
 
+  // The LinkedIn company page (linkedin.com/company/beehivemind-beekeeping-software)
+  // no longer exists; add it back here and in index.html's `sameAs` once a
+  // page is live again.
   readonly social: FooterLink[] = [
     { label: 'Facebook', href: 'https://www.facebook.com/beehivemind.org', external: true },
     { label: 'Instagram', href: 'https://www.instagram.com/beehivemind_org', external: true },
     { label: 'Twitter', href: 'https://twitter.com/Beehivemind_org', external: true },
-    { label: 'Linkedin', href: 'https://www.linkedin.com/company/beehivemind-beekeeping-software', external: true },
     { label: 'Youtube', href: 'https://www.youtube.com/channel/UCSacxrpIMgWoWhLORBY5HcQ', external: true },
   ];
 

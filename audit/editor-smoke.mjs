@@ -7,7 +7,7 @@ import { mock } from './mocks.mjs';
 
 const BASE = 'http://localhost:4301';
 const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const EMPLOYEE = { id: 1, name: 'Anna', surname: 'Ioannou', email: 'anna@beehivemind.org', role: 'superadmin' };
+const EMPLOYEE = { id: 1, name: 'Anna', surname: 'Ioannou', email: 'anna@beehivemind.tech', role: 'superadmin' };
 const SEED = {
   auth: { token: null, loading: false, error: null, twoFactorToken: null, twoFactorPending: null, pendingUser: null, pendingToken: null, retryAfterMinutes: null, user: null },
   employeeAuth: { token: null, loading: false, error: null, twoFactorToken: null, twoFactorStep: null, employee: EMPLOYEE },

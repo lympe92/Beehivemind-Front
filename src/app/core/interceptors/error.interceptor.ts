@@ -29,7 +29,7 @@ const AUTH_PATHS = [
  * exist is a 404 *page*, not a notification floating over one — and on the
  * server render there is nobody to read a toast anyway.
  */
-const SILENT_PATHS = ['blog/posts', 'blog/categories'];
+const SILENT_PATHS = ['blog/posts', 'blog/categories', 'contact'];
 
 /**
  * Single source of truth for HTTP-error toasts. Components no longer toast on

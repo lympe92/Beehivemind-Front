@@ -24,10 +24,9 @@ interface HelpPageConfig {
 }
 
 /**
- * The one thing a support portal handles badly: the voice command reference.
- * The ten commands are real, taken from the mobile client's parser
- * (features/voice/parsing/command-parser.ts). It hands off to the portal at
- * the end.
+ * The voice command reference. The ten commands are real, taken from the
+ * mobile client's parser (features/voice/parsing/command-parser.ts). It hands
+ * off to the contact page at the end.
  *
  * The page applies its own SEO rather than going through the route's `seoKey`,
  * because the FAQPage node is built from `troubleshooting` — keeping the
@@ -81,15 +80,16 @@ export class HelpComponent {
         {
           title: 'My inspection has not appeared',
           body: 'Recordings stay on the phone until it has signal, then upload on their own. Nothing is lost while you are out of range. If a session is still pending after the phone has been online, open the app once to let it finish.',
-          linkHref: 'https://beehivemind.freshdesk.com/support/home',
-          linkLabel: 'Ask support »',
+          linkHref: '/contact',
+          linkLabel: 'Ask us »',
         },
       ],
     },
+    // The former Freshdesk portal is gone (404), so support is the contact page.
     ctaBanner: {
       title: 'Still stuck?',
-      description: 'Our support portal has the full documentation, and a person on the other end of it.',
-      cta: { label: 'Open the support portal', routerLink: 'https://beehivemind.freshdesk.com/support/home', variant: 'outline' },
+      description: 'Write to us. A person answers — one of the people who build the software.',
+      cta: { label: 'Contact us', routerLink: '/contact', variant: 'outline' },
     },
   };
 

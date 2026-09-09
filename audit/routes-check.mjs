@@ -7,8 +7,8 @@ import { mock } from './mocks.mjs';
 
 /* Defaults to the dev server; TARGET=https://beehivemind.tech checks a deploy. */
 const BASE = process.env.TARGET || 'http://localhost:4301';
-const USER = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.org', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true };
-const EMPLOYEE = { id: 1, name: 'Anna', surname: 'Ioannou', email: 'anna@beehivemind.org', role: 'superadmin' };
+const USER = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true };
+const EMPLOYEE = { id: 1, name: 'Anna', surname: 'Ioannou', email: 'anna@beehivemind.tech', role: 'superadmin' };
 const AUTH_BASE = { token: null, loading: false, error: null, twoFactorToken: null, twoFactorPending: null, pendingUser: null, pendingToken: null, retryAfterMinutes: null };
 const EMP_BASE = { token: null, loading: false, error: null, twoFactorToken: null, twoFactorStep: null };
 const SEEDS = {

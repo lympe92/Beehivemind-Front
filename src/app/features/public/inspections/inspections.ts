@@ -51,8 +51,8 @@ export class InspectionsComponent {
         {
           title: 'Easy apiary management',
           body: 'When you are ready to start your inspection, simply open the app and use your voice to record what you see during inspection. When the inspection will be completed, all data will be available on site.',
-          linkHref: 'https://beehivemind.freshdesk.com/support/home',
-          linkLabel: 'Check the docs »',
+          linkHref: '/help',
+          linkLabel: 'Read the help page »',
         },
         {
           title: 'Voice recognition commands',
@@ -78,8 +78,8 @@ export class InspectionsComponent {
         { img: LOGO, title: 'Diseases', description: 'Keep notes on the diseases you find in each hive and get rid of them immediately by using the genetic material you have at your disposal.' },
         { img: LOGO, title: 'Info about queen', description: 'Every time you see the queen give the right voice command and you will be able to know when was the last time that the hive was prosperous.' },
       ],
-      ctaHref: 'https://beehivemind.freshdesk.com/support/home',
-      ctaLabel: 'Explore the docs',
+      ctaHref: '/help',
+      ctaLabel: 'Read the help page',
     },
     splitAccordion2: {
       title: 'Keep records of all-that happens',

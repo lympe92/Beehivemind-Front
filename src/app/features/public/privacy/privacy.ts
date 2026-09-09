@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { PageIntroComponent } from '../../../shared/components/info-sections/page-intro/page-intro';
 
 /**
@@ -10,7 +11,7 @@ import { PageIntroComponent } from '../../../shared/components/info-sections/pag
 @Component({
   selector: 'app-privacy',
   standalone: true,
-  imports: [PageIntroComponent],
+  imports: [PageIntroComponent, RouterLink],
   templateUrl: './privacy.html',
 })
 export class PrivacyComponent {}

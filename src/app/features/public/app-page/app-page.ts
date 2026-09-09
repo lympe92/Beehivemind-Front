@@ -83,8 +83,8 @@ export class AppPageComponent {
         {
           title: 'Group beehives according to your needs',
           body: 'You can use beehive groups for better organization. Group beehives according to some similar features, like bought queens or new beehives. Now its possible for you to check their growth as a group.',
-          linkHref: 'https://beehivemind.freshdesk.com/support/home',
-          linkLabel: 'Explore the docs »',
+          linkHref: '/help',
+          linkLabel: 'Read the help page »',
         },
       ],
     },

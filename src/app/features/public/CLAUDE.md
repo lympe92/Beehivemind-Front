@@ -13,13 +13,13 @@ The logged-out website: product pages, plans, help, legal, blog. No store, no se
 | `/` | `home/` | HeroLeft (proof strip) → Ribbon → SplitContent (product shot, steps) → SplitAccordion → FeaturesRow → Ribbon → SplitList → PricingTiers → ApplicationDownload → InfoColumns → CtaBanner |
 | `/features` | `features-page/` | HeroCenter → SplitList ×3 → Ribbon → SplitList ×2 → CtaBanner (media side alternates across the ribbon) |
 | `/app` | `app-page/` | HeroLeft → Ribbon → SplitContent → TextColumns → SplitAccordion → ApplicationDownload → SplitAccordion → InfoColumns → CtaBanner |
-| `/pricing` | `pricing/` | PageIntro → PricingTiers → TextColumns (level 2) → CtaBanner |
+| `/pricing` | `pricing/` | PageIntro → PricingTiers → TextColumns (level 2) → CtaBanner. Applies its own SEO (no `seoKey`) so it can add a `FAQPage` built from the questions band — same pattern as `/help` |
 | `/apiariesandbeehives`, `/harvestandfeeding` | `apiaries-and-beehives/`, `harvest-and-feeding/` | HeroCenter → SplitContent ×3 (alternating) → InfoColumns → CtaBanner |
 | `/inspections` | `inspections/` | HeroCenter → SplitAccordion → FeaturesListCta → SplitAccordion → CtaBanner (pivot) → InfoColumns → CtaBanner |
 | `/financial` | `financial/` | HeroCenter → TextCenterColumn ×2 → FeaturesListCta (6 items) → InfoColumns → CtaBanner |
 | `/help` | `help/` | PageIntro → TextColumns (level 2) → `.prose` command reference → SplitAccordion → CtaBanner |
 | `/about` | `about/` | PageIntro → SplitContent → TextColumns → Ribbon → InfoColumns → CtaBanner — **placeholder content, `TODO(content)` throughout** |
-| `/contact` | `contact/` | PageIntro → reactive form (`.form-stack`) + neutral Callout → success Callout. **No backend endpoint yet.** `/pages/contact-us` redirects here. |
+| `/contact` | `contact/` | PageIntro → reactive form (`.form-stack`) + neutral Callout → success Callout. Posts to `contact` via `core/services/contact.service.ts` (Content module → email to `info@`, visitor in Reply-To, honeypot field `website`); failure renders inline with the mailbox as fallback (`contact` is in the error interceptor's `SILENT_PATHS`). Success fires `generate_lead`. `/pages/contact-us` redirects here. |
 | `/privacy`, `/terms` | `privacy/`, `terms/` | PageIntro → `.prose`. Terms is a **skeleton**; muted paragraphs mark values a lawyer must fill in. |
 | `/blog`, `/blog/category/:slug`, `/blog/:slug` | `blog/`, `blog-category/`, `blog-article/` | PageIntro → PostList → CtaBanner; article = `.article__*` + `.prose`. **The only pages here that fetch** — see [The blog](#the-blog). |
 
@@ -70,7 +70,9 @@ categories are written in the admin console and read from the API
 
 ## Content flags
 - Figures in the "Trusted partner" bands and every price/limit on `/pricing` and the home pricing band are **unconfirmed** (`TODO(content)` comments). The home pricing band duplicates `/pricing` — change a price in both.
-- Store links: Play `org.beehivemind`, App Store `apps.apple.com/app/beehivemind` (unverified ids).
+- Store links: Play `org.beehivemind`, App Store `apps.apple.com/app/beehivemind` — **both 404 as of 2026-09-09** (the old Play listing is gone, there is no iOS build). Left in place pending a content decision; every click is counted as `app_store_click`.
+- The Freshdesk support portal no longer exists. Support links go to `/help` and `/contact`; the LinkedIn company page is gone too and is out of the footer and the Organization schema until a new one exists.
+- Titles are keyword-first (`seo.config.ts`), under 60 characters, brand last. Nobody searches for the brand yet.
 
 ## Related
 [Root CLAUDE.md](../../../../CLAUDE.md) · sections in `shared/components/{hero,info,cta}-sections/` · `seo.config.ts`

@@ -8,8 +8,8 @@ const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const [path = '/', widthArg = '375', seedName = 'none'] = process.argv.slice(2);
 const width = Number(widthArg);
 
-const USER = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.org', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true };
-const EMPLOYEE = { id: 1, name: 'Anna', surname: 'Ioannou', email: 'anna@beehivemind.org', role: 'superadmin' };
+const USER = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true };
+const EMPLOYEE = { id: 1, name: 'Anna', surname: 'Ioannou', email: 'anna@beehivemind.tech', role: 'superadmin' };
 const AUTH_BASE = { token: null, loading: false, error: null, twoFactorToken: null, twoFactorPending: null, pendingUser: null, pendingToken: null, retryAfterMinutes: null };
 const EMP_BASE = { token: null, loading: false, error: null, twoFactorToken: null, twoFactorStep: null };
 const SEEDS = {

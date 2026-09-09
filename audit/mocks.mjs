@@ -88,7 +88,7 @@ const AGENDA = [
   { type: 'inspection', title: 'Move Evia hives to thyme', subtitle: 'Evia Coast', scheduled_date: '2026-09-15', is_overdue: false, entity_type: 'inspection', entity_id: 78, apiary_id: 3 },
 ];
 
-const PROFILE = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.org', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true };
+const PROFILE = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true };
 
 const NOTIFICATIONS = {
   success: true,
@@ -140,9 +140,9 @@ const ADMIN_USERS = [
 ];
 
 const ADMIN_EMPLOYEES = [
-  { id: 1, name: 'Anna', surname: 'Ioannou', email: 'anna@beehivemind.org', role: 'superadmin', created_at: '2023-01-16T10:00:00Z' },
-  { id: 2, name: 'Petros', surname: 'Rallis', email: 'petros@beehivemind.org', role: 'admin', created_at: '2024-05-04T10:00:00Z' },
-  { id: 3, name: 'Katerina', surname: 'Sideri', email: 'katerina@beehivemind.org', role: 'moderator', created_at: '2025-02-11T10:00:00Z' },
+  { id: 1, name: 'Anna', surname: 'Ioannou', email: 'anna@beehivemind.tech', role: 'superadmin', created_at: '2023-01-16T10:00:00Z' },
+  { id: 2, name: 'Petros', surname: 'Rallis', email: 'petros@beehivemind.tech', role: 'admin', created_at: '2024-05-04T10:00:00Z' },
+  { id: 3, name: 'Katerina', surname: 'Sideri', email: 'katerina@beehivemind.tech', role: 'moderator', created_at: '2025-02-11T10:00:00Z' },
 ];
 
 const ADMIN_COUPONS = [

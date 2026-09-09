@@ -1,33 +1,38 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { PageIntroComponent } from '../../../shared/components/info-sections/page-intro/page-intro';
 import { CalloutComponent } from '../../../shared/components/ui/callout/callout';
+import { AnalyticsService } from '../../../core/services/analytics.service';
+import { ContactService } from '../../../core/services/contact.service';
 import { PageIntroConfig } from '../public-page.model';
 
 interface ContactPageConfig {
   intro: PageIntroConfig;
-  docs: { title: string; text: string; href: string; label: string };
+  docs: { title: string; text: string; routerLink: string; label: string };
+  /** The company mailbox — the way in when the form cannot be. */
+  email: string;
 }
 
 /**
  * The contact page. Every "Need a consultation?" CTA used to point at
- * `/pages/contact-us`, which matched no route. There is no contact address,
- * phone number or response-time commitment anywhere in the source, so none
- * is stated here — add the real ones before this ships.
+ * `/pages/contact-us`, which matched no route. There is no phone number or
+ * response-time commitment anywhere in the source, so none is stated here.
  *
- * TODO(backend): the form has no endpoint yet. `submit()` only flips `sent`,
- * so until it posts somewhere the success callout must not claim the message
- * arrived — it used to, and every enquiry was being discarded silently. The
- * copy to restore is in the template, next to the callout.
+ * The form posts to `contact` (Content module), which emails the company
+ * mailbox with the visitor in Reply-To. Failure is rendered here, not toasted:
+ * the page has the mailbox to fall back on, and a toast could not say so.
  */
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [ReactiveFormsModule, PageIntroComponent, CalloutComponent],
+  imports: [ReactiveFormsModule, RouterLink, PageIntroComponent, CalloutComponent],
   templateUrl: './contact.html',
 })
 export class ContactComponent {
   private fb = inject(FormBuilder);
+  private contactService = inject(ContactService);
+  private analytics = inject(AnalyticsService);
 
   readonly page: ContactPageConfig = {
     intro: {
@@ -37,10 +42,11 @@ export class ContactComponent {
     },
     docs: {
       title: 'Already answered?',
-      text: 'Setup, voice commands and billing are covered in the support docs. Most questions are quicker to answer there.',
-      href: 'https://beehivemind.freshdesk.com/support/home',
-      label: 'Open the support docs',
+      text: 'Setup, the voice commands and troubleshooting are covered on the help page. Most questions are quicker to answer there.',
+      routerLink: '/help',
+      label: 'Read the help page',
     },
+    email: 'info@beehivemind.tech',
   };
 
   readonly form = this.fb.nonNullable.group({
@@ -48,16 +54,40 @@ export class ContactComponent {
     email: ['', [Validators.required, Validators.email]],
     subject: [''],
     message: ['', Validators.required],
+    // Honeypot: visually hidden, never filled by a person. The API drops the
+    // message silently when it is.
+    website: [''],
   });
 
+  readonly sending = signal(false);
   readonly sent = signal(false);
+  readonly failed = signal(false);
 
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    this.sent.set(true);
+    if (this.sending()) return;
+
+    this.sending.set(true);
+    this.failed.set(false);
+
+    this.contactService.send(this.form.getRawValue()).subscribe({
+      next: (res) => {
+        this.sending.set(false);
+        if (res.success) {
+          this.sent.set(true);
+          this.analytics.event('generate_lead', { form: 'contact' });
+        } else {
+          this.failed.set(true);
+        }
+      },
+      error: () => {
+        this.sending.set(false);
+        this.failed.set(true);
+      },
+    });
   }
 
   invalid(control: 'name' | 'email' | 'message'): boolean {

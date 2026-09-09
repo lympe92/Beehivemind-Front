@@ -8,14 +8,16 @@
     <div class="flex-col lg:flex-row gap-band">
       <div class="w-full lg:w-half">
         @if (sent()) {
-          <!-- TODO(backend): when `submit()` posts to a real endpoint, this
-               becomes tone="success" / "Message sent" / "Thanks — we have your
-               note and will reply to {{ '{{' }} form.controls.email.value {{ '}}' }}." -->
-          <app-callout tone="warning" title="Not sent yet">
-            This form is not connected yet, so your message has not reached us. Please send it
-            through the support portal below — it reaches the same people.
+          <app-callout tone="success" title="Message sent">
+            Thanks — we have your note and will reply to {{ form.controls.email.value }}.
           </app-callout>
         } @else {
+          @if (failed()) {
+            <app-callout tone="warning" title="Not sent">
+              Something went wrong on our side and your message did not reach us. Please email it to
+              <a [href]="'mailto:' + page.email">{{ page.email }}</a> instead — it reaches the same people.
+            </app-callout>
+          }
           <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()" novalidate>
             <div class="form-group">
               <label class="form-label" for="contact-name">Name *</label>
@@ -40,9 +42,14 @@
                         formControlName="message" rows="6"></textarea>
               @if (invalid('message')) { <div class="error">This field is required</div> }
             </div>
+            <!-- Honeypot: off-screen for people, a field like any other for a bot. -->
+            <div class="sr-only" aria-hidden="true">
+              <label for="contact-website">Website</label>
+              <input id="contact-website" type="text" formControlName="website" tabindex="-1" autocomplete="off" />
+            </div>
             <div>
-              <button type="submit" class="btn btn--md btn--primary btn--full" [disabled]="form.invalid">
-                Send message
+              <button type="submit" class="btn btn--md btn--primary btn--full" [disabled]="form.invalid || sending()">
+                {{ sending() ? 'Sending…' : 'Send message' }}
               </button>
             </div>
           </form>
@@ -52,7 +59,10 @@
       <div class="w-full lg:w-half">
         <app-callout tone="neutral" [title]="page.docs.title">{{ page.docs.text }}</app-callout>
         <p>
-          <a [href]="page.docs.href" target="_blank" rel="noopener noreferrer">{{ page.docs.label }} »</a>
+          <a [routerLink]="page.docs.routerLink">{{ page.docs.label }} »</a>
+        </p>
+        <p>
+          Or write to us directly: <a [href]="'mailto:' + page.email">{{ page.email }}</a>
         </p>
       </div>
     </div>
