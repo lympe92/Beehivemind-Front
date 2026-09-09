@@ -19,3 +19,31 @@
   font-display: swap;
   src: url("/assets/fonts/peridot-pe-variable.woff2") format("woff2");
 }
+
+/* The fallback, cut to Peridot's measurements.
+
+   `swap` means a slow connection paints in the fallback first and re-paints in
+   Peridot when it lands. If the two fonts take different amounts of room, that
+   second paint reflows the page: on /financial it moved the heading onto
+   another line and pushed everything below it down, for a CLS of 0.102 — a
+   failed Core Web Vital. Blocking the font file took the same page to 0.000,
+   which is how this was pinned down.
+
+   So the fallback is made to occupy exactly the space Peridot will. The numbers
+   are measured, not guessed: Peridot's advance width over the same string is
+   91.33% of Arial's, and its ascent and descent are 89.10% and 21.60% of the em
+   — divided by the size-adjust here, because the overrides apply to the scaled
+   face. Arial was the better base of the two candidates; system-ui's line box
+   is 1.33em against Peridot's 1.15em, Arial's is 1.15em exactly.
+
+   Re-measure with tools/font-metrics.mjs if the typeface is ever rebuilt. */
+@font-face {
+  font-family: "Peridot Fallback";
+  font-style: normal;
+  font-weight: 400 700;
+  src: local("Arial"), local("Helvetica"), local("Liberation Sans");
+  size-adjust: 91.33%;
+  ascent-override: 97.56%;
+  descent-override: 23.65%;
+  line-gap-override: 0%;
+}

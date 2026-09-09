@@ -9,7 +9,9 @@
 /* The @font-face lives in fonts.css — one file, normal width, axis 400-700. */
 
 :root {
-  --font-family-base: "Peridot PE", system-ui, -apple-system, sans-serif;
+  /* "Peridot Fallback" is Arial cut to Peridot's metrics — see fonts.css. It
+     sits ahead of the generic stack so the swap does not reflow the page. */
+  --font-family-base: "Peridot PE", "Peridot Fallback", system-ui, -apple-system, sans-serif;
   --font-family-heading: var(--font-family-base);
 
   --font-size-base: 1rem;      /* 16px */
