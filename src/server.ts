@@ -17,6 +17,35 @@ const angularApp = new AngularNodeAppEngine();
 
 app.use(compression());
 
+/* ---------------------------------------------------------- canonical URLs */
+
+/**
+ * One address per page. nginx answers for both hostnames and the router
+ * accepts a route with or without a trailing slash, so without this the home
+ * page lives at four URLs (`/`, `/index.html`, and both again under `www`).
+ * The canonical tag only *asks* Google to consolidate them; a 301 settles it,
+ * and moves whatever links point at the variants onto the one that counts.
+ *
+ * Only GET and HEAD, only the host and the path — the query string travels
+ * with the visitor. `www` is always sent to https: nothing behind this proxy
+ * speaks plain http.
+ */
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+
+  const host = req.headers.host ?? '';
+  const apex = host.startsWith('www.') ? host.slice(4) : null;
+
+  let path = req.path;
+  if (path === '/index.html') path = '/';
+  else if (path.length > 1 && path.endsWith('/')) path = path.replace(/\/+$/, '');
+
+  if (apex === null && path === req.path) return next();
+
+  const query = req.originalUrl.slice(req.path.length);
+  res.redirect(301, `${apex ? `https://${apex}` : ''}${path}${query}`);
+});
+
 /* ------------------------------------------------------------------ sitemap */
 
 interface SitemapEntry {

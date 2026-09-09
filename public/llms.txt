@@ -1,0 +1,35 @@
+# BeehiveMind
+
+> Beehive management software for working beekeepers. Hive inspections are recorded by voice, offline, from the apiary; harvests, feedings, treatment schedules, weather and costs per hive live on the web dashboard. Built in Greece. Free for one apiary; Pro plan for unlimited apiaries.
+
+BeehiveMind is one account across two clients: an Android app that records inspections and harvests by voice (works with no signal, syncs later) and a web dashboard at https://beehivemind.tech/user that turns those records into tables, charts, treatment reminders, a diagnosis per inspection and an AI assistant grounded in the beekeeper's own data.
+
+## Product
+
+- [Home](https://beehivemind.tech/): what BeehiveMind is and who it is for
+- [Features](https://beehivemind.tech/features): inspections, treatments, harvest and feeding, finances, weather, QR labels
+- [The app](https://beehivemind.tech/app): the voice-driven Android field app
+- [Hive inspections](https://beehivemind.tech/inspections): the fourteen readings recorded per visit
+- [Apiaries and beehives](https://beehivemind.tech/apiariesandbeehives): apiaries on a map, hives in bulk, queen records
+- [Harvest and feeding](https://beehivemind.tech/harvestandfeeding): honey, pollen, propolis, royal jelly; syrup, fondant, patties
+- [Financial](https://beehivemind.tech/financial): costs and income by category, cost per hive
+- [Plans](https://beehivemind.tech/pricing): Free (one apiary, ten hives) and Pro (€9 a month)
+- [Help](https://beehivemind.tech/help): the ten voice phrases and troubleshooting
+- [About](https://beehivemind.tech/about)
+- [Contact](https://beehivemind.tech/contact)
+
+## Blog
+
+- [Beekeeping blog](https://beehivemind.tech/blog): practical articles on inspections, treatments, records and the cost per hive
+- [RSS feed](https://beehivemind.tech/rss.xml)
+- [Sitemap](https://beehivemind.tech/sitemap.xml)
+
+## Facts
+
+- Voice commands are in English; the platform's diagnoses are available in English and Greek.
+- Inspection readings: date, frames, population, pollen, honey, eggs, closed brood, varroa, American foulbrood, European foulbrood, nosema, queen seen, queen cells, queen year.
+- Records are the beekeeper's and exportable on every plan.
+
+## Contact
+
+- info@beehivemind.tech

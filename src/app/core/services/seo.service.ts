@@ -133,6 +133,9 @@ export class SeoService {
         publisher: {
           '@type': 'Organization',
           name: environment.appName,
+          // The article rich result wants to draw the publisher; without a
+          // logo it falls back to nothing.
+          logo: { '@type': 'ImageObject', url: `${environment.appUrl}/assets/img/logo.webp` },
         },
         keywords: article.tags.length ? article.tags.join(', ') : undefined,
         articleSection: article.category?.name,

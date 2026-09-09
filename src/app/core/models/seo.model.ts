@@ -89,6 +89,7 @@ export interface BlogPostingSchema extends BaseSchema {
   publisher: {
     '@type': 'Organization';
     name: string;
+    logo?: { '@type': 'ImageObject'; url: string };
   };
   keywords?: string;
   articleSection?: string;

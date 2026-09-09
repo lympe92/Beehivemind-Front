@@ -15,7 +15,8 @@
   <!-- The company as an entity, sitewide. It carries no `data-seo` attribute on
        purpose: SeoService only clears its own nodes, so this one survives every
        navigation and is present even on the client-rendered signed-in routes.
-       `sameAs` are the profiles listed in the footer. -->
+       `sameAs` are the profiles listed in the footer — only the ones that
+       resolve; a profile that 404s tells a crawler the entity is stale. -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -25,17 +26,20 @@
     "logo": "https://beehivemind.tech/assets/img/logo.webp",
     "description": "Beehive management software for working beekeepers, recorded by voice and usable offline from the apiary.",
     "foundingDate": "2019",
+    "email": "info@beehivemind.tech",
     "address": { "@type": "PostalAddress", "addressCountry": "GR" },
+    "knowsLanguage": ["en", "el"],
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "customer support",
-      "url": "https://beehivemind.freshdesk.com/support/home"
+      "email": "info@beehivemind.tech",
+      "url": "https://beehivemind.tech/contact",
+      "availableLanguage": ["en", "el"]
     },
     "sameAs": [
       "https://www.facebook.com/beehivemind.org",
       "https://www.instagram.com/beehivemind_org",
       "https://twitter.com/Beehivemind_org",
-      "https://www.linkedin.com/company/beehivemind-beekeeping-software",
       "https://www.youtube.com/channel/UCSacxrpIMgWoWhLORBY5HcQ"
     ]
   }

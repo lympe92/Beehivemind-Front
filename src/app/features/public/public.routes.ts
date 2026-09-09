@@ -19,8 +19,9 @@ export const publicRoutes: Routes = [
   },
   {
     path: 'pricing',
+    // No seoKey: PricingComponent applies its own, so it can add the FAQPage
+    // node built from the questions band.
     loadComponent: () => import('./pricing/pricing').then((m) => m.PricingComponent),
-    data: { seoKey: 'pricing' },
   },
   {
     path: 'apiariesandbeehives',
