@@ -60,6 +60,7 @@ export class ApiariesAndBeehivesComponent {
       title: 'What are you waiting for?',
       description: 'The only thing left to do is to register and download BeehiveMind App today!',
       cta: { label: 'Get Started', routerLink: '/auth/register', variant: 'outline' },
+      secondary: { label: 'From the blog: apiary sites »', routerLink: '/blog/category/apiaries' },
     },
   };
 

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -8,7 +8,25 @@ import { BlogService } from '../../../core/services/blog.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { SEOModel } from '../../../core/models/seo.model';
 import { environment } from '../../../../environments/environment';
-import { formatDate } from '../blog/blog.mapper';
+import { PostListComponent } from '../../../shared/components/info-sections/post-list/post-list';
+import { Post } from '../../../shared/components/info-sections/post-list/post-list.model';
+import { formatDate, productPageFor, toPost } from '../blog/blog.mapper';
+
+/** How many other posts from the same category follow an article. */
+const RELATED_COUNT = 3;
+
+/**
+ * Bulk edits in the console touch `updated_at` without changing a word, so a
+ * change the same day as publishing is not shown as an update.
+ */
+const UPDATED_AFTER_MS = 24 * 60 * 60 * 1000;
+
+interface Lookup {
+  article: ArticleModel | undefined;
+  /** False when the API could not be asked, as opposed to answering 404. */
+  reachable: boolean;
+  related: ArticleModel[];
+}
 
 /**
  * One post, by slug. The header, hero image and body share the 68ch `.prose`
@@ -27,7 +45,7 @@ import { formatDate } from '../blog/blog.mapper';
 @Component({
   selector: 'app-blog-article',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, PostListComponent],
   templateUrl: './blog-article.html',
 })
 export class BlogArticleComponent {
@@ -37,18 +55,24 @@ export class BlogArticleComponent {
   private seoService = inject(SeoService);
   private destroyRef = inject(DestroyRef);
 
-  private readonly currentPost = signal<ArticleModel | undefined>(undefined);
-  private readonly unavailable = signal(false);
+  private readonly currentPost  = signal<ArticleModel | undefined>(undefined);
+  private readonly relatedPosts = signal<Post[]>([]);
+  private readonly unavailable  = signal(false);
 
   readonly post = this.currentPost.asReadonly();
+  /** Up to three more from the same category; the reader's next step and the crawler's next link. */
+  readonly related = this.relatedPosts.asReadonly();
+  /** The product page this category is about, for the link at the foot of the article. */
+  readonly productLink = computed(() => productPageFor(this.currentPost()?.category?.slug));
   /** The lookup failed, as opposed to the post not existing. */
   readonly isUnavailable = this.unavailable.asReadonly();
 
   constructor() {
     this.route.paramMap
       .pipe(
-        switchMap(params =>
-          this.blog.getPost(params.get('slug') ?? '').pipe(
+        switchMap(params => {
+          const slug = params.get('slug') ?? '';
+          return this.blog.getPost(slug).pipe(
             map(response => ({ article: response?.data ?? undefined, reachable: true })),
             // A 404 is the ordinary case for a deleted post. Anything else —
             // 5xx, a timeout, no network — means we could not ask, which is a
@@ -59,12 +83,14 @@ export class BlogArticleComponent {
                 reachable: error instanceof HttpErrorResponse && error.status === 404,
               }),
             ),
-          ),
-        ),
+            switchMap(result => this.withRelated(result, slug)),
+          );
+        }),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe(({ article, reachable }) => {
+      .subscribe(({ article, reachable, related }) => {
         this.currentPost.set(article);
+        this.relatedPosts.set(related.map(toPost));
         this.unavailable.set(!article && !reachable);
 
         if (article) {
@@ -84,6 +110,30 @@ export class BlogArticleComponent {
   /** Display date; the machine one goes into the structured data. */
   displayDate(iso: string): string {
     return formatDate(iso);
+  }
+
+  /** Whether the post was changed after the day it went up — then the page says so, as the schema already does. */
+  wasUpdated(post: ArticleModel): boolean {
+    return new Date(post.updated_at).getTime() - new Date(post.published_at).getTime() > UPDATED_AFTER_MS;
+  }
+
+  /**
+   * The rest of the category, minus this post. Fetched during the same server
+   * render, so a crawler sees the links in the HTML. A failure here is not the
+   * article's failure: the post still renders, with nothing underneath.
+   */
+  private withRelated(result: Omit<Lookup, 'related'>, slug: string) {
+    const category = result.article?.category;
+    if (!category) {
+      return of<Lookup>({ ...result, related: [] });
+    }
+    return this.blog.getPosts({ category: category.slug, perPage: RELATED_COUNT + 1 }).pipe(
+      map(response => ({
+        ...result,
+        related: (response.data ?? []).filter(post => post.slug !== slug).slice(0, RELATED_COUNT),
+      })),
+      catchError(() => of<Lookup>({ ...result, related: [] })),
+    );
   }
 
   /**

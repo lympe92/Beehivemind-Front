@@ -63,8 +63,14 @@ export class SeoService {
       this.applyArticleOGTags(seo);
     }
 
-    // Canonical
-    this.setCanonicalURL(seo.canonical_url);
+    // Canonical — unless the page asks not to be indexed. The two directives
+    // contradict each other ("index that one instead" against "index nothing
+    // here"), and a 404 page pointing at the home page was exactly that.
+    if (/noindex/i.test(seo.robots)) {
+      this.removeCanonicalURL();
+    } else {
+      this.setCanonicalURL(seo.canonical_url);
+    }
 
     // Schema
     this.addSchema(seo.schema);
@@ -126,10 +132,14 @@ export class SeoService {
         image: image ? [image] : undefined,
         datePublished: article.published_at,
         dateModified: article.updated_at,
-        author: {
-          '@type': 'Person',
-          name: article.author.name,
-        },
+        mainEntityOfPage: url,
+        inLanguage: 'en',
+        // A named byline is a person. When the console has no author for the
+        // post it falls back to the company name, and a company is not a
+        // Person — it is the same Organization the site declares everywhere.
+        author: article.author.id
+          ? { '@type': 'Person', name: article.author.name }
+          : { '@type': 'Organization', name: environment.appName, url: `${environment.appUrl}/about` },
         publisher: {
           '@type': 'Organization',
           name: environment.appName,
@@ -229,14 +239,15 @@ export class SeoService {
   }
 
   private setCanonicalURL(url: string): void {
-    const existing = this.doc.querySelector('link[rel="canonical"]');
-    if (existing) {
-      existing.remove();
-    }
+    this.removeCanonicalURL();
     const link = this.doc.createElement('link');
     link.setAttribute('rel', 'canonical');
     link.setAttribute('href', url);
     this.doc.head.appendChild(link);
+  }
+
+  private removeCanonicalURL(): void {
+    this.doc.querySelector('link[rel="canonical"]')?.remove();
   }
 
   /**

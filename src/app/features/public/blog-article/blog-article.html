@@ -7,11 +7,17 @@
             <a class="post-list__tag" [routerLink]="['/blog/category', post.category.slug]">{{ post.category.name }}</a>
             <span class="post-list__dot">·</span>
           }
-          <!-- The machine-readable date lives in the BlogPosting node; this is
-               the one a reader sees. -->
+          <!-- The machine-readable dates live in the BlogPosting node; these
+               are the ones a reader sees, and they say the same thing. -->
           <span>{{ displayDate(post.published_at) }}</span>
+          @if (wasUpdated(post)) {
+            <span class="post-list__dot">·</span>
+            <span>Updated {{ displayDate(post.updated_at) }}</span>
+          }
           <span class="post-list__dot">·</span>
           <span>{{ post.reading_minutes }} min read</span>
+          <span class="post-list__dot">·</span>
+          <span>By {{ post.author.name }}</span>
         </div>
         <h1 class="article__title">{{ post.title }}</h1>
         <p class="lead">{{ post.excerpt }}</p>
@@ -57,9 +63,23 @@
           }
         }
 
+        <!-- The product page the category is about. The one link that turns a
+             reader into a trial, and the one that tells a crawler which page
+             of the site this article supports. -->
+        @if (productLink(); as link) {
+          <p><a [routerLink]="link.routerLink">{{ link.label }} »</a></p>
+        }
+
         <a class="article__back" routerLink="/blog">« All posts</a>
       </div>
     </article>
+
+    @if (related().length) {
+      <section class="container">
+        <h2>More from {{ post.category?.name }}</h2>
+      </section>
+      <section app-post-list [posts]="related()"></section>
+    }
   } @else if (isUnavailable()) {
     <!-- The post may well exist; we could not reach the API. Saying "not found"
          here would be wrong, and the response is a 503, not a 404. -->

@@ -14,6 +14,11 @@
   <!-- Feed autodiscovery. Served by /rss.xml in server.ts, built from the
        console's published posts. -->
   <link rel="alternate" type="application/rss+xml" title="BeehiveMind blog" href="/rss.xml">
+  <!-- The blog's images live on the API's origin. Opening that connection
+       alongside the page, rather than when the first <img> is reached, takes
+       the DNS, TCP and TLS round trips off the article's largest paint. -->
+  <link rel="preconnect" href="https://api.beehivemind.tech">
+  <link rel="dns-prefetch" href="https://api.beehivemind.tech">
   <!-- Peridot PE is self-hosted: one variable file, declared in styles/tokens/fonts.css. -->
   <link rel="preload" as="font" type="font/woff2" crossorigin
         href="/assets/fonts/peridot-pe-variable.woff2">

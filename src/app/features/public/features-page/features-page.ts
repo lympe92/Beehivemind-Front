@@ -97,6 +97,7 @@ export class FeaturesPageComponent {
       title: 'What are you waiting for?',
       description: "That's right, what are you waiting for? The only thing left to do is to register and download BeehiveMind App today!",
       cta: { label: 'Get Started', routerLink: '/auth/register', variant: 'outline' },
+      secondary: { label: 'Read the blog »', routerLink: '/blog' },
     },
   };
 

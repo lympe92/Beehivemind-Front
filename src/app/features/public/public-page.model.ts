@@ -89,6 +89,8 @@ export interface CtaBannerConfig {
   title: string;
   description?: string;
   cta: CtaLink;
+  /** A second, quieter link — the product pages point it at their blog category. */
+  secondary?: CtaLink;
 }
 
 export interface PageIntroConfig {

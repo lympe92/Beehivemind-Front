@@ -12,7 +12,7 @@ import { SEOModel } from '../../../core/models/seo.model';
 import { ArticleModel, BlogCategoryModel } from '../../../core/models/article.model';
 import { Post, PostChip } from '../../../shared/components/info-sections/post-list/post-list.model';
 import { environment } from '../../../../environments/environment';
-import { toChips, toItemList, toPost } from '../blog/blog.mapper';
+import { INDEXABLE_CATEGORY_MIN_POSTS, toChips, toItemList, toPost } from '../blog/blog.mapper';
 
 /**
  * One category's archive.
@@ -103,7 +103,12 @@ export class BlogCategoryComponent {
       meta_description: description,
       focus_keyword: category.name,
       canonical_url: url,
-      robots: 'index, follow',
+      // An archive of one or two teasers is a thin page — and near enough a
+      // duplicate of the article it teases — on a domain that has no standing
+      // to spend on it yet. It is crawled and its links are followed either
+      // way; it enters the index once it has three posts to show. The sitemap
+      // in src/server.ts draws the same line.
+      robots: articles.length >= INDEXABLE_CATEGORY_MIN_POSTS ? 'index, follow' : 'noindex, follow',
       image_url: `${environment.appUrl}/assets/images/og-blog.jpg`,
 
       og_title: title,

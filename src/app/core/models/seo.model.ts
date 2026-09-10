@@ -80,11 +80,15 @@ export interface BlogPostingSchema extends BaseSchema {
   image?: string[];
   datePublished: string;
   dateModified: string;
+  /** The article's own URL, so the node is about this page and not a mention of it. */
+  mainEntityOfPage?: string;
+  inLanguage?: string;
   // Posts written under the company byline use Organization; a named byline
   // (the CMS shape in `convertArticleToSeoModel`) uses Person.
   author: {
     '@type': 'Person' | 'Organization';
     name: string;
+    url?: string;
   };
   publisher: {
     '@type': 'Organization';

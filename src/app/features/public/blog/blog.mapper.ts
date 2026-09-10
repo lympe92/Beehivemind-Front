@@ -8,6 +8,32 @@ import { environment } from '../../../../environments/environment';
  * API shape, so the three things they all need live here rather than twice.
  */
 
+/**
+ * How many posts an archive page needs before it is worth indexing. Below
+ * this it is served with `noindex, follow` and left out of the sitemap; the
+ * same number lives in src/server.ts, which cannot import from here.
+ */
+export const INDEXABLE_CATEGORY_MIN_POSTS = 3;
+
+/**
+ * The product page each category is really about — the link at the foot of
+ * an article, and the "from the blog" link on the product page. A slug that is
+ * not listed maps to nothing rather than to a guess.
+ */
+const PRODUCT_PAGES: Record<string, { label: string; routerLink: string }> = {
+  inspections: { label: 'How BeehiveMind records an inspection', routerLink: '/inspections' },
+  'the-app':   { label: 'The BeehiveMind app', routerLink: '/app' },
+  treatments:  { label: 'Treatment schedules in BeehiveMind', routerLink: '/features' },
+  financial:   { label: 'Cost and income tracking in BeehiveMind', routerLink: '/financial' },
+  apiaries:    { label: 'Apiaries and beehives in BeehiveMind', routerLink: '/apiariesandbeehives' },
+  harvest:     { label: 'Harvest and feeding records in BeehiveMind', routerLink: '/harvestandfeeding' },
+  feeding:     { label: 'Harvest and feeding records in BeehiveMind', routerLink: '/harvestandfeeding' },
+};
+
+export function productPageFor(categorySlug: string | undefined): { label: string; routerLink: string } | null {
+  return categorySlug ? (PRODUCT_PAGES[categorySlug] ?? null) : null;
+}
+
 /** The API's article, as one row of the index. */
 export function toPost(article: ArticleModel): Post {
   return {
