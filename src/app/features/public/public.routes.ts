@@ -76,6 +76,14 @@ export const publicRoutes: Routes = [
     data: { seoKey: 'privacy' },
   },
   {
+    // Linked from the Play listing's "Delete account URL" field. Changing this
+    // path means updating Play Console too, or the listing points at a 404.
+    path: 'delete-account',
+    loadComponent: () =>
+      import('./delete-account/delete-account').then((m) => m.DeleteAccountComponent),
+    data: { seoKey: 'deleteAccount' },
+  },
+  {
     path: 'terms',
     loadComponent: () => import('./terms/terms').then((m) => m.TermsComponent),
     data: { seoKey: 'terms' },

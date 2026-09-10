@@ -355,6 +355,29 @@ export const SEO_CONFIG: Record<string, SEOModel> = {
     },
   },
 
+  deleteAccount: {
+    meta_title: `Delete Your Account | ${SITE}`,
+    meta_description:
+      'How to delete your BeehiveMind account and the data stored with it, from the app or by asking us.',
+    focus_keyword: 'delete BeehiveMind account',
+    canonical_url: `${BASE}/delete-account`,
+    robots: 'noindex, follow',
+    image_url: `${BASE}/assets/images/og-home.jpg`,
+    og_title: `Delete Your Account | ${SITE}`,
+    og_description: 'How to delete your BeehiveMind account and its data.',
+    og_type: 'website',
+    og_locale: 'en_US',
+    og_site_name: SITE,
+    twitter_card: 'summary',
+    twitter_title: `Delete Your Account | ${SITE}`,
+    twitter_description: 'How to delete your BeehiveMind account and its data.',
+    schema: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: `Delete Your Account | ${SITE}`,
+      url: `${BASE}/delete-account`,
+    },
+  },
   privacy: {
     meta_title: `Privacy Policy | ${SITE}`,
     meta_description: 'Read the BeehiveMind privacy policy and learn how we protect your data.',

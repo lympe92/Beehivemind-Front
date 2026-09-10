@@ -15,6 +15,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'contact',            renderMode: RenderMode.Prerender },
   { path: 'privacy',            renderMode: RenderMode.Prerender },
   { path: 'terms',              renderMode: RenderMode.Prerender },
+  { path: 'delete-account',     renderMode: RenderMode.Prerender },
 
   // The blog index and the category archives list what the console has
   // published, so neither can be prerendered: a build-time copy would stop
