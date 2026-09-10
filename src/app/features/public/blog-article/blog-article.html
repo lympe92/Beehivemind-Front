@@ -19,11 +19,14 @@
 
       @if (post.featured_image; as image) {
         <div class="article__hero">
+          <!-- The largest paint on the page; it must not queue behind the
+               scripts and the stylesheet. -->
           <img
             [src]="image.url"
             [alt]="image.alt"
             [attr.width]="image.width"
-            [attr.height]="image.height" />
+            [attr.height]="image.height"
+            fetchpriority="high" />
         </div>
       }
 

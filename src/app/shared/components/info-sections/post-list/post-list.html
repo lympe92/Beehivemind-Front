@@ -16,12 +16,16 @@
     <article class="post-list__item">
       @if (post.image) {
         <a class="post-list__media" [routerLink]="['/blog', post.slug]" [attr.aria-label]="post.title">
+          <!-- The first row's artwork is on screen at load and is the page's
+               largest paint. Lazy-loading it deferred the LCP by a second;
+               it is fetched eagerly and first, the rest wait for the scroll. -->
           <img
             [src]="post.image.src"
             [alt]="post.image.alt"
             [width]="post.image.width"
             [height]="post.image.height"
-            loading="lazy" />
+            [attr.loading]="$first ? 'eager' : 'lazy'"
+            [attr.fetchpriority]="$first ? 'high' : null" />
         </a>
       }
 

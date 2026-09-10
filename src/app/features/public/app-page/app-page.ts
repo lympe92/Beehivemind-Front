@@ -52,7 +52,7 @@ export class AppPageComponent {
       // competing for the same phrase. This one is about the app.
       title: 'The beekeeping app that records while you work',
       subtitle: 'Describe a hive out loud and the app writes the inspection down. It runs offline, so an apiary with no signal changes nothing.',
-      image: { src: 'assets/img/jar2.webp', alt: 'Jar', width: 473, height: 473, priority: true },
+      image: { src: '/assets/img/jar2.webp', alt: 'Jar', width: 473, height: 473, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },
       secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline' },
     },
@@ -63,7 +63,7 @@ export class AppPageComponent {
     splitContent: {
       title: 'The smarter way to organize your apiaries',
       description: 'Its time to set your apiaries. When you create an apiary, you can pin it on map. Furthermore its practical to name your new apiary for better organization.',
-      image: { src: 'assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 },
+      image: { src: '/assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 },
     },
     textColumns: [
       { title: 'Dashboard', description: 'How to manage your beehives growth from dashboard.' },
@@ -72,7 +72,7 @@ export class AppPageComponent {
     ],
     splitAccordion1: {
       title: 'Create and manage your beehives',
-      image: { src: 'assets/img/flower2.webp', alt: 'Flower', width: 473, height: 473 },
+      image: { src: '/assets/img/flower2.webp', alt: 'Flower', width: 473, height: 473 },
       items: [
         {
           title: 'Create beehives to start inspect',
@@ -91,15 +91,15 @@ export class AppPageComponent {
     applicationDownload: {
       title: 'New era on beekeeping!',
       subtitle: 'Meet our beekeeping app now!',
-      logo: { src: 'assets/img/logotr.webp', alt: 'Logo', width: 512, height: 512 },
+      logo: { src: '/assets/img/logotr.webp', alt: 'Logo', width: 512, height: 512 },
       storeLinks: [
-        { href: 'https://play.google.com/store/apps/details?id=org.beehivemind', img: { src: 'assets/icons/android.svg', alt: 'Get it on Google Play', width: 180, height: 48 } },
-        { href: 'https://apps.apple.com/app/beehivemind', img: { src: 'assets/icons/apple-store.svg', alt: 'Download on the App Store', width: 180, height: 48 } },
+        { href: 'https://play.google.com/store/apps/details?id=org.beehivemind', img: { src: '/assets/icons/android.svg', alt: 'Get it on Google Play', width: 180, height: 48 } },
+        { href: 'https://apps.apple.com/app/beehivemind', img: { src: '/assets/icons/apple-store.svg', alt: 'Download on the App Store', width: 180, height: 48 } },
       ],
     },
     splitAccordion2: {
       title: 'Inspect and track your hives with ease',
-      image: { src: 'assets/img/bee1.webp', alt: 'Bee', width: 417, height: 221 },
+      image: { src: '/assets/img/bee1.webp', alt: 'Bee', width: 417, height: 221 },
       items: [
         {
           title: 'Use voice commands',

@@ -1,9 +1,14 @@
 User-agent: *
 Allow: /
 
-# Signed-in zones. All three are guarded, so a crawler only ever gets an empty
-# shell from them — keep them out of the crawl budget entirely.
-Disallow: /auth/
+# Signed-in zones. Both are guarded, so a crawler only ever gets an empty shell
+# from them — keep them out of the crawl budget entirely.
+#
+# /auth is deliberately NOT listed. Every page links to /auth/register and
+# /auth/login, and a URL that many links point at gets indexed even when it is
+# blocked here — as a bare address with no title. Those routes answer with an
+# `X-Robots-Tag: noindex` header instead (src/server.ts), which a crawler can
+# only see if it is allowed to fetch them.
 Disallow: /admin/
 Disallow: /user/
 

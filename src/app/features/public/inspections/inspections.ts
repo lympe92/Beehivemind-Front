@@ -23,7 +23,7 @@ interface InspectionsPageConfig {
   ctaBanner2: CtaBannerConfig;
 }
 
-const LOGO: ImageConfig = { src: 'assets/img/logotr.webp', alt: 'Logo', width: 105, height: 105 };
+const LOGO: ImageConfig = { src: '/assets/img/logotr.webp', alt: 'Logo', width: 105, height: 105 };
 
 /**
  * The only page with two CtaBanners: a title-only one mid-page as a pivot,
@@ -40,13 +40,13 @@ export class InspectionsComponent {
     hero: {
       title: 'Turn your Inspections into Knowledge',
       subtitle: 'Beehivemind makes your data assimilable. Monitor bee habits, track their performance and understand their needs.',
-      image: { src: 'assets/img/hive.webp', alt: 'Hive', width: 417, height: 417, priority: true },
+      image: { src: '/assets/img/hive.webp', alt: 'Hive', width: 417, height: 417, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },
       secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline' },
     },
     splitAccordion1: {
       title: 'Use the magic of voice recognition',
-      image: { src: 'assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 },
+      image: { src: '/assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 },
       items: [
         {
           title: 'Easy apiary management',
@@ -83,7 +83,7 @@ export class InspectionsComponent {
     },
     splitAccordion2: {
       title: 'Keep records of all-that happens',
-      image: { src: 'assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 },
+      image: { src: '/assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 },
       items: [
         {
           title: 'Easy to use inspection tab',

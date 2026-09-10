@@ -5,13 +5,38 @@
   <title>BeehiveMind</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Every URL in this document is root-absolute, and `deployUrl` in
+       angular.json makes the build's own script and style tags the same. The
+       `<base href>` would resolve relative ones for a browser, but not for every
+       crawler: GPTBot fetched `/blog/chunk-….js` and `/blog/category/assets/…`
+       from the blog pages and left with 404s. -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <!-- Feed autodiscovery. Served by /rss.xml in server.ts, built from the
        console's published posts. -->
   <link rel="alternate" type="application/rss+xml" title="BeehiveMind blog" href="/rss.xml">
   <!-- Peridot PE is self-hosted: one variable file, declared in styles/tokens/fonts.css. -->
   <link rel="preload" as="font" type="font/woff2" crossorigin
-        href="assets/fonts/peridot-pe-variable.woff2">
+        href="/assets/fonts/peridot-pe-variable.woff2">
+  <!-- The face Peridot swaps in over, cut to Peridot's measurements so the
+       swap does not reflow the page (the reasoning is in styles/tokens/fonts.css,
+       the numbers come from tools/font-metrics.mjs). It lives here rather than
+       in the stylesheet because the build inlines only each page's critical CSS
+       and leaves this face out; the full sheet arrives later, and until it did
+       the first paint used system-ui and the swap moved every hero by a CLS of
+       0.09–0.10 on a phone. A face in the document head is there from the
+       first byte. -->
+  <style>
+    @font-face {
+      font-family: "Peridot Fallback";
+      font-style: normal;
+      font-weight: 400 700;
+      src: local("Arial"), local("Helvetica"), local("Liberation Sans");
+      size-adjust: 105.63%;
+      ascent-override: 94.67%;
+      descent-override: 21.77%;
+      line-gap-override: 0%;
+    }
+  </style>
   <!-- The company as an entity, sitewide. It carries no `data-seo` attribute on
        purpose: SeoService only clears its own nodes, so this one survives every
        navigation and is present even on the client-rendered signed-in routes.

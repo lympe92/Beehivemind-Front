@@ -21,8 +21,8 @@ interface FinancialPageConfig {
   ctaBanner: CtaBannerConfig;
 }
 
-const LOGO: ImageConfig = { src: 'assets/img/logo1.webp', alt: 'Logo', width: 105, height: 105 };
-const FINANCIAL_GIF: ImageConfig = { src: 'assets/img/financial.webp', alt: 'Financial', width: 477, height: 213 };
+const LOGO: ImageConfig = { src: '/assets/img/logo1.webp', alt: 'Logo', width: 105, height: 105 };
+const FINANCIAL_GIF: ImageConfig = { src: '/assets/img/financial.webp', alt: 'Financial', width: 477, height: 213 };
 
 @Component({
   selector: 'app-financial',
@@ -35,7 +35,7 @@ export class FinancialComponent {
     hero: {
       title: 'Streamline your income with Beehivemind software',
       subtitle: 'We know what you need to manage your business costs more efficiently. With our financial tool you can get views of where your cash is going and manage your numbers effortlessly.',
-      image: { src: 'assets/img/bee1.webp', alt: 'Bee', width: 417, height: 221, priority: true },
+      image: { src: '/assets/img/bee1.webp', alt: 'Bee', width: 417, height: 221, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },
       secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline' },
     },

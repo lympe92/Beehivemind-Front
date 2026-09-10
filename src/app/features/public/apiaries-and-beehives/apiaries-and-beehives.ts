@@ -14,7 +14,7 @@ interface ApiariesPageConfig {
 }
 
 /** All three SplitContents reuse the same flower artwork — a deliberate rhythm. */
-const FLOWER: ImageConfig = { src: 'assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 };
+const FLOWER: ImageConfig = { src: '/assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 };
 
 @Component({
   selector: 'app-apiaries-and-beehives',
@@ -27,7 +27,7 @@ export class ApiariesAndBeehivesComponent {
     hero: {
       title: 'Organise your apiaries and beehives on one map',
       subtitle: 'By utilizing the latest innovations in digital mapping, we offer you the best mapping system to depict your apiaries.',
-      image: { src: 'assets/img/jar2.webp', alt: 'Jar', width: 473, height: 473, priority: true },
+      image: { src: '/assets/img/jar2.webp', alt: 'Jar', width: 473, height: 473, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary', size: 'md' },
       secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline', size: 'md' },
     },

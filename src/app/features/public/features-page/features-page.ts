@@ -29,14 +29,14 @@ export class FeaturesPageComponent {
     hero: {
       title: 'Tired of inefficient Beekeeping Softwares?',
       subtitle: 'Join users who made beehive management easy with our beekeeping software.',
-      image: { src: 'assets/img/bee2.webp', alt: 'Bee', width: 473, height: 473, priority: true },
+      image: { src: '/assets/img/bee2.webp', alt: 'Bee', width: 473, height: 473, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },
       secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline' },
     },
     splitListsPre: [
       {
         title: 'Tools for effective apiary management',
-        image: { src: 'assets/img/hive.webp', alt: 'Hive', width: 417, height: 417 },
+        image: { src: '/assets/img/hive.webp', alt: 'Hive', width: 417, height: 417 },
         items: [
           { title: 'Frame cells analysis', description: 'Find out exactly how much honey, pollen, brood etc there is in your hives.' },
           { title: 'Info about population', description: 'Get a pulse on how your beehives are growing and get the right decision.' },
@@ -47,7 +47,7 @@ export class FeaturesPageComponent {
       },
       {
         title: 'Get holistic view of apiary',
-        image: { src: 'assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 },
+        image: { src: '/assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 },
         items: [
           { title: 'Add apiaries location', description: 'Create your apiaries, add beehives and set their exact location on the map.' },
           { title: 'Organize your beehives', description: 'Select an apiary, create beehives, add notes and give them a number as a name.' },
@@ -57,7 +57,7 @@ export class FeaturesPageComponent {
       },
       {
         title: 'Inspect without inspection checklists',
-        image: { src: 'assets/img/flower2.webp', alt: 'Flower', width: 473, height: 473 },
+        image: { src: '/assets/img/flower2.webp', alt: 'Flower', width: 473, height: 473 },
         items: [
           { title: 'Record all beehive inspection data', description: 'Collect all inspection data only with your voice during inspection without touching screens.' },
           { title: 'Continuous Speech Recognition', description: 'Meet the highly accurate speech recognition technology during the inspection.' },
@@ -74,7 +74,7 @@ export class FeaturesPageComponent {
     splitListsPost: [
       {
         title: 'Understand your financial habits',
-        image: { src: 'assets/img/jar.webp', alt: 'Jar', width: 473, height: 473 },
+        image: { src: '/assets/img/jar.webp', alt: 'Jar', width: 473, height: 473 },
         items: [
           { title: 'Balance income and expenses', description: 'Create cost categories to control all your income and expenses.' },
           { title: 'Make confident decisions', description: "Each month you'll be able to view a full financial review of your business." },
@@ -84,7 +84,7 @@ export class FeaturesPageComponent {
       },
       {
         title: "Keep control of the feedings 'n' harvests",
-        image: { src: 'assets/img/comb.webp', alt: 'Comb', width: 473, height: 473 },
+        image: { src: '/assets/img/comb.webp', alt: 'Comb', width: 473, height: 473 },
         items: [
           { title: 'Keep records of feedings', description: 'Use feeding feature to learn how much food consumed from each beehive.' },
           { title: 'Collect harvest data via your voice', description: 'Use our app to collect harvest data that can help you filter the most productive beehives.' },

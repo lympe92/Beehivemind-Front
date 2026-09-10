@@ -108,7 +108,7 @@ function hexagon(ctx: CanvasRenderingContext2D, x: number, y: number, w: number,
 
 /** The mark ships black on transparent, so it is inverted onto the ink ground. */
 async function drawLockup(ctx: CanvasRenderingContext2D): Promise<void> {
-  const mark = await loadImage('assets/img/logotr.webp').catch(() => null);
+  const mark = await loadImage('/assets/img/logotr.webp').catch(() => null);
 
   if (mark) {
     ctx.save();

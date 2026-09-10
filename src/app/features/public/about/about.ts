@@ -57,7 +57,7 @@ export class AboutComponent {
       // TODO(content): a real photograph — the team, or the apiary this was
       // built in. Until then the stock bee carries an alt that describes it
       // truthfully; the previous one printed the instruction into the page.
-      image: { src: 'assets/img/bee1.webp', alt: 'A honeybee on a flower', width: 417, height: 221, priority: true },
+      image: { src: '/assets/img/bee1.webp', alt: 'A honeybee on a flower', width: 417, height: 221, priority: true },
     },
     // Three principles, each one falsifiable. TODO(content): confirm these are
     // the three you want to be held to.

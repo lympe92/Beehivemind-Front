@@ -41,14 +41,11 @@
    ratio cannot be right for all three. Arial's metrics are fixed everywhere,
    and Helvetica and Liberation Sans are metric clones of it.
 
-   Re-measure with tools/font-metrics.mjs if the typeface is ever rebuilt. */
-@font-face {
-  font-family: "Peridot Fallback";
-  font-style: normal;
-  font-weight: 400 700;
-  src: local("Arial"), local("Helvetica"), local("Liberation Sans");
-  size-adjust: 105.63%;
-  ascent-override: 94.67%;
-  descent-override: 21.77%;
-  line-gap-override: 0%;
-}
+   Re-measure with tools/font-metrics.mjs if the typeface is ever rebuilt.
+
+   The face itself is declared in src/index.html, not here. The build inlines
+   only each page's critical CSS and left this @font-face out of it, while the
+   rest of the sheet loads asynchronously — so the first paint used system-ui
+   with no adjustment, and the swap to the adjusted face moved every hero by a
+   CLS of 0.09–0.10 on a phone. In the document head it is there from the
+   first byte. Keep the two in step: this comment, that declaration. */

@@ -67,7 +67,7 @@ export class HelpComponent {
     ],
     troubleshooting: {
       title: 'When something goes wrong',
-      image: { src: 'assets/img/bee2.webp', alt: 'Bee', width: 473, height: 473 },
+      image: { src: '/assets/img/bee2.webp', alt: 'Bee', width: 473, height: 473 },
       items: [
         {
           title: 'It did not hear me',

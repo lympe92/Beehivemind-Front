@@ -62,7 +62,7 @@ export class HomeComponent {
     hero: {
       title: 'Most intelligent beekeeping software',
       subtitle: 'Increase your business productivity with our beehive management software.',
-      image: { src: 'assets/img/bee4.webp', alt: 'Bee', width: 512, height: 358, priority: true },
+      image: { src: '/assets/img/bee4.webp', alt: 'Bee', width: 512, height: 358, priority: true },
       // Was /auth/login: a visitor who has never heard of the product landed
       // on a sign-in form, while the same label in the closing banner went to
       // /auth/register.
@@ -92,7 +92,7 @@ export class HomeComponent {
       // Not `priority`: the band sits below the first screen on every width,
       // and an eager 83 KB GIF competed with the hero image for bandwidth.
       image: {
-        src: 'assets/img/inspections.webp',
+        src: '/assets/img/inspections.webp',
         alt: 'The Beehivemind inspection table, with a row being edited in place',
         width: 477,
         height: 213,
@@ -100,7 +100,7 @@ export class HomeComponent {
     },
     splitAccordion: {
       title: 'Turn inspections into knowledge',
-      image: { src: 'assets/img/bee1.webp', alt: 'Bee', width: 417, height: 221 },
+      image: { src: '/assets/img/bee1.webp', alt: 'Bee', width: 417, height: 221 },
       items: [
         {
           title: 'Know your bees right now',
@@ -145,7 +145,7 @@ export class HomeComponent {
         { title: 'Work Smarter', description: 'Record all inspections, track down the weaknesses of your beehives and limit them.' },
         { title: 'Simple Interface', description: 'With simple design and user interface our easy to use App allows you to become more effective.' },
       ],
-      image: { src: 'assets/img/comb.webp', alt: 'Comb', width: 548, height: 542 },
+      image: { src: '/assets/img/comb.webp', alt: 'Comb', width: 548, height: 542 },
       cta: { label: 'Discover how our beekeeping App works »', routerLink: '/app' },
     },
     // TODO(content): every figure below needs confirming. The tier names are
@@ -185,15 +185,15 @@ export class HomeComponent {
     applicationDownload: {
       title: 'The app is where the recording happens',
       subtitle: 'Free on both stores, and it works without signal.',
-      logo: { src: 'assets/img/logo1.webp', alt: 'Beehivemind', width: 105, height: 105 },
+      logo: { src: '/assets/img/logo1.webp', alt: 'Beehivemind', width: 105, height: 105 },
       storeLinks: [
         {
           href: 'https://play.google.com/store/apps/details?id=org.beehivemind',
-          img: { src: 'assets/icons/android.svg', alt: 'Get it on Google Play', width: 180, height: 48 },
+          img: { src: '/assets/icons/android.svg', alt: 'Get it on Google Play', width: 180, height: 48 },
         },
         {
           href: 'https://apps.apple.com/app/beehivemind',
-          img: { src: 'assets/icons/apple-store.svg', alt: 'Download on the App Store', width: 180, height: 48 },
+          img: { src: '/assets/icons/apple-store.svg', alt: 'Download on the App Store', width: 180, height: 48 },
         },
       ],
     },

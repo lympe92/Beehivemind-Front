@@ -46,6 +46,22 @@ app.use((req, res, next) => {
   res.redirect(301, `${apex ? `https://${apex}` : ''}${path}${query}`);
 });
 
+/* ------------------------------------------------------------ crawl control */
+
+/**
+ * The auth screens and the signed-in zones are client-rendered: a crawler gets
+ * the empty shell. Every page links to /auth/register and /auth/login, though,
+ * and a URL that many links point at gets indexed even when robots.txt blocks
+ * it — listed as a bare address with no title. This header is the directive a
+ * crawler can act on. robots.txt therefore lets /auth through so the header is
+ * seen and the page is dropped, rather than listed empty; /user and /admin stay
+ * disallowed as well, since nothing links to them.
+ */
+app.use(['/auth', '/user', '/admin'], (_req, res, next) => {
+  res.set('X-Robots-Tag', 'noindex');
+  next();
+});
+
 /* ------------------------------------------------------------------ sitemap */
 
 interface SitemapEntry {
