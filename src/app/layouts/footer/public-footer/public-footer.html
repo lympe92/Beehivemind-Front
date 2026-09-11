@@ -2,7 +2,7 @@
   <div class="container">
     <div class="public-footer__grid">
       <div>
-        <h2 class="public-footer__heading">Beehivemind</h2>
+        <p class="public-footer__heading">Beehivemind</h2>
         <hr class="public-footer__rule">
         <p class="public-footer__blurb">
           BeehiveMind beekeeping software makes integrated beekeeping management
@@ -13,7 +13,7 @@
 
       @for (column of columns; track column.heading) {
         <div>
-          <h2 class="public-footer__heading">{{ column.heading }}</h2>
+          <p class="public-footer__heading">{{ column.heading }}</h2>
           <hr class="public-footer__rule">
           <ul class="public-footer__links">
             @for (link of column.links; track link.label) {

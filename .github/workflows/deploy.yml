@@ -42,6 +42,26 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: pm2 restart beehivemind-front
 
+      # Cloudflare holds every page for the five minutes the app declares, so
+      # without this a deploy shows up to five minutes late. Assets are hashed
+      # and refetched anyway, so purging everything costs one cold request per
+      # page. Needs a token with "Zone → Cache Purge" on the zone, stored as
+      # the CLOUDFLARE_API_TOKEN secret; without it the step just says so.
+      - name: Purge the Cloudflare cache
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ZONE_ID: 646faf54c6fc96d5934a52997488907f
+        run: |
+          if [ -z "$CF_API_TOKEN" ]; then
+            echo "No CLOUDFLARE_API_TOKEN secret: the edge cache expires on its own within five minutes."
+            exit 0
+          fi
+          curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}' \
+            || echo "purge failed; the edge cache expires on its own within five minutes"
+
       # After the restart, so the key file and the fresh sitemap are what the
       # engine fetches. A failure here must not fail the deploy: the site is up.
       - name: Tell Bing what changed (IndexNow)
