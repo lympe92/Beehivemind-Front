@@ -12,10 +12,14 @@ export const publicRoutes: Routes = [
       import('./features-page/features-page').then((m) => m.FeaturesPageComponent),
     data: { seoKey: 'features' },
   },
+  // No seoKey on this route or on the other product pages below: each one
+  // applies its own SEO, so it can add the FAQPage node built from its
+  // "Common questions" band (core/utils/faq-schema.ts). Comments stay outside
+  // the route object: tools/build-sitemap.mjs finds a route's folder within
+  // 200 characters of its path, and a longer gap costs the page its lastmod.
   {
     path: 'app',
     loadComponent: () => import('./app-page/app-page').then((m) => m.AppPageComponent),
-    data: { seoKey: 'app' },
   },
   {
     path: 'pricing',
@@ -29,12 +33,10 @@ export const publicRoutes: Routes = [
       import('./apiaries-and-beehives/apiaries-and-beehives').then(
         (m) => m.ApiariesAndBeehivesComponent,
       ),
-    data: { seoKey: 'apiariesAndBeehives' },
   },
   {
     path: 'financial',
     loadComponent: () => import('./financial/financial').then((m) => m.FinancialComponent),
-    data: { seoKey: 'financial' },
   },
   {
     path: 'harvestandfeeding',
@@ -42,13 +44,11 @@ export const publicRoutes: Routes = [
       import('./harvest-and-feeding/harvest-and-feeding').then(
         (m) => m.HarvestAndFeedingComponent,
       ),
-    data: { seoKey: 'harvestAndFeeding' },
   },
   {
     path: 'inspections',
     loadComponent: () =>
       import('./inspections/inspections').then((m) => m.InspectionsComponent),
-    data: { seoKey: 'inspections' },
   },
   {
     path: 'help',

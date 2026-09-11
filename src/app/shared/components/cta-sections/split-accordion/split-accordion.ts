@@ -9,6 +9,12 @@ import { AccordionItem } from './split-accordion.model';
  * The first row opens on mount; clicking the open row closes it, so all rows
  * can be collapsed. Rows are hairline-separated, not boxed as cards.
  * Usage: `<section app-split-accordion …></section>`.
+ *
+ * Every answer is rendered, open or not, and a closed one is only `hidden`:
+ * `/help` and the product pages quote these answers in their FAQPage markup,
+ * and a crawler reads what the server sent, not what a click would reveal.
+ * A closed row also drops the body class, whose `display: flex` would
+ * otherwise beat the `hidden` attribute.
  */
 @Component({
   selector: 'section[app-split-accordion]',

@@ -20,18 +20,16 @@
             <span>{{ item.title }}</span>
             <span class="split-accordion__chevron" aria-hidden="true">»</span>
           </button>
-          @if (open() === i) {
-            <div class="split-accordion__body">
-              <p>{{ item.body }}</p>
-              @if (item.linkHref) {
-                @if (isExternal(item.linkHref)) {
-                  <a [href]="item.linkHref" target="_blank" rel="noopener noreferrer">{{ item.linkLabel }}</a>
-                } @else {
-                  <a [routerLink]="item.linkHref">{{ item.linkLabel }}</a>
-                }
+          <div [class.split-accordion__body]="open() === i" [hidden]="open() !== i">
+            <p>{{ item.body }}</p>
+            @if (item.linkHref) {
+              @if (isExternal(item.linkHref)) {
+                <a [href]="item.linkHref" target="_blank" rel="noopener noreferrer">{{ item.linkLabel }}</a>
+              } @else {
+                <a [routerLink]="item.linkHref">{{ item.linkLabel }}</a>
               }
-            </div>
-          }
+            }
+          </div>
         </div>
       }
     </div>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { HeroLeftContentComponent } from '../../../shared/components/hero-sections/hero-left-content/hero-left-content';
 import { RibbonComponent } from '../../../shared/components/info-sections/ribbon/ribbon';
 import { SplitContentComponent } from '../../../shared/components/info-sections/split-content/split-content';
@@ -17,6 +17,9 @@ import {
   SplitContentConfig,
   TextColumnsConfig,
 } from '../public-page.model';
+import { SeoService } from '../../../core/services/seo.service';
+import { SEO_CONFIG } from '../../../core/services/seo.config';
+import { faqPageSchema, fromAccordion, withFaq } from '../../../core/utils/faq-schema';
 
 interface AppPageConfig {
   hero: HeroConfig;
@@ -26,10 +29,15 @@ interface AppPageConfig {
   splitAccordion1: SplitAccordionConfig;
   applicationDownload: ApplicationDownloadConfig;
   splitAccordion2: SplitAccordionConfig;
+  questions: SplitAccordionConfig;
   infoColumns: InfoColumnsConfig;
   ctaBanner: CtaBannerConfig;
 }
 
+/**
+ * Applies its own SEO rather than the route's `seoKey`, like `/pricing` and
+ * `/help`: the FAQPage node is built from `questions`, the band the page shows.
+ */
 @Component({
   selector: 'app-app-page',
   standalone: true,
@@ -46,6 +54,8 @@ interface AppPageConfig {
   templateUrl: './app-page.html',
 })
 export class AppPageComponent {
+  private seoService = inject(SeoService);
+
   readonly page: AppPageConfig = {
     hero: {
       // Was the apiaries page's hero, copied verbatim — two indexed pages
@@ -115,6 +125,33 @@ export class AppPageComponent {
         },
       ],
     },
+    // Every answer is the help page's own account of how recording works
+    // (offline recognition, the beep, the hive command, corrections on the
+    // website). No store or platform question until the listings exist.
+    questions: {
+      title: 'Common questions',
+      image: { src: '/assets/img/hive.webp', alt: 'Straw-roofed beehive', width: 417, height: 417 },
+      items: [
+        {
+          title: 'Does the app work without signal?',
+          body: 'Yes. Speech recognition runs on the phone, so recording needs no connection. Inspections upload by themselves the next time the phone is online, and nothing is lost while you are out of range.',
+        },
+        {
+          title: 'What does the app understand?',
+          body: 'Ten phrases, such as "beehive number one", "six frames honey" or "queen cells". Each one is confirmed with a short beep, so you know it was heard without looking at the screen.',
+          linkHref: '/help',
+          linkLabel: 'All ten phrases »',
+        },
+        {
+          title: 'What if it hears the wrong hive number?',
+          body: 'Say the right number and carry on. Everything after a hive command belongs to that hive, so the earlier readings stay where they were, and a finished inspection can be corrected on the website.',
+        },
+        {
+          title: 'Do I have to use my voice?',
+          body: 'No. Inspections, harvests and feedings can all be entered from forms on the website. The app is for the part of the job where your hands are full.',
+        },
+      ],
+    },
     infoColumns: {
       title: 'Trusted partner',
       items: [
@@ -130,4 +167,11 @@ export class AppPageComponent {
       secondary: { label: 'From the blog: about the app »', routerLink: '/blog/category/the-app' },
     },
   };
+
+  constructor() {
+    // In the constructor, not ngOnInit, so the tags are part of the prerender.
+    const seo = SEO_CONFIG['app'];
+    const faq = faqPageSchema(seo.meta_title, '/app', seo.meta_description, this.page.questions.items.map(fromAccordion));
+    this.seoService.applySEO(withFaq(seo, faq));
+  }
 }

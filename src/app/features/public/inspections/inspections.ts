@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { HeroCenterContentComponent } from '../../../shared/components/hero-sections/hero-center-content/hero-center-content';
 import { SplitAccordionComponent } from '../../../shared/components/cta-sections/split-accordion/split-accordion';
 import { InfoColumnsComponent } from '../../../shared/components/info-sections/info-columns/info-columns';
@@ -12,6 +12,9 @@ import {
   InfoColumnsConfig,
   SplitAccordionConfig,
 } from '../public-page.model';
+import { SeoService } from '../../../core/services/seo.service';
+import { SEO_CONFIG } from '../../../core/services/seo.config';
+import { faqPageSchema, fromAccordion, withFaq } from '../../../core/utils/faq-schema';
 
 interface InspectionsPageConfig {
   hero: HeroConfig;
@@ -19,6 +22,7 @@ interface InspectionsPageConfig {
   featuresListCta: FeaturesListCtaConfig;
   splitAccordion2: SplitAccordionConfig;
   ctaBanner1: CtaBannerConfig;
+  questions: SplitAccordionConfig;
   infoColumns: InfoColumnsConfig;
   ctaBanner2: CtaBannerConfig;
 }
@@ -28,6 +32,9 @@ const LOGO: ImageConfig = { src: '/assets/img/logotr.webp', alt: 'Logo', width: 
 /**
  * The only page with two CtaBanners: a title-only one mid-page as a pivot,
  * then the full closing one.
+ *
+ * Applies its own SEO rather than the route's `seoKey`, like `/pricing` and
+ * `/help`: the FAQPage node is built from `questions`, the band the page shows.
  */
 @Component({
   selector: 'app-inspections',
@@ -36,6 +43,8 @@ const LOGO: ImageConfig = { src: '/assets/img/logotr.webp', alt: 'Logo', width: 
   templateUrl: './inspections.html',
 })
 export class InspectionsComponent {
+  private seoService = inject(SeoService);
+
   readonly page: InspectionsPageConfig = {
     hero: {
       title: 'Turn your Inspections into Knowledge',
@@ -103,6 +112,35 @@ export class InspectionsComponent {
       title: 'Ready to explore the app?',
       cta: { label: 'Explore the App', routerLink: '/app', variant: 'outline' },
     },
+    // What a recording holds is the help page's list of phrases; the offline
+    // and upload answers are the help page's own words. The first question is
+    // the one searched most, and ends in the checklist article.
+    questions: {
+      title: 'Common questions',
+      image: { src: '/assets/img/bee2.webp', alt: 'Honeybee seen from above', width: 473, height: 473 },
+      items: [
+        {
+          title: 'How often should a hive be inspected?',
+          body: 'Every seven to ten days while the colony is building up and could swarm, every two to three weeks once the main flow is over, and not at all in cold weather, when opening the hive costs the bees more heat than the visit is worth. Following the same order every time makes each visit quicker and misses less.',
+          linkHref: '/blog/hive-inspection-checklist',
+          linkLabel: 'The fourteen readings, in order »',
+        },
+        {
+          title: 'What does one inspection record?',
+          body: 'Frames of bees and the space they have, open and capped brood, pollen, honey, whether you saw the queen or queen cells, and any disease you found, varroa, nosema and both foulbroods included. Each visit becomes one row per hive, so the next visit is compared with the last one rather than with memory.',
+          linkHref: '/help',
+          linkLabel: 'The phrases the app understands »',
+        },
+        {
+          title: 'Do I need phone signal at the apiary?',
+          body: 'No. Speech recognition runs on the phone, so an inspection is recorded with no signal at all. It uploads by itself the next time the phone is online and appears on the website ready to review.',
+        },
+        {
+          title: 'Can I add an inspection without the app?',
+          body: 'Yes. The inspections tab on the website takes the same readings from a form, which suits notes written at the hive and typed up later. Inspections from the app and from the form land in the same list and the same dashboard.',
+        },
+      ],
+    },
     infoColumns: {
       title: 'Trusted partner',
       items: [
@@ -118,4 +156,11 @@ export class InspectionsComponent {
       secondary: { label: 'From the blog: inspections »', routerLink: '/blog/category/inspections' },
     },
   };
+
+  constructor() {
+    // In the constructor, not ngOnInit, so the tags are part of the prerender.
+    const seo = SEO_CONFIG['inspections'];
+    const faq = faqPageSchema(seo.meta_title, '/inspections', seo.meta_description, this.page.questions.items.map(fromAccordion));
+    this.seoService.applySEO(withFaq(seo, faq));
+  }
 }

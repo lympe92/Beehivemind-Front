@@ -6,7 +6,7 @@ import { CtaBannerComponent } from '../../../shared/components/cta-sections/cta-
 import { CtaBannerConfig, PageIntroConfig, SplitAccordionConfig, TextColumnsConfig } from '../public-page.model';
 import { SeoService } from '../../../core/services/seo.service';
 import { SEO_CONFIG } from '../../../core/services/seo.config';
-import { FAQPageSchema } from '../../../core/models/seo.model';
+import { faqPageSchema, fromAccordion, withFaq } from '../../../core/utils/faq-schema';
 import { environment } from '../../../../environments/environment';
 
 interface VoiceCommand {
@@ -95,24 +95,10 @@ export class HelpComponent {
 
   constructor() {
     // In the constructor, not ngOnInit, so the tags are part of the prerender.
-    const base = SEO_CONFIG['help'];
-    const pageSchema = Array.isArray(base.schema) ? base.schema : [base.schema];
-    this.seoService.applySEO({ ...base, schema: [...pageSchema, this.faqSchema()] });
-  }
-
-  /** Built from the accordion, so every question and answer is visible on the page. */
-  private faqSchema(): FAQPageSchema {
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      name: `Help | ${environment.appName}`,
-      url: `${environment.appUrl}/help`,
-      description: SEO_CONFIG['help'].meta_description,
-      mainEntity: this.page.troubleshooting.items.map(item => ({
-        '@type': 'Question' as const,
-        name: item.title,
-        acceptedAnswer: { '@type': 'Answer' as const, text: item.body },
-      })),
-    };
+    // Built from the accordion, which renders every answer (closed rows are
+    // only hidden), so every question and answer is on the page.
+    const seo = SEO_CONFIG['help'];
+    const faq = faqPageSchema(`Help | ${environment.appName}`, '/help', seo.meta_description, this.page.troubleshooting.items.map(fromAccordion));
+    this.seoService.applySEO(withFaq(seo, faq));
   }
 }
