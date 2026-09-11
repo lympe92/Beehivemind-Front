@@ -65,8 +65,20 @@ categories are written in the admin console and read from the API
   `RenderMode.Server` in `app.routes.server.ts`. Prerendering them would freeze
   the list at build time. A missing slug calls `SeoService.markNotFound()`, which
   `src/server.ts` turns into a real 404.
-- `src/server.ts` builds `/sitemap.xml` and `/rss.xml` from `blog/sitemap` and
-  `blog/posts`, cached an hour, falling back to empty rather than erroring.
+- `src/server.ts` builds `/sitemap.xml`, `/rss.xml` and `/llms.txt` from
+  `blog/sitemap` and `blog/posts`, cached an hour, falling back to empty rather
+  than erroring. It also caches every `api/blog/*` answer for a minute below
+  `HttpClient` (a stale copy stands in for a 429/5xx), and answers file-like
+  paths such as `/blog/chunk-x.js` with a bare 404 before Angular.
+- An article page also loads up to three more posts from its category
+  (`withRelated()` in `blog-article.ts`, same server render), shows the byline
+  and an "Updated" date when the post changed after the day it went up, and
+  links to the product page its category is about (`productPageFor()` in
+  `blog.mapper.ts`); the product pages link back through the closing CTA
+  banner's `secondary` link. A category archive with fewer than three posts is
+  `noindex, follow` and out of the sitemap (`INDEXABLE_CATEGORY_MIN_POSTS`).
+- `BlogPosting.author` is a `Person` only when the console names one; the
+  company byline is the `Organization`. A `noindex` page carries no canonical.
 
 ## Content flags
 - Figures in the "Trusted partner" bands and every price/limit on `/pricing` and the home pricing band are **unconfirmed** (`TODO(content)` comments). The home pricing band duplicates `/pricing` — change a price in both.
