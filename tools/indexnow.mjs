@@ -10,7 +10,11 @@
 const HOST = 'beehivemind.tech';
 const KEY = 'ac998c067e17b4a3156d9cca9ed5b8b6';
 
-const sitemapUrl = process.argv[2] ?? `https://${HOST}/sitemap.xml`;
+// Cloudflare keeps the sitemap for the hour the app declares, so right after a
+// restart the plain URL can still be the copy from before the deploy (a deploy
+// once pinged 21 URLs while the fresh sitemap had 28). A query string the edge
+// has never seen is a new cache key, so the list comes from the origin.
+const sitemapUrl = process.argv[2] ?? `https://${HOST}/sitemap.xml?deploy=${Date.now()}`;
 const xml = await (await fetch(sitemapUrl)).text();
 const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
 
