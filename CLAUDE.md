@@ -2,7 +2,7 @@
 
 ## Tech Stack
 - **Angular 21** — standalone components, signals, lazy-loaded routes
-- **NgRx** (`@ngrx/store` + `@ngrx/effects` + store-devtools) for domain state
+- **NgRx** (`@ngrx/store` + `@ngrx/effects`) for domain state; store-devtools in dev builds only (`store/devtools.ts`, swapped for an empty `devtools.prod.ts` by `fileReplacements`, which keeps the initial bundle under its 500 kB budget)
 - **Angular CDK** (`@angular/cdk/dialog`) for overlays
 - **SSR** (`@angular/ssr`, Express) with client hydration + store hydration meta-reducer
 - **Google Maps** (`@angular/google-maps`), **ApexCharts** (`ngx-apexcharts`), **qrcode**

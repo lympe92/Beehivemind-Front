@@ -1,16 +1,15 @@
 import {
   ApplicationConfig,
   provideBrowserGlobalErrorListeners,
-  isDevMode,
   PLATFORM_ID,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideStore, META_REDUCERS } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
-import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { routes } from './app.routes';
 import { appReducers, appEffects } from './store';
+import { storeDevtools } from './store/devtools';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { analyticsInterceptor } from './core/interceptors/analytics.interceptor';
@@ -36,7 +35,8 @@ export const appConfig: ApplicationConfig = {
       multi: true,
     },
     provideEffects(appEffects),
-    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
+    // Empty in a production build (see store/devtools.ts).
+    ...storeDevtools,
     provideClientHydration(withEventReplay()),
   ],
 };
