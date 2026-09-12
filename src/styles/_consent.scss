@@ -13,15 +13,16 @@
   bottom: 0;
   // Under the CDK overlay (1000), above everything a page draws.
   z-index: 900;
-  padding: var(--spacing-md);
+  // Only the block padding: the side gutter and the width are the system's
+  // own `.container` inside, so the panel lines up with the page's content at
+  // every breakpoint instead of guessing a width of its own.
+  padding-block: var(--spacing-md);
   padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom));
   pointer-events: none;
 }
 
 .consent__panel {
   pointer-events: auto;
-  margin: 0 auto;
-  max-width: var(--container-max, 1200px);
   display: flex;
   flex-wrap: wrap;
   align-items: center;

@@ -66,6 +66,14 @@ export class AnalyticsService {
   /** The title of the page last reported, so a late one can be waited for. */
   private lastTitle = '';
   private pageViewPending = 0;
+  /**
+   * The URL last reported, which is the referrer of the next page view.
+   * `document.referrer` is fixed at the first load and would otherwise repeat
+   * the site that sent the visitor on every navigation of the visit.
+   */
+  private lastUrl = '';
+  /** The last `internal` answer published; `null` until the first one. */
+  private trafficInternal: boolean | null = null;
 
   /** One GA4 event. `params` are the event's own; they do not outlive it. */
   event(name: string, params: EventParams = {}): void {
@@ -97,6 +105,11 @@ export class AnalyticsService {
    * employee and for anyone who has opened the site with `?bhm_internal=on`.
    */
   setTrafficType(internal: boolean): void {
+    // The bootstrap publishes this, and a moment later the auth store answers
+    // with the same value for a visitor who is not an employee. Only a change
+    // is worth a second push.
+    if (internal === this.trafficInternal) return;
+    this.trafficInternal = internal;
     this.setContext({ traffic_type: internal ? 'internal' : undefined });
   }
 
@@ -180,7 +193,12 @@ export class AnalyticsService {
     // A newer navigation has started; that one reports, this one drops.
     if (attempt !== this.pageViewPending) return;
 
+    // The page that led here: the previous view within the visit, or the site
+    // that sent the visitor when this is the first.
+    const referrer = this.lastUrl || document.referrer;
+
     this.lastTitle = document.title;
+    this.lastUrl = location.href;
     this.setContext({
       page_type: this.pageType(),
       content_group: this.contentGroup(),
@@ -188,7 +206,7 @@ export class AnalyticsService {
     this.event('page_view', {
       page_location: location.href,
       page_title: document.title,
-      page_referrer: document.referrer || undefined,
+      page_referrer: referrer || undefined,
     });
   }
 

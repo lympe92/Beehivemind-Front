@@ -22,9 +22,23 @@ const OPT_IN_COUNTRIES = [
 const TRACE_URL = '/cdn-cgi/trace';
 const TRACE_TIMEOUT_MS = 3000;
 
+/**
+ * The answer to that question, kept for a month. Outside the opt-in countries
+ * nothing else is ever stored, so without this the edge would be asked again on
+ * every full load for as long as the visitor keeps coming back.
+ */
+const GEO_KEY = 'bhm_geo';
+const GEO_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
 interface StoredConsent {
   v: number;
   analytics: ConsentChoice;
+  at: string;
+}
+
+interface StoredGeo {
+  v: number;
+  country: string;
   at: string;
 }
 
@@ -144,20 +158,48 @@ export class ConsentService {
 
   /** Asks the edge where the visitor is, and shows the banner if it matters. */
   private async decideBanner(): Promise<void> {
-    let country: string | null = null;
+    let country = this.readGeo();
+    if (!country) {
+      country = await this.fetchCountry();
+      if (country) this.writeGeo(country);
+    }
+
+    // An unknown country is treated as one that needs asking.
+    this.showBanner.set(country === null || OPT_IN_COUNTRIES.includes(country));
+  }
+
+  private async fetchCountry(): Promise<string | null> {
     try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), TRACE_TIMEOUT_MS);
       const response = await fetch(TRACE_URL, { signal: controller.signal, cache: 'no-store' });
       clearTimeout(timer);
-      if (response.ok) {
-        country = /(?:^|\n)loc=([A-Z]{2})/.exec(await response.text())?.[1] ?? null;
-      }
+      if (!response.ok) return null;
+      return /(?:^|\n)loc=([A-Z]{2})/.exec(await response.text())?.[1] ?? null;
     } catch {
-      country = null;
+      return null;
     }
+  }
 
-    // An unknown country is treated as one that needs asking.
-    this.showBanner.set(country === null || OPT_IN_COUNTRIES.includes(country));
+  private readGeo(): string | null {
+    try {
+      const raw = localStorage.getItem(GEO_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as StoredGeo;
+      if (parsed?.v !== STORAGE_VERSION || !/^[A-Z]{2}$/.test(parsed.country)) return null;
+      // A malformed date parses to NaN, and the comparison then asks again.
+      return Date.now() - Date.parse(parsed.at) < GEO_TTL_MS ? parsed.country : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private writeGeo(country: string): void {
+    try {
+      const value: StoredGeo = { v: STORAGE_VERSION, country, at: new Date().toISOString() };
+      localStorage.setItem(GEO_KEY, JSON.stringify(value));
+    } catch {
+      // Same cost as a refused consent write: one more trace on the next visit.
+    }
   }
 }

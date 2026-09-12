@@ -1,18 +1,20 @@
 @if (consent.showBanner()) {
   <div class="consent" role="region" aria-labelledby="consent-title">
-    <div class="consent__panel">
-      <div class="consent__text">
-        <p id="consent-title" class="consent__title">Cookies</p>
-        <p class="consent__body">
-          We use Google Analytics to see which pages help beekeepers and which do not.
-          It sets cookies in your browser. Nothing we send identifies you, and refusing
-          changes nothing about how the site works.
-          <a routerLink="/privacy" fragment="cookies">What we measure »</a>
-        </p>
-      </div>
-      <div class="consent__actions">
-        <button type="button" class="btn btn--md btn--outline" (click)="consent.reject()">Reject</button>
-        <button type="button" class="btn btn--md btn--primary" (click)="consent.accept()">Accept</button>
+    <div class="container">
+      <div class="consent__panel">
+        <div class="consent__text">
+          <p id="consent-title" class="consent__title">Cookies</p>
+          <p class="consent__body">
+            We use Google Analytics to see which pages help beekeepers and which do not.
+            It sets cookies in your browser. Nothing we send identifies you, and refusing
+            changes nothing about how the site works.
+            <a routerLink="/privacy" fragment="cookies">What we measure »</a>
+          </p>
+        </div>
+        <div class="consent__actions">
+          <button type="button" class="btn btn--md btn--outline" (click)="consent.reject()">Reject</button>
+          <button type="button" class="btn btn--md btn--primary" (click)="consent.accept()">Accept</button>
+        </div>
       </div>
     </div>
   </div>

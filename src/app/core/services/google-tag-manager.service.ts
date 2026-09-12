@@ -16,8 +16,7 @@ const INTERNAL_KEY = 'bhm_internal';
 
 /**
  * The whole measurement stack starts here: consent defaults, the page views,
- * the signed-in user, the click listener, the web vitals, and last of all the
- * container itself.
+ * the signed-in user, the click listener, and last of all the container itself.
  *
  * Google Tag Manager is the only script this app loads for measurement. GA4
  * lives inside the container, configured there rather than in code, so a tag
@@ -33,15 +32,20 @@ export class GoogleTagManagerService {
   private consent    = inject(ConsentService);
 
   init(): void {
-    if (!isPlatformBrowser(this.platformId) || !environment.googleTagManagerId) return;
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    // First, and for every browser that runs the app: no tag may write a cookie
+    // before the defaults are on the dataLayer. It comes before both guards
+    // below on purpose — the banner is a promise to the visitor rather than a
+    // measurement detail, so it is asked and answered on the dev server and in
+    // the audit battery too, neither of which ever loads a container.
+    this.consent.init();
+
+    if (!environment.googleTagManagerId) return;
 
     // The audit harness, and any other driven browser, announce themselves
     // here. Keeping them out is what makes "users" mean people.
     if (navigator.webdriver) return;
-
-    // Before anything else: no tag may write a cookie before the defaults are
-    // on the dataLayer.
-    this.consent.init();
 
     this.analytics.setTrafficType(this.isInternal());
 
