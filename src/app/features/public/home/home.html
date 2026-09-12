@@ -42,6 +42,7 @@
   <section app-pricing-tiers
     [title]="page.pricing.title"
     [note]="page.pricing.note ?? ''"
+    [noteLink]="page.pricing.noteLink ?? null"
     [tiers]="page.pricing.tiers"></section>
 
   <section app-application-download
@@ -58,5 +59,6 @@
   <section app-cta-banner
     [title]="page.ctaBanner.title"
     [description]="page.ctaBanner.description ?? ''"
-    [cta]="page.ctaBanner.cta"></section>
+    [cta]="page.ctaBanner.cta"
+    [secondary]="page.ctaBanner.secondary"></section>
 </main>

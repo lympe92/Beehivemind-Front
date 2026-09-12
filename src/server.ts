@@ -96,6 +96,9 @@ globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
+// Express announces itself on every response; nothing reads it but scanners.
+app.disable('x-powered-by');
+
 app.use(compression());
 
 /* ---------------------------------------------------------- canonical URLs */
@@ -411,12 +414,22 @@ app.get('/llms.txt', async (_req, res, next) => {
 
 /**
  * Serve static files from /browser
+ *
+ * A year suits the build's hashed bundles. robots.txt carries no hash and is
+ * the file a crawler obeys, so a year-old copy in a cache — the edge's or the
+ * crawler's — would keep enforcing rules that have since changed. An hour, like
+ * the sitemap.
  */
 app.use(
   express.static(browserDistFolder, {
     maxAge: '1y',
     index: false,
     redirect: false,
+    setHeaders: (res, filePath) => {
+      if (/[\\/]robots\.txt$/.test(filePath)) {
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+      }
+    },
   }),
 );
 

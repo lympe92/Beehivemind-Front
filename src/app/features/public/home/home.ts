@@ -62,7 +62,7 @@ export class HomeComponent {
     hero: {
       title: 'Beekeeping software that records by voice',
       subtitle: 'Increase your business productivity with our beehive management software.',
-      image: { src: '/assets/img/bee4.webp', alt: 'Bee', width: 512, height: 358, priority: true },
+      image: { src: '/assets/img/bee4.webp', alt: 'Ink illustration of honeybees and linden blossom', width: 512, height: 358, priority: true },
       // Was /auth/login: a visitor who has never heard of the product landed
       // on a sign-in form, while the same label in the closing banner went to
       // /auth/register.
@@ -93,60 +93,84 @@ export class HomeComponent {
       // and an eager 83 KB GIF competed with the hero image for bandwidth.
       image: {
         src: '/assets/img/inspections.webp',
-        alt: 'The Beehivemind inspection table, with a row being edited in place',
+        alt: 'The BeehiveMind hive inspection table, with a row being edited in place',
         width: 477,
         height: 213,
       },
     },
+    // The home page is the strongest page on the site, so its links are where
+    // the product pages get their weight from: each one goes to the page that
+    // covers what the row talks about, named with the words that page is found
+    // by, rather than "Explore the features we offer" twice over.
     splitAccordion: {
       title: 'Turn inspections into knowledge',
-      image: { src: '/assets/img/bee1.webp', alt: 'Bee', width: 417, height: 221 },
+      image: { src: '/assets/img/bee1.webp', alt: 'Ink illustration of a honeybee, wings spread', width: 417, height: 221 },
       items: [
         {
           title: 'Know your bees right now',
           body: "Do you know your bees? Use our advanced tools to understand your beehives' growth, decrease bee colonies mortality rate and promote the genetic improvement of your bee stocks.",
-          linkHref: '/features',
-          linkLabel: 'Explore the features we offer »',
+          linkHref: '/inspections',
+          linkLabel: 'Hive inspection records »',
         },
         {
           title: 'Unified beekeeping management',
-          body: 'Get the most out of beekeeping using our voice recognition beehive management system. In this way you can contribute to sustainable beekeeping for a better world.',
-          linkHref: '/features',
-          linkLabel: 'Explore the features we offer »',
+          body: 'Inspections and harvests recorded by voice, feedings and treatments logged beside them: one beehive management system for the whole season of every colony.',
+          linkHref: '/harvestandfeeding',
+          linkLabel: 'Harvest and feeding records »',
         },
         {
           title: 'Efficient financial management',
-          body: 'Beehivemind makes the financial management of your beekeeping business efficient. Manage your business costs more efficiently through our financial management system and grow up while reducing your overall workload.',
+          body: 'BeehiveMind makes the financial management of your beekeeping business efficient. Manage your business costs more efficiently through our financial management system and grow up while reducing your overall workload.',
           linkHref: '/financial',
-          linkLabel: 'Explore the financial mode »',
+          linkLabel: 'Beekeeping cost and income tracking »',
         },
       ],
     },
     featuresRow: {
       items: [
-        { title: 'Optimize your account', description: 'Create your account, add your apiaries, create as many beehives as you want and name groups according to your needs. Now your account is ready to use.' },
-        { title: 'Inspect your colonies', description: 'Just open our beekeeping App and work using voice commands during inspection. Once the inspection is over, all data you entered will be available to evaluate them.' },
-        { title: 'Analyze inspection data', description: 'Analyze apiary management data to determinate what needs to be better in order to increase the growth rate of your colonies, productivity and healthiness.' },
-        { title: 'Diagnose growth issues', description: 'With our beekeeping software you can analyze apiary management data which will help you to understand better the bees, conduct tests and draw useful conclusions.' },
+        {
+          title: 'Optimize your account',
+          description: 'Create your account, add your apiaries, create as many beehives as you want and name groups according to your needs. Now your account is ready to use.',
+          linkHref: '/apiariesandbeehives',
+          linkLabel: 'Apiary and beehive management »',
+        },
+        {
+          title: 'Inspect your colonies',
+          description: 'Just open our beekeeping App and work using voice commands during inspection. Once the inspection is over, all data you entered will be available to evaluate them.',
+          linkHref: '/help',
+          linkLabel: 'The voice commands »',
+        },
+        {
+          title: 'Analyze inspection data',
+          description: 'Analyze apiary management data to determinate what needs to be better in order to increase the growth rate of your colonies, productivity and healthiness.',
+          linkHref: '/blog/hive-inspection-checklist',
+          linkLabel: 'Hive inspection checklist »',
+        },
+        {
+          title: 'Diagnose growth issues',
+          description: 'With our beekeeping software you can analyze apiary management data which will help you to understand better the bees, conduct tests and draw useful conclusions.',
+          linkHref: '/blog/reading-closed-brood',
+          linkLabel: 'What closed brood tells you »',
+        },
       ],
-      cta: { label: 'Explore the features', routerLink: '/features' },
+      cta: { label: 'All beekeeping software features', routerLink: '/features' },
     },
     ribbon2: {
       mode: 'dark',
       quote: 'Being productive is all about using the right tool!',
       // TODO(content): the line had no attribution, so it read as our own
       // slogan in quotation marks. Confirm or replace.
-      author: 'Beehivemind',
+      author: 'BeehiveMind',
     },
     splitList: {
-      title: "See all info about hives' growth with Beehivemind app",
+      title: "See all info about hives' growth with BeehiveMind app",
       items: [
         { title: 'Stay Hands-On', description: 'By using our beekeeping App you remain engaged and focused on high-value work by removing distractions.' },
         { title: 'Work Smarter', description: 'Record all inspections, track down the weaknesses of your beehives and limit them.' },
         { title: 'Simple Interface', description: 'With simple design and user interface our easy to use App allows you to become more effective.' },
       ],
-      image: { src: '/assets/img/comb.webp', alt: 'Comb', width: 548, height: 542 },
-      cta: { label: 'Discover how our beekeeping App works »', routerLink: '/app' },
+      image: { src: '/assets/img/comb.webp', alt: 'Ink illustration of honeycomb dripping with honey', width: 548, height: 542 },
+      cta: { label: 'How the voice beekeeping app works »', routerLink: '/app' },
     },
     // TODO(content): every figure below needs confirming. The tier names are
     // real (the admin panel filters on them); the prices and limits are the
@@ -155,6 +179,8 @@ export class HomeComponent {
     pricing: {
       title: 'Plans',
       note: 'Start free and stay free if one apiary is all you keep. Every plan records by voice, works offline and exports your data.',
+      // The band is a copy of /pricing; the link says which one is the source.
+      noteLink: { label: 'Compare the plans in full »', routerLink: '/pricing' },
       tiers: [
         {
           name: 'Free',
@@ -185,7 +211,7 @@ export class HomeComponent {
     applicationDownload: {
       title: 'The app is where the recording happens',
       subtitle: 'Free on both stores, and it works without signal.',
-      logo: { src: '/assets/img/logo1.webp', alt: 'Beehivemind', width: 105, height: 105 },
+      logo: { src: '/assets/img/logo1.webp', alt: 'BeehiveMind logo', width: 105, height: 105 },
       storeLinks: [
         {
           href: 'https://play.google.com/store/apps/details?id=org.beehivemind',
@@ -212,6 +238,7 @@ export class HomeComponent {
       title: 'What are you waiting for?',
       description: "That's right, what are you waiting for? The only thing left to do is to register and download BeehiveMind App today!",
       cta: { label: 'Get Started', routerLink: '/auth/register', variant: 'outline' },
+      secondary: { label: 'Beekeeping guides on the blog »', routerLink: '/blog' },
     },
   };
 }

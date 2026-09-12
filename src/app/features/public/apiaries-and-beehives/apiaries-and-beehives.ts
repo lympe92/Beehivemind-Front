@@ -19,7 +19,7 @@ interface ApiariesPageConfig {
 }
 
 /** All three SplitContents reuse the same flower artwork — a deliberate rhythm. */
-const FLOWER: ImageConfig = { src: '/assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 };
+const FLOWER: ImageConfig = { src: '/assets/img/flower.webp', alt: 'Ink illustration of a daisy', width: 473, height: 473 };
 
 /**
  * Applies its own SEO rather than the route's `seoKey`, like `/pricing` and
@@ -38,7 +38,7 @@ export class ApiariesAndBeehivesComponent {
     hero: {
       title: 'Apiary management, every hive on one map',
       subtitle: 'By utilizing the latest innovations in digital mapping, we offer you the best mapping system to depict your apiaries.',
-      image: { src: '/assets/img/jar2.webp', alt: 'Jar', width: 473, height: 473, priority: true },
+      image: { src: '/assets/img/jar2.webp', alt: 'Ink illustration of a honey jar with a honey spoon', width: 473, height: 473, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary', size: 'md' },
       secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline', size: 'md' },
     },
@@ -63,7 +63,7 @@ export class ApiariesAndBeehivesComponent {
     // types, each ending in the article that answers it at length.
     questions: {
       title: 'Common questions',
-      image: { src: '/assets/img/flower2.webp', alt: 'Clover in flower', width: 473, height: 473 },
+      image: { src: '/assets/img/flower2.webp', alt: 'Ink illustration of clover in flower', width: 473, height: 473 },
       items: [
         {
           title: 'How do I add an apiary?',

@@ -1,7 +1,12 @@
 <div class="container">
   <h2 class="pricing__title text-center">{{ title() }}</h2>
   @if (note()) {
-    <p class="pricing__note">{{ note() }}</p>
+    <p class="pricing__note">
+      {{ note() }}
+      @if (noteLink(); as link) {
+        <a [routerLink]="link.routerLink">{{ link.label }}</a>
+      }
+    </p>
   }
 
   <div class="pricing__grid">

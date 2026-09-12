@@ -32,10 +32,13 @@ const prerendered = Object.keys(
 );
 
 /* Route -> source folder, straight out of public.routes.ts, so a renamed
-   folder cannot silently break lastmod. */
+   folder cannot silently break lastmod. The gap between a path and its import
+   may not cross another `path:` — a redirect has no import of its own, and
+   without the guard it claimed the next route's (`pages/contact-us` took
+   `privacy`, which then had no lastmod). */
 const routesSrc = read(path.join(ROOT, 'src/app/features/public/public.routes.ts'));
 const folderFor = new Map();
-for (const m of routesSrc.matchAll(/path:\s*'([^']*)'[\s\S]{0,200}?import\('\.\/([^/']+)\//g)) {
+for (const m of routesSrc.matchAll(/path:\s*'([^']*)'(?:(?!path:)[\s\S]){0,200}?import\('\.\/([^/']+)\//g)) {
   folderFor.set('/' + m[1], m[2]);
 }
 
@@ -59,7 +62,7 @@ const skipped = [];
 for (const route of prerendered) {
   const file = htmlFor(route);
   if (!fs.existsSync(file)) continue;
-  // The page's own robots directive decides. /privacy and /terms opt out here.
+  // The page's own robots directive decides. /delete-account opts out here.
   if (/<meta[^>]+name="robots"[^>]+content="[^"]*noindex/i.test(read(file))) {
     skipped.push(route);
     continue;

@@ -27,8 +27,9 @@ interface FinancialPageConfig {
   ctaBanner: CtaBannerConfig;
 }
 
-const LOGO: ImageConfig = { src: '/assets/img/logo1.webp', alt: 'Logo', width: 105, height: 105 };
-const FINANCIAL_GIF: ImageConfig = { src: '/assets/img/financial.webp', alt: 'Financial', width: 477, height: 213 };
+// The mark is a bullet here, repeated six times: decorative, so no alt text.
+const LOGO: ImageConfig = { src: '/assets/img/logo1.webp', alt: '', width: 105, height: 105 };
+const FINANCIAL_GIF: ImageConfig = { src: '/assets/img/financial.webp', alt: 'BeehiveMind cost categories beside the costs table, each cost with a date, category and amount', width: 477, height: 213 };
 
 /**
  * Applies its own SEO rather than the route's `seoKey`, like `/pricing` and
@@ -47,7 +48,7 @@ export class FinancialComponent {
     hero: {
       title: 'Beekeeping costs and income, per hive',
       subtitle: 'We know what you need to manage your business costs more efficiently. With our financial tool you can get views of where your cash is going and manage your numbers effortlessly.',
-      image: { src: '/assets/img/bee1.webp', alt: 'Bee', width: 417, height: 221, priority: true },
+      image: { src: '/assets/img/bee1.webp', alt: 'Ink illustration of a honeybee, wings spread', width: 417, height: 221, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },
       secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline' },
     },
@@ -65,7 +66,7 @@ export class FinancialComponent {
     ],
     // Six items, so the three-up grid has no orphan.
     featuresListCta: {
-      title: 'Meet Beehivemind financial features',
+      title: 'Meet BeehiveMind financial features',
       items: [
         { img: LOGO, title: 'Costs', description: "Insert all costs of your business for better control on what's coming in and going out." },
         { img: LOGO, title: 'Cost Categories', description: 'Create cost categories like jars, feeding, tools, honey, pollen etc to personalize your account.' },
@@ -75,14 +76,14 @@ export class FinancialComponent {
         { img: LOGO, title: 'Financial Reports', description: 'Filter your costs by period and category, then export the summary to keep your bookkeeping in order.' },
       ],
       ctaHref: '/help',
-      ctaLabel: 'Read the help page',
+      ctaLabel: 'Help and voice commands',
     },
     // The categories answer is what the cost-category form takes (name,
     // description, income or outgoing); the rest are the money questions
     // people search, each ending in the article that answers them.
     questions: {
       title: 'Common questions',
-      image: { src: '/assets/img/jar.webp', alt: 'Honey jar with a cloth cover', width: 417, height: 417 },
+      image: { src: '/assets/img/jar.webp', alt: 'Ink illustration of a honey jar with a cloth cover', width: 417, height: 417 },
       items: [
         {
           title: 'What counts as a beekeeping cost?',

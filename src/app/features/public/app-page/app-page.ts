@@ -62,7 +62,7 @@ export class AppPageComponent {
       // competing for the same phrase. This one is about the app.
       title: 'The beekeeping app that records while you work',
       subtitle: 'Describe a hive out loud and the app writes the inspection down. It runs offline, so an apiary with no signal changes nothing.',
-      image: { src: '/assets/img/jar2.webp', alt: 'Jar', width: 473, height: 473, priority: true },
+      image: { src: '/assets/img/jar2.webp', alt: 'Ink illustration of a honey jar with a honey spoon', width: 473, height: 473, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },
       secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline' },
     },
@@ -73,35 +73,35 @@ export class AppPageComponent {
     splitContent: {
       title: 'The smarter way to organize your apiaries',
       description: 'Its time to set your apiaries. When you create an apiary, you can pin it on map. Furthermore its practical to name your new apiary for better organization.',
-      image: { src: '/assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 },
+      image: { src: '/assets/img/flower.webp', alt: 'Ink illustration of a daisy', width: 473, height: 473 },
     },
     textColumns: [
       { title: 'Dashboard', description: 'How to manage your beehives growth from dashboard.' },
       { title: 'Inspections', description: "Check the ways to keep notes for what's happening to your beehives." },
-      { title: 'Mobile Apps', description: 'Use the Beehivemind App and collect all inspection data you need.' },
+      { title: 'Mobile Apps', description: 'Use the BeehiveMind App and collect all inspection data you need.' },
     ],
     splitAccordion1: {
       title: 'Create and manage your beehives',
-      image: { src: '/assets/img/flower2.webp', alt: 'Flower', width: 473, height: 473 },
+      image: { src: '/assets/img/flower2.webp', alt: 'Ink illustration of clover in flower', width: 473, height: 473 },
       items: [
         {
           title: 'Create beehives to start inspect',
           body: 'Before you start collecting data from inspections, the last step is creating the beehives that you want to keep notes on. Select the apiary you want, insert beehives and give them a name and group.',
-          linkHref: '/features',
-          linkLabel: 'Explore the features we offer »',
+          linkHref: '/apiariesandbeehives',
+          linkLabel: 'Apiary and beehive management »',
         },
         {
           title: 'Group beehives according to your needs',
           body: 'You can use beehive groups for better organization. Group beehives according to some similar features, like bought queens or new beehives. Now its possible for you to check their growth as a group.',
           linkHref: '/help',
-          linkLabel: 'Read the help page »',
+          linkLabel: 'Help and voice commands »',
         },
       ],
     },
     applicationDownload: {
       title: 'New era on beekeeping!',
       subtitle: 'Meet our beekeeping app now!',
-      logo: { src: '/assets/img/logotr.webp', alt: 'Logo', width: 512, height: 512 },
+      logo: { src: '/assets/img/logotr.webp', alt: 'BeehiveMind logo', width: 512, height: 512 },
       storeLinks: [
         { href: 'https://play.google.com/store/apps/details?id=org.beehivemind', img: { src: '/assets/icons/android.svg', alt: 'Get it on Google Play', width: 180, height: 48 } },
         { href: 'https://apps.apple.com/app/beehivemind', img: { src: '/assets/icons/apple-store.svg', alt: 'Download on the App Store', width: 180, height: 48 } },
@@ -109,19 +109,19 @@ export class AppPageComponent {
     },
     splitAccordion2: {
       title: 'Inspect and track your hives with ease',
-      image: { src: '/assets/img/bee1.webp', alt: 'Bee', width: 417, height: 221 },
+      image: { src: '/assets/img/bee1.webp', alt: 'Ink illustration of a honeybee, wings spread', width: 417, height: 221 },
       items: [
         {
           title: 'Use voice commands',
           body: 'Record inspection data hands-free using our voice recognition system. Keep your focus on the bees, not the screen.',
-          linkHref: '/features',
-          linkLabel: 'Explore the features we offer »',
+          linkHref: '/inspections',
+          linkLabel: 'Hive inspections by voice »',
         },
         {
           title: 'Track hive history',
           body: 'All your inspection data is stored and visualized in graphs. Understand trends and make better decisions for your colonies.',
           linkHref: '/features',
-          linkLabel: 'Explore the features we offer »',
+          linkLabel: 'Every beekeeping software feature »',
         },
       ],
     },
@@ -130,7 +130,7 @@ export class AppPageComponent {
     // website). No store or platform question until the listings exist.
     questions: {
       title: 'Common questions',
-      image: { src: '/assets/img/hive.webp', alt: 'Straw-roofed beehive', width: 417, height: 417 },
+      image: { src: '/assets/img/hive.webp', alt: 'Ink illustration of a straw-roofed beehive', width: 417, height: 417 },
       items: [
         {
           title: 'Does the app work without signal?',

@@ -1,6 +1,6 @@
-/* Builds the three Open Graph cards in src/assets/images/ (1200x630 JPEG),
-   the sizes seo.config.ts points at. Run it when the wording or the brand
-   changes:  node tools/build-og.mjs
+/* Builds the Open Graph cards in src/assets/images/ (1200x630 JPEG), one per
+   public page that is shared, at the paths seo.config.ts points at. Run it when
+   the wording or the brand changes:  node tools/build-og.mjs
    Needs puppeteer-core and the system Chrome; the cards use the real Peridot
    PE file and the logo mark, both inlined, so they never depend on a network. */
 import fs from 'node:fs';
@@ -72,10 +72,22 @@ h1{
 </div>
 </body></html>`;
 
+// A shared link used to show the home card for every product page, so nine
+// different pages looked like one in a feed. No prices on the cards: a card
+// outlives a price change, and nobody re-runs this for one.
 const CARDS = [
-  ['og-home.jpg',     'Beehive management for working beekeepers', 'Beekeeping software'],
-  ['og-features.jpg', 'Inspections, harvest, treatments and costs', 'Features'],
-  ['og-blog.jpg',     'Notes on keeping bees with better records',  'Blog'],
+  ['og-home.jpg',             'Beehive management for working beekeepers',  'Beekeeping software'],
+  ['og-features.jpg',         'Inspections, harvest, treatments and costs', 'Features'],
+  ['og-blog.jpg',             'Notes on keeping bees with better records',  'Blog'],
+  ['og-app.jpg',              'Say what you see, and the inspection is written', 'Beekeeping app'],
+  ['og-inspections.jpg',      'Hive inspections, recorded by voice',        'Hive inspections'],
+  ['og-apiaries.jpg',         'Every apiary on a map, every hive on record', 'Apiaries and beehives'],
+  ['og-harvest-feeding.jpg',  'Every harvest and feeding, per hive',        'Harvest and feeding'],
+  ['og-financial.jpg',        'Beekeeping costs and income, per hive',      'Financial'],
+  ['og-pricing.jpg',          'Free for one apiary, Pro when you grow',     'Plans'],
+  ['og-help.jpg',             'Ten phrases, and your hands stay in the hive', 'Help'],
+  ['og-about.jpg',            'Record-keeping for working beekeepers',      'About'],
+  ['og-contact.jpg',          'Questions about the software? Write to us.', 'Contact'],
 ];
 
 const browser = await puppeteer.launch({

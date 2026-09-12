@@ -43,12 +43,12 @@ export class AboutComponent {
   readonly page: AboutPageConfig = {
     intro: {
       eyebrow: 'Beekeeping software since 2019',
-      title: 'About Beehivemind',
+      title: 'About BeehiveMind',
       lead: 'We build record-keeping for working beekeepers. The reason it records by voice is that the people who asked for it had their hands in a hive at the time.',
     },
     story: {
       title: 'It started as a notebook problem',
-      description: 'Beehivemind exists because writing an inspection down is the part of beekeeping that gets skipped. The three steps below are how the product got from that problem to what it does now.',
+      description: 'BeehiveMind exists because writing an inspection down is the part of beekeeping that gets skipped. The three steps below are how the product got from that problem to what it does now.',
       steps: [
         { title: 'The problem', body: 'Fourteen readings an inspection, a hundred hives, and a notebook that has to survive smoke, gloves and rain. Most of it was being written up in the evening from memory.' },
         { title: 'What we built first', body: 'Voice recording for a single inspection. It worked badly and beekeepers used it anyway, which told us the problem was worth the rest of the work.' },
@@ -57,7 +57,7 @@ export class AboutComponent {
       // TODO(content): a real photograph — the team, or the apiary this was
       // built in. Until then the stock bee carries an alt that describes it
       // truthfully; the previous one printed the instruction into the page.
-      image: { src: '/assets/img/bee1.webp', alt: 'A honeybee on a flower', width: 417, height: 221, priority: true },
+      image: { src: '/assets/img/bee1.webp', alt: 'Ink illustration of a honeybee, wings spread', width: 417, height: 221, priority: true },
     },
     // Three principles, each one falsifiable. TODO(content): confirm these are
     // the three you want to be held to.

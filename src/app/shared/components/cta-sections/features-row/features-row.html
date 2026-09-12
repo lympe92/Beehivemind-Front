@@ -3,6 +3,9 @@
     <div class="features-row__item">
       <h3 class="text-center">{{ item.title }}</h3>
       <p>{{ item.description }}</p>
+      @if (item.linkHref) {
+        <p><a [routerLink]="item.linkHref">{{ item.linkLabel }}</a></p>
+      }
     </div>
   }
 </div>

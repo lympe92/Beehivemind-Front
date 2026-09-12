@@ -32,7 +32,9 @@ export class SeoService {
     // Meta tags
     this.titleService.setTitle(seo.meta_title);
     this.metaService.updateTag({ name: 'description', content: seo.meta_description });
-    this.metaService.updateTag({ name: 'keywords', content: seo.focus_keyword });
+    // No `keywords` meta: no search engine reads it, and it printed the page's
+    // target phrases for anyone viewing the source. `focus_keyword` stays in the
+    // model — the blog console and the API still use it.
     this.metaService.updateTag({ name: 'robots', content: seo.robots });
 
     // Open Graph

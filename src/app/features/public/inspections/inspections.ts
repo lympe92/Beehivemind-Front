@@ -27,7 +27,8 @@ interface InspectionsPageConfig {
   ctaBanner2: CtaBannerConfig;
 }
 
-const LOGO: ImageConfig = { src: '/assets/img/logotr.webp', alt: 'Logo', width: 105, height: 105 };
+// The mark is a bullet here, repeated six times: decorative, so no alt text.
+const LOGO: ImageConfig = { src: '/assets/img/logotr.webp', alt: '', width: 105, height: 105 };
 
 /**
  * The only page with two CtaBanners: a title-only one mid-page as a pivot,
@@ -48,32 +49,32 @@ export class InspectionsComponent {
   readonly page: InspectionsPageConfig = {
     hero: {
       title: 'Hive inspections, recorded by voice',
-      subtitle: 'Beehivemind makes your data assimilable. Monitor bee habits, track their performance and understand their needs.',
-      image: { src: '/assets/img/hive.webp', alt: 'Hive', width: 417, height: 417, priority: true },
+      subtitle: 'BeehiveMind makes your data assimilable. Monitor bee habits, track their performance and understand their needs.',
+      image: { src: '/assets/img/hive.webp', alt: 'Ink illustration of a straw-roofed beehive', width: 417, height: 417, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },
       secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline' },
     },
     splitAccordion1: {
       title: 'Use the magic of voice recognition',
-      image: { src: '/assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 },
+      image: { src: '/assets/img/flower.webp', alt: 'Ink illustration of a daisy', width: 473, height: 473 },
       items: [
         {
           title: 'Easy apiary management',
           body: 'When you are ready to start your inspection, simply open the app and use your voice to record what you see during inspection. When the inspection will be completed, all data will be available on site.',
           linkHref: '/help',
-          linkLabel: 'Read the help page »',
+          linkLabel: 'Voice commands for an inspection »',
         },
         {
           title: 'Voice recognition commands',
           body: 'Our continuous offline speech recognition delivers the insights you added in real time. Use the right voice commands to describe what you inspect. When the inspection is over, all data will be available on site.',
           linkHref: '/app',
-          linkLabel: 'Learn more about our beekeeping app »',
+          linkLabel: 'The voice beekeeping app »',
         },
         {
           title: 'No wasted time at inspection',
-          body: 'Beehivemind beekeeping app eliminates the time you spend on your screen during inspection. Just start the recording and use the voice commands you learned. No clicks needed. In this way you focus on the pulse of bees.',
+          body: 'The BeehiveMind beekeeping app eliminates the time you spend on your screen during inspection. Just start the recording and use the voice commands you learned. No clicks needed. In this way you focus on the pulse of bees.',
           linkHref: '/app',
-          linkLabel: 'See how our beekeeping app works »',
+          linkLabel: 'Recording offline with the app »',
         },
       ],
     },
@@ -88,11 +89,11 @@ export class InspectionsComponent {
         { img: LOGO, title: 'Info about queen', description: 'Every time you see the queen give the right voice command and you will be able to know when was the last time that the hive was prosperous.' },
       ],
       ctaHref: '/help',
-      ctaLabel: 'Read the help page',
+      ctaLabel: 'All ten voice commands',
     },
     splitAccordion2: {
       title: 'Keep records of all-that happens',
-      image: { src: '/assets/img/flower.webp', alt: 'Flower', width: 473, height: 473 },
+      image: { src: '/assets/img/flower.webp', alt: 'Ink illustration of a daisy', width: 473, height: 473 },
       items: [
         {
           title: 'Easy to use inspection tab',
@@ -110,14 +111,14 @@ export class InspectionsComponent {
     },
     ctaBanner1: {
       title: 'Ready to explore the app?',
-      cta: { label: 'Explore the App', routerLink: '/app', variant: 'outline' },
+      cta: { label: 'Explore the beekeeping app', routerLink: '/app', variant: 'outline' },
     },
     // What a recording holds is the help page's list of phrases; the offline
     // and upload answers are the help page's own words. The first question is
     // the one searched most, and ends in the checklist article.
     questions: {
       title: 'Common questions',
-      image: { src: '/assets/img/bee2.webp', alt: 'Honeybee seen from above', width: 473, height: 473 },
+      image: { src: '/assets/img/bee2.webp', alt: 'Ink illustration of a honeybee seen from above', width: 473, height: 473 },
       items: [
         {
           title: 'How often should a hive be inspected?',

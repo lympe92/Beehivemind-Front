@@ -46,7 +46,7 @@ export class HelpComponent {
     intro: {
       eyebrow: 'Help',
       title: 'How recording works',
-      lead: 'Beehivemind listens while you work. Learn ten phrases and you never touch the screen during an inspection.',
+      lead: 'BeehiveMind listens while you work. Learn ten phrases and you never touch the screen during an inspection.',
     },
     steps: [
       { title: 'Open and start', description: 'Open the app at the apiary, press record, and put the phone in your pocket. Recognition runs offline, so a dead spot in the field costs you nothing.' },
@@ -67,7 +67,7 @@ export class HelpComponent {
     ],
     troubleshooting: {
       title: 'When something goes wrong',
-      image: { src: '/assets/img/bee2.webp', alt: 'Bee', width: 473, height: 473 },
+      image: { src: '/assets/img/bee2.webp', alt: 'Ink illustration of a honeybee seen from above', width: 473, height: 473 },
       items: [
         {
           title: 'It did not hear me',

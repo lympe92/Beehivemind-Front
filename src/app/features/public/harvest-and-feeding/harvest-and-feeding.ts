@@ -35,8 +35,8 @@ export class HarvestAndFeedingComponent {
       // Was about inspection spreadsheets, which is the /inspections page's
       // subject — the strongest signal on the page pointed at the wrong one.
       title: 'Every harvest and feeding, recorded as it happens',
-      subtitle: "Never worry about your feeding and harvest data. Beehivemind's tables update in real time via voice.",
-      image: { src: '/assets/img/jar.webp', alt: 'Jar', width: 417, height: 417, priority: true },
+      subtitle: "Never worry about your feeding and harvest data. BeehiveMind's tables update in real time via voice.",
+      image: { src: '/assets/img/jar.webp', alt: 'Ink illustration of a honey jar with a cloth cover', width: 417, height: 417, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },
       secondaryCta: { label: 'Need a consultation? »', routerLink: '/contact', variant: 'outline' },
     },
@@ -47,17 +47,17 @@ export class HarvestAndFeedingComponent {
         // financial tab." Nothing does that — a cost is only ever created from
         // the financial tab (the API's Costs module) — so the promise is gone.
         description: 'Input feedings for all your beehives individually or massively. Select the apiary or beehive that you want to add a feeding, insert the feeding type and the quantity.',
-        image: { src: '/assets/img/inspections.webp', alt: 'Inspections', width: 477, height: 213 },
+        image: { src: '/assets/img/feeding.webp', alt: 'BeehiveMind feeding records: date, feeding type, food type and quantity per beehive', width: 477, height: 213 },
       },
       {
         title: 'Record harvest data on the go using your voice',
-        description: 'Easily note how much honey you harvested from each hive using our voice recognition beekeeping app. Just explore Beehivemind App and use voice commands to describe how much honey you harvest from each hive.',
-        image: { src: '/assets/img/feeding.webp', alt: 'Feeding', width: 477, height: 213 },
+        description: 'Easily note how much honey you harvested from each hive using our voice recognition beekeeping app. Just explore the BeehiveMind App and use voice commands to describe how much honey you harvest from each hive.',
+        image: { src: '/assets/img/inspections.webp', alt: 'The BeehiveMind records table that a voice recording fills in, one row per visit', width: 477, height: 213 },
       },
       {
         title: 'Add harvest data with input form',
         description: "If you don't want to use our app, you can insert all harvest data with the help of harvest tab. Just select the apiary or beehive, type the harvest type and the total quantity. Then a new harvest log will be created.",
-        image: { src: '/assets/img/harvest.webp', alt: 'Harvest', width: 477, height: 213 },
+        image: { src: '/assets/img/harvest.webp', alt: 'BeehiveMind harvest records: date, harvest type, honey description and total quantity', width: 477, height: 213 },
       },
     ],
     // The harvest types, units and the apiary-wide feeding are what the forms
@@ -65,7 +65,7 @@ export class HarvestAndFeedingComponent {
     // questions people search, each ending in the article that answers them.
     questions: {
       title: 'Common questions',
-      image: { src: '/assets/img/jar2.webp', alt: 'Honey jar with a dipper', width: 473, height: 473 },
+      image: { src: '/assets/img/jar2.webp', alt: 'Ink illustration of a honey jar with a honey spoon', width: 473, height: 473 },
       items: [
         {
           title: 'What can I record as a harvest?',

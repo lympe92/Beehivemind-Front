@@ -37,7 +37,7 @@ export class NotFoundComponent {
     },
     cta: {
       title: 'Start from the beginning',
-      description: 'The home page has the short version of what Beehivemind does.',
+      description: 'The home page has the short version of what BeehiveMind does.',
       cta: { label: 'Go to the home page', routerLink: '/', variant: 'outline' },
     },
   };

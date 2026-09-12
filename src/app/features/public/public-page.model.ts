@@ -102,6 +102,8 @@ export interface PageIntroConfig {
 export interface PricingConfig {
   title: string;
   note?: string;
+  /** A text link closing the note. */
+  noteLink?: CtaLink;
   tiers: PricingTier[];
 }
 
