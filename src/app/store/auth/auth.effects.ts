@@ -68,7 +68,7 @@ export class AuthEffects {
     ),
   );
 
-  // The user id itself is attached by GoogleAnalyticsService, which watches
+  // The user id itself is attached by GoogleTagManagerService, which watches
   // the store; this is only the event that a sign-in happened.
   loginSuccess$ = createEffect(
     () =>
