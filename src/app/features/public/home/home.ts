@@ -60,7 +60,7 @@ interface HomePageConfig {
 export class HomeComponent {
   readonly page: HomePageConfig = {
     hero: {
-      title: 'Most intelligent beekeeping software',
+      title: 'Beekeeping software that records by voice',
       subtitle: 'Increase your business productivity with our beehive management software.',
       image: { src: '/assets/img/bee4.webp', alt: 'Bee', width: 512, height: 358, priority: true },
       // Was /auth/login: a visitor who has never heard of the product landed

@@ -37,7 +37,7 @@ export class PricingComponent {
 
   readonly page: PricingPageConfig = {
     intro: {
-      title: 'Plans',
+      title: 'Beekeeping software pricing',
       lead: 'Start free and stay free if one apiary is all you keep. Every plan records by voice, works without signal, and lets you take your data out whenever you want.',
     },
     pricing: {

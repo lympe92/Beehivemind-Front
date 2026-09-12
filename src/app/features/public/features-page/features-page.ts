@@ -27,7 +27,7 @@ interface FeaturesPageConfig {
 export class FeaturesPageComponent {
   readonly page: FeaturesPageConfig = {
     hero: {
-      title: 'Tired of inefficient Beekeeping Softwares?',
+      title: 'Everything a beekeeping app should record',
       subtitle: 'Join users who made beehive management easy with our beekeeping software.',
       image: { src: '/assets/img/bee2.webp', alt: 'Bee', width: 473, height: 473, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },

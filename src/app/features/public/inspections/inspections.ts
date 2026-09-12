@@ -47,7 +47,7 @@ export class InspectionsComponent {
 
   readonly page: InspectionsPageConfig = {
     hero: {
-      title: 'Turn your Inspections into Knowledge',
+      title: 'Hive inspections, recorded by voice',
       subtitle: 'Beehivemind makes your data assimilable. Monitor bee habits, track their performance and understand their needs.',
       image: { src: '/assets/img/hive.webp', alt: 'Hive', width: 417, height: 417, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },

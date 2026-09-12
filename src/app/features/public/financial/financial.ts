@@ -45,7 +45,7 @@ export class FinancialComponent {
 
   readonly page: FinancialPageConfig = {
     hero: {
-      title: 'Streamline your income with Beehivemind software',
+      title: 'Beekeeping costs and income, per hive',
       subtitle: 'We know what you need to manage your business costs more efficiently. With our financial tool you can get views of where your cash is going and manage your numbers effortlessly.',
       image: { src: '/assets/img/bee1.webp', alt: 'Bee', width: 417, height: 221, priority: true },
       primaryCta: { label: 'Get Started', routerLink: '/auth/register', variant: 'primary' },
