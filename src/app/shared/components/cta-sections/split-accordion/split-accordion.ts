@@ -1,7 +1,8 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ImageComponent } from '../../ui/image/image';
 import { ImageConfig } from '../../ui/image/image.model';
+import { AnalyticsService } from '../../../../core/services/analytics.service';
 import { AccordionItem } from './split-accordion.model';
 
 /**
@@ -28,10 +29,23 @@ export class SplitAccordionComponent {
   image = input.required<ImageConfig>();
   items = input.required<AccordionItem[]>();
 
+  private analytics = inject(AnalyticsService);
+
   readonly open = signal(0);
 
   toggle(index: number): void {
-    this.open.set(this.open() === index ? -1 : index);
+    const opening = this.open() !== index;
+    this.open.set(opening ? index : -1);
+
+    // Which questions people open is the only signal these bands give, and on
+    // the product pages it says which answer the page is missing above it.
+    if (opening) {
+      this.analytics.event('select_content', {
+        content_type: 'accordion',
+        item_id: this.items()[index]?.title,
+        section: this.title(),
+      });
+    }
   }
 
   isExternal(href: string): boolean {

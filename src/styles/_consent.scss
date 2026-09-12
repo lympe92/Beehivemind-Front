@@ -1,0 +1,78 @@
+// =============================================================================
+// CONSENT BANNER — repo-owned
+// The design system has no cookie banner, so this sheet holds the one thing a
+// component may not: the fixed panel it sits in. Every value is a token; the
+// buttons inside it are the system's own `.btn` pills and carry no rules here.
+// Fixed, not sticky, so asking the question costs no layout shift.
+// =============================================================================
+
+.consent {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  // Under the CDK overlay (1000), above everything a page draws.
+  z-index: 900;
+  padding: var(--spacing-md);
+  padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+
+.consent__panel {
+  pointer-events: auto;
+  margin: 0 auto;
+  max-width: var(--container-max, 1200px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
+.consent__text {
+  flex: 1 1 20rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.consent__title {
+  margin: 0;
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--text-heading);
+}
+
+.consent__body {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+  color: var(--text-body);
+  text-wrap: pretty;
+}
+
+.consent__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+// On a phone the two answers share the width, so neither reads as the
+// expected one.
+@media (max-width: 559px) {
+  .consent__actions {
+    width: 100%;
+  }
+
+  .consent__actions .btn {
+    flex: 1 1 0;
+  }
+}

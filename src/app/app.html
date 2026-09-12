@@ -1,3 +1,5 @@
 <router-outlet />
 <app-toast />
-
+@defer (when showConsent()) {
+  <app-consent-banner />
+}
