@@ -47,6 +47,15 @@ export class GoogleTagManagerService {
     // here. Keeping them out is what makes "users" mean people.
     if (navigator.webdriver) return;
 
+    // The container's opening message, pushed here rather than beside the
+    // script tag. GTM replays the dataLayer in order when it boots, and the
+    // tags on its Initialization and All Pages triggers — where the Google tag
+    // that configures GA4 lives — fire at this message. Every app event queued
+    // below therefore has to come after it, or the first page view of the visit
+    // would be processed before GA4 had been configured at all.
+    window.dataLayer = window.dataLayer ?? [];
+    window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' } as Record<string, unknown>);
+
     this.analytics.setTrafficType(this.isInternal());
 
     this.router.events
@@ -67,13 +76,11 @@ export class GoogleTagManagerService {
 
     this.analytics.trackClicks();
 
-    // The container is around 120 kB on the wire; loading it after the page is
-    // idle keeps it out of the first-paint critical path. Events pushed before
-    // it arrives wait on the dataLayer and are replayed when it does.
+    // The container is around 120 kB on the wire; fetching it after the page is
+    // idle keeps it out of the first-paint critical path. Only the fetch waits:
+    // everything above is already on the dataLayer, in the right order, and is
+    // replayed when the container arrives.
     runWhenIdle(() => {
-      window.dataLayer = window.dataLayer ?? [];
-      window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' } as Record<string, unknown>);
-
       const script = document.createElement('script');
       script.async = true;
       script.src = `https://www.googletagmanager.com/gtm.js?id=${environment.googleTagManagerId}`;
