@@ -10,7 +10,14 @@
        `<base href>` would resolve relative ones for a browser, but not for every
        crawler: GPTBot fetched `/blog/chunk-….js` and `/blog/category/assets/…`
        from the blog pages and left with 404s. -->
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- The bee mark, traced from the design system's logo-mark.png, on a white
+       rounded tile: bare ink vanishes into a dark tab strip. The ICO (16/32/48)
+       is for browsers without SVG icons; `sizes` on it is what stops Chrome from
+       choosing it over the SVG. iOS rounds the touch icon itself, so that one is
+       a plain white square. -->
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <!-- Feed autodiscovery. Served by /rss.xml in server.ts, built from the
        console's published posts. -->
   <link rel="alternate" type="application/rss+xml" title="BeehiveMind blog" href="/rss.xml">
