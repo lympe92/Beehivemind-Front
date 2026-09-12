@@ -157,12 +157,11 @@ The reset is not optional: GTM merges pushes, so without it `method` would ride 
 | `core/services/consent.service.ts` | Consent Mode v2: denied everywhere by default, granted by `region` outside the EEA/UK/CH, ads storage denied throughout. Decides whether the banner is needed from Cloudflare's `/cdn-cgi/trace`, stores the answer in `localStorage`, and republishes it as `consent update` |
 | `core/services/analytics.service.ts` | `event(name, params)`, `setContext()`, `setUser(user \| null)`, `setTrafficType()`, `reportNavigation()`, `trackClicks()` (store badges → `app_store_click`, `/auth/register` links → `cta_click`, blog cards, category chips and an article's product link → `select_content`). No-op on the server and without a container id, so callers never guard |
 | `core/interceptors/analytics.interceptor.ts` | Maps successful creation POSTs to `create_apiary`, `create_beehive`, `create_inspection` / `create_feeding` / `create_harvest` (from the `records` body `type`), `create_treatment_type`, `create_treatment_session`, `create_cost`, `create_cost_category`, `ai_message`, `enable_2fa`. A new entity is one line in its table |
-| `core/utils/web-vitals.ts` | LCP, CLS and INP from `PerformanceObserver`, reported once when the page is hidden, as `web_vitals` |
 | `shared/components/ui/consent-banner/` | The banner itself, in `app.html` beside the toasts. Accept and Reject carry equal weight; `/privacy#cookies` explains what is measured and changes the answer |
 
 `page_view` is sent by the app, not by the container's history trigger, because a blog title arrives with the API answer: `reportNavigation()` waits for the title to change (two seconds at most) on `/blog/…` before reporting.
 
-The banner and the vitals observers are behind `@defer` and a dynamic import, so only the visitors who are asked pay for them; the rest of the stack is ~5 kB in the initial bundle, which is why the budget is 510 kB rather than 500.
+The banner is behind `@defer`, so only the visitors who are asked pay for it; the rest of the stack is ~5 kB in the initial bundle, which is why the budget is 510 kB rather than 500.
 
 Funnel events fired by hand: `sign_up {method}` (register success; Google sign-in when the API says `is_new_user`), `email_confirmed`, `login {method}` (`AuthEffects`), `complete_profile {skipped}`, `generate_lead {form}` (contact). **No PII**: the user id is the numeric key, user properties are `country` and `auth_method`. Key events, data retention and the Search Console link are GA4 admin settings, not code. The growth/SEO audit that defined these events lives outside the repo (this repo is public) in the `Beehivemind Software` folder on the Desktop.
 

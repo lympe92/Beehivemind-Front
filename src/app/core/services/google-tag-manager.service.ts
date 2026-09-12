@@ -65,20 +65,8 @@ export class GoogleTagManagerService {
 
     // The container is around 120 kB on the wire; loading it after the page is
     // idle keeps it out of the first-paint critical path. Events pushed before
-    // it arrives wait on the dataLayer and are replayed when it does. The
-    // vitals observers are imported here rather than at the top of the file so
-    // they land in the same idle chunk instead of the initial bundle.
+    // it arrives wait on the dataLayer and are replayed when it does.
     runWhenIdle(() => {
-      void import('../utils/web-vitals').then(({ reportWebVitals }) =>
-        reportWebVitals((vital) =>
-          this.analytics.event('web_vitals', {
-            metric_name: vital.name,
-            metric_value: vital.value,
-            metric_rating: vital.rating,
-          }),
-        ),
-      );
-
       window.dataLayer = window.dataLayer ?? [];
       window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' } as Record<string, unknown>);
 
