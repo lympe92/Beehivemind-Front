@@ -192,7 +192,7 @@ export class HomeComponent {
         },
         {
           name: 'Pro',
-          price: '€9',
+          price: '€5',
           period: '/ month',
           featured: true,
           forWhom: 'The working beekeeper, one to twenty apiaries.',

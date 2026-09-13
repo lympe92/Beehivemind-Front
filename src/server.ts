@@ -348,7 +348,7 @@ BeehiveMind is one account across two clients: an Android app that records inspe
 - [Apiaries and beehives](https://beehivemind.tech/apiariesandbeehives): apiaries on a map, hives in bulk, queen records
 - [Harvest and feeding](https://beehivemind.tech/harvestandfeeding): honey, pollen, propolis, royal jelly; syrup, fondant, patties
 - [Financial](https://beehivemind.tech/financial): costs and income by category, cost per hive
-- [Plans](https://beehivemind.tech/pricing): Free (one apiary, ten hives) and Pro (€9 a month)
+- [Plans](https://beehivemind.tech/pricing): Free (one apiary, ten hives) and Pro (€5 a month)
 - [Help](https://beehivemind.tech/help): the ten voice phrases and troubleshooting
 - [About](https://beehivemind.tech/about)
 - [Contact](https://beehivemind.tech/contact)

@@ -53,9 +53,9 @@ export class SeoService {
     this.metaService.updateTag({ property: 'og:locale', content: seo.og_locale ?? 'en_US' });
     this.metaService.updateTag({ property: 'og:site_name', content: seo.og_site_name ?? environment.appName });
 
-    // Twitter
+    // Twitter / X. There is no company account, so no `twitter:site`; the card
+    // tags stay, since they shape the preview when anyone shares a link there.
     this.metaService.updateTag({ name: 'twitter:card', content: seo.twitter_card });
-    this.metaService.updateTag({ name: 'twitter:site', content: '@Beehivemind_org' });
     this.metaService.updateTag({ name: 'twitter:title', content: seo.twitter_title });
     this.metaService.updateTag({ name: 'twitter:description', content: seo.twitter_description });
     this.metaService.updateTag({ name: 'twitter:image', content: seo.image_url });

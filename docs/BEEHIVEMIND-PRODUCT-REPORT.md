@@ -183,7 +183,7 @@ The canonical "records" page. An inspection is one row of **14 readings**:
 | Plan | Price | For | Includes |
 |---|---|---|---|
 | **Free** | €0 forever | One apiary, a beekeeper starting out | 1 apiary, up to 10 hives · voice inspections and harvest · offline recording · data exportable at any time |
-| **Pro** | €9 / month | The working beekeeper, one to twenty apiaries | Unlimited apiaries and hives · treatment schedules and reminders · financial tracking by category · weather per apiary · QR labels for every hive |
+| **Pro** | €5 / month | The working beekeeper, one to twenty apiaries | Unlimited apiaries and hives · treatment schedules and reminders · financial tracking by category · weather per apiary · QR labels for every hive |
 | **Enterprise** | Talk to us | Cooperatives and operations with staff | Everything in Pro · several users on one operation · per-user roles and permissions · bulk import of existing records · support with setup |
 
 Stated plan policies: change plan any time from the profile; downgrading never deletes records (apiaries over the limit become read-only); all data exportable on every plan; monthly billing, cancel at month end; **coupons** apply at checkout. The backend stores `plan` (free / pro / enterprise) and `plan_expires_at` per user and admin-managed coupons (percentage or free period in days/months, max uses, expiry). **No payment gateway or plan-limit enforcement exists in the code yet.**

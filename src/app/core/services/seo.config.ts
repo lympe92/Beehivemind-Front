@@ -262,19 +262,19 @@ export const SEO_CONFIG: Record<string, SEOModel> = {
 
   pricing: {
     meta_title: `Beekeeping Software Pricing: Free & Pro Plans | ${SITE}`,
-    meta_description: 'Free forever for one apiary and ten hives. Pro at €9 a month for unlimited apiaries, treatment reminders, finances and weather. No card to start.',
+    meta_description: 'Free forever for one apiary and ten hives. Pro at €5 a month for unlimited apiaries, treatment reminders, finances and weather. No card to start.',
     focus_keyword: 'beekeeping software pricing, beekeeping app free, hive management software plans',
     canonical_url: `${BASE}/pricing`,
     robots: 'index, follow',
     image_url: `${BASE}/assets/images/og-pricing.jpg`,
     og_title: `Beekeeping Software Pricing: Free & Pro Plans | ${SITE}`,
-    og_description: 'Free forever for one apiary. Pro at €9 a month for unlimited apiaries. No card to start.',
+    og_description: 'Free forever for one apiary. Pro at €5 a month for unlimited apiaries. No card to start.',
     og_type: 'website',
     og_locale: 'en_US',
     og_site_name: SITE,
     twitter_card: 'summary_large_image',
     twitter_title: `Plans | ${SITE}`,
-    twitter_description: 'Free forever for one apiary. Pro at €9 a month for unlimited apiaries. No card to start.',
+    twitter_description: 'Free forever for one apiary. Pro at €5 a month for unlimited apiaries. No card to start.',
     schema: [
       {
         '@context': 'https://schema.org',
