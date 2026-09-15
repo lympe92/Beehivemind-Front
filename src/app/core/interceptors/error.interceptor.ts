@@ -24,6 +24,11 @@ const AUTH_PATHS = [
   'user/account',
   // `/auth/invite` renders every state of its token itself.
   'team/invite/',
+  // Signing out of a session that is already dead answers 401. Handled here,
+  // that 401 dispatched another logout, which posted again and got another 401:
+  // a loop of requests and "session expired" toasts, each round navigating to
+  // /auth/login — which is how it pulled a visitor off the invite page.
+  'user/logout',
   'employee/login',
   'employee/2fa',
 ];
