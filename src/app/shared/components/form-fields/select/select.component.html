@@ -2,21 +2,37 @@
   @if (label) {
     <label class="form-label">{{ label }}{{ isRequired ? ' *' : '' }}</label>
   }
+  <!-- Two elements, not one with [multiple]="isMultiple": Angular picks the
+       value accessor from the attributes a <select> is written with, and a
+       bound [multiple] matches SelectMultipleControlValueAccessor even when it
+       is false — a single select then reported [1] instead of 1, so a
+       cascading select (Beehive after Apiary) never found a match. -->
   <div [formGroup]="form">
-    <select
-      formControlName="select"
-      class="form-control"
-      [multiple]="isMultiple"
-      [class.multiple-select]="isMultiple"
-      [class.invalid]="isFieldValid()"
-    >
-      @if (placeholder && !isMultiple) {
-        <option [ngValue]="null">{{ placeholder }}</option>
-      }
-      @for (opt of resolvedOptions; track opt.returnValue) {
-        <option [ngValue]="opt.returnValue">{{ opt.displayValue }}</option>
-      }
-    </select>
+    @if (isMultiple) {
+      <select
+        multiple
+        formControlName="select"
+        class="form-control multiple-select"
+        [class.invalid]="isFieldValid()"
+      >
+        @for (opt of resolvedOptions(); track opt.returnValue) {
+          <option [ngValue]="opt.returnValue">{{ opt.displayValue }}</option>
+        }
+      </select>
+    } @else {
+      <select
+        formControlName="select"
+        class="form-control"
+        [class.invalid]="isFieldValid()"
+      >
+        @if (placeholder) {
+          <option [ngValue]="null">{{ placeholder }}</option>
+        }
+        @for (opt of resolvedOptions(); track opt.returnValue) {
+          <option [ngValue]="opt.returnValue">{{ opt.displayValue }}</option>
+        }
+      </select>
+    }
   </div>
   <app-form-errors
     [errors]="saFormControlName?.valid === false && saFormControlName?.touched ? (saFormControlName?.control?.errors ?? null) : null"

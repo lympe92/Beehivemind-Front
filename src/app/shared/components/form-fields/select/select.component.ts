@@ -1,4 +1,4 @@
-import { Component, DestroyRef, forwardRef, inject, Injector, Input } from '@angular/core';
+import { Component, DestroyRef, forwardRef, inject, Injector, Input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ControlValueAccessor,
@@ -40,7 +40,13 @@ export class SelectComponent implements ControlValueAccessor {
   @Input() options?: Observable<FieldOption[]> | ((value: unknown) => Observable<FieldOption[]>);
   @Input() cascadeFrom?: string;
 
-  resolvedOptions: FieldOption[] = [];
+  /**
+   * A signal, not a plain field: the options arrive in a microtask (and a
+   * cascading select's on every change of its source), and the app runs
+   * without zone.js — assigning an array there never re-rendered the list, so
+   * every select in a form dialog (Add Inspection's apiary and beehive) was empty.
+   */
+  readonly resolvedOptions = signal<FieldOption[]>([]);
   value: string = '';
   disabled: boolean = false;
   private _saFormControlName?: SAFormControlNameDirective | null;
@@ -83,11 +89,11 @@ export class SelectComponent implements ControlValueAccessor {
           switchMap(val => (this.options as (v: unknown) => Observable<FieldOption[]>)(val)),
           takeUntilDestroyed(this.destroyRef),
         )
-        .subscribe(opts => (this.resolvedOptions = opts));
+        .subscribe(opts => this.resolvedOptions.set(opts));
     } else if (this.options) {
       this.options
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(opts => (this.resolvedOptions = opts));
+        .subscribe(opts => this.resolvedOptions.set(opts));
     }
   }
 
