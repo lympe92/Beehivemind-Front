@@ -1,6 +1,6 @@
 <main>
   <section app-page-intro
-    eyebrow="Last updated 10 September 2026"
+    eyebrow="Last updated 15 September 2026"
     title="Delete your BeehiveMind account"
     lead="How to delete your BeehiveMind account and everything stored with it, from the app or by asking us."></section>
 
@@ -32,6 +32,18 @@
         the device and the app returns to the welcome screen.
       </p>
 
+      <h2>Or from the website</h2>
+      <ol>
+        <li>Sign in at beehivemind.tech.</li>
+        <li>Open <strong>Profile</strong> from the sidebar.</li>
+        <li>
+          In <strong>Danger zone</strong>, the last card on the page, enter your
+          password (not asked if you signed up with Google) and select
+          <strong>Delete account</strong>.
+        </li>
+        <li>Confirm in the dialog that follows.</li>
+      </ol>
+
       <h2>Or ask us to delete it</h2>
       <p>
         If you cannot get into the app — a lost phone, a forgotten password, a
@@ -51,7 +63,13 @@
       <p>
         Everything below is removed permanently. There is no soft delete, no
         recycle bin and no grace period, so please export anything you want to
-        keep first.
+        keep first — Profile → <strong>Your data</strong> on the website
+        downloads all of it.
+      </p>
+      <p>
+        This is what goes when the account is your own. If you work in a team,
+        read <strong>If you are in a team</strong> below as well: what is
+        deleted depends on whether you own the team or were invited to it.
       </p>
       <ul>
         <li>Your account: name, email address, password, country and preferences.</li>
@@ -61,12 +79,48 @@
         <li>Your treatments and treatment types.</li>
         <li>Your costs and cost categories.</li>
         <li>Your notifications and to-dos.</li>
+        <li>Your conversations with the AI assistant.</li>
         <li>Your voice training profile — the per-word corrections the app learned from you.</li>
         <li>Your sign-in sessions on every device.</li>
       </ul>
       <p>
         Anything still waiting to sync on your phone is deleted with the app's
         own data when you sign out or uninstall. It never reaches us.
+      </p>
+
+      <h2>If you are in a team</h2>
+      <p>
+        A BeehiveMind account can invite other people to work on the same
+        apiaries. The person who invites is the team's <strong>owner</strong>;
+        everyone who joins through an invitation is a <strong>team member</strong>
+        with an account of their own. The records belong to the team, so
+        deleting an account works differently for the two.
+      </p>
+      <p><strong>If you own the team</strong>, deleting your account deletes the team:</p>
+      <ul>
+        <li>everything in the list above, including the records your team members added;</li>
+        <li>the account of every team member — they can no longer sign in;</li>
+        <li>any invitations that have not been accepted yet.</li>
+      </ul>
+      <p>
+        The app and the website both name the team members whose accounts will
+        be deleted before you confirm. If they want to keep a copy of the records, they need to
+        export it before you delete.
+      </p>
+      <p><strong>If you are a team member</strong>, deleting your account deletes only what is yours:</p>
+      <ul>
+        <li>your account: name, email address, password, country and preferences;</li>
+        <li>your notifications, your conversations with the AI assistant, your voice training profile and your sign-in sessions.</li>
+      </ul>
+      <p>
+        The apiaries, hives, inspections, feedings, harvests, treatments and
+        costs you added belong to the team and stay with it. Your name is removed
+        from them: they show as added by "a former team member".
+      </p>
+      <p>
+        The team owner can also remove you from the team. That deletes your
+        account in the same way, and you are signed out the next time you use
+        BeehiveMind.
       </p>
 
       <h2>What we keep, and for how long</h2>
@@ -82,16 +136,24 @@
           These are not linked to your records once the account is gone.
         </li>
         <li>
+          <strong>Records you added to someone else's team</strong>, if you
+          were a team member. They stay with that team, without your name.
+        </li>
+        <li>
+          <strong>Backups, for up to 4 weeks.</strong> The database is copied
+          once a day, and again before each update to the service, and those
+          copies are deleted automatically after 8 days. Our hosting provider
+          also keeps a weekly copy of the whole server, and deletes each one
+          after 4 weeks. A deleted account can therefore still exist inside a
+          backup for up to 4 weeks. Backups exist only to recover the service
+          after a failure and are not used for anything else.
+        </li>
+        <li>
           <strong>Records we are required by law to keep</strong>, such as
           invoices for a paid plan, which tax law obliges us to retain even
           after an account closes.
         </li>
       </ul>
-      <p class="text-muted">
-        The backup retention window needs stating here — how long deleted data
-        may still exist inside encrypted database backups before those backups
-        rotate out. Confirm the real figure before publishing this page.
-      </p>
 
       <h2>Deleting some of your data without closing the account</h2>
       <p>

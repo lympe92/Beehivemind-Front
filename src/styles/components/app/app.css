@@ -1515,12 +1515,17 @@
   color: var(--app-text-primary);
 }
 
-.app-badge--suspended {
+/* Pending shares the warning tint: an invitation that has not been accepted is
+   a state that runs out. */
+.app-badge--suspended,
+.app-badge--pending {
   background: color-mix(in srgb, var(--app-warning) 14%, #fff);
   color: var(--app-text-primary);
 }
 
-.app-badge--banned {
+/* Expired shares the danger tint — the link no longer works. */
+.app-badge--banned,
+.app-badge--expired {
   background: color-mix(in srgb, var(--app-danger) 14%, #fff);
   color: var(--app-text-primary);
 }
@@ -1558,7 +1563,10 @@
   color: var(--app-gray-600);
 }
 
+/* Owner joins the grey fills: it is a fact about a person, not a status that
+   can go wrong. */
 .app-badge--single,
+.app-badge--owner,
 .app-badge--apiary {
   background: var(--app-gray-100);
   color: var(--app-gray-600);
@@ -1605,6 +1613,9 @@
 .app-toolbar {
   display: flex;
   justify-content: flex-end;
+  /* The same 8px as .dt__actions. It only ever had one child, so the gap was
+     never missed until the costs table gained an export beside its + Add. */
+  gap: 8px;
   padding-bottom: 12px;
 }
 
@@ -2434,6 +2445,10 @@
   white-space: nowrap;
 }
 
+/* One select for the dashboard, two names: `.fb__select` inside a filter bar,
+   `.app-select` anywhere else a select is needed (the export card's range and
+   format). Two rules would be two selects the moment one of them changed. */
+.app-select,
 .fb__select {
   background: var(--app-bg-hover);
   border: 1px solid var(--app-border);
@@ -2450,7 +2465,235 @@
   transition: border-color 0.15s;
 }
 
+.app-select:focus,
 .fb__select:focus {
   outline: none;
   border-color: var(--app-accent);
+}
+
+/* ---------- Export ----------
+   Two placements: a ghost menu in the filter bar (ExportMenu) and the account
+   card on Profile (DataExportCard). Ghost, because the records pages already
+   have an orange "+ Add Record" and the accent budget is under 15%. */
+
+/* The export is not one of the filters, so it leaves the group and takes the
+   right end of the bar. */
+.fb__group--end {
+  margin-left: auto;
+}
+
+/* Matched to .fb__select rather than to .app-btn: in the bar it stands next to
+   the selects, and a 2px height difference along that baseline is visible.
+   Excluding --sm, because this rule is declared later and would otherwise beat
+   it — which put two type sizes in the costs toolbar. */
+.fb__export:not(.app-btn--sm) {
+  padding: 6px 10px;
+  font-size: 0.875rem;
+}
+
+.fb__export {
+  gap: 6px;
+}
+
+.fb__export svg {
+  width: 9px;
+  height: 9px;
+}
+
+/* Open is a state of the trigger, so it carries the hover ground while the
+   panel is up — otherwise the button returns to rest the moment the pointer
+   moves into the menu it opened. */
+.fb__export[aria-expanded="true"] {
+  background: var(--app-bg-hover);
+  color: var(--app-text-primary);
+}
+
+/* A popover's own label. It names what the list below will act on, so it takes
+   the structural voice. */
+.pop__note {
+  padding: 9px 12px 7px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--app-border-soft);
+  font-size: var(--structural-size-sm);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.dx__intro {
+  margin: 0 0 var(--app-gap);
+  max-width: 68ch;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--app-text-muted);
+}
+
+.dx__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  gap: var(--app-gap);
+  align-items: start;
+}
+
+.dx__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+/* Ink with a grey underline that goes orange on hover — the link treatment,
+   because that is what this is. */
+.dx__all {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--app-text-muted);
+  text-decoration: underline;
+  text-decoration-color: var(--app-border);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.dx__all:hover {
+  color: var(--app-text-primary);
+  text-decoration-color: var(--app-accent);
+}
+
+/* Two class names deep, because `.checkbox-group__options.row` is (0,2,0) and a
+   single class would match and then lose. Eight options in one column is a
+   scroll; in a grid it is a glance. */
+.checkbox-group__options.dx__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  gap: 9px 16px;
+}
+
+.dx__hint {
+  margin: 14px 0 0;
+  max-width: 60ch;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--app-text-muted);
+}
+
+.dx__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* The footer strip is right-aligned; this takes the whole of it so the date can
+   hold the left edge. */
+.dx__footer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dx__last {
+  font-size: 0.8rem;
+  color: var(--app-text-muted);
+}
+
+/* ---------- Team ----------
+   The owner's members card, its dialog, and the record attribution line. */
+
+/* A team of one has nothing to list, so the card carries the explanation and
+   the action instead of an empty table with headers over nothing. */
+.team__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.team__empty-copy {
+  margin: 0;
+  max-width: 56ch;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--app-text-muted);
+}
+
+/* Name over email in one cell: two columns for one person would put the email
+   header over addresses that are already unmistakable. */
+.team__who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.team__name {
+  color: var(--app-text-primary);
+}
+
+.team__email {
+  font-size: 0.78rem;
+  color: var(--app-text-muted);
+}
+
+.team__dialog-copy {
+  margin: 0 0 16px;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--app-text-muted);
+}
+
+.team__dialog-offer {
+  margin-top: 4px;
+}
+
+/* ---------- Danger zone ---------- */
+.danger__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.danger__copy {
+  margin: 0;
+  max-width: 64ch;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--app-text-muted);
+}
+
+/* Field and button on one line, bottom-aligned, so the password reads as the
+   confirmation of that button rather than as another profile field. */
+.danger__confirm {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.danger__field {
+  min-width: 220px;
+}
+
+/* Who added a record, in a detail view. A sentence, not a label, so it stays in
+   the editorial voice rather than taking the structural one. */
+.rec-meta {
+  margin: 0 0 14px;
+  font-size: 0.78rem;
+  color: var(--app-text-muted);
+}
+
+@media (max-width: 768px) {
+  .dx__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The bar stacks its filters full-width at this size, so a right-pushed
+     export would sit alone on a line of its own. */
+  .fb__group--end {
+    margin-left: 0;
+  }
 }

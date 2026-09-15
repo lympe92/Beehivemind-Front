@@ -1,3 +1,5 @@
+import { RecordAttribution } from './team.model';
+
 export type HarvestType = 'honey' | 'pollen' | 'royal jelly' | 'propolis';
 export type HarvestUnit = 'kg' | 'libre' | 'lt' | 'gallon';
 
@@ -9,6 +11,7 @@ export interface Harvest {
   food_quantity: number;
   unit: HarvestUnit;
   beehiveId: number;
+  addedBy: RecordAttribution | null;
 }
 
 export const HARVEST_TYPES: { value: HarvestType; label: string }[] = [

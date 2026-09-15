@@ -1,6 +1,6 @@
 <main>
   <section app-page-intro
-    eyebrow="Last updated 5 September 2026"
+    eyebrow="Last updated 15 September 2026"
     title="Privacy policy"
     lead="What BeehiveMind records, why we record it, and what you can ask us to do about it."></section>
 
@@ -28,6 +28,14 @@
         harvests, treatments, costs and to-dos. Apiary coordinates are a
         location you place on a map yourself — the app does not track your
         device.
+      </p>
+
+      <h3>Your conversations with the AI assistant</h3>
+      <p>
+        What you ask the assistant and what it answers, so a conversation can
+        be picked up where you left it. Your conversations are yours alone:
+        they are not shared with a team you belong to, and they are deleted
+        with your account.
       </p>
 
       <h3>Voice recordings</h3>
@@ -61,6 +69,42 @@
         <li>We do not sell your data.</li>
         <li>We do not share your hive records with other beekeepers, associations or authorities.</li>
         <li>We do not use your inspection data to advertise to you or to anyone else.</li>
+      </ul>
+
+      <h2>Working in a team</h2>
+      <p>
+        An account can invite other people to work on the same apiaries. The
+        person who invites is the team's owner; everyone who accepts is a team
+        member with an account of their own. Inside a team, the records are
+        shared: every member sees and can change the team's apiaries, hives,
+        inspections, feedings, harvests, treatments and costs, and a record's
+        details show the name of the member who added it.
+      </p>
+      <ul>
+        <li>
+          <strong>Inviting someone.</strong> The owner gives us the person's
+          email address and we email them the link to join. We keep the
+          address with the invitation; if it is never accepted, it is deleted
+          30 days after the invitation expires, or straight away if the owner
+          cancels it.
+        </li>
+        <li>
+          <strong>What the owner sees.</strong> The owner sees each member's
+          name, email address and the date they joined. Members do not see
+          each other's email addresses, and nobody in a team sees another
+          member's AI conversations, notifications, password or sign-in
+          settings.
+        </li>
+        <li>
+          <strong>When a member leaves.</strong> A member who deletes their
+          account, or whom the owner removes, loses their account and their
+          personal data. The records they added belong to the team and stay
+          with it, shown as added by "a former team member".
+        </li>
+        <li>
+          <strong>When the owner leaves.</strong> Deleting the owner's account
+          deletes the team: all of its records and every member's account.
+        </li>
       </ul>
 
       <h2 id="cookies">Cookies and analytics</h2>
@@ -108,12 +152,18 @@
       <p>
         Your records are kept for as long as your account is open, because
         beekeeping data is only useful across seasons. If you delete your
-        account we remove your personal data and your records; backups age out
-        afterwards on a fixed schedule.
+        account we remove your personal data and your records at once — or,
+        if you are a member of someone else's team, your personal data, while
+        the records you added stay with that team.
       </p>
-      <p class="text-muted">
-        The retention and backup periods need real numbers, taken from the
-        infrastructure, not placeholders.
+      <ul>
+        <li><strong>Backups:</strong> up to 4 weeks. The database is copied daily and before each update, and those copies are deleted after 8 days; our hosting provider keeps a weekly copy of the whole server for 4 weeks.</li>
+        <li><strong>Request logs</strong> (times and IP addresses): 14 days.</li>
+        <li><strong>Unaccepted team invitations:</strong> 30 days after they expire.</li>
+      </ul>
+      <p>
+        The full steps, and what is kept after an account is deleted, are on
+        <a routerLink="/delete-account">Delete your account</a>.
       </p>
 
       <h2>Your rights</h2>
@@ -144,8 +194,9 @@
 
       <h2>Contact</h2>
       <p>
-        Questions about this policy, or about your data, go to our support
-        portal and we will answer them.
+        Questions about this policy, or about your data, go to
+        <a href="mailto:info@beehivemind.tech">info@beehivemind.tech</a> or the
+        <a routerLink="/contact">contact page</a>, and we will answer them.
       </p>
     </div>
   </section>

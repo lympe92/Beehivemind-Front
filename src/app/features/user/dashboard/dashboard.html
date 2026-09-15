@@ -1,5 +1,13 @@
 <div class="dashboard">
 
+  <!-- An editor's first arrival. Above the filter bar: it is about the page,
+       not about the data below it. -->
+  @if (welcomeTeam(); as team) {
+    <app-callout tone="accent" [dismissable]="true" (dismiss)="dismissWelcome()">
+      You've joined {{ team }}. Everything here is shared with the team, and changes you make are visible to everyone.
+    </app-callout>
+  }
+
   <!-- Filters -->
   <app-filter-bar
     [apiaries]="apiaries()"

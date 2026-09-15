@@ -14,6 +14,11 @@ import { ChartBuilderService } from '../../../core/services/chart-builder.servic
 import { ApexChartComponent } from '../../../shared/components/ui/apex-chart/apex-chart';
 import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
 import { CardComponent } from '../../../shared/components/ui/card/card';
+import { CalloutComponent } from '../../../shared/components/ui/callout/callout';
+import { AuthActions } from '../../../store/auth/auth.actions';
+import { selectCurrentUser } from '../../../store/auth/auth.selectors';
+import { TeamService } from '../../../core/services/team.service';
+import { teamName } from '../../../core/models/team.model';
 
 export type FilterLevel = 'user' | 'apiary' | 'beehive';
 
@@ -51,7 +56,7 @@ interface DetectionRow {
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
-  imports: [ApexChartComponent, FilterBarComponent, CardComponent],
+  imports: [ApexChartComponent, FilterBarComponent, CardComponent, CalloutComponent],
   templateUrl: './dashboard.html',
 })
 export class UserDashboardComponent implements OnInit {
@@ -59,6 +64,19 @@ export class UserDashboardComponent implements OnInit {
   private inspectionService = inject(InspectionService);
   private chartBuilder = inject(ChartBuilderService);
   private destroyRef = inject(DestroyRef);
+  private teamService = inject(TeamService);
+
+  private user = this.store.selectSignal(selectCurrentUser);
+
+  /**
+   * An editor's one-time welcome: "You've joined Daniel Hart's team." Null for
+   * an owner, and once dismissed — the dismissal is kept on the account, so it
+   * does not come back on another device.
+   */
+  readonly welcomeTeam = computed(() => {
+    const team = this.user()?.team;
+    return team?.role === 'editor' && team.show_welcome ? teamName(team.owner_name) : null;
+  });
 
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);
@@ -188,6 +206,11 @@ export class UserDashboardComponent implements OnInit {
   });
 
   // ── Lifecycle ───────────────────────────────────────────
+
+  dismissWelcome(): void {
+    this.store.dispatch(AuthActions.teamWelcomeDismissed());
+    this.teamService.dismissWelcome().subscribe({ error: () => {} });
+  }
 
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());

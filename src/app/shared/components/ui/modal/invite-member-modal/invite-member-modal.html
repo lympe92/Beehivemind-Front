@@ -1,0 +1,34 @@
+<app-modal-shell title="Invite member" (close)="cancel()">
+  <form (ngSubmit)="send()" novalidate>
+    <p class="team__dialog-copy">
+      They'll get an email with a link to create their account. The link expires in 7 days.
+    </p>
+
+    <div class="form-group">
+      <label class="form-label" for="invite-email">Email</label>
+      <input id="invite-email" class="form-control" type="email" name="email"
+             placeholder="name@example.com" autocomplete="off"
+             [class.invalid]="!!error()"
+             [attr.aria-invalid]="!!error()"
+             [attr.aria-describedby]="error() ? 'invite-email-error' : null"
+             [disabled]="sending()"
+             [ngModel]="email" (ngModelChange)="onEmailChange($event)" />
+      @if (error()) {
+        <div id="invite-email-error" class="error" role="alert">{{ error() }}</div>
+      }
+    </div>
+
+    @if (code() === 'already_invited') {
+      <div class="team__dialog-offer">
+        <button type="button" class="app-btn app-btn--ghost app-btn--sm" [disabled]="sending()" (click)="resend()">Resend invitation</button>
+      </div>
+    }
+  </form>
+
+  <ng-template #footer>
+    <button type="button" class="app-btn app-btn--ghost" [disabled]="sending()" (click)="cancel()">Cancel</button>
+    <button type="button" class="app-btn app-btn--primary" [disabled]="!valid() || sending()" (click)="send()">
+      {{ sending() ? 'Sending…' : 'Send invitation' }}
+    </button>
+  </ng-template>
+</app-modal-shell>

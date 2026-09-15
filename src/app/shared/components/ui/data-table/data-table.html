@@ -36,11 +36,17 @@
               </td>
             }
             @if (actionsTpl && showActions) {
-              <td class="dt__actions">
-                <ng-container
-                  [ngTemplateOutlet]="actionsTpl"
-                  [ngTemplateOutletContext]="{ $implicit: row }">
-                </ng-container>
+              <!-- The flex row is inside the cell, not on it: a td with
+                   display:flex stops being a table cell, so on a two-line row
+                   (Team members) it kept its own height and its border broke
+                   away from the row's. -->
+              <td>
+                <div class="dt__actions">
+                  <ng-container
+                    [ngTemplateOutlet]="actionsTpl"
+                    [ngTemplateOutletContext]="{ $implicit: row }">
+                  </ng-container>
+                </div>
               </td>
             }
           </tr>

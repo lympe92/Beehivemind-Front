@@ -1,0 +1,55 @@
+<app-card title="Your data">
+  <p class="dx__intro">
+    Every inspection, harvest, feeding and cost you have entered is exportable, on every plan.
+    Exporting copies your records; it does not remove anything from BeehiveMind.
+  </p>
+
+  <div class="dx__grid">
+    <div>
+      <div class="dx__head">
+        <span class="app-field__label">Include</span>
+        <button type="button" class="dx__all" (click)="toggleAll()">{{ everything() ? 'Clear all' : 'Select all' }}</button>
+      </div>
+
+      <div class="checkbox-group__options dx__options">
+        @for (section of sections; track section.key) {
+          <label class="checkbox-group__option">
+            <input type="checkbox" [checked]="isChosen(section.key)" (change)="toggle(section.key)" />
+            <span class="checkbox-group__option--label">{{ section.label }}</span>
+          </label>
+        }
+      </div>
+    </div>
+
+    <div class="dx__controls">
+      <div class="app-field">
+        <label class="app-field__label" for="dx-range">Date range</label>
+        <select id="dx-range" class="app-select" [(ngModel)]="range" name="dx-range">
+          @for (option of ranges; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="app-field">
+        <label class="app-field__label" for="dx-format">Format</label>
+        <select id="dx-format" class="app-select" [(ngModel)]="format" name="dx-format">
+          @for (option of formats; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #cardFooter>
+    <div class="dx__footer">
+      <span class="dx__last">
+        @if (lastExport(); as at) { Last export {{ at | date:'d MMM y, HH:mm' }} } @else { No export yet }
+      </span>
+      <button type="button" class="app-btn app-btn--primary" [disabled]="chosen().length === 0 || busy()" (click)="submit()">
+        {{ busy() ? 'Exporting…' : 'Export' }}
+      </button>
+    </div>
+  </ng-template>
+</app-card>

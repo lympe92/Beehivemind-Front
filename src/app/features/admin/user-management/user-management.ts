@@ -20,9 +20,19 @@ interface AdminUser {
   surname: string;
   email: string;
   status: 'active' | 'suspended' | 'banned';
+  /** For an editor, the team owner's plan — an editor has none of their own. */
   plan: 'free' | 'pro' | 'enterprise';
+  team: AdminUserTeam | null;
   email_verified: boolean;
   created_at: string;
+}
+
+interface AdminUserTeam {
+  role: 'owner' | 'editor';
+  owner_id: number;
+  owner_name: string;
+  /** Editors in the team, the owner not counted. */
+  member_count: number;
 }
 
 @Component({
@@ -124,11 +134,33 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  /** A native confirm cannot carry the sentence that matters: what else is deleted. */
+  /** Under the name: whose team an editor is in, or how many editors an owner has. A team of one says nothing. */
+  teamLine(user: AdminUser): string | null {
+    const team = user.team;
+    if (!team) return null;
+    if (team.role === 'editor') return `Editor · ${team.owner_name}'s team`;
+    return team.member_count > 0
+      ? `Owner · ${team.member_count} team member${team.member_count === 1 ? '' : 's'}`
+      : null;
+  }
+
+  /**
+   * A native confirm cannot carry the sentence that matters: what else is
+   * deleted. The API deletes as the account holder would — an owner takes the
+   * team with them, an editor goes alone and their records stay.
+   */
   async deleteUser(user: AdminUser): Promise<void> {
+    const who = `${user.name} ${user.surname} (${user.email})`;
+    const members = user.team?.member_count ?? 0;
+    const message = user.team?.role === 'editor'
+      ? `Permanently delete ${who}. They are an editor in ${user.team.owner_name}'s team: the records they added stay with that team. This cannot be undone.`
+      : members > 0
+        ? `Permanently delete ${who}. They own a team, so its apiaries, beehives and records go too, and so do the accounts of its ${members} team member${members === 1 ? '' : 's'}. This cannot be undone.`
+        : `Permanently delete ${who}. Their apiaries, beehives and every record they hold go with it. This cannot be undone.`;
+
     const confirmed = await this.modal.confirm({
       title: 'Delete this account?',
-      message: `Permanently delete ${user.name} ${user.surname} (${user.email}). Their apiaries, beehives and every record they hold go with it. This cannot be undone.`,
+      message,
       confirmLabel: 'Delete account',
       danger: true,
     });

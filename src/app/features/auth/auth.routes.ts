@@ -25,6 +25,11 @@ export const authRoutes: Routes = [
       import('./two-factor-verify/two-factor-verify').then((m) => m.TwoFactorVerifyComponent),
   },
   {
+    // The link in an invitation email: creates an account inside the owner's team.
+    path: 'invite',
+    loadComponent: () => import('./invite/invite').then((m) => m.InviteComponent),
+  },
+  {
     path: 'complete-profile',
     loadComponent: () =>
       import('./complete-profile/complete-profile').then((m) => m.CompleteProfileComponent),

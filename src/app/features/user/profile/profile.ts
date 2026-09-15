@@ -20,6 +20,17 @@ import { ModalService } from '../../../core/modal/modal.service';
 import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
 import { DynamicField } from '../../../core/models/form.model';
 import { crossFieldValidators, syncValidators } from '../../../shared/components/ui/form/validators.config';
+import { TeamActions } from '../../../store/team/team.actions';
+import { selectTeam, selectTeamInvitations, selectTeamMembers } from '../../../store/team/team.selectors';
+import { AuthActions } from '../../../store/auth/auth.actions';
+import { TeamService } from '../../../core/services/team.service';
+import { ProfileService } from '../../../core/services/profile.service';
+import { ExportService } from '../../../core/services/export.service';
+import { TeamInvitation, TeamMember, teamName } from '../../../core/models/team.model';
+import { InviteMemberModalComponent, InviteMemberResult } from '../../../shared/components/ui/modal/invite-member-modal/invite-member-modal';
+import { TeamMembersCardComponent } from './team-members-card/team-members-card';
+import { DataExportCardComponent, DataExportRequest } from './data-export-card/data-export-card';
+import { DeleteAccountCardComponent } from './delete-account-card/delete-account-card';
 
 const UNITS = [
   { value: 'kg',    label: 'Kg / Lt (Metric)' },
@@ -31,7 +42,10 @@ type TfaStep = 'idle' | 'setup' | 'backup' | 'disable';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [FormsModule, LoaderComponent, CardComponent, CalloutComponent],
+  imports: [
+    FormsModule, LoaderComponent, CardComponent, CalloutComponent,
+    TeamMembersCardComponent, DataExportCardComponent, DeleteAccountCardComponent,
+  ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
@@ -40,6 +54,9 @@ export class ProfileComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   private toast = inject(ToastService);
   private modal = inject(ModalService);
+  private teamService = inject(TeamService);
+  private profileService = inject(ProfileService);
+  private exportService = inject(ExportService);
 
   readonly UNITS = UNITS;
 
@@ -55,6 +72,29 @@ export class ProfileComponent implements OnInit {
   readonly tfaSecret    = this.store.selectSignal(selectTfaSetupSecret);
   readonly tfaOtpauth   = this.store.selectSignal(selectTfaSetupOtpauth);
   readonly backupCodes  = this.store.selectSignal(selectTfaBackupCodes);
+
+  // Team — the role gates the members card and the danger-zone copy.
+  private readonly team = this.store.selectSignal(selectTeam);
+  readonly members      = this.store.selectSignal(selectTeamMembers);
+  readonly invitations  = this.store.selectSignal(selectTeamInvitations);
+  readonly role         = computed(() => this.profile()?.team?.role ?? 'owner');
+  readonly ownerPerson  = computed(() => {
+    const p = this.profile();
+    return { name: p?.name ?? '', surname: p?.surname ?? '', email: p?.email ?? '' };
+  });
+  readonly editorTeamName = computed(() => {
+    const t = this.profile()?.team;
+    return t?.role === 'editor' ? teamName(t.owner_name) : '';
+  });
+  /** Under the name: an editor's team, or an owner's editors. A team of one says nothing. */
+  readonly standing = computed(() => {
+    if (this.role() === 'editor') return `Team member · ${this.editorTeamName()}`;
+    const count = this.team() ? this.members().length : (this.profile()?.team?.member_count ?? 0);
+    return count > 0 ? `Owner · ${count} team member${count === 1 ? '' : 's'}` : null;
+  });
+
+  readonly exporting = signal(false);
+  readonly deleting  = signal(false);
 
   // Personal info form — kept in sync with store when profile loads
   infoForm = { name: '', surname: '', country: '', unit: 'kg' };
@@ -121,6 +161,139 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(ProfileActions.loadProfile());
+    // reload, not load: the team changes from elsewhere — an invitation accepted
+    // in another browser — and this page is where the owner looks for that.
+    this.store.dispatch(TeamActions.reload());
+  }
+
+  // ── Team (owner) ─────────────────────────────────────────
+
+  async inviteMember(): Promise<void> {
+    const result = await this.modal.open<InviteMemberResult>(InviteMemberModalComponent, {
+      type: 'center',
+      width: '460px',
+    });
+    if (!result) return;
+
+    this.store.dispatch(TeamActions.reload());
+    this.toast.success(
+      result.kind === 'sent' ? `Invitation sent to ${result.email}` : `Invitation resent to ${result.email}.`,
+    );
+  }
+
+  resendInvitation(invitation: TeamInvitation): void {
+    this.teamService.resendInvitation(invitation.id).subscribe({
+      next: res => {
+        if (res.success) {
+          this.store.dispatch(TeamActions.reload());
+          this.toast.success(`Invitation resent to ${invitation.email}.`);
+        } else {
+          this.toast.error('Something went wrong. Please try again.');
+        }
+      },
+      error: () => {},
+    });
+  }
+
+  async cancelInvitation(invitation: TeamInvitation): Promise<void> {
+    const confirmed = await this.modal.confirm({
+      title: 'Cancel invitation?',
+      message: `The link sent to ${invitation.email} will stop working.`,
+      confirmLabel: 'Cancel invitation',
+      danger: true,
+    });
+    if (!confirmed) return;
+
+    this.teamService.cancelInvitation(invitation.id).subscribe({
+      next: res => {
+        if (res.success) {
+          this.store.dispatch(TeamActions.reload());
+          this.toast.success('Invitation cancelled.');
+        } else {
+          this.toast.error('Something went wrong. Please try again.');
+        }
+      },
+      error: () => {},
+    });
+  }
+
+  async removeMember(member: TeamMember): Promise<void> {
+    const name = `${member.name} ${member.surname}`.trim();
+    const confirmed = await this.modal.confirm({
+      title: `Remove ${name}?`,
+      message: "Their account will be deleted and they won't be able to sign in. Everything they added stays in your team.",
+      confirmLabel: 'Remove member',
+      danger: true,
+    });
+    if (!confirmed) return;
+
+    this.teamService.removeMember(member.id).subscribe({
+      next: res => {
+        if (res.success) {
+          this.store.dispatch(TeamActions.reload());
+          this.toast.success(`${name} was removed from your team.`);
+        } else {
+          this.toast.error('Something went wrong. Please try again.');
+        }
+      },
+      error: () => {},
+    });
+  }
+
+  // ── Your data ────────────────────────────────────────────
+
+  exportData(request: DataExportRequest): void {
+    this.exporting.set(true);
+    this.exportService.downloadAccount(request).subscribe({
+      next: () => {
+        this.exporting.set(false);
+        this.store.dispatch(ProfileActions.exportCompleted({ at: new Date().toISOString() }));
+        const count = request.sections.length;
+        this.toast.success(
+          `${count} section${count === 1 ? '' : 's'} downloaded as ${request.format === 'csv' ? 'CSV' : 'Excel'}.`,
+          { title: 'Export ready' },
+        );
+      },
+      error: () => this.exporting.set(false),
+    });
+  }
+
+  // ── Danger zone ──────────────────────────────────────────
+
+  async deleteAccount(password: string): Promise<void> {
+    const editors = this.members().length;
+    const message = this.role() === 'editor'
+      ? `Your account will be deleted. Everything you added stays in ${this.editorTeamName()}.`
+      : editors > 0
+        ? `This deletes your account, all your records, and the accounts of your ${editors} team member${editors === 1 ? '' : 's'}. It cannot be undone.`
+        : 'This deletes your account and all your records. It cannot be undone.';
+
+    const confirmed = await this.modal.confirm({
+      title: 'Delete your account?',
+      message,
+      confirmLabel: 'Delete account',
+      danger: true,
+    });
+    if (!confirmed) return;
+
+    this.deleting.set(true);
+    this.profileService.deleteAccount(password).subscribe({
+      next: res => {
+        this.deleting.set(false);
+        if (res.success) {
+          this.toast.success('Your account was deleted.');
+          this.store.dispatch(AuthActions.accountDeleted());
+        } else {
+          this.toast.error('Something went wrong. Please try again.');
+        }
+      },
+      // This endpoint is one of the interceptor's AUTH_PATHS: a wrong password
+      // is a 401 the card explains, not an expired session.
+      error: err => {
+        this.deleting.set(false);
+        this.toast.error(err?.status === 401 ? 'That password is not correct.' : (err?.error?.message ?? 'Something went wrong. Please try again.'));
+      },
+    });
   }
 
   // ── Personal info ────────────────────────────────────────

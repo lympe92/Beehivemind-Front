@@ -1,0 +1,79 @@
+@if (empty()) {
+  <app-card title="Team members">
+    <div class="team__empty">
+      <p class="team__empty-copy">
+        Invite people to work on your apiaries with you. Team members can view and edit everything except your plan and billing.
+      </p>
+      <button type="button" class="app-btn app-btn--primary" (click)="invite.emit()">Invite member</button>
+    </div>
+  </app-card>
+} @else {
+  <app-card title="Team members" [flush]="true">
+    <button card-header-end type="button" class="app-btn app-btn--primary app-btn--sm" (click)="invite.emit()">Invite member</button>
+
+    <app-data-table [columns]="columns" [rows]="rows()" [loading]="loading()" [showActions]="true">
+
+      <ng-template #cellTpl let-row let-col="col">
+        @switch (col.key) {
+          @case ('member') {
+            <div class="team__who">
+              @switch (row.kind) {
+                @case ('owner') {
+                  <span class="team__name">{{ row.person.name }} {{ row.person.surname }}</span>
+                  <span class="team__email">{{ row.person.email }}</span>
+                }
+                @case ('editor') {
+                  <span class="team__name">{{ row.member.name }} {{ row.member.surname }}</span>
+                  <span class="team__email">{{ row.member.email }}</span>
+                }
+                @default {
+                  <span class="team__name">{{ row.invitation.email }}</span>
+                }
+              }
+            </div>
+          }
+          @case ('status') {
+            @switch (row.kind) {
+              @case ('owner') { <span class="app-badge app-badge--owner">Owner</span> }
+              @case ('editor') { <span class="dt__muted">—</span> }
+              @default {
+                @if (row.invitation.expired) {
+                  <span class="app-badge app-badge--expired">Expired</span>
+                } @else {
+                  <span class="app-badge app-badge--pending">Pending</span>
+                }
+              }
+            }
+          }
+          @default {
+            @switch (row.kind) {
+              @case ('owner') { <span class="dt__muted">You</span> }
+              @case ('editor') { <span class="dt__muted">Joined {{ row.member.joinedAt | date:'d MMM y' }}</span> }
+              @default {
+                <span class="dt__muted">
+                  Invited {{ row.invitation.sentAt | date:'d MMM' }} ·
+                  @if (row.invitation.expired) { expired } @else { expires in {{ expiresIn(row.invitation) }} }
+                </span>
+              }
+            }
+          }
+        }
+      </ng-template>
+
+      <ng-template #actionsTpl let-row>
+        @switch (row.kind) {
+          @case ('editor') {
+            <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="remove.emit(row.member)">Remove</button>
+          }
+          @case ('invite') {
+            <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="resend.emit(row.invitation)">Resend</button>
+            @if (!row.invitation.expired) {
+              <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="cancel.emit(row.invitation)">Cancel</button>
+            }
+          }
+        }
+      </ng-template>
+
+    </app-data-table>
+  </app-card>
+}

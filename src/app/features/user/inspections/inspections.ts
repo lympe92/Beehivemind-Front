@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Inspection } from '../../../core/models/inspection.model';
 import { InspectionService } from '../../../core/services/inspection.service';
+import { ExportService } from '../../../core/services/export.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
@@ -15,6 +16,7 @@ import { ToastService } from '../../../shared/components/ui/toast/toast.service'
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
 import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
+import { ExportMenuComponent, exportFormat, exportScope } from '../../../shared/components/ui/export-menu/export-menu';
 import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
 import { syncValidators } from '../../../shared/components/ui/form/validators.config';
 import { DynamicField } from '../../../core/models/form.model';
@@ -42,12 +44,13 @@ interface InspectionFormValue {
 @Component({
   selector: 'app-inspections',
   standalone: true,
-  imports: [DataTableComponent, CardComponent, FilterBarComponent, DatePipe],
+  imports: [DataTableComponent, CardComponent, FilterBarComponent, ExportMenuComponent, DatePipe],
   templateUrl: './inspections.html',
 })
 export class InspectionsComponent implements OnInit {
   private store = inject(Store);
   private inspectionService = inject(InspectionService);
+  private exportService = inject(ExportService);
   private toast = inject(ToastService);
   private modal = inject(ModalService);
 
@@ -100,6 +103,11 @@ export class InspectionsComponent implements OnInit {
   selectedApiaryId = signal<number>(0);
   selectedBeehiveId = signal<number>(0);
 
+  /** What the export will hold, before the click. */
+  exportNote = computed(() =>
+    exportScope(this.apiaries(), this.allBeehives(), this.selectedApiaryId(), this.selectedBeehiveId(), this.inspections().length)
+  );
+
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
     this.store.dispatch(BeehivesActions.load());
@@ -115,6 +123,18 @@ export class InspectionsComponent implements OnInit {
 
   onBeehiveChange(beehiveId: number): void {
     this.selectedBeehiveId.set(beehiveId);
+  }
+
+  // ── Export ───────────────────────────────────────────────
+
+  export(format: string): void {
+    this.exportService.downloadTable('inspections', exportFormat(format), {
+      apiaryId: this.selectedApiaryId(),
+      beehiveId: this.selectedBeehiveId(),
+    }).subscribe({
+      next: () => this.toast.success(`Inspection records downloaded as ${format}.`, { title: 'Export ready' }),
+      error: () => {},
+    });
   }
 
   // ── Add ──────────────────────────────────────────────────
@@ -190,6 +210,7 @@ export class InspectionsComponent implements OnInit {
       width: '640px',
       data: {
         title: 'Edit Inspection',
+        meta: row.addedBy,
         fields: this.inspectionBaseFields(row),
       },
     });

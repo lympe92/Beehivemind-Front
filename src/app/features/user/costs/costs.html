@@ -1,4 +1,7 @@
 <div class="app-toolbar">
+  <app-export-menu chrome="bare" size="sm"
+                   [note]="'All apiaries · ' + costs().length + (costs().length === 1 ? ' row' : ' rows')"
+                   (export)="export($event)" />
   <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="startAdd()">+ Add</button>
 </div>
 

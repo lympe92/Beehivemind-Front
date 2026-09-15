@@ -14,6 +14,7 @@ interface HarvestPayload {
   food_quantity: Harvest['food_quantity'];
   unit: Harvest['unit'];
   beehive_id: number;
+  added_by?: Harvest['addedBy'];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -38,7 +39,7 @@ export class HarvestService {
     );
   }
 
-  createHarvest(data: Omit<Harvest, 'id' | 'beehiveId'> & { beehive_id?: number; apiary_id?: number }): Observable<ApiResponse<Harvest[]>> {
+  createHarvest(data: Omit<Harvest, 'id' | 'beehiveId' | 'addedBy'> & { beehive_id?: number; apiary_id?: number }): Observable<ApiResponse<Harvest[]>> {
     const { apiary_id, ...rest } = data;
     if (apiary_id) {
       return this.request.postRequest<Harvest[]>(`records/apiary/${apiary_id}`, { ...rest, type: 'harvest' });
@@ -46,7 +47,7 @@ export class HarvestService {
     return this.request.postRequest<Harvest[]>('records', { ...rest, type: 'harvest' });
   }
 
-  updateHarvest(id: number, data: Partial<Omit<Harvest, 'id' | 'beehiveId'>>): Observable<ApiResponse<Harvest>> {
+  updateHarvest(id: number, data: Partial<Omit<Harvest, 'id' | 'beehiveId' | 'addedBy'>>): Observable<ApiResponse<Harvest>> {
     return this.request.putRequest<Harvest>(`records/${id}`, data);
   }
 
@@ -66,5 +67,6 @@ export class HarvestService {
     food_quantity: r.food_quantity,
     unit: r.unit,
     beehiveId: r.beehive_id,
+    addedBy: r.added_by ?? null,
   });
 }

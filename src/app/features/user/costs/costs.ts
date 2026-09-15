@@ -4,20 +4,23 @@ import { of } from 'rxjs';
 import { Cost } from '../../../core/models/cost.model';
 import { CostCategory } from '../../../core/models/cost-category.model';
 import { CostService } from '../../../core/services/cost.service';
+import { ExportService } from '../../../core/services/export.service';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
 import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
+import { ExportMenuComponent, exportFormat } from '../../../shared/components/ui/export-menu/export-menu';
 import { syncValidators } from '../../../shared/components/ui/form/validators.config';
 
 @Component({
   selector: 'app-costs',
   standalone: true,
-  imports: [DataTableComponent, DatePipe, DecimalPipe],
+  imports: [DataTableComponent, ExportMenuComponent, DatePipe, DecimalPipe],
   templateUrl: './costs.html',
 })
 export class CostsComponent implements OnInit {
   private costService = inject(CostService);
+  private exportService = inject(ExportService);
   private toast = inject(ToastService);
   private modal = inject(ModalService);
 
@@ -41,6 +44,17 @@ export class CostsComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+  }
+
+  /**
+   * Financial has no filter bar, so the costs table's export sits in its
+   * toolbar and the scope is the whole table.
+   */
+  export(format: string): void {
+    this.exportService.downloadTable('costs', exportFormat(format)).subscribe({
+      next: () => this.toast.success(`Costs downloaded as ${format}.`, { title: 'Export ready' }),
+      error: () => {},
+    });
   }
 
   async startAdd(): Promise<void> {
@@ -116,6 +130,7 @@ export class CostsComponent implements OnInit {
       width: '440px',
       data: {
         title: 'Edit Cost',
+        meta: row.added_by,
         fields: [
           {
             name: 'date',

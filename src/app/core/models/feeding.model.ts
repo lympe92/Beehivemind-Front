@@ -1,3 +1,5 @@
+import { RecordAttribution } from './team.model';
+
 export type FeedingType = 'stimulation' | 'maintenance';
 export type FoodType = 'pollen patties' | 'sugar syrup' | 'fresh pollen' | 'fondant' | 'nutritional supplement';
 export type FeedingUnit = 'kg' | 'libre' | 'lt' | 'gallon';
@@ -10,6 +12,7 @@ export interface Feeding {
   food_quantity: number;
   unit: FeedingUnit;
   beehiveId: number;
+  addedBy: RecordAttribution | null;
 }
 
 export const FEEDING_TYPES: { value: FeedingType; label: string }[] = [

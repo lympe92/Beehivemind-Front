@@ -32,6 +32,15 @@ export class ProfileService {
     return this.request.deleteRequest<void>('user/2fa', { password });
   }
 
+  /**
+   * An owner's deletion takes the team — its data and every editor's account;
+   * an editor's takes only theirs. `password` is omitted for a Google-only
+   * account, which has none. A wrong one answers 401.
+   */
+  deleteAccount(password: string): Observable<ApiResponse<void>> {
+    return this.request.deleteRequest<void>('user/account', password ? { password } : {});
+  }
+
   regenerateBackupCodes(): Observable<ApiResponse<{ backup_codes: string[] }>> {
     return this.request.postRequest<{ backup_codes: string[] }>('user/2fa/backup-codes/regenerate');
   }

@@ -66,6 +66,12 @@ export const profileReducer = createReducer(
     ...state, saving: false, tfaBackupCodes: backupCodes,
   })),
 
+  // ── Account export ───────────────────────────────────────────
+  on(ProfileActions.exportCompleted, (state, { at }) => ({
+    ...state,
+    data: state.data ? { ...state.data, last_exported_at: at } : state.data,
+  })),
+
   // ── Any failure resets saving ────────────────────────────────
   on(
     ProfileActions.updateProfileFailure,

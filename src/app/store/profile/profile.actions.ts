@@ -38,5 +38,8 @@ export const ProfileActions = createActionGroup({
     'Regenerate Backup Codes': emptyProps(),
     'Regenerate Backup Codes Success': props<{ backupCodes: string[] }>(),
     'Regenerate Backup Codes Failure': props<{ error: string }>(),
+
+    // Account export — only the "Last export" line changes, so no reload.
+    'Export Completed': props<{ at: string }>(),
   },
 });

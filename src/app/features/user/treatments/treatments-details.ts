@@ -14,12 +14,13 @@ import { ToastService } from '../../../shared/components/ui/toast/toast.service'
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
 import { TooltipDirective } from '../../../shared/components/ui/tooltip/tooltip.directive';
+import { RecordMetaComponent } from '../../../shared/components/ui/record-meta/record-meta';
 import { TreatmentSessionModalComponent } from '../../../shared/components/ui/modal/treatment-session-modal/treatment-session-modal';
 
 @Component({
   selector: 'app-treatments-details',
   standalone: true,
-  imports: [DatePipe, CardComponent, TooltipDirective],
+  imports: [DatePipe, CardComponent, TooltipDirective, RecordMetaComponent],
   templateUrl: './treatments-details.html',
 })
 export class TreatmentsDetailsComponent implements OnInit {

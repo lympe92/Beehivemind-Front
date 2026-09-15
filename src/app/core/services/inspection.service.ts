@@ -23,6 +23,7 @@ interface InspectionPayload {
   queen_exists: Inspection['queen_exists'];
   queen_cells: Inspection['queen_cells'];
   queen_year: Inspection['queen_year'];
+  added_by?: Inspection['addedBy'];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -59,11 +60,11 @@ export class InspectionService {
     );
   }
 
-  createInspection(data: Omit<Inspection, 'id' | 'beehiveId'> & { beehive_id: number }): Observable<ApiResponse<Inspection>> {
+  createInspection(data: Omit<Inspection, 'id' | 'beehiveId' | 'addedBy'> & { beehive_id: number }): Observable<ApiResponse<Inspection>> {
     return this.request.postRequest<Inspection>('records', { ...data, type: 'inspection' });
   }
 
-  updateInspection(id: number, data: Partial<Omit<Inspection, 'id' | 'beehiveId'>>): Observable<ApiResponse<Inspection>> {
+  updateInspection(id: number, data: Partial<Omit<Inspection, 'id' | 'beehiveId' | 'addedBy'>>): Observable<ApiResponse<Inspection>> {
     return this.request.putRequest<Inspection>(`records/${id}`, data);
   }
 
@@ -88,5 +89,6 @@ export class InspectionService {
     queen_exists: r.queen_exists,
     queen_cells: r.queen_cells,
     queen_year: r.queen_year,
+    addedBy: r.added_by ?? null,
   });
 }

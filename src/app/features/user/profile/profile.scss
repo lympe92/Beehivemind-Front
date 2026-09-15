@@ -32,6 +32,14 @@
     font-weight: var(--font-weight-medium);
   }
 
+  // The team standing, above the trade line: ink against the muted line below
+  // it, so two secondary lines stay apart without a second size.
+  &__who-team {
+    margin-top: 2px;
+    font-size: 0.78rem;
+    color: var(--app-text-primary);
+  }
+
   &__who-sub {
     font-size: 0.8rem;
     color: var(--app-text-muted);

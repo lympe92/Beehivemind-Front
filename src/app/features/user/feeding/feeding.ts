@@ -12,6 +12,7 @@ import {
   FeedingUnit,
 } from '../../../core/models/feeding.model';
 import { FeedingService } from '../../../core/services/feeding.service';
+import { ExportService } from '../../../core/services/export.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
@@ -23,18 +24,20 @@ import { ToastService } from '../../../shared/components/ui/toast/toast.service'
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
 import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
+import { ExportMenuComponent, exportFormat, exportScope } from '../../../shared/components/ui/export-menu/export-menu';
 import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
 import { syncValidators } from '../../../shared/components/ui/form/validators.config';
 
 @Component({
   selector: 'app-feeding',
   standalone: true,
-  imports: [DataTableComponent, CardComponent, FilterBarComponent, DatePipe],
+  imports: [DataTableComponent, CardComponent, FilterBarComponent, ExportMenuComponent, DatePipe],
   templateUrl: './feeding.html',
 })
 export class FeedingComponent implements OnInit {
   private store = inject(Store);
   private feedingService = inject(FeedingService);
+  private exportService = inject(ExportService);
   private toast = inject(ToastService);
   private modal = inject(ModalService);
 
@@ -76,6 +79,11 @@ export class FeedingComponent implements OnInit {
   selectedApiaryId = signal<number>(0);
   selectedBeehiveId = signal<number>(0);
 
+  /** What the export will hold, before the click. */
+  exportNote = computed(() =>
+    exportScope(this.apiaries(), this.allBeehives(), this.selectedApiaryId(), this.selectedBeehiveId(), this.feeding().length)
+  );
+
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
     this.store.dispatch(BeehivesActions.load());
@@ -91,6 +99,18 @@ export class FeedingComponent implements OnInit {
 
   onBeehiveChange(beehiveId: number): void {
     this.selectedBeehiveId.set(beehiveId);
+  }
+
+  // ── Export ───────────────────────────────────────────────
+
+  export(format: string): void {
+    this.exportService.downloadTable('feeding', exportFormat(format), {
+      apiaryId: this.selectedApiaryId(),
+      beehiveId: this.selectedBeehiveId(),
+    }).subscribe({
+      next: () => this.toast.success(`Feeding records downloaded as ${format}.`, { title: 'Export ready' }),
+      error: () => {},
+    });
   }
 
   // ── Add ──────────────────────────────────────────────────
@@ -240,6 +260,7 @@ export class FeedingComponent implements OnInit {
       width: '640px',
       data: {
         title: 'Edit Feeding Record',
+        meta: row.addedBy,
         fields: [
           {
             name: 'date',

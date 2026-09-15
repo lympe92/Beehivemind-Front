@@ -24,6 +24,8 @@ const CREATIONS: { path: RegExp; event: (body: unknown) => string }[] = [
   { path: /^cost-categories$/,            event: () => 'create_cost_category' },
   { path: /^ai\/chat$/,                   event: () => 'ai_message' },
   { path: /^user\/2fa\/confirm$/,         event: () => 'enable_2fa' },
+  { path: /^team\/invitations$/,          event: () => 'invite_member' },
+  { path: /^export$/,                     event: () => 'export_data' },
 ];
 
 export const analyticsInterceptor: HttpInterceptorFn = (req, next) => {

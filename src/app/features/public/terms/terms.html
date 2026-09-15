@@ -1,6 +1,6 @@
 <main>
   <section app-page-intro
-    eyebrow="Draft — last updated 7 September 2026"
+    eyebrow="Draft — last updated 15 September 2026"
     title="Terms of service"
     lead="The agreement between you and BeehiveMind: what we owe you, what you agree to, and what happens to your records if either of us walks away."></section>
 
@@ -35,9 +35,23 @@
       <h3>Eligibility</h3>
       <p>
         You need to be 16 or over and able to enter a contract. One account
-        belongs to one person; a cooperative with several beekeepers uses
-        several accounts under one operation rather than sharing one.
+        belongs to one person. Several beekeepers who work the same apiaries
+        use a team, with an account each, rather than sharing one.
       </p>
+      <h3>Teams</h3>
+      <p>
+        An account can invite other people to work on its apiaries. The account
+        that invites is the team's <strong>owner</strong>; everyone who accepts
+        an invitation is a <strong>team member</strong>, with their own account
+        and their own acceptance of these terms. Only the owner invites and
+        removes members.
+      </p>
+      <ul>
+        <li>The owner's plan covers the whole team. Members do not pay separately and have no plan of their own.</li>
+        <li>The owner decides who is in the team and is responsible for having invited them. Every member can see and change all of the team's records.</li>
+        <li>Removing a member deletes that member's account. The records they added stay with the team.</li>
+        <li>If the owner deletes their account, the team goes with it: its records and every member's account.</li>
+      </ul>
       <h3>Keeping it secure</h3>
       <p>
         You are responsible for your password and for anything done through
@@ -98,15 +112,23 @@
         entered, on every plan including the free one, at any time.
       </p>
       <p>
+        <strong>In a team, the records are the team's.</strong> What a member
+        adds belongs to the team and its owner, and stays with the team when
+        the member leaves. Every member can export the team's records while
+        they are in it.
+      </p>
+      <p>
         <strong>Going down a plan never deletes a record.</strong> If you move
         to a plan whose limits your data exceeds, the apiaries over the limit
         become read-only until you remove one or move back up. They are not
         erased.
       </p>
-      <p class="text-muted">
-        One number needed: how long a closed account's data is retained before
-        deletion, and how long backups hold it after that. The privacy page
-        needs the same figure and it has to be the same figure.
+      <p>
+        <strong>Deleting is immediate.</strong> When an account is deleted its
+        data is removed from the live service at once. Copies can remain in
+        our backups for up to 4 weeks, after which they are deleted
+        automatically. The <a routerLink="/privacy">privacy policy</a> gives the
+        same figures.
       </p>
 
       <h2>5. What you give us permission to do</h2>
@@ -129,7 +151,7 @@
 
       <h2>6. What you agree not to do</h2>
       <ul>
-        <li>Use another beekeeper's account, or share yours.</li>
+        <li>Use another beekeeper's account, or share yours — invite them to your team instead.</li>
         <li>Try to break, overload or reverse-engineer the service, or reach data that is not yours.</li>
         <li>Upload anything unlawful, or anything that infringes someone else's rights.</li>
         <li>Resell access to BeehiveMind, or rebuild it from an automated extraction of it.</li>
@@ -164,7 +186,10 @@
       <p>
         Cancel a paid plan at any time from your profile; it stops at the end
         of the month you have paid for. You can delete your account yourself,
-        and we recommend exporting your records first.
+        and we recommend exporting your records first. If you own a team,
+        deleting your account also deletes the team and your members' accounts,
+        so tell them first — they may want their own export. What each case
+        removes is set out on <a routerLink="/delete-account">Delete your account</a>.
       </p>
       <h3>By us</h3>
       <p>

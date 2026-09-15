@@ -66,5 +66,18 @@ export const authReducer = createReducer(
     error,
   })),
 
-  on(AuthActions.logoutSuccess, () => initialAuthState),
+  on(AuthActions.teamWelcomeDismissed, (state) => ({
+    ...state,
+    user: state.user?.team
+      ? { ...state.user, team: { ...state.user.team, show_welcome: false } }
+      : state.user,
+  })),
+
+  on(
+    AuthActions.logoutSuccess,
+    AuthActions.accountDeleted,
+    AuthActions.accountRemoved,
+    AuthActions.sessionCleared,
+    () => initialAuthState,
+  ),
 );

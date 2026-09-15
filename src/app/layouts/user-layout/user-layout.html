@@ -195,7 +195,9 @@
           @if (sidebarOpen()) {
             <div class="sidebar__user">
               <span class="sidebar__user-name">{{ u.name }} {{ u.surname }}</span>
-              <span class="sidebar__user-role">{{ u.role === 'user' ? 'Beekeeper' : u.role }}</span>
+              <!-- An editor's team replaces the trade on this line rather than
+                   adding a third: it is what explains whose apiaries these are. -->
+              <span class="sidebar__user-role">{{ u.team?.role === 'editor' ? teamName(u.team!.owner_name) : (u.role === 'user' ? 'Beekeeper' : u.role) }}</span>
             </div>
           }
         </a>

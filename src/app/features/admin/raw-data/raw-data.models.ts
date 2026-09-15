@@ -76,12 +76,12 @@ export const RAW_MODELS: Record<string, ModelConfig> = {
     singularLabel: 'Apiary',
     endpoint: 'apiaries',
     searchPlaceholder: 'Search by name...',
-    displayColumns: ['id', 'name', 'latitude', 'longitude', 'user_id', 'created_at'],
+    displayColumns: ['id', 'name', 'latitude', 'longitude', 'team_id', 'created_at'],
     fields: [
       { key: 'name',      label: 'Name',      type: 'text',   required: true },
       { key: 'latitude',  label: 'Latitude',  type: 'number' },
       { key: 'longitude', label: 'Longitude', type: 'number' },
-      { key: 'user_id',   label: 'User ID',   type: 'number', required: true },
+      { key: 'team_id',   label: 'Team ID',   type: 'number', required: true },
     ],
   },
 
@@ -114,10 +114,10 @@ export const RAW_MODELS: Record<string, ModelConfig> = {
     singularLabel: 'Beehive Group',
     endpoint: 'beehive-groups',
     searchPlaceholder: 'Search by name...',
-    displayColumns: ['id', 'name', 'user_id', 'created_at'],
+    displayColumns: ['id', 'name', 'team_id', 'created_at'],
     fields: [
       { key: 'name',    label: 'Name',    type: 'text',   required: true },
-      { key: 'user_id', label: 'User ID', type: 'number', required: true },
+      { key: 'team_id', label: 'Team ID', type: 'number', required: true },
     ],
   },
 
@@ -166,7 +166,7 @@ export const RAW_MODELS: Record<string, ModelConfig> = {
     singularLabel: 'Cost Category',
     endpoint: 'cost-categories',
     searchPlaceholder: 'Search by name...',
-    displayColumns: ['id', 'name', 'type', 'user_id', 'created_at'],
+    displayColumns: ['id', 'name', 'type', 'team_id', 'created_at'],
     fields: [
       { key: 'name',        label: 'Name',        type: 'text',   required: true },
       { key: 'description', label: 'Description', type: 'textarea' },
@@ -174,7 +174,7 @@ export const RAW_MODELS: Record<string, ModelConfig> = {
         { value: 'income',  label: 'Income' },
         { value: 'outcome', label: 'Outcome' },
       ]},
-      { key: 'user_id', label: 'User ID', type: 'number', required: true },
+      { key: 'team_id', label: 'Team ID', type: 'number', required: true },
     ],
   },
 

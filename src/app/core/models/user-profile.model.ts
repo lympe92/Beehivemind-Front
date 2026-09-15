@@ -1,3 +1,5 @@
+import { UserTeamSummary } from './team.model';
+
 export interface UserProfile {
   id: number;
   name: string;
@@ -11,4 +13,6 @@ export interface UserProfile {
   show_hints: boolean;
   two_factor_enabled: boolean;
   has_password: boolean;
+  team: UserTeamSummary | null;
+  last_exported_at: string | null;
 }

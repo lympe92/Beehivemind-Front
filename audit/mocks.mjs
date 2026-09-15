@@ -18,7 +18,7 @@ const BEEHIVES = [
 ];
 
 const INSPECTIONS = [
-  { id: 501, beehive_id: 11, date: '2026-08-28', frame_space: 10, population: 7, pollen: 2, honey: 6, opened_brood: 3, closed_brood: 3, varroa: 1, american_foulbrood: 0, european_foulbrood: 0, nosema: 0, queen_exists: 1, queen_cells: 0, queen_year: 2024 },
+  { id: 501, beehive_id: 11, date: '2026-08-28', frame_space: 10, population: 7, pollen: 2, honey: 6, opened_brood: 3, closed_brood: 3, varroa: 1, american_foulbrood: 0, european_foulbrood: 0, nosema: 0, queen_exists: 1, queen_cells: 0, queen_year: 2024, added_by: { name: 'Maya Lopez', former: false, at: '2026-08-28' } },
   { id: 502, beehive_id: 12, date: '2026-08-28', frame_space: 10, population: 6, pollen: 2, honey: 5, opened_brood: 2, closed_brood: 3, varroa: 0, american_foulbrood: 0, european_foulbrood: 0, nosema: 0, queen_exists: 1, queen_cells: 0, queen_year: 2024 },
   { id: 503, beehive_id: 13, date: '2026-08-27', frame_space: 8, population: 4, pollen: 1, honey: 2, opened_brood: 2, closed_brood: 1, varroa: 1, american_foulbrood: 0, european_foulbrood: 1, nosema: 0, queen_exists: 0, queen_cells: 1, queen_year: null },
   { id: 504, beehive_id: 14, date: '2026-08-27', frame_space: 8, population: 3, pollen: 1, honey: 1, opened_brood: 1, closed_brood: 1, varroa: 0, american_foulbrood: 0, european_foulbrood: 0, nosema: 1, queen_exists: 1, queen_cells: 0, queen_year: 2025 },
@@ -52,6 +52,7 @@ const TREATMENT_SESSIONS = [
   {
     id: 900, treatment_type_id: 2, apiary_id: 1, start_date: '2026-08-10', notes: 'Started after the thyme harvest.',
     treatment_type: TREATMENT_TYPES[1], beehive_ids: [11, 12, 13],
+    added_by: { name: 'Maya Lopez', former: false, at: '2026-08-10' },
     instances: [
       { id: 1, treatment_session_id: 900, scheduled_date: '2026-08-10', actual_date: '2026-08-10', status: 'done', notes: '' },
       { id: 2, treatment_session_id: 900, scheduled_date: '2026-08-17', actual_date: '2026-08-18', status: 'done', notes: 'One day late, rain.' },
@@ -77,7 +78,7 @@ const COST_CATEGORIES = [
 
 const COSTS = [
   { id: 301, category_id: 1, category_name: 'Honey sales', date: '2026-07-30', name: 'Farmers market', amount: 1240 },
-  { id: 302, category_id: 2, category_name: 'Jars', date: '2026-07-12', name: '500 × 450g jars', amount: 385 },
+  { id: 302, category_id: 2, category_name: 'Jars', date: '2026-07-12', name: '500 × 450g jars', amount: 385, added_by: { name: null, former: true, at: '2026-07-12' } },
   { id: 303, category_id: 3, category_name: 'Feeding', date: '2026-08-20', name: 'Autumn syrup', amount: 210 },
   { id: 304, category_id: 4, category_name: 'Tools', date: '2026-06-04', name: 'Extractor service', amount: 160 },
 ];
@@ -88,7 +89,32 @@ const AGENDA = [
   { type: 'inspection', title: 'Move Evia hives to thyme', subtitle: 'Evia Coast', scheduled_date: '2026-09-15', is_overdue: false, entity_type: 'inspection', entity_id: 78, apiary_id: 3 },
 ];
 
-const PROFILE = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true };
+/* Whose account the run is: AUDIT_ROLE=owner (default, with two editors and
+   two invitations), solo (a team of one) or editor. run.mjs seeds the same. */
+export const ROLE = process.env.AUDIT_ROLE || 'owner';
+
+export const TEAM_SUMMARY = {
+  owner:  { role: 'owner', owner_name: 'Nikos Lymperis', member_count: 2, show_welcome: false },
+  solo:   { role: 'owner', owner_name: 'Nikos Lymperis', member_count: 0, show_welcome: false },
+  editor: { role: 'editor', owner_name: 'Daniel Hart', member_count: 2, show_welcome: true },
+}[ROLE];
+
+const PROFILE = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true, team: TEAM_SUMMARY, last_exported_at: '2026-03-12T09:14:00Z' };
+
+const TEAM = ROLE === 'editor'
+  ? { role: 'editor', owner: { name: 'Daniel', surname: 'Hart' } }
+  : {
+      role: 'owner',
+      owner: { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech' },
+      members: ROLE === 'solo' ? [] : [
+        { id: 31, name: 'Maya', surname: 'Lopez', email: 'maya.lopez@example.com', joined_at: '2026-09-12T10:04:00Z' },
+        { id: 32, name: 'Tom', surname: 'Reed', email: 'tom.reed@example.com', joined_at: '2026-08-02T08:30:00Z' },
+      ],
+      invitations: ROLE === 'solo' ? [] : [
+        { id: 1, email: 'sam.green@example.com', sent_at: '2026-09-12T10:00:00Z', expires_at: new Date(Date.now() + 5 * 864e5).toISOString(), expired: false },
+        { id: 2, email: 'lena.fischer@example.com', sent_at: '2026-08-28T10:00:00Z', expires_at: '2026-09-04T10:00:00Z', expired: true },
+      ],
+    };
 
 const NOTIFICATIONS = {
   success: true,
@@ -132,11 +158,11 @@ const WEATHER = (() => {
 const ADMIN_STATS = { users: { total: 1284, active: 1163, suspended: 47, banned: 74, new_this_month: 96, by_plan: { free: 902, pro: 341, enterprise: 41 } }, employees: 9, apiaries: 2417, beehives: 18963, records: 264018 };
 
 const ADMIN_USERS = [
-  { id: 1, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.gr', status: 'active', plan: 'pro', email_verified: true, created_at: '2024-03-11T09:20:00Z' },
-  { id: 2, name: 'Eleni', surname: 'Vasiliou', email: 'eleni.v@example.com', status: 'active', plan: 'free', email_verified: true, created_at: '2025-01-08T14:02:00Z' },
-  { id: 3, name: 'Giorgos', surname: 'Petrou', email: 'g.petrou@example.com', status: 'suspended', plan: 'pro', email_verified: true, created_at: '2024-11-27T08:45:00Z' },
-  { id: 4, name: 'Maria', surname: 'Antoniou', email: 'maria.a@example.com', status: 'active', plan: 'enterprise', email_verified: false, created_at: '2026-02-19T11:31:00Z' },
-  { id: 5, name: 'Dimitris', surname: 'Kalogeras', email: 'dk@example.com', status: 'banned', plan: 'free', email_verified: true, created_at: '2023-07-02T16:10:00Z' },
+  { id: 1, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.gr', status: 'active', plan: 'pro', team: { role: 'owner', owner_id: 1, owner_name: 'Nikos Lymperis', member_count: 1 }, email_verified: true, created_at: '2024-03-11T09:20:00Z' },
+  { id: 2, name: 'Eleni', surname: 'Vasiliou', email: 'eleni.v@example.com', status: 'active', plan: 'pro', team: { role: 'editor', owner_id: 1, owner_name: 'Nikos Lymperis', member_count: 1 }, email_verified: true, created_at: '2025-01-08T14:02:00Z' },
+  { id: 3, name: 'Giorgos', surname: 'Petrou', email: 'g.petrou@example.com', status: 'suspended', plan: 'pro', team: { role: 'owner', owner_id: 3, owner_name: 'Giorgos Petrou', member_count: 0 }, email_verified: true, created_at: '2024-11-27T08:45:00Z' },
+  { id: 4, name: 'Maria', surname: 'Antoniou', email: 'maria.a@example.com', status: 'active', plan: 'enterprise', team: { role: 'owner', owner_id: 4, owner_name: 'Maria Antoniou', member_count: 0 }, email_verified: false, created_at: '2026-02-19T11:31:00Z' },
+  { id: 5, name: 'Dimitris', surname: 'Kalogeras', email: 'dk@example.com', status: 'banned', plan: 'free', team: { role: 'owner', owner_id: 5, owner_name: 'Dimitris Kalogeras', member_count: 0 }, email_verified: true, created_at: '2023-07-02T16:10:00Z' },
 ];
 
 const ADMIN_EMPLOYEES = [
@@ -153,7 +179,7 @@ const ADMIN_COUPONS = [
 
 const RAW_COUNTS = { users: 1284, employees: 9, apiaries: 2417, beehives: 18963, queens: 4021, 'beehive-groups': 312, records: 264018, costs: 12604, 'cost-categories': 88, coupons: 18, tokens: 3122 };
 
-const RAW_USERS = ADMIN_USERS.map(u => ({ ...u, role: 'user', country: 'Greece', unit: 'kg' }));
+const RAW_USERS = ADMIN_USERS.map(({ team, ...u }) => ({ ...u, role: 'user', country: 'Greece', unit: 'kg' }));
 
 const PENDING_AI = [
   { message_id: 12, conversation_id: 1, user_question: 'Which hives lost population since July?', ai_response: 'Two: Beehive 13 at Kalamos North dropped from 6 to 4 frames of bees, and Beehive 14 from 4 to 3. Both had a detection in the last inspection.', tool_calls: null, created_at: '2026-09-06T10:12:00Z' },
@@ -280,6 +306,8 @@ export function mock(method, path) {
   if (route === 'costs/stats/by-category/outcome') return ok([{ category: 'Jars', amount: 385 }, { category: 'Feeding', amount: 210 }, { category: 'Tools', amount: 160 }]);
   if (route === 'agenda') return ok(q.get('apiary_id') ? AGENDA.filter(a => a.apiary_id === Number(q.get('apiary_id'))) : AGENDA);
   if (route === 'user/profile') return ok(PROFILE);
+  if (route === 'team') return ok(TEAM);
+  if (route.startsWith('team/invite/')) return ok({ state: 'valid', owner_name: 'Daniel Hart', email: 'sam.green@example.com' });
   if (route === 'notifications') return NOTIFICATIONS;
   if (route === 'weather') return ok(WEATHER);
   if (route === 'ai/conversations') return ok(CONVERSATIONS);

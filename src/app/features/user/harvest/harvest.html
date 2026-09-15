@@ -6,7 +6,9 @@
     [apiaryId]="selectedApiaryId()"
     (apiaryIdChange)="onApiaryChange($event)"
     [beehiveId]="selectedBeehiveId()"
-    (beehiveIdChange)="onBeehiveChange($event)" />
+    (beehiveIdChange)="onBeehiveChange($event)">
+    <app-export-menu [note]="exportNote()" (export)="export($event)" />
+  </app-filter-bar>
 
   <app-card title="Harvest Data" [flush]="true">
     <button card-header-end type="button" class="app-btn app-btn--primary" (click)="startAdd()">+ Add Record</button>

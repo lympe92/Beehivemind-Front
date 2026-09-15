@@ -10,8 +10,10 @@ import { PageIntroComponent } from '../../../shared/components/info-sections/pag
  * "Delete account URL" field, so the path must not change without updating
  * Play Console.
  *
- * ⚠ One paragraph is marked muted: the backup retention window needs a real
- * value from whoever runs the DigitalOcean backups before this ships.
+ * The backup figure ("up to 4 weeks") is the longest of the two backups: the
+ * droplet's own dumps in /var/backups/mysql (8 days) and DigitalOcean's weekly
+ * droplet backups (kept 4 weeks) — see the backend's CLAUDE.md, Deployment.
+ * Change either and this page, /privacy and /terms change with it.
  */
 @Component({
   selector: 'app-delete-account',

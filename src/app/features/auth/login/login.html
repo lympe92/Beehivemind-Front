@@ -1,5 +1,8 @@
 <app-auth-card title="Welcome back" subtitle="Sign in to your BeehiveMind account">
   <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+    @if (notice) {
+      <div class="auth-form__error" role="alert">{{ notice }}</div>
+    }
     @if (error$ | async; as error) {
       <div class="auth-form__error" role="alert">
         {{ error }}

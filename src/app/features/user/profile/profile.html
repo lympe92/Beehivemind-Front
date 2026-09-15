@@ -12,6 +12,9 @@
           <div class="prof__avatar" aria-hidden="true">{{ initials() }}</div>
           <div class="prof__who">
             <div class="prof__who-name">{{ profile()?.name }} {{ profile()?.surname }}</div>
+            @if (standing(); as line) {
+              <div class="prof__who-team">{{ line }}</div>
+            }
             <div class="prof__who-sub">
               {{ profile()?.role === 'user' ? 'beekeeper' : profile()?.role }}
               @if (profile()?.country) { · {{ profile()?.country }} }
@@ -173,6 +176,33 @@
 
       </div>
     </app-card>
+
+    <!-- Owner only. An editor cannot invite, cancel or remove, so there is no
+         disabled version of this card: it is absent. -->
+    @if (role() === 'owner') {
+      <app-team-members-card
+        [owner]="ownerPerson()"
+        [members]="members()"
+        [invitations]="invitations()"
+        (invite)="inviteMember()"
+        (remove)="removeMember($event)"
+        (resend)="resendInvitation($event)"
+        (cancel)="cancelInvitation($event)" />
+    }
+
+    <!-- Above Danger zone: it answers the question that card raises. -->
+    <app-data-export-card
+      [lastExport]="profile()?.last_exported_at ?? null"
+      [busy]="exporting()"
+      (exportData)="exportData($event)" />
+
+    <app-delete-account-card
+      [role]="role()"
+      [members]="members()"
+      [teamName]="editorTeamName()"
+      [hasPassword]="profile()?.has_password ?? true"
+      [busy]="deleting()"
+      (deleteAccount)="deleteAccount($event)" />
 
   }
 

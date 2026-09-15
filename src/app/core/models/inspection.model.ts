@@ -1,3 +1,5 @@
+import { RecordAttribution } from './team.model';
+
 export interface Inspection {
   id: number;
   date: string;
@@ -15,6 +17,7 @@ export interface Inspection {
   queen_exists: 0 | 1;
   queen_cells: 0 | 1;
   queen_year: number | null;
+  addedBy: RecordAttribution | null;
 }
 
 export interface AvgInspection {

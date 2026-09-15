@@ -42,9 +42,9 @@ export class AuthEffects {
   loginWithGoogle$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.loginWithGoogle),
-      exhaustMap(({ credential }) => {
+      exhaustMap(({ credential, inviteToken }) => {
         this.loginMethod = 'google';
-        return this.authService.loginWithGoogle(credential).pipe(
+        return this.authService.loginWithGoogle(credential, inviteToken).pipe(
           map((res) => {
             if (res.requires_2fa) {
               return AuthActions.loginRequires2FA({ twoFactorToken: res.twoFactorToken! });
@@ -56,7 +56,9 @@ export class AuthEffects {
             }
             const user = res.user!;
             const token = res.token!;
-            return user.country
+            // An invitation's account goes straight to the team's dashboard:
+            // country is optional on that form, so Google does not ask for it either.
+            return user.country || inviteToken
               ? AuthActions.loginSuccess({ user, token })
               : AuthActions.loginNeedsCountry({ user, token });
           }),
@@ -142,6 +144,25 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.logoutSuccess),
         tap(() => this.router.navigate(['/auth/login'])),
+      ),
+    { dispatch: false },
+  );
+
+  accountDeleted$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.accountDeleted),
+        tap(() => this.router.navigate(['/'])),
+      ),
+    { dispatch: false },
+  );
+
+  // The login screen says why they are there; see LoginComponent's notice.
+  accountRemoved$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.accountRemoved),
+        tap(() => this.router.navigate(['/auth/login'], { queryParams: { notice: 'account-removed' } })),
       ),
     { dispatch: false },
   );

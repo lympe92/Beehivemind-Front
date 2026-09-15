@@ -19,6 +19,7 @@ import { AuthActions } from '../../store/auth/auth.actions';
 import { selectCurrentUser } from '../../store/auth/auth.selectors';
 import { NotificationBellComponent } from '../../shared/components/ui/notification-bell/notification-bell';
 import { TooltipDirective } from '../../shared/components/ui/tooltip/tooltip.directive';
+import { teamName } from '../../core/models/team.model';
 
 /** Below this width the sidebar is an overlay rather than a column. */
 const OVERLAY_BREAKPOINT = 992;
@@ -47,6 +48,7 @@ export class UserLayoutComponent implements OnInit {
   private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   readonly user = this.store.selectSignal(selectCurrentUser);
+  readonly teamName = teamName;
   sidebarOpen = signal(true);
   openGroups = signal<Set<string>>(new Set());
 

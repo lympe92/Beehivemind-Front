@@ -20,6 +20,9 @@
               <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteSession(session)">Delete</button>
             </div>
 
+            <!-- Who added it: detail view only, never a table column. -->
+            <app-record-meta [attribution]="session.addedBy" />
+
             <div class="app-tile__meta">
               <span>Started {{ session.startDate | date:'mediumDate' }}</span>
               <span class="app-tile__sep">·</span>

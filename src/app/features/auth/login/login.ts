@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, PLATFOR
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AsyncPipe } from '@angular/common';
 import { AuthActions } from '../../../store/auth/auth.actions';
@@ -27,12 +27,22 @@ export class LoginComponent implements OnInit {
   private store = inject(Store);
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private platformId = inject(PLATFORM_ID);
   private destroyRef = inject(DestroyRef);
 
   loading$ = this.store.select(selectAuthLoading);
   error$ = this.store.select(selectAuthError);
   retryAfterMinutes$ = this.store.select(selectRetryAfterMinutes);
+
+  /**
+   * Why they are on this screen at all — a removed editor's next request lands
+   * here. It is not a form error, so it sits above the form's own and survives
+   * a failed sign-in attempt.
+   */
+  readonly notice = this.route.snapshot.queryParamMap.get('notice') === 'account-removed'
+    ? 'Your account no longer exists. It may have been removed by the team owner.'
+    : null;
 
   form: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],

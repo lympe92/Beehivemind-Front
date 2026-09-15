@@ -1,0 +1,32 @@
+@if (chrome() === 'filter') {
+  <!-- The host is the bar's group (see `host` in the component), so
+       .fb__group--end can push it to the right end of the bar. -->
+  <span class="fb__label">{{ label() }}</span>
+}
+
+<button #trigger type="button"
+        class="app-btn app-btn--ghost fb__export"
+        [class.app-btn--sm]="size() === 'sm'"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="open()"
+        [disabled]="disabled()"
+        (click)="toggle()">
+  {{ text() }}
+  <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 8L1 3h10z" fill="currentColor" /></svg>
+</button>
+
+@if (open()) {
+  <!-- Hidden until measured, so it never flashes at the page's corner. -->
+  <div #panel class="pop__panel" role="menu" aria-label="Export format"
+       [style.width]="'230px'"
+       [style.top.px]="position()?.top ?? 0"
+       [style.left.px]="position()?.left ?? 0"
+       [style.visibility]="position() ? 'visible' : 'hidden'">
+    @if (note()) {
+      <div class="pop__note">{{ note() }}</div>
+    }
+    @for (format of formats(); track format) {
+      <button type="button" class="pop__item" role="menuitem" (click)="choose(format)">{{ format }}</button>
+    }
+  </div>
+}

@@ -22,6 +22,8 @@ import { notificationsReducer } from './notifications/notifications.reducer';
 import { NotificationsEffects } from './notifications/notifications.effects';
 import { aiChatReducer } from './ai-chat/ai-chat.reducer';
 import { AiChatEffects } from './ai-chat/ai-chat.effects';
+import { teamReducer } from './team/team.reducer';
+import { TeamEffects } from './team/team.effects';
 
 export const appReducers = {
   auth: authReducer,
@@ -36,6 +38,7 @@ export const appReducers = {
   treatmentSessions: treatmentSessionsReducer,
   notifications: notificationsReducer,
   aiChat:        aiChatReducer,
+  team:          teamReducer,
 };
 
 export const appEffects = [
@@ -51,6 +54,7 @@ export const appEffects = [
   TreatmentSessionsEffects,
   NotificationsEffects,
   AiChatEffects,
+  TeamEffects,
 ];
 
 /** Root application state, derived from the registered reducers. */

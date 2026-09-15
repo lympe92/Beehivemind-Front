@@ -14,6 +14,7 @@ interface FeedingPayload {
   food_quantity: Feeding['food_quantity'];
   unit: Feeding['unit'];
   beehive_id: number;
+  added_by?: Feeding['addedBy'];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -38,7 +39,7 @@ export class FeedingService {
     );
   }
 
-  createFeeding(data: Omit<Feeding, 'id' | 'beehiveId'> & { beehive_id?: number; apiary_id?: number }): Observable<ApiResponse<Feeding[]>> {
+  createFeeding(data: Omit<Feeding, 'id' | 'beehiveId' | 'addedBy'> & { beehive_id?: number; apiary_id?: number }): Observable<ApiResponse<Feeding[]>> {
     const { apiary_id, ...rest } = data;
     if (apiary_id) {
       return this.request.postRequest<Feeding[]>(`records/apiary/${apiary_id}`, { ...rest, type: 'feeding' });
@@ -46,7 +47,7 @@ export class FeedingService {
     return this.request.postRequest<Feeding[]>('records', { ...rest, type: 'feeding' });
   }
 
-  updateFeeding(id: number, data: Partial<Omit<Feeding, 'id' | 'beehiveId'>>): Observable<ApiResponse<Feeding>> {
+  updateFeeding(id: number, data: Partial<Omit<Feeding, 'id' | 'beehiveId' | 'addedBy'>>): Observable<ApiResponse<Feeding>> {
     return this.request.putRequest<Feeding>(`records/${id}`, data);
   }
 
@@ -62,5 +63,6 @@ export class FeedingService {
     food_quantity: r.food_quantity,
     unit: r.unit,
     beehiveId: r.beehive_id,
+    addedBy: r.added_by ?? null,
   });
 }

@@ -49,9 +49,22 @@
 
         <ng-template #cellTpl let-row let-col="col">
           @switch (col.key) {
-            @case ('name') { {{ row.name }} {{ row.surname }} }
-            <!-- A plan is a fact about an account, not a state: the outlined neutral badge. -->
-            @case ('plan') { <span class="app-badge app-badge--neutral">{{ row.plan }}</span> }
+            @case ('name') {
+              <!-- The members card's name-over-detail cell: the team is a fact
+                   about the person, not a column of its own. -->
+              <div class="team__who">
+                <span class="team__name">{{ row.name }} {{ row.surname }}</span>
+                @if (teamLine(row); as line) {
+                  <span class="team__email">{{ line }}</span>
+                }
+              </div>
+            }
+            <!-- A plan is a fact about an account, not a state: the outlined
+                 neutral badge. An editor's is the owner's, and says so. -->
+            @case ('plan') {
+              <span class="app-badge app-badge--neutral">{{ row.plan }}</span>
+              @if (row.team?.role === 'editor') { <span class="dt__muted">via owner</span> }
+            }
             @case ('status') { <span class="app-badge app-badge--{{ row.status }}">{{ row.status }}</span> }
             @case ('email_verified') {
               @if (row.email_verified) { Yes } @else { <span class="dt__muted">No</span> }

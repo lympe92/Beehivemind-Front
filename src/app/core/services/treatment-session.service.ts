@@ -17,6 +17,7 @@ interface TreatmentSessionPayload {
   beehive_ids?: number[];
   instances?: TreatmentInstancePayload[];
   created_at?: string | null;
+  added_by?: TreatmentSession['addedBy'];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -64,6 +65,7 @@ export class TreatmentSessionService {
       beehiveIds:      s.beehive_ids ?? [],
       instances:       (s.instances ?? []).map(i => this.instanceService.fromApi(i)),
       createdAt:       s.created_at ?? null,
+      addedBy:         s.added_by ?? null,
     };
   }
 }

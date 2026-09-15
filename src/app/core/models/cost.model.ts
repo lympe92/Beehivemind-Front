@@ -1,3 +1,5 @@
+import { RecordAttribution } from './team.model';
+
 export interface Cost {
   id: number;
   date: string;
@@ -5,6 +7,7 @@ export interface Cost {
   category_id: number;
   category_name: string;
   amount: number;
+  added_by?: RecordAttribution | null;
 }
 
 export interface MonthlyCost {

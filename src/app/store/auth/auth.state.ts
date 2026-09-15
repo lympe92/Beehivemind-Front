@@ -1,3 +1,5 @@
+import { UserTeamSummary } from '../../core/models/team.model';
+
 export type UserRole = 'user' | 'admin' | 'superadmin';
 
 export interface User {
@@ -11,6 +13,9 @@ export interface User {
   show_hints: boolean;
   two_factor_enabled: boolean;
   has_password: boolean;
+  /** Absent on a session stored before teams existed; the shell then reads it as an owner's. */
+  team?: UserTeamSummary | null;
+  last_exported_at?: string | null;
 }
 
 export interface AuthState {

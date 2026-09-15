@@ -1,0 +1,33 @@
+<app-card title="Danger zone">
+  <div class="danger__body">
+    <p class="danger__copy">
+      @if (role() === 'editor') {
+        Deletes your account. Everything you added stays in {{ teamName() || 'your team' }}.
+      } @else {
+        Permanently deletes your account and all your apiaries, hives, records, treatments and costs. This can't be undone.
+      }
+    </p>
+
+    @if (withEditors()) {
+      <app-callout tone="warning" title="This deletes their accounts too">
+        The accounts of your {{ members().length }} team member{{ members().length === 1 ? '' : 's' }} will also be deleted: {{ memberNames() }}. Pending invitations will be cancelled.
+      </app-callout>
+    }
+
+    <div class="danger__confirm">
+      @if (hasPassword()) {
+        <div class="app-field danger__field">
+          <label class="app-field__label" for="danger-password">Confirm your password</label>
+          <input id="danger-password" class="app-input" type="password" autocomplete="current-password"
+                 [(ngModel)]="password" name="danger-password" />
+        </div>
+      }
+
+      <button type="button" class="app-btn app-btn--danger-solid"
+              [disabled]="(hasPassword() && !password) || busy()"
+              (click)="submit()">
+        {{ busy() ? 'Deleting…' : 'Delete account' }}
+      </button>
+    </div>
+  </div>
+</app-card>

@@ -59,14 +59,18 @@ export class AuthService {
       .pipe(map(() => void 0));
   }
 
-  loginWithGoogle(credential: string): Observable<{
+  /** With `inviteToken`, Google on `/auth/invite`: only the invited address is accepted. */
+  loginWithGoogle(credential: string, inviteToken?: string): Observable<{
     user?: User; token?: string;
     requires_2fa?: boolean; twoFactorToken?: string;
     /** True when this credential created the account — a sign-up, not a sign-in. */
     isNewUser?: boolean;
   }> {
     return this.request
-      .postRequest<{ token?: string; user?: User; requires_2fa?: boolean; two_factor_token?: string; is_new_user?: boolean }>('user/auth/google', { credential })
+      .postRequest<{ token?: string; user?: User; requires_2fa?: boolean; two_factor_token?: string; is_new_user?: boolean }>(
+        'user/auth/google',
+        inviteToken ? { credential, invite_token: inviteToken } : { credential },
+      )
       .pipe(map((res) => ({
         user: res.data.user,
         token: res.data.token,

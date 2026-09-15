@@ -2,7 +2,7 @@
    Usage: node run.mjs [--only=<substring>] [--widths=375,768] [--dialogs=0|1] */
 import puppeteer from 'puppeteer-core';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { mock } from './mocks.mjs';
+import { mock, TEAM_SUMMARY } from './mocks.mjs';
 
 const BASE = 'http://localhost:4301';
 const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
@@ -15,7 +15,7 @@ const checksSrc = readFileSync(new URL('./checks.js', import.meta.url), 'utf8')
   .replace(/^export function/gm, 'function') +
   '\nwindow.__audit = { palette, run, dialogContract, openers };';
 
-const USER = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true };
+const USER = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true, team: TEAM_SUMMARY };
 const EMPLOYEE = { id: 1, name: 'Anna', surname: 'Ioannou', email: 'anna@beehivemind.tech', role: 'superadmin' };
 const AUTH_BASE = { token: null, loading: false, error: null, twoFactorToken: null, twoFactorPending: null, pendingUser: null, pendingToken: null, retryAfterMinutes: null };
 const EMP_BASE = { token: null, loading: false, error: null, twoFactorToken: null, twoFactorStep: null };
@@ -30,9 +30,10 @@ const PAGES = [
   ['none', '/'], ['none', '/features'], ['none', '/app'], ['none', '/pricing'],
   ['none', '/apiariesandbeehives'], ['none', '/financial'], ['none', '/harvestandfeeding'],
   ['none', '/inspections'], ['none', '/help'], ['none', '/about'], ['none', '/contact'],
-  ['none', '/privacy'], ['none', '/terms'], ['none', '/blog'], ['none', '/blog/reading-closed-brood'], ['none', '/blog/category/inspections'],
+  ['none', '/privacy'], ['none', '/terms'], ['none', '/delete-account'], ['none', '/blog'], ['none', '/blog/reading-closed-brood'], ['none', '/blog/category/inspections'],
   ['none', '/auth/login'], ['none', '/auth/register'], ['none', '/auth/reset-password'],
   ['none', '/auth/reset-password?token=x'], ['none', '/auth/confirmation'],
+  ['none', '/auth/invite?token=x'], ['none', '/auth/login?notice=account-removed'],
   ['user', '/user/dashboard'], ['user', '/user/apiary'], ['user', '/user/apiary/details'],
   ['user', '/user/apiary/map'], ['user', '/user/apiary/1'], ['user', '/user/beehives'],
   ['user', '/user/inspections'], ['user', '/user/feeding'], ['user', '/user/harvest'],
@@ -73,6 +74,12 @@ async function setupPage(page, seed) {
       };
       if (res && res.status === 204) return req.respond({ status: 204, headers });
       return req.respond({ status: 200, headers, body: JSON.stringify(res) });
+    }
+    // ConsentService asks Cloudflare where the visitor is. The dev server has no
+    // /cdn-cgi/trace and never answers it, so no page would reach networkidle0.
+    // An EEA answer keeps the consent banner on screen, where it gets audited.
+    if (url === BASE + '/cdn-cgi/trace') {
+      return req.respond({ status: 200, headers: { 'Content-Type': 'text/plain' }, body: 'loc=GR\n' });
     }
     if (url.startsWith(BASE) || url.startsWith('data:') || url.startsWith('blob:')) return req.continue();
     return req.abort();

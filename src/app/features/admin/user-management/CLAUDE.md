@@ -16,6 +16,7 @@ Admin view of beekeeper accounts: search/filter, change status, force email conf
 - Reads `selectIsAtLeastModerator` / `selectIsAtLeastAdmin` from `employeeAuth` store (via `toSignal`) to gate actions by role.
 - Suspend opens `SuspendUserModalComponent` (indefinite / until a date); ban and delete go through `ModalService.confirm({ danger: true })` — the delete message names what else is deleted with the account.
 - Status is a tinted badge (`.app-badge--active|--suspended|--banned`); plan is the outlined neutral badge.
+- **Teams:** each row carries `team` (`{ role, owner_id, owner_name, member_count }`). The name cell adds "Editor · Daniel Hart's team" or "Owner · 2 team members" (the members card's `.team__who` cell). An editor's `plan` is the owner's — the API sends it and filters by it, and refuses to set a plan on an editor — so the badge adds a muted "via owner". The delete confirm says what the API will do: an owner's deletion takes the team and its members' accounts, an editor's leaves their records with the team.
 
 ## Admin zone conventions
 These differ from the user-zone conventions in the [root](../../../../CLAUDE.md):

@@ -56,7 +56,7 @@ Top-level routes in `app.routes.ts`, all lazy-loaded. Four zones, each with its 
 | Zone | Path | Guard | Layout | Features dir |
 |------|------|-------|--------|--------------|
 | Public (marketing) | `/` | — | `public-layout` | `features/public/` |
-| Auth | `/auth` | — | none — each screen renders `AuthCard` (brand mark + legal line) | `features/auth/` |
+| Auth | `/auth` (incl. `/auth/invite?token=`) | — | none — each screen renders `AuthCard` (brand mark + legal line) | `features/auth/` |
 | User (beekeeper) | `/user` | `authGuard` | `user-layout` | `features/user/` |
 | Admin login | `/admin/login` | — | none | `features/admin/login` |
 | Admin panel | `/admin` | `employeeGuard` + `employeeRoleGuard(role)` | `admin-layout` | `features/admin/` |
@@ -156,14 +156,14 @@ The reset is not optional: GTM merges pushes, so without it `method` would ride 
 | `core/services/google-tag-manager.service.ts` | The bootstrap, in order: consent defaults, `traffic_type`, page views on every `NavigationEnd`, the signed-in user, the click listener, and the container itself after idle. Skips driven browsers (`navigator.webdriver` — the audit harness must not count as users), but only *after* the consent defaults, so the banner is real in dev and gets audited like any other panel |
 | `core/services/consent.service.ts` | Consent Mode v2: denied everywhere by default, granted by `region` outside the EEA/UK/CH, ads storage denied throughout. Decides whether the banner is needed from Cloudflare's `/cdn-cgi/trace`, stores the answer in `localStorage`, and republishes it as `consent update` |
 | `core/services/analytics.service.ts` | `event(name, params)`, `setContext()`, `setUser(user \| null)`, `setTrafficType()`, `reportNavigation()`, `trackClicks()` (store badges → `app_store_click`, `/auth/register` links → `cta_click`, blog cards, category chips and an article's product link → `select_content`). No-op on the server and without a container id, so callers never guard |
-| `core/interceptors/analytics.interceptor.ts` | Maps successful creation POSTs to `create_apiary`, `create_beehive`, `create_inspection` / `create_feeding` / `create_harvest` (from the `records` body `type`), `create_treatment_type`, `create_treatment_session`, `create_cost`, `create_cost_category`, `ai_message`, `enable_2fa`. A new entity is one line in its table |
+| `core/interceptors/analytics.interceptor.ts` | Maps successful creation POSTs to `create_apiary`, `create_beehive`, `create_inspection` / `create_feeding` / `create_harvest` (from the `records` body `type`), `create_treatment_type`, `create_treatment_session`, `create_cost`, `create_cost_category`, `ai_message`, `enable_2fa`, `invite_member`, `export_data` (the account export). A new entity is one line in its table |
 | `shared/components/ui/consent-banner/` | The banner itself, in `app.html` beside the toasts. Accept and Reject carry equal weight; `/privacy#cookies` explains what is measured and changes the answer |
 
 `page_view` is sent by the app, not by the container's history trigger, because a blog title arrives with the API answer: `reportNavigation()` waits for the title to change (two seconds at most) on `/blog/…` before reporting.
 
 The banner is behind `@defer`, so only the visitors who are asked pay for it; the rest of the stack is ~5 kB in the initial bundle, which is why the budget is 510 kB rather than 500.
 
-Funnel events fired by hand: `sign_up {method}` (register success; Google sign-in when the API says `is_new_user`), `email_confirmed`, `login {method}` (`AuthEffects`), `complete_profile {skipped}`, `generate_lead {form}` (contact). **No PII**: the user id is the numeric key, user properties are `country` and `auth_method`. Key events, data retention and the Search Console link are GA4 admin settings, not code. The growth/SEO audit that defined these events lives outside the repo (this repo is public) in the `Beehivemind Software` folder on the Desktop.
+Funnel events fired by hand: `sign_up {method}` (register success; Google sign-in when the API says `is_new_user`; `invite` when an invitation's form creates the account), `email_confirmed`, `login {method}` (`AuthEffects`), `complete_profile {skipped}`, `generate_lead {form}` (contact). **No PII**: the user id is the numeric key, user properties are `country` and `auth_method`. Key events, data retention and the Search Console link are GA4 admin settings, not code. The growth/SEO audit that defined these events lives outside the repo (this repo is public) in the `Beehivemind Software` folder on the Desktop.
 
 ---
 
@@ -189,6 +189,20 @@ Components never subscribe to services for *display* data — they `selectSignal
 
 ---
 
+## Teams and export
+
+**The data belongs to a team, not to a user.** Every account is in exactly one team: whoever signs up owns a team of one; an invitation (email only, 7 days) creates a new account inside the owner's team as an editor. Two roles, no picker: the owner invites, cancels, removes and (when it exists) handles billing; editors do everything else. The API scopes everything by team, so the data screens need no role checks at all — only three places look at the role:
+
+| Where | Owner | Editor |
+|---|---|---|
+| Profile → Team members card | the table (or the team-of-one explanation) | absent — not disabled |
+| Profile → Danger zone copy | deletes the team (a warning names the editors) | deletes only their account |
+| Sidebar profile line / Account card / dashboard | "Owner · 2 team members" on Profile | "Daniel Hart's team" replaces the trade; one-time welcome callout on the dashboard |
+
+The role comes from `user.team` (`{ role, owner_name, member_count, show_welcome }`) on the auth user and the profile; the members list from the `team` slice. "Added by" is the API's `added_by` (`{ name, former, at }`), shown by `<app-record-meta>` in detail views only — the record edit dialogs via `FormModalData.meta`, and the treatment session details. When the owner removes an editor, the editor's next request is a 401 with `code: account_removed`; the error interceptor dispatches `AuthActions.accountRemoved()` and the login screen explains (`?notice=account-removed`).
+
+**Export** has two placements and no route. `<app-export-menu>` (`shared/components/ui/export-menu/`) sits inside the filter bar on Inspections, Feeding and Harvest — the filter is the scope, so it asks only for a format and its note says what the file holds — and in the costs toolbar on Financial (`chrome="bare" size="sm"`). Profile's "Your data" card is the account export. Both go through `ExportService`, which saves the file the API answers with.
+
 ## Domain Glossary
 
 | Term | Meaning |
@@ -202,6 +216,7 @@ Components never subscribe to services for *display* data — they `selectSignal
 | **Treatment Session** | An applied treatment across selected beehives; contains per-hive **Instances** |
 | **Cost / Cost Category** | Financial expense tracking |
 | **Employee** | Admin-panel user (role: `admin` / `superadmin`), distinct from a beekeeper User |
+| **Team** | Who the data belongs to: one owner, any number of editors. Referred to by the owner's name — "Daniel Hart's team" |
 
 ---
 
@@ -222,7 +237,7 @@ Each row links to that feature's own `CLAUDE.md`.
 | Financial | `/user/financial` | — (services only; `costs/` + `cost-categories/` are child components, not routes) | [↗](src/app/features/user/financial/CLAUDE.md) |
 | Todo / Calendar | `/user/todo/{list,calendar}` | `inspections`, `beehives` | [↗](src/app/features/user/todo/CLAUDE.md) |
 | AI Chat | `/user/ai-chat` (+ `/:id`) | `aiChat` | [↗](src/app/features/user/ai-chat/CLAUDE.md) |
-| Profile | `/user/profile` | `profile` | [↗](src/app/features/user/profile/CLAUDE.md) |
+| Profile | `/user/profile` | `profile`, `team` | [↗](src/app/features/user/profile/CLAUDE.md) |
 | Admin · Users | `/admin/users` | — (direct `RequestService`) | [↗](src/app/features/admin/user-management/CLAUDE.md) |
 | Admin · Employees | `/admin/employees` | — | [↗](src/app/features/admin/employee-management/CLAUDE.md) |
 | Admin · Coupons | `/admin/coupons` | — | [↗](src/app/features/admin/coupons/CLAUDE.md) |

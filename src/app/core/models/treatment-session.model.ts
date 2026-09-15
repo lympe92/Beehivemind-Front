@@ -1,5 +1,6 @@
 import { TreatmentType } from './treatment-type.model';
 import { TreatmentInstance } from './treatment-instance.model';
+import { RecordAttribution } from './team.model';
 
 export interface TreatmentSession {
   id: number;
@@ -11,4 +12,5 @@ export interface TreatmentSession {
   beehiveIds: number[];
   instances: TreatmentInstance[];
   createdAt: string | null;
+  addedBy: RecordAttribution | null;
 }
