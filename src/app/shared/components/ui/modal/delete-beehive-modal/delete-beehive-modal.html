@@ -1,0 +1,41 @@
+<app-modal-shell [title]="'Delete beehive ' + data.name + '?'" (close)="cancel()">
+  <div class="form-stack">
+    <p class="team__dialog-copy">
+      The hive goes, and with it every inspection, feeding and harvest recorded on it. This can't be undone.
+    </p>
+
+    @if (data.hasQueen) {
+      <div class="radio-group column" role="radiogroup" aria-labelledby="queen-fate-label">
+        <span class="radio-group__label" id="queen-fate-label">The queen</span>
+        <label class="radio-group__option">
+          <input type="radio" name="queen_fate" value="lost" [checked]="fate() === 'lost'" (change)="fate.set('lost')" />
+          <span class="radio-group__option--label">Is gone too</span>
+        </label>
+        <label class="radio-group__option">
+          <input type="radio" name="queen_fate" value="moved" [checked]="fate() === 'moved'" (change)="fate.set('moved')" />
+          <span class="radio-group__option--label">Moved to another hive</span>
+        </label>
+      </div>
+
+      @if (fate() === 'moved') {
+        <div class="form-group">
+          <label class="form-label" for="queen-target">Moved to</label>
+          <select id="queen-target" class="form-control" name="queen_target"
+                  [ngModel]="target()" (ngModelChange)="target.set($event)">
+            <option [ngValue]="null">Select a beehive</option>
+            @for (hive of data.targets; track hive.id) {
+              <option [ngValue]="hive.id">{{ hive.name }}</option>
+            }
+          </select>
+        </div>
+      }
+    }
+  </div>
+
+  <ng-template #footer>
+    <button type="button" class="app-btn app-btn--ghost" (click)="cancel()">Cancel</button>
+    <button type="button" class="app-btn app-btn--danger-solid" [disabled]="!canConfirm()" (click)="confirm()">
+      Delete beehive
+    </button>
+  </ng-template>
+</app-modal-shell>

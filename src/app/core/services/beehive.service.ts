@@ -43,8 +43,17 @@ export class BeehiveService {
     );
   }
 
-  deleteBeehive(id: number): Observable<ApiResponse<void>> {
-    return this.request.deleteRequest<void>(`beehives/${id}`);
+  /**
+   * A hive that still holds a queen cannot be deleted without saying what
+   * happens to her: she is lost with the hive, or moved to another one — and
+   * moving her onto a hive that already has a queen is refused with a 409
+   * unless the caller says to replace.
+   */
+  deleteBeehive(
+    id: number,
+    queen?: { queen_fate: 'lost' | 'moved'; target_beehive_id?: number; force_replace_queen?: boolean },
+  ): Observable<ApiResponse<void>> {
+    return this.request.deleteRequest<void>(`beehives/${id}`, queen ?? {});
   }
 
   private fromApi(b: BeehivePayload): Beehive {

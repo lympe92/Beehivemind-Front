@@ -80,8 +80,11 @@ export class ApiaryService {
       id: a.id,
       name: a.name,
       hivesNumber: a.hives_number ?? a.hivesNumber ?? 0,
-      latitude: a.latitude,
-      longitude: a.longitude,
+      // The API casts coordinates to decimal, which JSON carries as strings
+      // ("38.384488"). Google Maps refuses anything but a number and threw
+      // "not a LatLng", leaving the apiary map a blank page.
+      latitude: Number(a.latitude),
+      longitude: Number(a.longitude),
       location: a.location ?? null,
       dateEstablished: a.date_established ?? null,
       lastVisited: a.last_visited ?? null,

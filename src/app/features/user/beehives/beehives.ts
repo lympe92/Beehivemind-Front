@@ -13,6 +13,11 @@ import { CardComponent } from '../../../shared/components/ui/card/card';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
 import { QrCodeModalComponent, QrCodeModalData } from '../../../shared/components/ui/modal/qr-code-modal/qr-code-modal';
+import {
+  DeleteBeehiveModalComponent,
+  DeleteBeehiveModalData,
+  DeleteBeehiveResult,
+} from '../../../shared/components/ui/modal/delete-beehive-modal/delete-beehive-modal';
 
 interface BeehiveForm {
   name: string;
@@ -157,15 +162,35 @@ export class BeehivesComponent implements OnInit {
   // ── Delete ───────────────────────────────────────────────
 
   async deleteRow(row: Beehive): Promise<void> {
-    const confirmed = await this.modal.confirm({
-      title: 'Delete Beehive',
-      message: `Delete "${row.name}"? All inspection and feeding data will be lost.`,
-      confirmLabel: 'Delete',
-      danger: true,
+    const answer = await this.modal.open<DeleteBeehiveResult>(DeleteBeehiveModalComponent, {
+      type: 'center',
+      width: '460px',
+      data: {
+        name: row.name,
+        hasQueen: !!row.queen,
+        targets: this.allBeehives()
+          .filter(b => b.id !== row.id)
+          .map(b => ({ id: b.id, name: b.name })),
+      } satisfies DeleteBeehiveModalData,
     });
-    if (!confirmed) return;
+    if (!answer) return;
 
-    this.beehiveService.deleteBeehive(row.id).subscribe({
+    this.destroy(row, {
+      queen_fate: answer.queenFate,
+      ...(answer.targetBeehiveId !== undefined && { target_beehive_id: answer.targetBeehiveId }),
+    });
+  }
+
+  /**
+   * The one case the dialog cannot answer in advance: the hive the queen moves
+   * to already has one. The API refuses with a 409 rather than replacing her
+   * silently, so the choice goes back to the beekeeper.
+   */
+  private destroy(
+    row: Beehive,
+    queen: { queen_fate: 'lost' | 'moved'; target_beehive_id?: number; force_replace_queen?: boolean },
+  ): void {
+    this.beehiveService.deleteBeehive(row.id, queen).subscribe({
       next: res => {
         if (res.success) {
           this.store.dispatch(BeehivesActions.reload());
@@ -174,7 +199,17 @@ export class BeehivesComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => {},
+      error: async err => {
+        if (err?.status !== 409 || queen.force_replace_queen) return;
+
+        const replace = await this.modal.confirm({
+          title: 'That beehive already has a queen',
+          message: 'Moving this queen there replaces the one living in it. The replaced queen is removed from your records.',
+          confirmLabel: 'Replace her',
+          danger: true,
+        });
+        if (replace) this.destroy(row, { ...queen, force_replace_queen: true });
+      },
     });
   }
 
