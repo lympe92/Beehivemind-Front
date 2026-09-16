@@ -22,14 +22,16 @@ export class GoogleMapsLoaderService {
     if (document.getElementById('google-maps-script')) return;
 
     const callbackName = '__googleMapsReady';
-    w[callbackName] = () => {
+    w[callbackName] = async () => {
       delete w[callbackName];
-      setTimeout(() => this.mapsLoaded.set(true));
+      const maps = (window as unknown as { google: { maps: { importLibrary(name: string): Promise<unknown> } } }).google.maps;
+      await Promise.all([maps.importLibrary('maps'), maps.importLibrary('marker')]);
+      this.mapsLoaded.set(true);
     };
 
     const script = document.createElement('script');
     script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&callback=${callbackName}`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&loading=async&callback=${callbackName}`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
