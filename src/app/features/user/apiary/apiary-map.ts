@@ -32,7 +32,6 @@ export class ApiaryMapComponent implements OnInit {
       if (!this.viewReady() || !this.mapsLoader.mapsLoaded()) return;
       if (this.mapReady()) return;
       this.initMap();
-      this.mapReady.set(true);
     });
 
     // Re-render markers whenever apiaries data changes (after map is ready)
@@ -49,8 +48,23 @@ export class ApiaryMapComponent implements OnInit {
     this.viewReady.set(true);
   }
 
+  /**
+   * Google Maps paints for the size its container had when it was created. The
+   * effect that gets here runs before the page has finished laying out — the
+   * frame is `height: 100%` of a column that is not measured yet — so the map
+   * was built into a box of zero height and stayed a grey rectangle until a
+   * window resize told it to look again. Wait for the frame to have a size, and
+   * keep watching it: collapsing and reopening the sidebar changes it too.
+   */
   private initMap(): void {
-    this.map = new google.maps.Map(this.mapEl.nativeElement, {
+    const frame = this.mapEl.nativeElement;
+
+    if (!frame.clientHeight || !frame.clientWidth) {
+      requestAnimationFrame(() => this.initMap());
+      return;
+    }
+
+    this.map = new google.maps.Map(frame, {
       center: { lat: 37.9838, lng: 23.7275 },
       zoom: 6,
       mapTypeId: 'roadmap',
@@ -58,6 +72,9 @@ export class ApiaryMapComponent implements OnInit {
       fullscreenControl: false,
     });
     this.infoWindow = new google.maps.InfoWindow();
+    this.mapReady.set(true);
+
+    new ResizeObserver(() => this.renderMarkers(this.apiaries())).observe(frame);
   }
 
   private renderMarkers(apiaries: Apiary[]): void {
