@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, DestroyRef, effect, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { GoogleMapsLoaderService } from '../../../core/services/google-maps-loader.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
@@ -15,6 +15,7 @@ import { Apiary } from '../../../core/models/apiary.model';
 export class ApiaryMapComponent implements OnInit {
   private store      = inject(Store);
   private mapsLoader = inject(GoogleMapsLoaderService);
+  private destroyRef = inject(DestroyRef);
 
   @ViewChild('mapEl', { static: true }) mapEl!: ElementRef<HTMLDivElement>;
 
@@ -25,8 +26,11 @@ export class ApiaryMapComponent implements OnInit {
   private map: google.maps.Map | null = null;
   private infoWindow: google.maps.InfoWindow | null = null;
   private markers: google.maps.Marker[] = [];
+  private alive = true;
 
   constructor() {
+    this.destroyRef.onDestroy(() => (this.alive = false));
+
     // Init map once DOM + Maps API are both ready
     effect(() => {
       if (!this.viewReady() || !this.mapsLoader.mapsLoaded()) return;
@@ -60,7 +64,7 @@ export class ApiaryMapComponent implements OnInit {
     const frame = this.mapEl.nativeElement;
 
     if (!frame.clientHeight || !frame.clientWidth) {
-      requestAnimationFrame(() => this.initMap());
+      this.retryWhenSized();
       return;
     }
 
@@ -75,6 +79,23 @@ export class ApiaryMapComponent implements OnInit {
     this.mapReady.set(true);
 
     new ResizeObserver(() => this.renderMarkers(this.apiaries())).observe(frame);
+  }
+
+  /**
+   * `requestAnimationFrame` is the cheap way to wait for the next layout, but it
+   * does not fire while the document is hidden — open the map in a background
+   * tab and the retry above never ran, so the map was never built and the page
+   * stayed an empty frame after the tab was brought forward. Wait for the next
+   * frame *or* for the tab to be shown, whichever comes first.
+   */
+  private retryWhenSized(): void {
+    const retry = () => {
+      document.removeEventListener('visibilitychange', retry);
+      if (this.alive && !this.mapReady()) this.initMap();
+    };
+
+    requestAnimationFrame(retry);
+    document.addEventListener('visibilitychange', retry);
   }
 
   private renderMarkers(apiaries: Apiary[]): void {

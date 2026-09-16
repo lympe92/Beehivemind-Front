@@ -1,7 +1,12 @@
-/* The apiary map, with no nudge: it must paint on its own. It has failed twice
-   — coordinates arriving as strings threw "not a LatLng" and left the page
-   blank, and a map built before the frame had a height stayed a grey box until
-   a window resize. Loads the page, waits, and looks for painted tiles.
+/* The apiary map, with no nudge: it must paint on its own. It has failed three
+   times — coordinates arriving as strings threw "not a LatLng" and left the
+   page blank, a map built before the frame had a height stayed a grey box until
+   a window resize, and the requestAnimationFrame that waited for that height
+   never fired in a background tab, so the map was never built at all. This
+   check covers the first two: a hidden document paints nothing by design, so
+   the third one cannot be reproduced here — it is guarded by the
+   visibilitychange retry in apiary-map.ts. Loads the page, waits, and looks for
+   painted tiles.
    Usage: dev server on PORT (default 4321), then `node apiary-map-check.mjs`.
    The Google Maps key is restricted by referrer, so a port it does not allow
    answers RefererNotAllowedMapError and the check cannot run there — use a host
