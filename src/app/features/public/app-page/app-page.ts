@@ -20,6 +20,7 @@ import {
 import { SeoService } from '../../../core/services/seo.service';
 import { SEO_CONFIG } from '../../../core/services/seo.config';
 import { faqPageSchema, fromAccordion, withFaq } from '../../../core/utils/faq-schema';
+import { storeBadges } from '../../../shared/components/cta-sections/application-download/store-badges';
 
 interface AppPageConfig {
   hero: HeroConfig;
@@ -102,10 +103,7 @@ export class AppPageComponent {
       title: 'New era on beekeeping!',
       subtitle: 'Meet our beekeeping app now!',
       logo: { src: '/assets/img/logotr.webp', alt: 'BeehiveMind logo', width: 512, height: 512 },
-      storeLinks: [
-        { href: 'https://play.google.com/store/apps/details?id=org.beehivemind', img: { src: '/assets/icons/android.svg', alt: 'Get it on Google Play', width: 180, height: 48 } },
-        { href: 'https://apps.apple.com/app/beehivemind', img: { src: '/assets/icons/apple-store.svg', alt: 'Download on the App Store', width: 180, height: 48 } },
-      ],
+      storeLinks: storeBadges('app_page'),
     },
     splitAccordion2: {
       title: 'Inspect and track your hives with ease',

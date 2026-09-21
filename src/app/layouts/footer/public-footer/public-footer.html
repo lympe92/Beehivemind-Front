@@ -19,7 +19,7 @@
             @for (link of column.links; track link.label) {
               <li>
                 @if (link.external) {
-                  <a class="public-footer__link" [href]="link.href" target="_blank" rel="noopener noreferrer">{{ link.label }}</a>
+                  <a class="public-footer__link" [href]="link.href" [attr.data-store]="link.store" target="_blank" rel="noopener noreferrer">{{ link.label }}</a>
                 } @else {
                   <a class="public-footer__link" [routerLink]="link.href">{{ link.label }}</a>
                 }

@@ -21,6 +21,7 @@ import {
   SplitContentConfig,
   SplitListConfig,
 } from '../public-page.model';
+import { storeBadges } from '../../../shared/components/cta-sections/application-download/store-badges';
 
 interface HomePageConfig {
   hero: HeroConfig;
@@ -212,16 +213,7 @@ export class HomeComponent {
       title: 'The app is where the recording happens',
       subtitle: 'Free on both stores, and it works without signal.',
       logo: { src: '/assets/img/logo1.webp', alt: 'BeehiveMind logo', width: 105, height: 105 },
-      storeLinks: [
-        {
-          href: 'https://play.google.com/store/apps/details?id=org.beehivemind',
-          img: { src: '/assets/icons/android.svg', alt: 'Get it on Google Play', width: 180, height: 48 },
-        },
-        {
-          href: 'https://apps.apple.com/app/beehivemind',
-          img: { src: '/assets/icons/apple-store.svg', alt: 'Download on the App Store', width: 180, height: 48 },
-        },
-      ],
+      storeLinks: storeBadges('home'),
     },
     // TODO(content): the two figures marked need real numbers from the
     // database — they are the shape the band should have, not confirmed values.

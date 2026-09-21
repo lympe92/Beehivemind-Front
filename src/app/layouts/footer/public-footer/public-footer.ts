@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { appStoreUrl, playStoreUrl } from '../../../core/data/app-stores';
 
 interface FooterLink {
   label: string;
   href: string;
   external?: boolean;
+  /** Set on store links, for analytics; see `StoreLink.store`. */
+  store?: 'google_play' | 'app_store';
 }
 
 /**
@@ -21,15 +24,15 @@ interface FooterLink {
 export class PublicFooterComponent {
   readonly year = new Date().getFullYear();
 
-  // The Android app ships under the `org.beehivemind` package id, carried
-  // over from the 2019 native build so it updates that existing listing.
+  // Store addresses come from core/data/app-stores.ts. "iOS App" opens the
+  // Play listing until the iOS build exists (see `appStoreUrl`).
   readonly software: FooterLink[] = [
     { label: 'Features', href: '/features' },
     { label: 'App', href: '/app' },
     { label: 'Blog', href: '/blog' },
     { label: 'About', href: '/about' },
-    { label: 'Android App', href: 'https://play.google.com/store/apps/details?id=org.beehivemind', external: true },
-    { label: 'iOS App', href: 'https://apps.apple.com/app/beehivemind', external: true },
+    { label: 'Android App', href: playStoreUrl('footer'), external: true, store: 'google_play' },
+    { label: 'iOS App', href: appStoreUrl('footer'), external: true, store: 'app_store' },
     { label: 'Help', href: '/help' },
     { label: 'Contact', href: '/contact' },
   ];

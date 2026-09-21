@@ -171,10 +171,13 @@ export class AnalyticsService {
         const page_path = location.pathname;
         const text = anchor.textContent?.trim().slice(0, 60) ?? '';
 
-        if (href.includes('play.google.com')) {
-          this.event('app_store_click', { store: 'google_play', page_path });
-        } else if (href.includes('apps.apple.com')) {
-          this.event('app_store_click', { store: 'app_store', page_path });
+        // A store badge says which store it stands for; the address alone would
+        // count App Store clicks as Play while the App Store badge points there.
+        const store = anchor.dataset['store']
+          ?? (href.includes('play.google.com') ? 'google_play' : href.includes('apps.apple.com') ? 'app_store' : null);
+
+        if (store) {
+          this.event('app_store_click', { store, page_path });
         } else if (href === '/auth/register') {
           this.event('cta_click', { cta_text: text, page_path });
         } else if (anchor.classList.contains('post-filter__chip')) {

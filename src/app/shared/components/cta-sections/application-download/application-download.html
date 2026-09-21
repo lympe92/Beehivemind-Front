@@ -11,7 +11,7 @@
   <h3>{{ subtitle() }}</h3>
   <div class="app-download__stores">
     @for (store of storeLinks(); track store.href + store.img.alt) {
-      <a [href]="store.href" target="_blank" rel="noopener noreferrer">
+      <a [href]="store.href" [attr.data-store]="store.store" target="_blank" rel="noopener noreferrer">
         <img [src]="store.img.src" [alt]="store.img.alt" [width]="store.img.width" [height]="store.img.height">
       </a>
     }
