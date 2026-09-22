@@ -2,7 +2,7 @@ import { CtaLink } from '../../ui/link-button/link-button.model';
 
 export interface PricingTier {
   name: string;
-  /** A price as written, including the currency: "€0", "€9", "Talk to us". */
+  /** A price as written, including the currency: "€0", "€5", "Talk to us". */
   price: string;
   /** "forever", "/ month". Omit on a tier with no period. */
   period?: string;

@@ -1,4 +1,5 @@
 import { SEOModel, SoftwareApplicationSchema } from '../models/seo.model';
+import { PLAY_STORE_URL } from '../data/app-stores';
 import { environment } from '../../../environments/environment';
 
 const BASE = environment.appUrl;
@@ -42,8 +43,13 @@ const SOFTWARE_APPLICATION: SoftwareApplicationSchema = {
   ],
   offers: [
     { '@type': 'Offer', name: 'Free',  price: '0', priceCurrency: 'EUR', category: 'free',         url: `${BASE}/pricing` },
-    { '@type': 'Offer', name: 'Pro',   price: '9', priceCurrency: 'EUR', category: 'subscription', url: `${BASE}/pricing` },
+    { '@type': 'Offer', name: 'Pro',   price: '5', priceCurrency: 'EUR', category: 'subscription', url: `${BASE}/pricing` },
   ],
+  // The Android app's listing. Only the Play address: the App Store badge on
+  // the page is a stand-in that also opens Play, and structured data claims
+  // only what exists.
+  installUrl: PLAY_STORE_URL,
+  downloadUrl: PLAY_STORE_URL,
   publisher: { '@type': 'Organization', name: SITE, url: BASE },
 };
 

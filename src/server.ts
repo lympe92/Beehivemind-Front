@@ -9,6 +9,7 @@ import compression from 'compression';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { environment } from './environments/environment';
+import { PLAY_STORE_URL } from './app/core/data/app-stores';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -344,6 +345,7 @@ BeehiveMind is one account across two clients: an Android app that records inspe
 - [Home](https://beehivemind.tech/): what BeehiveMind is and who it is for
 - [Features](https://beehivemind.tech/features): inspections, treatments, harvest and feeding, finances, weather, QR labels
 - [The app](https://beehivemind.tech/app): the voice-driven Android field app
+- [BeehiveMind on Google Play](${PLAY_STORE_URL}): install the Android app
 - [Hive inspections](https://beehivemind.tech/inspections): the fourteen readings recorded per visit
 - [Apiaries and beehives](https://beehivemind.tech/apiariesandbeehives): apiaries on a map, hives in bulk, queen records
 - [Harvest and feeding](https://beehivemind.tech/harvestandfeeding): honey, pollen, propolis, royal jelly; syrup, fondant, patties
