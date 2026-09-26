@@ -203,6 +203,31 @@ The role comes from `user.team` (`{ role, owner_name, member_count, show_welcome
 
 **Export** has two placements and no route. `<app-export-menu>` (`shared/components/ui/export-menu/`) sits inside the filter bar on Inspections, Feeding and Harvest — the filter is the scope, so it asks only for a format and its note says what the file holds — and in the costs toolbar on Financial (`chrome="bare" size="sm"`). Profile's "Your data" card is the account export. Both go through `ExportService`, which saves the file the API answers with.
 
+## Diagnosis
+
+**The automatic reading of the beekeeper's data — no language model.** The API's
+Rules Engine reads every inspection the moment it is saved (and every hive every
+morning) and stores a diagnosis: a one-word `level` plus risks, actions, what to
+avoid and why. The app only reads it (`core/services/diagnosis.service.ts`,
+`core/models/diagnosis.model.ts`); it never asks for one to be computed.
+
+| Level | Badge tone | Meaning |
+|---|---|---|
+| `survival` | danger | a rule put the colony in survival mode |
+| `attention` | danger | a high or critical risk |
+| `watch` | warning | a medium risk |
+| `ok` | success | rules matched, nothing above low |
+| `unknown` | outline | no rule matched |
+
+Where it shows: the **Status** column on Inspections (badge → dialog), the
+**Hive status** table on an apiary's page, **Hives needing attention** on the
+dashboard (every serious hive, not a top few), and the bell — the morning run
+writes one `hive_attention` notification per serious hive (`entity_type:
+beehive`), and clicking it opens the hive's diagnosis. The dialog is
+`shared/components/ui/modal/diagnosis-modal/` (`{ recordId }` or
+`{ beehiveId }`); the badge `shared/components/ui/diagnosis-badge/`. The chat
+(phase 3) will explain a diagnosis; it never produces one.
+
 ## Domain Glossary
 
 | Term | Meaning |
@@ -310,6 +335,7 @@ Modals are powered by Angular CDK `Dialog`. All overlay styles are **global** be
 | `src/app/shared/components/ui/modal/confirm-modal/confirm-modal.ts` | Built-in confirm dialog (uses `ModalShellComponent`) |
 | `src/app/shared/components/ui/modal/form-modal/form-modal.ts` | Generic dialog around one `<app-form>` config (`title`, `fields`, `submitLabel`, `cancelLabel`) |
 | `src/app/shared/components/ui/modal/suspend-user-modal/` | Admin: how long to suspend an account |
+| `src/app/shared/components/ui/modal/diagnosis-modal/` | The full diagnosis of an inspection or a hive (see Diagnosis) |
 | `src/styles/_modal.scss` | CDK overlay/backdrop/panel glue |
 
 ### ModalService API

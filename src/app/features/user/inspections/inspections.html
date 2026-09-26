@@ -26,6 +26,15 @@
         @switch (col.key) {
           @case ('beehiveId') { <span class="dt__nowrap">{{ beehiveName(row.beehiveId) }}</span> }
           @case ('date') { <span class="dt__nowrap">{{ row.date | date:'mediumDate' }}</span> }
+          @case ('diagnosis') {
+            @if (diagnosisOf(row.id); as d) {
+              <button type="button" class="app-badge-btn" [attr.aria-label]="'Open the diagnosis of this inspection'" (click)="openDiagnosis(row)">
+                <app-diagnosis-badge [level]="d.level" />
+              </button>
+            } @else {
+              <span class="app-badge app-badge--neutral">—</span>
+            }
+          }
           @case ('varroa') {
             <span class="app-bool" [class.app-bool--yes]="row.varroa">{{ row.varroa ? 'Yes' : 'No' }}</span>
           }

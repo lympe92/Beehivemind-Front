@@ -17,6 +17,40 @@
     [beehiveId]="selectedBeehiveId() ?? 0"
     (beehiveIdChange)="onBeehiveChange($event)" />
 
+  <!-- The rules' serious readings — every hive in survival or attention.
+       First, above the charts: it is what the beekeeper came to check. -->
+  <app-card title="Hives needing attention">
+    @if (attentionLoading()) {
+      <div class="app-state">Reading the hives…</div>
+    } @else if (attention().length === 0) {
+      <div class="app-state">Nothing serious in the latest inspections.</div>
+    } @else {
+      <div class="app-list">
+        @for (d of attention(); track d.id) {
+          <button type="button" class="app-tile app-tile--action" (click)="openDiagnosis(d)">
+            <div class="app-tile__header">
+              <div class="app-tile__title">
+                <span class="app-tile__name">{{ hiveLabel(d) }}</span>
+                @if (d.apiaryName) { <span class="app-badge app-badge--apiary">{{ d.apiaryName }}</span> }
+                <app-diagnosis-badge [level]="d.level" />
+              </div>
+            </div>
+            <div class="app-tile__meta">
+              @if (d.date) { <span>Inspected {{ d.date | date:'mediumDate' }}</span> }
+              @for (risk of d.topRisks; track risk.code) {
+                <span class="app-tile__sep">·</span>
+                <span>{{ risk.nameEn }}</span>
+              }
+            </div>
+            @if (d.firstAction) {
+              <p class="app-tile__notes">First step: {{ d.firstAction }}</p>
+            }
+          </button>
+        }
+      </div>
+    }
+  </app-card>
+
   <!-- Variables over Time -->
   <app-card title="Variables over Time">
     <app-apex-chart [options]="variablesLineOptions()" [loading]="chartLoading()" height="300" />

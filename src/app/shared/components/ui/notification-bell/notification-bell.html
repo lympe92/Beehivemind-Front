@@ -39,7 +39,7 @@
               type="button"
               class="notif-item"
               [class.notif-item--unread]="!n.isRead"
-              (click)="markRead(n, $event)">
+              (click)="open(n, $event)">
               <!-- The dot holds its column when read, so the rows align. -->
               <span class="notif-item__dot" [class.notif-item__dot--read]="n.isRead"></span>
               <span class="notif-item__content">

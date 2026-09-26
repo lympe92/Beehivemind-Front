@@ -16,6 +16,8 @@ import {
   selectUnreadCount,
 } from '../../../../store/notifications/notifications.selectors';
 import { Notification } from '../../../../core/models/notification.model';
+import { ModalService } from '../../../../core/modal/modal.service';
+import { DiagnosisModalComponent } from '../modal/diagnosis-modal/diagnosis-modal';
 
 /**
  * The header bell: unread badge, dropdown panel, per-item read and mark-all.
@@ -32,6 +34,7 @@ import { Notification } from '../../../../core/models/notification.model';
 export class NotificationBellComponent implements OnInit {
   private store   = inject(Store);
   private elRef   = inject(ElementRef);
+  private modal   = inject(ModalService);
 
   notifications  = this.store.selectSignal(selectAllNotifications);
   unreadCount    = this.store.selectSignal(selectUnreadCount);
@@ -59,6 +62,23 @@ export class NotificationBellComponent implements OnInit {
     event.stopPropagation();
     if (!notification.isRead) {
       this.store.dispatch(NotificationsActions.markRead({ id: notification.id }));
+    }
+  }
+
+  /**
+   * Read it, and where it points somewhere, go there: a hive's reading
+   * (`hive_attention`, the morning diagnosis run) opens that hive's diagnosis.
+   */
+  async open(notification: Notification, event: Event): Promise<void> {
+    this.markRead(notification, event);
+
+    if (notification.type === 'hive_attention' && notification.entityType === 'beehive') {
+      this.isOpen.set(false);
+      await this.modal.open(DiagnosisModalComponent, {
+        type: 'center',
+        width: '640px',
+        data: { beehiveId: notification.entityId, title: notification.title },
+      });
     }
   }
 

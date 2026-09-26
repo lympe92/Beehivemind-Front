@@ -72,3 +72,48 @@
 .dt__nowrap {
   white-space: nowrap;
 }
+
+/* A badge that opens something (the diagnosis behind a Status cell): the
+   button's chrome goes, the badge inside keeps its own, and the focus ring
+   is the ink one every control uses. */
+.app-badge-btn {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  border-radius: 999px;
+}
+
+.app-badge-btn:focus-visible {
+  outline: 2px solid var(--app-text-primary);
+  outline-offset: 2px;
+}
+
+/* A tile that opens something (a hive on the dashboard's attention list): a
+   button with the tile's own chrome, text left like any tile, a hover ground
+   and the ink focus ring. Stacked ones keep the list's rhythm. */
+.app-tile--action {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+.app-tile--action:hover {
+  background: var(--app-bg-hover);
+}
+
+.app-tile--action:focus-visible {
+  outline: 2px solid var(--app-text-primary);
+  outline-offset: 2px;
+}
+
+.app-tile--action + .app-tile--action {
+  margin-top: 10px;
+}

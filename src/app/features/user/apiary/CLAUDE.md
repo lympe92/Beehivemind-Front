@@ -11,11 +11,11 @@ Manage apiaries (μελισσοκομεία) — locations with GPS coordinates 
 | `/user/apiary` | `apiary.ts` (`ApiaryComponent`) | Paginated **table** of apiaries; add/edit/delete |
 | `/user/apiary/details` | `apiary-details.ts` (`ApiaryDetailsComponent`) | Card list of apiaries + per-apiary pending-todo counts (from `AgendaService`) |
 | `/user/apiary/map` | `apiary-map.ts` (`ApiaryMapComponent`) | Map of all apiaries |
-| `/user/apiary/:id` | `apiary-view/apiary-view.ts` (`ApiaryViewComponent`) | Single-apiary dashboard, the design system's ApiaryViewPage: header with Edit, weather card, "Hives" / "Pending to-dos" figure tiles (`.app-stat`), recent inspections table (beehive names from the store), treatment sessions with dose rows + Delete |
+| `/user/apiary/:id` | `apiary-view/apiary-view.ts` (`ApiaryViewComponent`) | Single-apiary dashboard, the design system's ApiaryViewPage: header with Edit, weather card, "Hives" / "Pending to-dos" figure tiles (`.app-stat`), **Hive status** table (every hive with the level badge of its current diagnosis, last inspection date and main risk; a row opens `DiagnosisModalComponent` with `{ beehiveId }`; from `GET diagnosis/apiaries/{id}`), recent inspections table (beehive names from the store), treatment sessions with dose rows + Delete |
 
 ## State & Data
 - **Store:** `apiaries` (`selectAllApiaries`, `selectApiariesLoading`) + `beehives`. List/details read via `selectSignal`.
-- **`apiary-view`** loads its apiary directly via `ApiaryService.getApiary(id)` (single record, not from store), plus `InspectionService.getInspectionsOfApiary`, `AgendaService.getByApiary`, and reads `treatmentSessions` from store filtered by `apiaryId`.
+- **`apiary-view`** loads its apiary directly via `ApiaryService.getApiary(id)` (single record, not from store), plus `InspectionService.getInspectionsOfApiary`, `AgendaService.getByApiary`, `DiagnosisService.getApiary` (the hives' current diagnoses), and reads `treatmentSessions` from store filtered by `apiaryId`.
 - **Service:** `core/services/apiary.service.ts` — `createApiary / updateApiary / deleteApiary / getApiary`. **Model:** `apiary.model.ts`.
 
 ## Modal

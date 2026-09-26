@@ -20,6 +20,10 @@ import { ExportMenuComponent, exportFormat, exportScope } from '../../../shared/
 import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
 import { syncValidators } from '../../../shared/components/ui/form/validators.config';
 import { DynamicField } from '../../../core/models/form.model';
+import { DiagnosisService } from '../../../core/services/diagnosis.service';
+import { DiagnosisSummary } from '../../../core/models/diagnosis.model';
+import { DiagnosisBadgeComponent } from '../../../shared/components/ui/diagnosis-badge/diagnosis-badge';
+import { DiagnosisModalComponent } from '../../../shared/components/ui/modal/diagnosis-modal/diagnosis-modal';
 
 /** Shape of the inspection add/edit form value. */
 interface InspectionFormValue {
@@ -44,12 +48,13 @@ interface InspectionFormValue {
 @Component({
   selector: 'app-inspections',
   standalone: true,
-  imports: [DataTableComponent, CardComponent, FilterBarComponent, ExportMenuComponent, DatePipe],
+  imports: [DataTableComponent, CardComponent, FilterBarComponent, ExportMenuComponent, DatePipe, DiagnosisBadgeComponent],
   templateUrl: './inspections.html',
 })
 export class InspectionsComponent implements OnInit {
   private store = inject(Store);
   private inspectionService = inject(InspectionService);
+  private diagnosisService = inject(DiagnosisService);
   private exportService = inject(ExportService);
   private toast = inject(ToastService);
   private modal = inject(ModalService);
@@ -59,6 +64,8 @@ export class InspectionsComponent implements OnInit {
     // plus the hive have to fit one row, and the reading is the data.
     { key: 'beehiveId', label: 'Beehive' },
     { key: 'date', label: 'Date' },
+    // The rules' reading of the row; the badge opens the full diagnosis.
+    { key: 'diagnosis', label: 'Status' },
     { key: 'frame_space', label: 'Frames' },
     { key: 'population', label: 'Pop.' },
     { key: 'pollen', label: 'Pollen' },
@@ -103,6 +110,18 @@ export class InspectionsComponent implements OnInit {
   selectedApiaryId = signal<number>(0);
   selectedBeehiveId = signal<number>(0);
 
+  /**
+   * The diagnosis of each inspection of the last year, by record id. Fetched
+   * once, not per filter: the API's window is the same as the list's, and the
+   * filter narrows client-side like the rows do. Refreshed after every
+   * mutation, since the API re-reads the record on each write.
+   */
+  private diagnoses = signal<Map<number, DiagnosisSummary>>(new Map());
+
+  diagnosisOf(recordId: number): DiagnosisSummary | undefined {
+    return this.diagnoses().get(recordId);
+  }
+
   /** What the export will hold, before the click. */
   exportNote = computed(() =>
     exportScope(this.apiaries(), this.allBeehives(), this.selectedApiaryId(), this.selectedBeehiveId(), this.inspections().length)
@@ -112,6 +131,27 @@ export class InspectionsComponent implements OnInit {
     this.store.dispatch(ApiariesActions.load());
     this.store.dispatch(BeehivesActions.load());
     this.store.dispatch(InspectionsActions.load());
+    this.loadDiagnoses();
+  }
+
+  private loadDiagnoses(): void {
+    this.diagnosisService.getRecordSummaries().subscribe({
+      next: res => this.diagnoses.set(new Map(res.data.map(d => [d.recordId, d]))),
+      error: () => {},
+    });
+  }
+
+  /** The full reading of one inspection, in a dialog. */
+  async openDiagnosis(row: Inspection): Promise<void> {
+    await this.modal.open(DiagnosisModalComponent, {
+      type: 'center',
+      width: '640px',
+      data: {
+        recordId: row.id,
+        title: `Beehive ${this.beehiveName(row.beehiveId)}`,
+        subtitle: `Inspection of ${row.date}`,
+      },
+    });
   }
 
   // ── Filter handlers ──────────────────────────────────────
@@ -193,6 +233,7 @@ export class InspectionsComponent implements OnInit {
       next: res => {
         if (res.success) {
           this.store.dispatch(InspectionsActions.reload());
+          this.loadDiagnoses();
           this.toast.success('Record created successfully.');
         } else {
           this.toast.error('Something went wrong. Please try again.');
@@ -221,6 +262,7 @@ export class InspectionsComponent implements OnInit {
       next: res => {
         if (res.success) {
           this.store.dispatch(InspectionsActions.reload());
+          this.loadDiagnoses();
           this.toast.success('Record updated successfully.');
         } else {
           this.toast.error('Something went wrong. Please try again.');
@@ -246,6 +288,7 @@ export class InspectionsComponent implements OnInit {
       next: res => {
         if (res.success) {
           this.store.dispatch(InspectionsActions.reload());
+          this.loadDiagnoses();
           this.toast.success('Record deleted.');
         } else {
           this.toast.error('Something went wrong. Please try again.');

@@ -41,6 +41,27 @@
       </app-card>
     </div>
 
+    <!-- The rules' reading of each hive's latest inspection; a row opens it. -->
+    <app-card title="Hive status" [flush]="true">
+      <app-data-table
+        [columns]="hiveColumns"
+        [rows]="hives()"
+        [showActions]="false"
+        [clickableRows]="true"
+        (rowClick)="openDiagnosis($event)"
+        emptyMessage="No hives yet.">
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('beehiveId') { {{ beehiveName(row.beehiveId) }} }
+            @case ('level') { <app-diagnosis-badge [level]="row.diagnosis?.level" /> }
+            @case ('date') { {{ row.diagnosis?.date ? (row.diagnosis.date | date:'mediumDate') : 'Not inspected yet' }} }
+            @case ('risk') { {{ row.diagnosis?.topRisks?.[0]?.nameEn ?? '—' }} }
+            @default { {{ row[col.key] ?? '—' }} }
+          }
+        </ng-template>
+      </app-data-table>
+    </app-card>
+
     <app-card title="Recent inspections" [flush]="true">
       <app-data-table
         [columns]="inspectionColumns"

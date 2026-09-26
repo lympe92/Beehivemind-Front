@@ -22,6 +22,10 @@ import { TreatmentSessionsActions } from '../../../../store/treatment-sessions/t
 import { selectAllBeehives } from '../../../../store/beehives/beehives.selectors';
 import { BeehivesActions } from '../../../../store/beehives/beehives.actions';
 import { ApiariesActions } from '../../../../store/apiaries/apiaries.actions';
+import { DiagnosisService } from '../../../../core/services/diagnosis.service';
+import { HiveDiagnosis } from '../../../../core/models/diagnosis.model';
+import { DiagnosisBadgeComponent } from '../../../../shared/components/ui/diagnosis-badge/diagnosis-badge';
+import { DiagnosisModalComponent } from '../../../../shared/components/ui/modal/diagnosis-modal/diagnosis-modal';
 
 /**
  * One apiary: the weather where it stands, two figures (hives, pending
@@ -31,7 +35,7 @@ import { ApiariesActions } from '../../../../store/apiaries/apiaries.actions';
 @Component({
   selector: 'app-apiary-view',
   standalone: true,
-  imports: [DatePipe, WeatherCardComponent, CardComponent, CalloutComponent, DataTableComponent],
+  imports: [DatePipe, WeatherCardComponent, CardComponent, CalloutComponent, DataTableComponent, DiagnosisBadgeComponent],
   templateUrl: './apiary-view.html',
 })
 export class ApiaryViewComponent implements OnInit {
@@ -40,6 +44,7 @@ export class ApiaryViewComponent implements OnInit {
   private agendaService     = inject(AgendaService);
   private inspectionService = inject(InspectionService);
   private sessionService    = inject(TreatmentSessionService);
+  private diagnosisService  = inject(DiagnosisService);
   private store             = inject(Store);
   private toast             = inject(ToastService);
   private modal             = inject(ModalService);
@@ -51,8 +56,17 @@ export class ApiaryViewComponent implements OnInit {
     { key: 'honey', label: 'Honey' },
   ];
 
+  readonly hiveColumns: ColumnDef[] = [
+    { key: 'beehiveId', label: 'Beehive', width: '30%' },
+    { key: 'level', label: 'Status' },
+    { key: 'date', label: 'Last inspection' },
+    { key: 'risk', label: 'Main risk' },
+  ];
+
   apiary      = signal<Apiary | null>(null);
   inspections = signal<Inspection[]>([]);
+  /** Every hive of the apiary with its current diagnosis (null before the first inspection). */
+  hives       = signal<HiveDiagnosis[]>([]);
   todos       = signal<AgendaItem[]>([]);
   loading     = signal(true);
 
@@ -84,6 +98,24 @@ export class ApiaryViewComponent implements OnInit {
     });
 
     this.agendaService.getByApiary(id).subscribe(items => this.todos.set(items));
+
+    this.diagnosisService.getApiary(id).subscribe({
+      next: res => this.hives.set(res.data),
+      error: () => {},
+    });
+  }
+
+  /** The full reading of a hive's latest inspection, in a dialog. */
+  async openDiagnosis(hive: HiveDiagnosis): Promise<void> {
+    if (!hive.diagnosis) return;
+    await this.modal.open(DiagnosisModalComponent, {
+      type: 'center',
+      width: '640px',
+      data: {
+        beehiveId: hive.beehiveId,
+        title: `Beehive ${this.beehiveName(hive.beehiveId)} · ${this.apiary()?.name ?? ''}`,
+      },
+    });
   }
 
   beehiveName(id: number): string {

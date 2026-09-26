@@ -19,6 +19,18 @@ Record hive inspections (επιθεωρήσεις): population, frames, brood, h
 4. **Payload mapping:** booleans (toggles) → `1 | 0` for the API (`toPayload`).
 5. **Mutation → `reload()` + toast** (the root convention).
 
+## The diagnosis (Status column)
+Every inspection has a reading by the API's Rules Engine (no language model): a
+`level` — `survival` / `attention` / `watch` / `ok` / `unknown` — plus risks,
+actions and a reason. The API computes it on every write, so the page never
+asks for one; it only reads. `loadDiagnoses()` fetches `GET diagnosis/records`
+once (a summary per inspection of the last year, the same window as the list)
+into a `Map<recordId, DiagnosisSummary>`, and again after every mutation. The
+**Status** cell shows `<app-diagnosis-badge>` inside an `.app-badge-btn`, and the
+click opens `DiagnosisModalComponent` with `{ recordId }` — the full reading,
+with the beekeeper's "useful? yes/no" at the bottom (`POST inspections/{id}/feedback`).
+Service `core/services/diagnosis.service.ts`, model `diagnosis.model.ts`.
+
 ## Gotchas
 - The table leads with a **Beehive** column (name resolved from the `beehives` slice via `beehiveName()`) and a `mediumDate` date, both wrapped in `.dt__nowrap`; headers use the design system's short forms ("Pop.", "Q. year") so all fourteen readings fit one row. Feeding and Harvest follow the same shape (Beehive · Date · … · Quantity with unit).
 - Edit strips `beehive_id` from the payload (`const { beehive_id, ...payload }`) — the beehive isn't reassigned on edit.

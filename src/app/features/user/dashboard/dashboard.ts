@@ -19,6 +19,12 @@ import { AuthActions } from '../../../store/auth/auth.actions';
 import { selectCurrentUser } from '../../../store/auth/auth.selectors';
 import { TeamService } from '../../../core/services/team.service';
 import { teamName } from '../../../core/models/team.model';
+import { DiagnosisService } from '../../../core/services/diagnosis.service';
+import { DiagnosisSummary } from '../../../core/models/diagnosis.model';
+import { DiagnosisBadgeComponent } from '../../../shared/components/ui/diagnosis-badge/diagnosis-badge';
+import { DiagnosisModalComponent } from '../../../shared/components/ui/modal/diagnosis-modal/diagnosis-modal';
+import { ModalService } from '../../../core/modal/modal.service';
+import { DatePipe } from '@angular/common';
 
 export type FilterLevel = 'user' | 'apiary' | 'beehive';
 
@@ -56,7 +62,7 @@ interface DetectionRow {
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
-  imports: [ApexChartComponent, FilterBarComponent, CardComponent, CalloutComponent],
+  imports: [ApexChartComponent, FilterBarComponent, CardComponent, CalloutComponent, DiagnosisBadgeComponent, DatePipe],
   templateUrl: './dashboard.html',
 })
 export class UserDashboardComponent implements OnInit {
@@ -65,6 +71,8 @@ export class UserDashboardComponent implements OnInit {
   private chartBuilder = inject(ChartBuilderService);
   private destroyRef = inject(DestroyRef);
   private teamService = inject(TeamService);
+  private diagnosisService = inject(DiagnosisService);
+  private modal = inject(ModalService);
 
   private user = this.store.selectSignal(selectCurrentUser);
 
@@ -84,6 +92,40 @@ export class UserDashboardComponent implements OnInit {
 
   chartInspections = signal<AvgInspection[]>([]);
   chartLoading = signal(true);
+
+  /**
+   * Every hive whose current reading is serious (survival or attention) —
+   * all of them, not a top few. The filter bar narrows the list like it
+   * narrows the charts.
+   */
+  private allAttention = signal<DiagnosisSummary[]>([]);
+  attentionLoading = signal(true);
+
+  attention = computed(() => {
+    const all = this.allAttention();
+    const beehiveId = this.selectedBeehiveId();
+    const apiaryId = this.selectedApiaryId();
+    if (beehiveId !== null) return all.filter(d => d.beehiveId === beehiveId);
+    if (apiaryId !== null) return all.filter(d => d.apiaryId === apiaryId);
+    return all;
+  });
+
+  hiveLabel(d: DiagnosisSummary): string {
+    const name = this.allBeehives().find(b => b.id === d.beehiveId)?.name
+      ?? (d.beehiveNumber !== null ? String(d.beehiveNumber) : `#${d.beehiveId}`);
+    return `Beehive ${name}`;
+  }
+
+  async openDiagnosis(d: DiagnosisSummary): Promise<void> {
+    await this.modal.open(DiagnosisModalComponent, {
+      type: 'center',
+      width: '640px',
+      data: {
+        beehiveId: d.beehiveId,
+        title: d.apiaryName ? `${this.hiveLabel(d)} · ${d.apiaryName}` : this.hiveLabel(d),
+      },
+    });
+  }
 
   filterLevel = signal<FilterLevel>('user');
   selectedApiaryId = signal<number | null>(null);
@@ -217,6 +259,14 @@ export class UserDashboardComponent implements OnInit {
     this.store.dispatch(BeehivesActions.load());
     this.store.dispatch(InspectionsActions.load());
     this.loadAvgData();
+
+    this.diagnosisService.getAttention().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: res => {
+        this.allAttention.set(res.data);
+        this.attentionLoading.set(false);
+      },
+      error: () => this.attentionLoading.set(false),
+    });
   }
 
   // ── Filter handlers ─────────────────────────────────────

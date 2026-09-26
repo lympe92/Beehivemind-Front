@@ -116,12 +116,39 @@ const TEAM = ROLE === 'editor'
       ],
     };
 
+const DIAGNOSIS_RISK = { code: 'colony_starvation', name_en: 'Colony starvation', severity: 'critical' };
+const DIAGNOSES = [
+  { id: 1, record_id: 504, date: '2026-08-27', beehive: { id: 14, number: 14, apiary_id: 1 }, apiary: { id: 1, name: 'Kalamos North' }, level: 'survival', is_current: true, mode: 'survival', top_risks: [DIAGNOSIS_RISK, { code: 'nosema_spread', name_en: 'Nosema spread', severity: 'high' }], risk_count: 2, action_count: 4, first_action: 'Emergency fondant feeding', evaluated_at: '2026-09-06T08:00:00Z' },
+  { id: 2, record_id: 503, date: '2026-08-27', beehive: { id: 13, number: 13, apiary_id: 1 }, apiary: { id: 1, name: 'Kalamos North' }, level: 'attention', is_current: true, mode: 'normal', top_risks: [{ code: 'queen_loss', name_en: 'Queen loss', severity: 'high' }], risk_count: 1, action_count: 2, first_action: 'Check for eggs in 3 days', evaluated_at: '2026-09-06T08:00:00Z' },
+  { id: 3, record_id: 501, date: '2026-08-28', beehive: { id: 11, number: 11, apiary_id: 1 }, apiary: { id: 1, name: 'Kalamos North' }, level: 'watch', is_current: true, mode: 'normal', top_risks: [{ code: 'varroa_load', name_en: 'Varroa load', severity: 'medium' }], risk_count: 1, action_count: 1, first_action: 'Mite count', evaluated_at: '2026-09-06T08:00:00Z' },
+  { id: 4, record_id: 502, date: '2026-08-28', beehive: { id: 12, number: 12, apiary_id: 1 }, apiary: { id: 1, name: 'Kalamos North' }, level: 'ok', is_current: true, mode: 'normal', top_risks: [], risk_count: 0, action_count: 1, first_action: 'Routine inspection', evaluated_at: '2026-09-06T08:00:00Z' },
+];
+const DIAGNOSIS_FULL = {
+  ...DIAGNOSES[0],
+  record: { id: 504, date: '2026-08-27' },
+  confidence: 'high',
+  risks: [
+    { code: 'colony_starvation', name_en: 'Colony starvation', name_el: 'Λιμοκτονία', severity: 'critical', category: 'hard' },
+    { code: 'nosema_spread', name_en: 'Nosema spread', name_el: 'Νοσεμίαση', severity: 'high', category: 'disease' },
+  ],
+  recommended_actions: [
+    { code: 'emergency_fondant_feeding', name_en: 'Emergency fondant feeding', name_el: 'Τάισμα με ζυμαρικό', urgency: 'immediate', category: 'feeding' },
+    { code: 'minimize_disturbance', name_en: 'Minimise disturbance', name_el: 'Ελάχιστη ενόχληση', urgency: 'within_week', category: 'management' },
+  ],
+  forbidden_actions: [{ code: 'sugar_syrup_feeding', name_en: 'Sugar syrup feeding', name_el: 'Σιρόπι' }],
+  reasoning: { en: 'Inspection shows critically low food stores (1 honey frame) with an active colony (3 frames covered by bees). Emergency fondant feeding required.', el: '' },
+  triggered_rule_codes: ['winter_starvation_emergency'],
+  trends_applied: [],
+  trends: [{ detector_code: 'population_decline', severity: 'high', direction: 'negative', confidence: 'medium', insight_en: 'Population fell from 6 to 3 frames over the last three inspections.', insight_el: '', window_start: '2026-07-01', window_end: '2026-08-27' }],
+  feedback: null,
+};
+
 const NOTIFICATIONS = {
   success: true,
   unread_count: 2,
   data: [
     { id: 1, type: 'treatment', title: 'Varroa treatment due', message: 'Kalamos North · 6 hives in the autumn oxalic session', entity_type: 'treatment_instance', entity_id: 3, is_read: false, created_at: '2026-09-04T08:00:00Z' },
-    { id: 2, type: 'inspection', title: 'Inspection overdue', message: 'Beehive 13 has not been inspected in 21 days', entity_type: 'beehive', entity_id: 13, is_read: false, created_at: '2026-09-03T17:30:00Z' },
+    { id: 2, type: 'hive_attention', title: 'Hive 14 at Kalamos North is in survival mode', message: 'Risks: Colony starvation, Nosema spread. First step: Emergency fondant feeding.', entity_type: 'beehive', entity_id: 14, is_read: false, created_at: '2026-09-06T08:00:00Z' },
     { id: 4, type: 'harvest', title: 'Harvest recorded', message: '18.4 kg thyme honey from Evia Coast', entity_type: 'harvest', entity_id: 91, is_read: true, created_at: '2026-09-01T14:45:00Z' },
   ],
 };
@@ -290,6 +317,13 @@ export function mock(method, path) {
   if (route === 'beehives') return ok(BEEHIVES);
   if (/^beehives\/apiary\/\d+$/.test(route)) return ok(BEEHIVES.filter(b => b.apiary_id === Number(route.split('/')[2])));
   if (route === 'inspections') return ok(INSPECTIONS);
+  if (route === 'diagnosis/attention') return ok(DIAGNOSES.filter(d => ['survival', 'attention'].includes(d.level)));
+  if (route === 'diagnosis/records') return ok(DIAGNOSES);
+  if (/^diagnosis\/(records|beehives)\/\d+$/.test(route)) return ok(DIAGNOSIS_FULL);
+  if (/^diagnosis\/apiaries\/\d+$/.test(route)) return ok(BEEHIVES.filter(b => b.apiary_id === 1).map(b => ({
+    beehive: { id: b.id, number: b.id, apiary_id: b.apiary_id },
+    diagnosis: DIAGNOSES.find(d => d.beehive.id === b.id) ?? null,
+  })));
   if (route === 'inspections/avg' || /^inspections\/apiary\/\d+\/avg$/.test(route)) return ok(AVG);
   if (/^inspections\/apiary\/\d+$/.test(route)) return ok(INSPECTIONS.filter(i => BEEHIVES.find(b => b.id === i.beehive_id)?.apiary_id === Number(route.split('/')[2])));
   if (/^inspections\/beehive\/\d+$/.test(route)) return ok(INSPECTIONS.filter(i => i.beehive_id === Number(route.split('/')[2])));

@@ -1,0 +1,114 @@
+<app-modal-shell [title]="title()" [subtitle]="data.subtitle ?? ''" (close)="close()">
+
+  @if (loading()) {
+    <div class="app-state">Reading the inspection…</div>
+  } @else if (missing() || !diagnosis()) {
+    <div class="app-state">This hive has no inspection to read yet. Record one and the diagnosis appears here.</div>
+  } @else if (diagnosis(); as d) {
+
+    <div class="dx">
+
+      <div class="app-fields">
+        <div class="app-field">
+          <span class="app-field__label">Status</span>
+          <span class="app-field__value"><app-diagnosis-badge [level]="d.level" /></span>
+        </div>
+        <div class="app-field">
+          <span class="app-field__label">Inspection</span>
+          <span class="app-field__value">{{ d.date ? (d.date | date:'mediumDate') : '—' }}</span>
+        </div>
+        <div class="app-field">
+          <span class="app-field__label">Colony mode</span>
+          <span class="app-field__value">{{ d.mode }}</span>
+        </div>
+        <div class="app-field">
+          <span class="app-field__label">Confidence</span>
+          <span class="app-field__value">{{ d.confidence }}</span>
+        </div>
+      </div>
+
+      @if (d.level === 'unknown') {
+        <p class="dx__note">No rule matched this inspection. Nothing stood out, and nothing was ruled out either — read the numbers yourself.</p>
+      }
+
+      @if (d.risks.length) {
+        <section class="dx__section">
+          <h4 class="dx__heading">Risks</h4>
+          <ul class="dx__list">
+            @for (risk of d.risks; track risk.code) {
+              <li class="dx__item">
+                <span class="app-badge" [class]="'app-badge ' + severityClass(risk.severity)">{{ risk.severity }}</span>
+                <span>{{ risk.nameEn }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      @if (d.recommendedActions.length) {
+        <section class="dx__section">
+          <h4 class="dx__heading">What to do</h4>
+          <ol class="dx__list">
+            @for (action of d.recommendedActions; track action.code) {
+              <li class="dx__item">
+                <span class="app-badge" [class]="'app-badge ' + urgencyClass(action.urgency)">{{ urgencyLabel(action.urgency) }}</span>
+                <span>{{ action.nameEn }}</span>
+              </li>
+            }
+          </ol>
+        </section>
+      }
+
+      @if (d.forbiddenActions.length) {
+        <section class="dx__section">
+          <h4 class="dx__heading">Do not</h4>
+          <ul class="dx__list">
+            @for (action of d.forbiddenActions; track action.code) {
+              <li class="dx__item">
+                <span class="app-badge app-badge--banned">avoid</span>
+                <span>{{ action.nameEn }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      @if (d.reasoning.en) {
+        <section class="dx__section">
+          <h4 class="dx__heading">Why</h4>
+          <p class="dx__text">{{ d.reasoning.en }}</p>
+        </section>
+      }
+
+      @if (d.trends.length) {
+        <section class="dx__section">
+          <h4 class="dx__heading">Trends over recent inspections</h4>
+          <ul class="dx__list">
+            @for (trend of d.trends; track trend.detectorCode) {
+              <li class="dx__item">
+                <span class="app-badge" [class]="'app-badge ' + (trend.direction === 'positive' ? 'app-badge--active' : trend.direction === 'negative' ? 'app-badge--banned' : 'app-badge--neutral')">{{ trend.severity }}</span>
+                <span>{{ trend.insightEn }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      <div class="dx__feedback">
+        @if (d.feedback) {
+          <span class="dx__note">You marked this {{ d.feedback.value === 'helpful' ? 'helpful' : 'not helpful' }}.</span>
+        } @else {
+          <span class="dx__note">Was this reading useful?</span>
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" [disabled]="sendingFeedback()" (click)="feedback('helpful')">Yes</button>
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" [disabled]="sendingFeedback()" (click)="feedback('not_helpful')">No</button>
+        }
+      </div>
+
+    </div>
+  }
+
+  <ng-template #footer>
+    <button class="app-btn app-btn--ghost" type="button" (click)="close()">Close</button>
+  </ng-template>
+
+</app-modal-shell>
