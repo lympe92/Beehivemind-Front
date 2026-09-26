@@ -54,7 +54,7 @@ export class PublicFooterComponent {
   readonly social: FooterLink[] = [
     { label: 'Instagram', href: 'https://www.instagram.com/beehivemindapp', external: true },
     { label: 'TikTok', href: 'https://www.tiktok.com/@beehivemind.tech', external: true },
-    { label: 'Youtube', href: 'https://www.youtube.com/channel/UCSacxrpIMgWoWhLORBY5HcQ', external: true },
+    { label: 'Youtube', href: 'https://www.youtube.com/@beehivemindapp', external: true },
   ];
 
   readonly columns = [
