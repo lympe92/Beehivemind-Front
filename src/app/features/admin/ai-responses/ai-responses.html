@@ -1,17 +1,17 @@
 <div class="app-page">
   <div class="app-page-header">
     <h1 class="app-page-title">AI response review</h1>
-    <span class="app-page-meta">{{ total() | number }} awaiting review</span>
+    <span class="app-page-meta">{{ pendingTotal() | number }} awaiting judgment</span>
   </div>
 
   @if (error()) {
     <app-callout tone="error" [dismissable]="true" (dismiss)="error.set(null)">{{ error() }}</app-callout>
   }
 
-  <!-- Result detail -->
-  @if (selectedResult(); as result) {
+  <!-- Detail: the rubric, the admin's review, the conversation -->
+  @if (selected(); as result) {
     <app-card title="Judgment">
-      <button card-header-end type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="closeResult()">Close</button>
+      <button card-header-end type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="closeDetail()">Close</button>
 
       <div class="app-fields">
         <div class="app-field">
@@ -25,10 +25,6 @@
         <div class="app-field">
           <span class="app-field__label">Factual accuracy</span>
           <span class="app-field__value">{{ result.judgment.factual_accuracy }}/5</span>
-        </div>
-        <div class="app-field">
-          <span class="app-field__label">Tool correctness</span>
-          <span class="app-field__value">{{ result.judgment.tool_correctness }}/5</span>
         </div>
         <div class="app-field">
           <span class="app-field__label">Refusal appropriateness</span>
@@ -58,48 +54,141 @@
         <span class="app-field__label">Reasoning</span>
         <p class="app-field__value" style="margin: 0; max-width: 72ch">{{ result.judgment.reasoning }}</p>
       </div>
+
+      @if (result.judgment.detector_flags?.length) {
+        <div class="app-field" style="margin-top: var(--app-pad)">
+          <span class="app-field__label">Automatic checks</span>
+          <span class="app-field__value">
+            @for (flag of result.judgment.detector_flags; track $index) {
+              <span class="app-badge app-badge--banned">{{ flag.type }}{{ flag.value !== undefined ? ': ' + flag.value : '' }}</span>
+            }
+          </span>
+        </div>
+      }
+
+      <!-- The admin's own verdict -->
+      <div class="app-field" style="margin-top: var(--app-pad)">
+        <span class="app-field__label">Your review</span>
+        <textarea class="app-input" rows="3" maxlength="2000" placeholder="Notes on this answer (optional)"
+                  [value]="notesDraft()" (input)="onNotesInput($event)" aria-label="Admin notes"></textarea>
+        <label class="app-field__value" style="display: flex; align-items: center; gap: 8px; margin-top: 8px">
+          <input type="checkbox" [checked]="flagDraft()" (change)="onFlagChange($event)" />
+          Flag for retraining
+        </label>
+        <div style="margin-top: 8px">
+          <button type="button" class="app-btn app-btn--primary app-btn--sm" [disabled]="saving()" (click)="saveReview()">
+            {{ saving() ? 'Saving…' : 'Save review' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- The conversation the answer sits in -->
+      <div class="app-field" style="margin-top: var(--app-pad)">
+        <span class="app-field__label">Conversation</span>
+        @if (conversationLoading()) {
+          <div class="app-state">Loading…</div>
+        } @else {
+          <div class="app-chat__log">
+            @for (m of conversation(); track m.id) {
+              <div class="app-msg" [class.app-msg--user]="m.role === 'user'" [class.app-msg--assistant]="m.role !== 'user'">
+                <div class="app-msg__bubble">{{ m.content || '—' }}</div>
+              </div>
+            }
+          </div>
+        }
+      </div>
     </app-card>
   }
 
-  <app-card [flush]="true">
-    <app-data-table
-      [columns]="columns"
-      [rows]="pending()"
-      [loading]="loading()"
-      [pagination]="tablePagination"
-      (pageChange)="goToPage($event)"
-      emptyMessage="Nothing is waiting for review.">
-
-      <ng-template #cellTpl let-row let-col="col">
-        @switch (col.key) {
-          @case ('user_question') { {{ row.user_question || '—' }} }
-          @case ('ai_response') {
-            {{ (row.ai_response || '—') | slice:0:120 }}{{ row.ai_response && row.ai_response.length > 120 ? '…' : '' }}
+  <!-- Tabs -->
+  <div class="app-page-header">
+    <div class="app-tile__actions">
+      <button type="button" class="app-btn app-btn--sm" [class.app-btn--primary]="tab() === 'pending'" [class.app-btn--ghost]="tab() !== 'pending'" (click)="showTab('pending')">
+        Awaiting judgment
+      </button>
+      <button type="button" class="app-btn app-btn--sm" [class.app-btn--primary]="tab() === 'judged'" [class.app-btn--ghost]="tab() !== 'judged'" (click)="showTab('judged')">
+        Judged
+      </button>
+    </div>
+    @if (tab() === 'judged') {
+      <div class="app-tile__actions">
+        <select class="app-input" aria-label="Filter" [value]="judgedFilter()" (change)="onFilterChange($event)">
+          @for (f of filters; track f.value) {
+            <option [value]="f.value">{{ f.label }}</option>
           }
-          @case ('created_at') { {{ row.created_at | slice:0:10 }} }
-          @default { {{ row[col.key] ?? '—' }} }
-        }
-      </ng-template>
+        </select>
+        <select class="app-input" aria-label="Sort" [value]="judgedSort()" (change)="onSortChange($event)">
+          <option value="date_desc">Newest first</option>
+          <option value="score_asc">Lowest score first</option>
+          <option value="score_desc">Highest score first</option>
+        </select>
+      </div>
+    }
+  </div>
 
-      <ng-template #actionsTpl let-row>
-        @if (results()[row.message_id]; as rubric) {
-          <span class="app-badge" [class.app-badge--banned]="rubric.composite_score <= 2.5" [class.app-badge--active]="rubric.composite_score > 2.5">
-            {{ rubric.composite_score }}
-          </span>
-          <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="viewResult(row.message_id)">View</button>
-        } @else if (judgingId() === row.message_id) {
-          <button type="button" class="app-btn app-btn--ghost app-btn--sm" disabled>Judging…</button>
-        } @else {
-          <button
-            type="button"
-            class="app-btn app-btn--primary app-btn--sm"
-            [disabled]="judgingId() !== null"
-            (click)="judge(row.message_id)">
-            Judge
-          </button>
-        }
-      </ng-template>
+  @if (tab() === 'pending') {
+    <app-card [flush]="true">
+      <app-data-table
+        [columns]="pendingColumns"
+        [rows]="pending()"
+        [loading]="pendingLoading()"
+        [pagination]="pendingPagination()"
+        (pageChange)="goToPendingPage($event)"
+        emptyMessage="Nothing is waiting for judgment.">
 
-    </app-data-table>
-  </app-card>
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('user_question') { {{ row.user_question || '—' }} }
+            @case ('ai_response') {
+              {{ (row.ai_response || '—') | slice:0:120 }}{{ row.ai_response && row.ai_response.length > 120 ? '…' : '' }}
+            }
+            @case ('created_at') { {{ row.created_at | slice:0:10 }} }
+            @default { {{ row[col.key] ?? '—' }} }
+          }
+        </ng-template>
+
+        <ng-template #actionsTpl let-row>
+          @if (judgingId() === row.message_id) {
+            <button type="button" class="app-btn app-btn--ghost app-btn--sm" disabled>Judging…</button>
+          } @else {
+            <button type="button" class="app-btn app-btn--primary app-btn--sm" [disabled]="judgingId() !== null" (click)="judge(row.message_id)">
+              Judge
+            </button>
+          }
+        </ng-template>
+      </app-data-table>
+    </app-card>
+  } @else {
+    <app-card [flush]="true">
+      <app-data-table
+        [columns]="judgedColumns"
+        [rows]="judged()"
+        [loading]="judgedLoading()"
+        [pagination]="judgedPagination()"
+        (pageChange)="goToJudgedPage($event)"
+        emptyMessage="No judged responses match.">
+
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('user_question') { {{ row.user_question || '—' }} }
+            @case ('score') {
+              <span class="app-badge" [class.app-badge--banned]="row.judgment.composite_score <= 2.5" [class.app-badge--active]="row.judgment.composite_score > 2.5">
+                {{ row.judgment.composite_score }}
+              </span>
+            }
+            @case ('flags') { {{ flagsOf(row) }} }
+            @case ('reviewed') {
+              <span class="app-bool" [class.app-bool--yes]="row.admin.reviewed_by !== null">{{ row.admin.reviewed_by !== null ? 'Yes' : 'No' }}</span>
+            }
+            @case ('judged_at') { {{ (row.judged_at || '') | slice:0:10 }} }
+            @default { {{ row[col.key] ?? '—' }} }
+          }
+        </ng-template>
+
+        <ng-template #actionsTpl let-row>
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="open(row)">View</button>
+        </ng-template>
+      </app-data-table>
+    </app-card>
+  }
 </div>

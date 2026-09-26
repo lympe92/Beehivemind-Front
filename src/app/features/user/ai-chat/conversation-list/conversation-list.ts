@@ -8,6 +8,7 @@ import {
 } from '../../../../store/ai-chat/ai-chat.selectors';
 import { ToastService } from '../../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../../core/modal/modal.service';
+import { AiChatService } from '../../../../core/services/ai-chat.service';
 
 @Component({
   selector: 'app-conversation-list',
@@ -18,9 +19,10 @@ import { ModalService } from '../../../../core/modal/modal.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConversationListComponent implements OnInit {
-  private store = inject(Store);
-  private toast = inject(ToastService);
-  private modal = inject(ModalService);
+  private store   = inject(Store);
+  private toast   = inject(ToastService);
+  private modal   = inject(ModalService);
+  private service = inject(AiChatService);
 
   activeId = input<number | null>(null);
   selected = output<number>();
@@ -45,8 +47,18 @@ export class ConversationListComponent implements OnInit {
       danger: true,
     });
     if (!confirmed) return;
-    this.store.dispatch(AiChatActions.deleteConversation({ id }));
-    this.toast.success('Conversation deleted.');
+
+    this.service.deleteConversation(id).subscribe({
+      next: res => {
+        if (res.success) {
+          this.store.dispatch(AiChatActions.deleteConversationSuccess({ id }));
+          this.toast.success('Conversation deleted.');
+        } else {
+          this.toast.error('Something went wrong. Please try again.');
+        }
+      },
+      error: () => {},
+    });
   }
 
   trackById(_: number, item: { id: number }): number {

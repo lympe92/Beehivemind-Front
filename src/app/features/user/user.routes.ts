@@ -1,4 +1,8 @@
 import { Routes } from '@angular/router';
+import { provideState } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { aiChatReducer } from '../../store/ai-chat/ai-chat.reducer';
+import { AiChatEffects } from '../../store/ai-chat/ai-chat.effects';
 
 export const userRoutes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -84,7 +88,11 @@ export const userRoutes: Routes = [
     loadComponent: () => import('./profile/profile').then((m) => m.ProfileComponent),
   },
   {
+    // The chat's slice lives on its route, not in the root store: nobody
+    // else reads it, and its polling effects would otherwise sit in the
+    // initial bundle of every page.
     path: 'ai-chat',
+    providers: [provideState('aiChat', aiChatReducer), provideEffects(AiChatEffects)],
     children: [
       {
         path: '',

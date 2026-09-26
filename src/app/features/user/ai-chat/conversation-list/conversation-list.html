@@ -10,8 +10,8 @@
   @for (conv of conversations(); track trackById($index, conv)) {
     <div class="conv-list__row" [class.conv-list__row--active]="conv.id === activeId()">
       <button type="button" class="conv-list__item" (click)="select(conv.id)" [attr.aria-current]="conv.id === activeId() ? 'true' : null">
-        <span class="conv-list__title">{{ conv.title }}</span>
-        <span class="conv-list__date">{{ conv.last_message_at | date:'d MMM' }}</span>
+        <span class="conv-list__title">{{ conv.title || 'New conversation' }}</span>
+        <span class="conv-list__date">{{ (conv.lastMessageAt ?? conv.createdAt) | date:'d MMM' }}</span>
       </button>
       <button type="button" class="conv-list__delete" aria-label="Delete conversation" (click)="delete($event, conv.id)">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"

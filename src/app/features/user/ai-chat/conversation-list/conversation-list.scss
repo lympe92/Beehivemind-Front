@@ -82,7 +82,7 @@
     &:focus-visible {
       opacity: 1;
       background: var(--app-danger);
-      color: #fff;
+      color: var(--app-bg-panel);
     }
   }
 }

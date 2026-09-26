@@ -1,34 +1,39 @@
 # AI Chat — Claude Guide
 
-> Follows [root conventions](../../../../../CLAUDE.md). Driven by the `aiChat` NgRx slice. See also the auto-memory note `project_ai_chat.md`.
+> Follows [root conventions](../../../../../CLAUDE.md). Driven by the `aiChat` NgRx slice, registered **on the route** (`user.routes.ts`, `provideState` + `provideEffects`), not in the root store.
 
 ## Purpose
-Conversational assistant over the user's beekeeping data. Conversation list + message thread with optimistic sending.
+A general beekeeping assistant on the API's local model. **It has no tools and
+cannot see the team's data** — the rules decide (see the Diagnosis section of
+the root guide), the chat explains. The one exception: opened from a hive's
+diagnosis (`?beehive=ID`), the API puts that hive's latest inspections and its
+diagnosis in front of the model for that conversation.
 
 ## Routes (`user.routes.ts`, under `authGuard`)
 | Path | Component | Role |
 |------|-----------|------|
-| `/user/ai-chat` | `ai-chat-page/ai-chat-page.ts` | New conversation (no id) |
+| `/user/ai-chat` | `ai-chat-page/ai-chat-page.ts` | New conversation (no id); `?beehive=ID` attaches a hive |
 | `/user/ai-chat/:id` | same component | Existing conversation |
 
 ## Structure
 | Component | Role |
 |-----------|------|
-| `ai-chat-page` | Container: thread, input, example prompts, scroll handling. `OnPush`. |
-| `conversation-list/` | Sidebar list of conversations |
-| `chat-message/` | Single message renderer |
+| `ai-chat-page` | Container: context chip, thread, composer, allowance line, upgrade callout. `OnPush`. |
+| `conversation-list/` | Sidebar list; delete goes service → `deleteConversationSuccess` → toast |
+| `chat-message/` | Single message renderer (bold, italic, code, line breaks) |
 
 ## State & Data
-- **Store:** `aiChat` slice. Selectors: `selectActiveConversationId`, `selectActiveConversation`, `selectMessages`, `selectSending`, `selectActiveConversationLoading`, `selectSendError`.
-- **Actions:** `loadConversation({ id })`, `clearActive()`, `sendMessage({ payload, optimisticMessage })`.
-- **Service/Models:** `core/services/ai-chat.service.ts`, `core/models/ai-chat.model.ts` (`AiMessage`, `SendMessageRequest`).
+- **Service/Models:** `core/services/ai-chat.service.ts`, `core/models/ai-chat.model.ts` (camelCase; `AiMessage.status` is `pending | done | failed`).
+- **Sending is asynchronous.** `sendMessage` answers 202 with the stored question and a *pending* reply; the `pollReply$` effect polls `GET ai/messages/{id}` every 2.5 s for up to 3 minutes until it is `done` (`replyReceived`) or `failed` (`replyFailed`, with the API's `error` text). The thinking row shows while `sending`; the pending reply itself is hidden. Reopening a conversation with a pending reply resumes the poll.
+- **The allowance.** `loadQuota` on init and the quota on every send: free plans see "n of 10 free messages left this month" under the composer; at 0 (or a 429 `quota_exceeded`) the composer locks and a warning callout links to `/pricing`. Paid plans show nothing.
+- The chat POST carries `inlineErrors()`, so the global interceptor does not toast: the page renders the failure (callout) itself.
+- The slice resets on `logoutSuccess` / `accountDeleted` / `accountRemoved` / `sessionCleared` — conversations are the user's.
 
 ## Patterns / gotchas
-- **Optimistic send:** `sendMessage()` builds an `optimisticMessage` (negative id) and dispatches immediately; clears the input. An `effect` restores the input text if `sendError()` is set after sending finishes.
-- **URL sync without reload:** after the first message of a *new* conversation, an `effect` calls `location.replaceState('/user/ai-chat/:id')` (avoids re-triggering the route's `loadConversation`). Tracked via the private `isNewMode` flag.
-- **Auto-scroll:** an `effect` flags `shouldScroll` on new visible messages; `ngAfterViewChecked` scrolls the container to the bottom.
-- `visibleMessages` filters to `user`/`assistant` roles only (hides tool/system). Send disabled when empty, > 4000 chars, or already sending.
-- The `n / 4000` counter under the composer renders only once the user has typed (the kit's composer has no counter at rest); it turns amber above 3500.
+- **Optimistic send:** the question appears at once with a negative id and is replaced by the stored one on success. The input is restored only when the *send* failed, not when the reply did (the question is already saved).
+- **URL sync without reload:** after the first message of a new conversation an `effect` calls `location.replaceState('/user/ai-chat/:id')` and drops the context chip — the API keeps the hive on the conversation from then on.
+- **Context chip:** "About Hive 12 · North Field" from the `beehives` and `apiaries` slices; "Ask without it" clears the query param before the first message.
+- `visibleMessages` filters to `user`/`assistant` with status other than `pending`. Send disabled when empty, > 4000 chars, sending, or the allowance is spent.
 
 ## Related
-[Root](../../../../../CLAUDE.md) · `store/ai-chat/` · auto-memory `project_ai_chat.md`.
+[Root](../../../../../CLAUDE.md) · `store/ai-chat/` · Diagnosis dialog's **Ask the assistant** (`shared/components/ui/modal/diagnosis-modal/`) · Admin: [AI Responses](../../admin/ai-responses/CLAUDE.md).

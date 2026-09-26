@@ -94,10 +94,40 @@
     field-sizing: content;
   }
 
-  &__counter {
+  // The hive the assistant was given, above the log.
+  &__context {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--app-border);
+  }
+
+  &__context-note {
+    font-size: 0.8rem;
+    color: var(--app-text-muted);
+  }
+
+  // Under the composer: the allowance on the left, the counter on the right.
+  &__foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 1em;
     font-size: 0.75rem;
     color: var(--app-text-muted);
-    text-align: right;
+  }
+
+  &__quota {
+    &--low {
+      color: var(--app-warning);
+      font-weight: var(--font-weight-medium);
+    }
+  }
+
+  &__counter {
+    margin-left: auto;
 
     &--warn {
       color: var(--app-warning);

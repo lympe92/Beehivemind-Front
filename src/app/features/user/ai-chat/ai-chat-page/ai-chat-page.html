@@ -14,12 +14,24 @@
     <!-- Chat -->
     <app-card title="AI Assistant" class="ai-chat__main">
       @if (activeConversation(); as conv) {
-        <span card-header-end class="ai-chat__meta">{{ conv.title }} · started {{ conv.created_at | date:'d MMM yyyy' }}</span>
+        <span card-header-end class="ai-chat__meta">{{ conv.title }} · started {{ conv.createdAt | date:'d MMM yyyy' }}</span>
       } @else {
-        <span card-header-end class="ai-chat__meta">BeehiveMind AI — powered by Beehive Pilot</span>
+        <span card-header-end class="ai-chat__meta">General beekeeping questions · answers take up to a minute</span>
       }
 
       <div class="app-chat">
+
+        <!-- The hive whose data the assistant was given. -->
+        @if (contextLabel(); as label) {
+          <div class="ai-chat__context">
+            <span class="app-badge app-badge--apiary">About {{ label }}</span>
+            @if (!activeConversationId()) {
+              <span class="ai-chat__context-note">The assistant sees this hive's latest inspections and its diagnosis.</span>
+              <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="dropContext()">Ask without it</button>
+            }
+          </div>
+        }
+
         <div class="app-chat__log ai-chat__log" #messagesContainer>
 
           @if (isLoadingHistory()) {
@@ -28,8 +40,10 @@
 
           @if (!isLoadingHistory() && visibleMessages().length === 0 && !isSending()) {
             <div class="ai-chat__empty">
-              <div class="ai-chat__empty-title">How can I help you today?</div>
-              <p class="ai-chat__empty-sub">Ask me anything about your hives. Try one of these:</p>
+              <div class="ai-chat__empty-title">Ask me anything about beekeeping</div>
+              <p class="ai-chat__empty-sub">
+                General questions only — I cannot see your hives. Open the chat from a hive's diagnosis to ask about that hive.
+              </p>
               <div class="ai-chat__prompts">
                 @for (prompt of examplePrompts; track prompt) {
                   <button type="button" class="app-btn app-btn--ghost" (click)="tryPrompt(prompt)">{{ prompt }}</button>
@@ -46,14 +60,18 @@
             <div class="app-msg app-msg--assistant" aria-live="polite">
               <div class="app-msg__bubble ai-chat__thinking">
                 <span class="ai-chat__dots" aria-hidden="true"><span></span><span></span><span></span></span>
-                Thinking… this may take up to 30 seconds.
+                Thinking… replies take up to a minute.
               </div>
             </div>
           }
         </div>
 
-        @if (sendError()) {
-          <app-callout tone="error" title="Message not sent">{{ sendError() }}</app-callout>
+        @if (quotaExceeded()) {
+          <app-callout tone="warning" title="You've used your free messages for this month">
+            Free accounts get {{ quota()?.limit ?? 10 }} messages a month. <a routerLink="/pricing">Upgrade to Pro</a> for unlimited conversations, or come back next month.
+          </app-callout>
+        } @else if (sendError()) {
+          <app-callout tone="error" title="No answer">{{ sendError() }}</app-callout>
         }
 
         <div class="app-chat__composer">
@@ -63,19 +81,22 @@
             [value]="inputMessage()"
             (input)="onInput($event)"
             (keydown)="onKeydown($event)"
-            [disabled]="isSending()"
+            [disabled]="isSending() || quotaExceeded()"
             aria-label="Message"
-            placeholder="Ask about your hives…"
+            placeholder="Ask a beekeeping question…"
             title="Enter sends, Shift+Enter adds a line"
             rows="1"
             maxlength="4000"></textarea>
           <button type="button" class="app-btn app-btn--primary" [disabled]="!canSend()" (click)="sendMessage()">Send</button>
         </div>
-        @if (characterCount() > 0) {
-          <div class="ai-chat__counter" [class.ai-chat__counter--warn]="charWarning()">
-            {{ characterCount() }} / 4000
-          </div>
-        }
+        <div class="ai-chat__foot">
+          @if (quotaLabel(); as label) {
+            <span class="ai-chat__quota" [class.ai-chat__quota--low]="(quota()?.remaining ?? 1) <= 2">{{ label }}</span>
+          }
+          @if (characterCount() > 0) {
+            <span class="ai-chat__counter" [class.ai-chat__counter--warn]="charWarning()">{{ characterCount() }} / 4000</span>
+          }
+        </div>
       </div>
     </app-card>
 

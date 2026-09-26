@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { AiMessage, Conversation, SendMessageRequest } from '../../core/models/ai-chat.model';
+import { AiMessage, ChatQuota, Conversation, SendMessageRequest } from '../../core/models/ai-chat.model';
 
 export const AiChatActions = createActionGroup({
   source: 'AiChat',
@@ -12,15 +12,19 @@ export const AiChatActions = createActionGroup({
     'Load Conversation Success': props<{ conversation: Conversation }>(),
     'Load Conversation Failure': props<{ error: string }>(),
 
+    // The send stores the question and starts the reply; the reply is then
+    // polled until it is done or failed.
     'Send Message':         props<{ payload: SendMessageRequest; optimisticMessage: AiMessage }>(),
-    'Send Message Success': props<{ conversationId: number; message: AiMessage }>(),
-    'Send Message Failure': props<{ error: string }>(),
+    'Send Message Success': props<{ conversationId: number; message: AiMessage; reply: AiMessage; quota: ChatQuota }>(),
+    'Send Message Failure': props<{ error: string; quotaExceeded: boolean; quota: ChatQuota | null }>(),
+    'Reply Received':       props<{ reply: AiMessage }>(),
+    'Reply Failed':         props<{ replyId: number; error: string }>(),
 
-    'Delete Conversation':         props<{ id: number }>(),
     'Delete Conversation Success': props<{ id: number }>(),
-    'Delete Conversation Failure': props<{ error: string }>(),
+
+    'Load Quota':         emptyProps(),
+    'Load Quota Success': props<{ quota: ChatQuota }>(),
 
     'Clear Active': emptyProps(),
   },
 });
-

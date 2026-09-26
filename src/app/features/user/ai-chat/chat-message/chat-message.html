@@ -1,5 +1,5 @@
 <div class="app-msg" [class.app-msg--user]="isUser()" [class.app-msg--assistant]="!isUser()">
-  <div class="app-msg__bubble" [attr.title]="message().created_at | date:'d MMM, HH:mm'">
+  <div class="app-msg__bubble" [attr.title]="message().createdAt | date:'d MMM, HH:mm'">
     <div class="msg__content" [innerHTML]="formattedContent()"></div>
   </div>
 </div>

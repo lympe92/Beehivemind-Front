@@ -225,8 +225,10 @@ dashboard (every serious hive, not a top few), and the bell — the morning run
 writes one `hive_attention` notification per serious hive (`entity_type:
 beehive`), and clicking it opens the hive's diagnosis. The dialog is
 `shared/components/ui/modal/diagnosis-modal/` (`{ recordId }` or
-`{ beehiveId }`); the badge `shared/components/ui/diagnosis-badge/`. The chat
-(phase 3) will explain a diagnosis; it never produces one.
+`{ beehiveId }`); the badge `shared/components/ui/diagnosis-badge/`. Its
+**Ask the assistant** opens the chat with that hive's data in front of the
+model (`/user/ai-chat?beehive=ID`): the chat explains a diagnosis, it never
+produces one. See [`features/user/ai-chat/CLAUDE.md`](src/app/features/user/ai-chat/CLAUDE.md).
 
 ## Domain Glossary
 
@@ -261,7 +263,7 @@ Each row links to that feature's own `CLAUDE.md`.
 | Treatments | `/user/treatments` (+ `/details`) | `treatmentTypes`, `treatmentSessions` | [↗](src/app/features/user/treatments/CLAUDE.md) |
 | Financial | `/user/financial` | — (services only; `costs/` + `cost-categories/` are child components, not routes) | [↗](src/app/features/user/financial/CLAUDE.md) |
 | Todo / Calendar | `/user/todo/{list,calendar}` | `inspections`, `beehives` | [↗](src/app/features/user/todo/CLAUDE.md) |
-| AI Chat | `/user/ai-chat` (+ `/:id`) | `aiChat` | [↗](src/app/features/user/ai-chat/CLAUDE.md) |
+| AI Chat | `/user/ai-chat` (+ `/:id`, `?beehive=`) | `aiChat` (registered on the route) | [↗](src/app/features/user/ai-chat/CLAUDE.md) |
 | Profile | `/user/profile` | `profile`, `team` | [↗](src/app/features/user/profile/CLAUDE.md) |
 | Admin · Users | `/admin/users` | — (direct `RequestService`) | [↗](src/app/features/admin/user-management/CLAUDE.md) |
 | Admin · Employees | `/admin/employees` | — | [↗](src/app/features/admin/employee-management/CLAUDE.md) |

@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { DialogRef } from '@angular/cdk/dialog';
+import { Router } from '@angular/router';
 import { MODAL_DATA } from '../../../../../core/modal/modal.types';
 import { DiagnosisService } from '../../../../../core/services/diagnosis.service';
 import {
@@ -35,6 +36,7 @@ export interface DiagnosisModalData {
 })
 export class DiagnosisModalComponent implements OnInit {
   private dialogRef = inject(DialogRef);
+  private router    = inject(Router);
   private service   = inject(DiagnosisService);
   private toast     = inject(ToastService);
   readonly data     = inject<DiagnosisModalData>(MODAL_DATA);
@@ -106,6 +108,18 @@ export class DiagnosisModalComponent implements OnInit {
       },
       error: () => this.sendingFeedback.set(false),
     });
+  }
+
+  /**
+   * The chat with this hive's data in front of the assistant: its latest
+   * inspections and this diagnosis. The assistant explains; it does not
+   * decide — see the AI chat feature.
+   */
+  askAssistant(): void {
+    const d = this.diagnosis();
+    if (!d) return;
+    this.dialogRef.close();
+    this.router.navigate(['/user/ai-chat'], { queryParams: { beehive: d.beehiveId } });
   }
 
   close(): void {

@@ -1,9 +1,18 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, mergeMap, of, switchMap } from 'rxjs';
+import { catchError, filter, mergeMap, of, switchMap, takeUntil, takeWhile, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AiChatService } from '../../core/services/ai-chat.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { AiChatService, quotaFromApi } from '../../core/services/ai-chat.service';
 import { AiChatActions } from './ai-chat.actions';
+import {
+  AiMessage,
+  QuotaExceededError,
+  REPLY_POLL_INTERVAL_MS,
+  REPLY_POLL_TIMEOUT_MS,
+} from '../../core/models/ai-chat.model';
+
+const GAVE_UP = 'The assistant is taking too long. Your message was saved — check back in a moment.';
 
 @Injectable()
 export class AiChatEffects {
@@ -42,41 +51,83 @@ export class AiChatEffects {
     ),
   );
 
-  // switchMap is intentional: if user sends quickly, cancel the previous in-flight request
+  loadQuota$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AiChatActions.loadQuota),
+      switchMap(() =>
+        this.service.getQuota().pipe(
+          map(quota => AiChatActions.loadQuotaSuccess({ quota })),
+          catchError(() => of()),
+        ),
+      ),
+    ),
+  );
+
+  /**
+   * The send answers at once with the stored question and the pending reply.
+   * A 429 is the spent allowance: the page shows the upgrade callout, so it
+   * arrives as a failure with the quota rather than as a toast.
+   */
   sendMessage$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AiChatActions.sendMessage),
       switchMap(({ payload }) =>
         this.service.sendMessage(payload).pipe(
-          mergeMap(({ conversation_id, message }) => [
-            AiChatActions.sendMessageSuccess({ conversationId: conversation_id, message }),
-            // Reload the conversations list so the title appears for new conversations
+          mergeMap(({ conversationId, message, reply, quota }) => [
+            AiChatActions.sendMessageSuccess({ conversationId, message, reply, quota }),
+            // The list shows the new conversation's title.
             AiChatActions.loadConversations(),
           ]),
-          catchError(err => {
-            const apiErr = err?.error;
-            let errorMsg = 'Something went wrong. Please try again.';
-            if (apiErr?.message) errorMsg = apiErr.message;
-            return of(AiChatActions.sendMessageFailure({ error: errorMsg }));
+          catchError((err: HttpErrorResponse) => {
+            const body = err?.error as QuotaExceededError | null;
+            const quotaExceeded = err?.status === 429 && body?.meta?.code === 'quota_exceeded';
+            const rawQuota = body?.meta?.quota as Parameters<typeof quotaFromApi>[0] | undefined;
+
+            return of(AiChatActions.sendMessageFailure({
+              error:         body?.message ?? 'Something went wrong. Please try again.',
+              quotaExceeded,
+              quota:         quotaExceeded && rawQuota ? quotaFromApi(rawQuota) : null,
+            }));
           }),
         ),
       ),
     ),
   );
 
-  deleteConversation$ = createEffect(() =>
+  /**
+   * Poll the reply until it is done or failed. Every few seconds, for a few
+   * minutes at most; a new send, another conversation or a cleared page
+   * stops the previous poll.
+   */
+  pollReply$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AiChatActions.deleteConversation),
-      mergeMap(({ id }) =>
-        this.service.deleteConversation(id).pipe(
-          map(() => AiChatActions.deleteConversationSuccess({ id })),
-          catchError(err =>
-            of(AiChatActions.deleteConversationFailure({
-              error: err?.error?.message ?? 'Failed to delete conversation',
-            }))
-          ),
-        ),
-      ),
+      ofType(AiChatActions.sendMessageSuccess, AiChatActions.loadConversationSuccess),
+      map(action => 'reply' in action
+        ? action.reply.id
+        : (action.conversation.messages ?? []).find(m => m.role === 'assistant' && m.status === 'pending')?.id ?? null),
+      filter((id): id is number => id !== null),
+      switchMap(replyId => {
+        const stop$ = this.actions$.pipe(
+          ofType(AiChatActions.sendMessage, AiChatActions.loadConversation, AiChatActions.clearActive),
+        );
+        const deadline = Date.now() + REPLY_POLL_TIMEOUT_MS;
+
+        return timer(REPLY_POLL_INTERVAL_MS, REPLY_POLL_INTERVAL_MS).pipe(
+          takeUntil(stop$),
+          switchMap(() => this.service.getMessage(replyId).pipe(catchError(() => of(null)))),
+          map((reply: AiMessage | null) => {
+            if (reply && reply.status === 'done') return AiChatActions.replyReceived({ reply });
+            if (reply && reply.status === 'failed') {
+              return AiChatActions.replyFailed({ replyId, error: reply.error ?? 'The assistant could not answer.' });
+            }
+            if (Date.now() > deadline) return AiChatActions.replyFailed({ replyId, error: GAVE_UP });
+            return null;
+          }),
+          // Keep polling through nulls; the first real action ends the poll.
+          takeWhile(action => action === null, true),
+          filter((action): action is NonNullable<typeof action> => action !== null),
+        );
+      }),
     ),
   );
 }

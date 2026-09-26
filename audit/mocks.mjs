@@ -158,11 +158,18 @@ const CONVERSATIONS = [
   { id: 2, beehive_id: null, title: 'When to treat for varroa', status: 'active', last_message_at: '2026-09-02T18:40:00Z', created_at: '2026-09-02T18:30:00Z' },
 ];
 
+const AI_QUOTA = { plan: 'free', limit: 10, used: 3, remaining: 7, resets_at: '2026-10-01T00:00:00Z' };
+const AI_REPLY = { id: 3, conversation_id: 1, role: 'assistant', status: 'done', content: 'Honey is ready when the bees have capped most of the cells — about 80% of a frame — and a refractometer reads under 18% moisture.', error: null, created_at: '2026-09-06T10:12:30Z' };
+const JUDGED_AI = [
+  { id: 1, conversation_id: 2, user_question: 'When should I treat my hives for Varroa?', ai_response: 'After the last honey flow and again in the broodless window.', judgment: { factual_accuracy: 4, refusal_appropriateness: null, helpfulness: 4, hallucination_flag: false, safety_flag: false, composite_score: 4, reasoning: 'Accurate, seasonal, sends the beekeeper to the label for doses.', detector_flags: [] }, admin: { reviewed_by: null, notes: null, flagged_for_retraining: false }, created_at: '2026-09-02T18:40:00Z', judged_at: '2026-09-06T09:00:00Z' },
+  { id: 2, conversation_id: 1, user_question: 'Which hives lost population since July?', ai_response: 'Beehive 13 dropped from 6 to 4 frames.', judgment: { factual_accuracy: 2, refusal_appropriateness: null, helpfulness: 2, hallucination_flag: true, safety_flag: false, composite_score: 1, reasoning: 'No hive context was given; the assistant invented readings about the beekeeper\'s hives.', detector_flags: [{ type: 'fake_tool_output_prose' }] }, admin: { reviewed_by: 1, notes: 'Classic — refuses to say it cannot see the data.', flagged_for_retraining: true }, created_at: '2026-09-06T10:12:00Z', judged_at: '2026-09-06T09:05:00Z' },
+];
+
 const CONVERSATION_1 = {
   ...CONVERSATIONS[0],
   messages: [
-    { id: 1, conversation_id: 1, role: 'user', content: 'Which hives lost population since July?', tool_calls: null, tool_name: null, metadata: null, created_at: '2026-09-06T10:00:00Z' },
-    { id: 2, conversation_id: 1, role: 'assistant', content: 'Two: **Beehive 13** at Kalamos North dropped from 6 to 4 frames of bees, and Beehive 14 from 4 to 3. Both had a detection in the last inspection — European foulbrood and Nosema respectively.', tool_calls: null, tool_name: null, metadata: null, created_at: '2026-09-06T10:12:00Z' },
+    { id: 1, conversation_id: 1, role: 'user', status: 'done', content: 'When is honey ready to harvest?', error: null, created_at: '2026-09-06T10:00:00Z' },
+    { id: 2, conversation_id: 1, role: 'assistant', status: 'done', content: 'Honey is ready when the bees have **capped** most of the cells — about 80% of a frame — and a refractometer reads under 18% moisture. Uncapped honey ferments in the jar.', error: null, created_at: '2026-09-06T10:12:00Z' },
   ],
 };
 
@@ -346,6 +353,9 @@ export function mock(method, path) {
   if (route === 'weather') return ok(WEATHER);
   if (route === 'ai/conversations') return ok(CONVERSATIONS);
   if (/^ai\/conversations\/\d+$/.test(route)) return ok(CONVERSATION_1);
+  if (route === 'ai/quota') return ok(AI_QUOTA);
+  if (route === 'ai/chat') return { status: 202, body: ok({ conversation_id: 1, message: { ...CONVERSATION_1.messages[0], id: 9 }, reply: { ...AI_REPLY, id: 10, status: 'pending', content: '' }, quota: AI_QUOTA }) };
+  if (/^ai\/messages\/\d+$/.test(route)) return ok(AI_REPLY);
   if (route === 'blog/posts') return page(
     q.get('category') ? BLOG_POSTS.filter(p => p.category.slug === q.get('category')) : BLOG_POSTS,
   );
@@ -370,5 +380,7 @@ export function mock(method, path) {
   if (route === 'admin/raw/users') return ok(RAW_USERS, { page: 1, per_page: 25, total: 1284, total_pages: 52 });
   if (route.startsWith('admin/raw/')) return page([]);
   if (route === 'admin/ai-responses/pending') return page(PENDING_AI);
+  if (route === 'admin/ai-responses') return page(JUDGED_AI);
+  if (/^admin\/ai-responses\/\d+$/.test(route)) return ok({ judgment: JUDGED_AI[0], conversation: { id: 2, title: 'When to treat for varroa', messages: CONVERSATION_1.messages } });
   return ok([]);
 }
