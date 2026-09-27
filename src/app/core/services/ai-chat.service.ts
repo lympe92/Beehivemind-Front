@@ -77,6 +77,13 @@ export class AiChatService {
       .pipe(map(res => messageFromApi(res.data)));
   }
 
+  /** Whether the assistant takes messages on this server (`AI_CHAT_ENABLED`). */
+  getStatus(): Observable<boolean> {
+    return this.request
+      .getRequest<{ enabled: boolean }>('ai/status')
+      .pipe(map(res => !!res.data?.enabled));
+  }
+
   getQuota(): Observable<ChatQuota> {
     return this.request
       .getRequest<QuotaPayload>('ai/quota')

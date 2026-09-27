@@ -35,6 +35,7 @@ import { ConversationListComponent } from '../conversation-list/conversation-lis
 import { ChatMessageComponent } from '../chat-message/chat-message';
 import { CardComponent } from '../../../../shared/components/ui/card/card';
 import { CalloutComponent } from '../../../../shared/components/ui/callout/callout';
+import { AiAssistantStatusService } from '../../../../core/services/ai-assistant-status.service';
 
 /** General questions: the assistant cannot see the beekeeper's data. */
 const EXAMPLE_PROMPTS = [
@@ -57,6 +58,8 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
   private router     = inject(Router);
   private location   = inject(Location);
   private destroyRef = inject(DestroyRef);
+  /** Off (or not yet known): the composer locks and a callout says so. */
+  readonly assistant = inject(AiAssistantStatusService);
 
   // ── NgRx signals ────────────────────────────────────────────
   activeConversationId = this.store.selectSignal(selectActiveConversationId);
@@ -87,6 +90,7 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
   );
   characterCount = computed(() => this.inputMessage().length);
   canSend = computed(() =>
+    this.assistant.enabled() &&
     this.inputMessage().trim().length > 0 &&
     this.inputMessage().length <= 4000 &&
     !this.isSending() &&
@@ -166,6 +170,7 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
   }
 
   ngOnInit(): void {
+    this.assistant.load();
     this.store.dispatch(BeehivesActions.load());
     this.store.dispatch(ApiariesActions.load());
     this.store.dispatch(AiChatActions.loadQuota());

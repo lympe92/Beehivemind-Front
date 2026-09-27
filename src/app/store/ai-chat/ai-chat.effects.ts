@@ -4,6 +4,7 @@ import { catchError, filter, mergeMap, of, switchMap, takeUntil, takeWhile, time
 import { map } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AiChatService, quotaFromApi } from '../../core/services/ai-chat.service';
+import { AiAssistantStatusService } from '../../core/services/ai-assistant-status.service';
 import { AiChatActions } from './ai-chat.actions';
 import {
   AiMessage,
@@ -18,6 +19,7 @@ const GAVE_UP = 'The assistant is taking too long. Your message was saved — ch
 export class AiChatEffects {
   private actions$ = inject(Actions);
   private service  = inject(AiChatService);
+  private status   = inject(AiAssistantStatusService);
 
   loadConversations$ = createEffect(() =>
     this.actions$.pipe(
@@ -86,6 +88,9 @@ export class AiChatEffects {
             const quotaExceeded = err?.status === 429 && body?.meta?.code === 'quota_exceeded';
             const rawQuota = body?.meta?.quota as Parameters<typeof quotaFromApi>[0] | undefined;
 
+            // Switched off since the page loaded: the page locks itself.
+            if (err?.status === 503 && body?.meta?.code === 'assistant_unavailable') this.status.markUnavailable();
+
             return of(AiChatActions.sendMessageFailure({
               error:         body?.message ?? 'Something went wrong. Please try again.',
               quotaExceeded,
@@ -94,6 +99,17 @@ export class AiChatEffects {
           }),
         ),
       ),
+    ),
+  );
+
+  /**
+   * A failed reply is not charged (the API counts answered messages), so the
+   * line under the composer goes back up.
+   */
+  refundFailed$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AiChatActions.replyFailed),
+      map(() => AiChatActions.loadQuota()),
     ),
   );
 

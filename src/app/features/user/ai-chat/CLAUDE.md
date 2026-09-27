@@ -25,7 +25,8 @@ diagnosis in front of the model for that conversation.
 ## State & Data
 - **Service/Models:** `core/services/ai-chat.service.ts`, `core/models/ai-chat.model.ts` (camelCase; `AiMessage.status` is `pending | done | failed`).
 - **Sending is asynchronous.** `sendMessage` answers 202 with the stored question and a *pending* reply; the `pollReply$` effect polls `GET ai/messages/{id}` every 2.5 s for up to 3 minutes until it is `done` (`replyReceived`) or `failed` (`replyFailed`, with the API's `error` text). The thinking row shows while `sending`; the pending reply itself is hidden. Reopening a conversation with a pending reply resumes the poll.
-- **The allowance.** `loadQuota` on init and the quota on every send: free plans see "n of 10 free messages left this month" under the composer; at 0 (or a 429 `quota_exceeded`) the composer locks and a warning callout links to `/pricing`. Paid plans show nothing.
+- **The switch.** `AiAssistantStatusService` (`core/services/`, root) holds `GET ai/status` → `enabled`; the user layout asks once per session. Off or unknown: no sidebar link, no "Ask the assistant" in the diagnosis dialog, and here the composer locks under a "not available yet" callout while past conversations stay readable. A 503 `assistant_unavailable` on a send (switched off meanwhile) marks it off without another request.
+- **The allowance.** `loadQuota` on init and the quota on every send: free plans see "n of 10 free messages left this month" under the composer; at 0 (or a 429 `quota_exceeded`) the composer locks and a warning callout links to `/pricing`. Paid plans show nothing. The API counts answered messages, so `replyFailed` reloads the quota and the line goes back up.
 - The chat POST carries `inlineErrors()`, so the global interceptor does not toast: the page renders the failure (callout) itself.
 - The slice resets on `logoutSuccess` / `accountDeleted` / `accountRemoved` / `sessionCleared` — conversations are the user's.
 

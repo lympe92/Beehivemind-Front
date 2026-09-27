@@ -7,6 +7,7 @@ import { MODAL_DATA } from '../../../../../core/modal/modal.types';
 import { selectAllBeehives } from '../../../../../store/beehives/beehives.selectors';
 import { selectAllApiaries } from '../../../../../store/apiaries/apiaries.selectors';
 import { DiagnosisService } from '../../../../../core/services/diagnosis.service';
+import { AiAssistantStatusService } from '../../../../../core/services/ai-assistant-status.service';
 import {
   ActionUrgency,
   Diagnosis,
@@ -45,6 +46,8 @@ export class DiagnosisModalComponent implements OnInit {
   private service   = inject(DiagnosisService);
   private toast     = inject(ToastService);
   readonly data     = inject<DiagnosisModalData>(MODAL_DATA);
+  /** "Ask the assistant" only where the API takes messages. */
+  readonly assistant = inject(AiAssistantStatusService);
 
   private beehives = this.store.selectSignal(selectAllBeehives);
   private apiaries = this.store.selectSignal(selectAllApiaries);
@@ -72,6 +75,8 @@ export class DiagnosisModalComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.assistant.load();
+
     const request = this.data.recordId
       ? this.service.getRecord(this.data.recordId)
       : this.service.getBeehive(this.data.beehiveId ?? 0);

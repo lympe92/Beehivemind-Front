@@ -3,7 +3,7 @@
     <thead>
       <tr>
         @for (col of columns; track col.key) {
-          <th [style.width]="col.width || null">{{ col.label }}</th>
+          <th [style.width]="col.width || null" [class]="col.className ?? ''">{{ col.label }}</th>
         }
         @if (actionsTpl && showActions) {
           <th class="dt__th--actions"></th>
@@ -24,7 +24,7 @@
             [class.dt__row--clickable]="clickableRows"
             (click)="clickableRows && rowClick.emit(row)">
             @for (col of columns; track col.key) {
-              <td>
+              <td [class]="col.className ?? ''">
                 @if (cellTpl) {
                   <ng-container
                     [ngTemplateOutlet]="cellTpl"

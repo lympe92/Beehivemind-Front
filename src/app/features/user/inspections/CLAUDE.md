@@ -10,6 +10,7 @@ Record hive inspections (επιθεωρήσεις): population, frames, brood, h
 
 ## State & Data
 - **Store:** `inspections` (`selectAllInspections`, `selectInspectionsLoading`) + `apiaries` + `beehives`. `ngOnInit` dispatches `load()` for all three.
+- **The table:** client-side pages of 25 over the filtered list (`pagedInspections`, `tablePagination`; a filter change goes back to page 1). Sixteen readings do not fit a laptop, so the eight after Queen carry `className: 'dt__col--wide'` and hide below 1800 px — the Status badge reads them, and Edit has them all.
 - **Service:** `core/services/inspection.service.ts` — `createInspection / updateInspection / deleteInspection` + analytics endpoints (`getInspectionsOfApiary`, `getAvgInspectionsOf*` used by dashboard/apiary-view). **Model:** `inspection.model.ts`.
 
 ## The "records" pattern (shared by Feeding & Harvest)

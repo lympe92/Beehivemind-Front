@@ -15,8 +15,10 @@
 
     <app-data-table
       [columns]="columns"
-      [rows]="inspections()"
+      [rows]="pagedInspections()"
       [loading]="loading()"
+      [pagination]="tablePagination()"
+      (pageChange)="goToPage($event)"
       [showActions]="true"
       emptyMessage="No inspection records found.">
 

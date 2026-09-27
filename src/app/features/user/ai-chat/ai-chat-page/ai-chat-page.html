@@ -44,11 +44,13 @@
               <p class="ai-chat__empty-sub">
                 General questions only — I cannot see your hives. Open the chat from a hive's diagnosis to ask about that hive.
               </p>
-              <div class="ai-chat__prompts">
-                @for (prompt of examplePrompts; track prompt) {
-                  <button type="button" class="app-btn app-btn--ghost" (click)="tryPrompt(prompt)">{{ prompt }}</button>
-                }
-              </div>
+              @if (assistant.enabled()) {
+                <div class="ai-chat__prompts">
+                  @for (prompt of examplePrompts; track prompt) {
+                    <button type="button" class="app-btn app-btn--ghost" (click)="tryPrompt(prompt)">{{ prompt }}</button>
+                  }
+                </div>
+              }
             </div>
           }
 
@@ -66,7 +68,11 @@
           }
         </div>
 
-        @if (quotaExceeded()) {
+        @if (assistant.state() === false) {
+          <app-callout tone="warning" title="The assistant is not available yet">
+            You can read your past conversations. Sending will open when the assistant comes online.
+          </app-callout>
+        } @else if (quotaExceeded()) {
           <app-callout tone="warning" title="You've used your free messages for this month">
             Free accounts get {{ quota()?.limit ?? 10 }} messages a month. <a routerLink="/pricing">Upgrade to Pro</a> for unlimited conversations, or come back next month.
           </app-callout>
@@ -80,7 +86,7 @@
             class="app-input ai-chat__textarea"
             (input)="onInput($event)"
             (keydown)="onKeydown($event)"
-            [disabled]="isSending() || quotaExceeded()"
+            [disabled]="isSending() || quotaExceeded() || !assistant.enabled()"
             aria-label="Message"
             placeholder="Ask a beekeeping question…"
             title="Enter sends, Shift+Enter adds a line"

@@ -353,6 +353,7 @@ export function mock(method, path) {
   if (route === 'weather') return ok(WEATHER);
   if (route === 'ai/conversations') return ok(CONVERSATIONS);
   if (/^ai\/conversations\/\d+$/.test(route)) return ok(CONVERSATION_1);
+  if (route === 'ai/status') return ok({ enabled: true });
   if (route === 'ai/quota') return ok(AI_QUOTA);
   if (route === 'ai/chat') return { status: 202, body: ok({ conversation_id: 1, message: { ...CONVERSATION_1.messages[0], id: 9 }, reply: { ...AI_REPLY, id: 10, status: 'pending', content: '' }, quota: AI_QUOTA }) };
   if (/^ai\/messages\/\d+$/.test(route)) return ok(AI_REPLY);

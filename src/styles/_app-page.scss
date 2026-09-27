@@ -117,3 +117,14 @@
 .app-tile--action + .app-tile--action {
   margin-top: 10px;
 }
+
+/* A wide table's tail. The inspections table has sixteen readings in a row
+   and was 1618 px wide inside a 974 px wrapper at 1280: everything after
+   Honey sat behind a horizontal scroll. Below 1800 px the columns marked
+   `dt__col--wide` are hidden; the Status badge already sums up what they
+   say, and the edit dialog has every field. */
+@media (max-width: 1799px) {
+  .dt__table .dt__col--wide {
+    display: none;
+  }
+}

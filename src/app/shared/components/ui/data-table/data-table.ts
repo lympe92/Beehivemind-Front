@@ -8,6 +8,8 @@ export interface ColumnDef {
   key: string;
   label: string;
   width?: string;
+  /** Put on the column's th and td — e.g. `dt__col--wide` hides it below 1800 px. */
+  className?: string;
 }
 
 export interface TablePagination {

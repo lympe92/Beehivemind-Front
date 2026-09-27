@@ -11,7 +11,7 @@ import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
 import { InspectionsActions } from '../../../store/inspections/inspections.actions';
 import { selectAllInspections, selectInspectionsLoading } from '../../../store/inspections/inspections.selectors';
-import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
+import { ColumnDef, DataTableComponent, TablePagination } from '../../../shared/components/ui/data-table/data-table';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
@@ -68,18 +68,24 @@ export class InspectionsComponent implements OnInit {
     { key: 'diagnosis', label: 'Status' },
     { key: 'frame_space', label: 'Frames' },
     { key: 'population', label: 'Pop.' },
-    { key: 'pollen', label: 'Pollen' },
     { key: 'honey', label: 'Honey' },
-    { key: 'opened_brood', label: 'Eggs' },
-    { key: 'closed_brood', label: 'Closed' },
     { key: 'varroa', label: 'Varroa' },
-    { key: 'american_foulbrood', label: 'AFB' },
-    { key: 'european_foulbrood', label: 'EFB' },
-    { key: 'nosema', label: 'Nosema' },
     { key: 'queen_exists', label: 'Queen' },
-    { key: 'queen_cells', label: 'Q. cells' },
-    { key: 'queen_year', label: 'Q. year' },
+    // The tail: below 1800 px it hides (`dt__col--wide`, styles/_app-page.scss).
+    // The Status badge is the rules' reading of these, and Edit has them all.
+    { key: 'pollen', label: 'Pollen', className: 'dt__col--wide' },
+    { key: 'opened_brood', label: 'Eggs', className: 'dt__col--wide' },
+    { key: 'closed_brood', label: 'Closed', className: 'dt__col--wide' },
+    { key: 'american_foulbrood', label: 'AFB', className: 'dt__col--wide' },
+    { key: 'european_foulbrood', label: 'EFB', className: 'dt__col--wide' },
+    { key: 'nosema', label: 'Nosema', className: 'dt__col--wide' },
+    { key: 'queen_cells', label: 'Q. cells', className: 'dt__col--wide' },
+    { key: 'queen_year', label: 'Q. year', className: 'dt__col--wide' },
   ];
+
+  /** Client-side pages over the filtered list; the store holds the year. */
+  page = signal(1);
+  readonly perPage = 25;
 
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);
@@ -106,6 +112,21 @@ export class InspectionsComponent implements OnInit {
     }
     return all;
   });
+
+  pagedInspections = computed(() => {
+    const start = (this.page() - 1) * this.perPage;
+    return this.inspections().slice(start, start + this.perPage);
+  });
+
+  tablePagination = computed<TablePagination | null>(() => {
+    const total = this.inspections().length;
+    const totalPages = Math.ceil(total / this.perPage) || 1;
+    return totalPages > 1 ? { page: Math.min(this.page(), totalPages), totalPages, total } : null;
+  });
+
+  goToPage(page: number): void {
+    this.page.set(page);
+  }
 
   selectedApiaryId = signal<number>(0);
   selectedBeehiveId = signal<number>(0);
@@ -155,10 +176,12 @@ export class InspectionsComponent implements OnInit {
   onApiaryChange(apiaryId: number): void {
     this.selectedApiaryId.set(apiaryId);
     this.selectedBeehiveId.set(0);
+    this.page.set(1);
   }
 
   onBeehiveChange(beehiveId: number): void {
     this.selectedBeehiveId.set(beehiveId);
+    this.page.set(1);
   }
 
   // ── Export ───────────────────────────────────────────────

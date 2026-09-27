@@ -230,7 +230,10 @@ the inspection's date under it — the same from every entry point, so callers
 pass no title); the badge `shared/components/ui/diagnosis-badge/`. Its
 **Ask the assistant** opens the chat with that hive's data in front of the
 model (`/user/ai-chat?beehive=ID`): the chat explains a diagnosis, it never
-produces one. See [`features/user/ai-chat/CLAUDE.md`](src/app/features/user/ai-chat/CLAUDE.md).
+produces one. The button, the sidebar link and the chat's composer exist only
+where the API takes messages: `AiAssistantStatusService` asks `GET ai/status`
+once per session (the API's `AI_CHAT_ENABLED`, off until Ollama and a worker
+run on the server), and unknown counts as off. See [`features/user/ai-chat/CLAUDE.md`](src/app/features/user/ai-chat/CLAUDE.md).
 
 ## Domain Glossary
 
@@ -589,7 +592,7 @@ Generic, presentational table used across nearly every list/CRUD feature. Render
 `src/app/shared/components/ui/data-table/data-table.ts` — `DataTableComponent<T>`, plus the exported `ColumnDef` and `TablePagination` interfaces (imported directly by feature components).
 
 ```ts
-export interface ColumnDef { key: string; label: string; width?: string; }
+export interface ColumnDef { key: string; label: string; width?: string; className?: string; }
 export interface TablePagination { page: number; totalPages: number; total: number; }
 ```
 
@@ -636,7 +639,9 @@ export interface TablePagination { page: number; totalPages: number; total: numb
 ### Content templates
 `#cellTpl`, `#editRowTpl`, `#actionsTpl` — projected via `@ContentChild`. Uses `ViewEncapsulation.None` (styles are global).
 
-> Pagination can be **client-side** (parent `computed` slices `rows` — see `apiary.ts`) or **server-side** (parent refetches on `pageChange` — see `admin/raw-data`).
+> Pagination can be **client-side** (parent `computed` slices `rows` — see `apiary.ts`, `inspections.ts`) or **server-side** (parent refetches on `pageChange` — see `admin/raw-data`).
+
+> `className` lands on the column's `th` and `td`. The one helper is `dt__col--wide` (`_app-page.scss`): hidden below 1800 px, for a wide table's tail — the inspections table's eight readings after Queen. The reading is still in the Status badge and the edit dialog.
 
 ---
 

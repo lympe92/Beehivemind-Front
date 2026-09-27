@@ -109,7 +109,7 @@
 
   <ng-template #footer>
     <button class="app-btn app-btn--ghost" type="button" (click)="close()">Close</button>
-    @if (diagnosis()) {
+    @if (diagnosis() && assistant.enabled()) {
       <button class="app-btn app-btn--primary" type="button" (click)="askAssistant()">Ask the assistant</button>
     }
   </ng-template>
