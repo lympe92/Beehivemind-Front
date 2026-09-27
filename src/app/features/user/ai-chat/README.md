@@ -33,7 +33,7 @@ Types:       `src/app/core/models/ai-chat.model.ts`
 3. Log in and navigate to `/user/ai-chat`.
 4. Type a question and press **Enter** (or click Send).
 5. The question appears at once; the reply is polled and appears when the model is done (up to a minute).
-6. After the first reply the URL updates to `/user/ai-chat/{id}` so you can refresh and keep your conversation. Opened from a hive, the "About Hive …" chip stays on the conversation; only "Ask without it" goes.
+6. After the first reply the URL updates to `/user/ai-chat/{id}` so you can refresh and keep your conversation. Opened from a hive, the "About Beehive …" chip stays on the conversation; only "Ask without it" goes.
 7. Past conversations appear in the left sidebar. Click one to reload its history.
 8. Hover a conversation item and click **×** to delete it (confirm dialog).
 9. On a free account the line under the composer counts down from 10 a month; at 0 the composer locks with an upgrade callout.

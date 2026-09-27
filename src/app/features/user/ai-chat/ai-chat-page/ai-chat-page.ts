@@ -100,7 +100,7 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
     if (id === null) return null;
     const hive   = this.beehives().find(b => b.id === id);
     const apiary = hive ? this.apiaries().find(a => a.id === hive.apiaryId) : null;
-    const name   = hive ? `Hive ${hive.name}` : `Hive #${id}`;
+    const name   = hive ? `Beehive ${hive.name}` : `Beehive #${id}`;
     return apiary ? `${name} · ${apiary.name}` : name;
   });
 
