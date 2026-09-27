@@ -31,8 +31,11 @@ diagnosis in front of the model for that conversation.
 
 ## Patterns / gotchas
 - **Optimistic send:** the question appears at once with a negative id and is replaced by the stored one on success. The input is restored only when the *send* failed, not when the reply did (the question is already saved).
-- **URL sync without reload:** after the first message of a new conversation an `effect` calls `location.replaceState('/user/ai-chat/:id')` and drops the context chip — the API keeps the hive on the conversation from then on.
-- **Context chip:** "About Hive 12 · North Field" from the `beehives` and `apiaries` slices; "Ask without it" clears the query param before the first message.
+- **URL sync without reload:** after the first message of a new conversation an `effect` calls `location.replaceState('/user/ai-chat/:id')`. The router still holds `/user/ai-chat`, so **"+ New chat" resets the page itself** (`startNew()`: `clearActive`, no hive) before navigating — a navigation to the same URL changes no param and the route subscription would never fire.
+- **The conversation from the send:** `sendMessageSuccess` carries the hive the question was sent with, and the reducer builds `activeConversation` from it when none was loaded (the list refresh brings the stored title). That is what keeps the chip and the header after the first reply without a second request.
+- **Context chip:** "About Hive 12 · North Field" from the `beehives` and `apiaries` slices — from `?beehive=` before the first message (with "Ask without it", which clears the query param), from the conversation's `beehiveId` after it.
+- **Composer:** the textarea is not `[value]`-bound; an `effect` writes the signal into the element when they differ. The one-way binding left the sent text in the disabled box when Angular saw no change.
+- **Renderer:** `chat-message.ts` `formatContent()` (exported, `chat-message.spec.ts`) reads lists line by line (`-`/`*` bullets → `<ul>`, `1.` → `<ol>`) before the inline pass, so a `* item` is never the start of an italic run; paragraphs split on blank lines.
 - `visibleMessages` filters to `user`/`assistant` with status other than `pending`. Send disabled when empty, > 4000 chars, sending, or the allowance is spent.
 
 ## Related

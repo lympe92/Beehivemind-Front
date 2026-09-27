@@ -146,11 +146,7 @@ export class InspectionsComponent implements OnInit {
     await this.modal.open(DiagnosisModalComponent, {
       type: 'center',
       width: '640px',
-      data: {
-        recordId: row.id,
-        title: `Beehive ${this.beehiveName(row.beehiveId)}`,
-        subtitle: `Inspection of ${row.date}`,
-      },
+      data: { recordId: row.id, beehiveId: row.beehiveId },
     });
   }
 

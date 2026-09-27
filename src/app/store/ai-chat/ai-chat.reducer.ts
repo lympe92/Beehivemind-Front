@@ -10,9 +10,21 @@ export const aiChatReducer = createReducer(
   on(AiChatActions.loadConversations, state => ({
     ...state, conversationsLoading: true, conversationsError: null,
   })),
-  on(AiChatActions.loadConversationsSuccess, (state, { conversations }) => ({
-    ...state, conversations, conversationsLoading: false, conversationsLoaded: true, conversationsError: null,
-  })),
+  on(AiChatActions.loadConversationsSuccess, (state, { conversations }) => {
+    // A conversation started on this page was built from the send; the list
+    // brings its stored title.
+    const listed = conversations.find(c => c.id === state.activeConversation?.id);
+    return {
+      ...state,
+      conversations,
+      conversationsLoading: false,
+      conversationsLoaded:  true,
+      conversationsError:   null,
+      activeConversation:   listed && state.activeConversation
+        ? { ...state.activeConversation, ...listed, beehiveId: state.activeConversation.beehiveId ?? listed.beehiveId }
+        : state.activeConversation,
+    };
+  }),
   on(AiChatActions.loadConversationsFailure, (state, { error }) => ({
     ...state, conversationsLoading: false, conversationsError: error,
   })),
@@ -53,7 +65,7 @@ export const aiChatReducer = createReducer(
     sendError: null,
     messages:  [...state.messages, optimisticMessage],
   })),
-  on(AiChatActions.sendMessageSuccess, (state, { conversationId, message, reply, quota }) => ({
+  on(AiChatActions.sendMessageSuccess, (state, { conversationId, beehiveId, message, reply, quota }) => ({
     ...state,
     // The stored question replaces the optimistic one (negative id); the
     // pending reply is not shown until it is done — the thinking row is.
@@ -62,9 +74,19 @@ export const aiChatReducer = createReducer(
     quota,
     quotaExceeded:        quota.remaining === 0,
     activeConversationId: conversationId,
+    // The first message of a new conversation creates it: the page then
+    // shows it (and the hive it is about) like one it loaded, without a
+    // second request. The list refresh brings the stored title.
     activeConversation:   state.activeConversation
-      ? { ...state.activeConversation, id: conversationId }
-      : null,
+      ? { ...state.activeConversation, id: conversationId, lastMessageAt: message.createdAt }
+      : {
+          id:            conversationId,
+          beehiveId,
+          title:         message.content.trim().slice(0, 60),
+          status:        'active',
+          lastMessageAt: message.createdAt,
+          createdAt:     message.createdAt,
+        },
   })),
   on(AiChatActions.sendMessageFailure, (state, { error, quotaExceeded, quota }) => ({
     ...state,

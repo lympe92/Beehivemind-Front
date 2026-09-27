@@ -83,8 +83,9 @@ export interface Diagnosis extends DiagnosisSubject {
   feedback: { value: 'helpful' | 'not_helpful' | 'incorrect'; text: string | null } | null;
 }
 
-/** A hive of an apiary with its current diagnosis, or none yet. */
+/** A hive of an apiary with its current diagnosis, or none yet. `id` is the hive's, for the table. */
 export interface HiveDiagnosis {
+  id: number;
   beehiveId: number;
   beehiveNumber: number | null;
   diagnosis: DiagnosisSummary | null;

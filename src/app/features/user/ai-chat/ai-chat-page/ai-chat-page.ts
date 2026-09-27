@@ -74,10 +74,10 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
   inputMessage = signal('');
 
   /**
-   * The hive whose data the assistant is given — from `?beehive=` when the
-   * chat is opened from a diagnosis, or from the conversation once it has
-   * one. Sent with the first message of a new conversation only; the API
-   * keeps it on the conversation after that.
+   * The hive whose data the assistant is given, from `?beehive=` when the
+   * chat is opened from a diagnosis. Sent with the first message of a new
+   * conversation only; the API keeps it on the conversation after that, and
+   * the chip reads it from the conversation from then on.
    */
   contextBeehiveId = signal<number | null>(null);
 
@@ -137,7 +137,8 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
     });
 
     // After the first message of a new conversation: update the URL without
-    // re-triggering the route load, and drop the query string with it.
+    // re-triggering the route load, and drop the query string with it. The
+    // hive stays visible through the conversation the store built from the send.
     effect(() => {
       const id = this.activeConversationId();
       if (id && this.isNewMode) {
@@ -145,6 +146,15 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
         this.isNewMode = false;
         this.contextBeehiveId.set(null);
       }
+    });
+
+    // The textarea follows the signal. A one-way [value] binding only writes
+    // the DOM when Angular sees the value change, and after a send the sent
+    // text sometimes stayed in the box while it was disabled.
+    effect(() => {
+      const value = this.inputMessage();
+      const el = this.composer()?.nativeElement;
+      if (el && el.value !== value) el.value = value;
     });
 
     // Queue scroll to bottom whenever visible messages change
@@ -169,12 +179,17 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
           this.contextBeehiveId.set(null);
           this.store.dispatch(AiChatActions.loadConversation({ id: Number(id) }));
         } else {
-          this.isNewMode = true;
           const beehive = Number(this.route.snapshot.queryParamMap.get('beehive'));
-          this.contextBeehiveId.set(beehive > 0 ? beehive : null);
-          this.store.dispatch(AiChatActions.clearActive());
+          this.startNew(beehive > 0 ? beehive : null);
         }
       });
+  }
+
+  /** An empty thread, about one hive or none. */
+  private startNew(beehiveId: number | null): void {
+    this.isNewMode = true;
+    this.contextBeehiveId.set(beehiveId);
+    this.store.dispatch(AiChatActions.clearActive());
   }
 
   ngAfterViewChecked(): void {
@@ -187,8 +202,14 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
 
   // ── Actions ──────────────────────────────────────────────────
 
+  /**
+   * Reset here, not through the route: after the first message the URL was
+   * swapped with replaceState, so the router still holds `/user/ai-chat`
+   * and a navigation to it changes no param — the route subscription would
+   * never fire, and the next question would go to the old conversation.
+   */
   newConversation(): void {
-    this.isNewMode = true;
+    this.startNew(null);
     this.router.navigate(['/user/ai-chat']);
   }
 

@@ -74,7 +74,10 @@ export class AiChatEffects {
       switchMap(({ payload }) =>
         this.service.sendMessage(payload).pipe(
           mergeMap(({ conversationId, message, reply, quota }) => [
-            AiChatActions.sendMessageSuccess({ conversationId, message, reply, quota }),
+            AiChatActions.sendMessageSuccess({
+              conversationId, message, reply, quota,
+              beehiveId: payload.beehive_id ?? null,
+            }),
             // The list shows the new conversation's title.
             AiChatActions.loadConversations(),
           ]),

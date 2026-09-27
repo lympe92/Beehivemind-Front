@@ -1,11 +1,37 @@
 // The bubble is `.app-msg__bubble` from the app layer. Only the inline
-// formatting the assistant emits, and the timestamp, are the message's own.
+// formatting the assistant emits — paragraphs, lists, code — and the
+// timestamp are the message's own.
 :host {
   display: contents;
 }
 
 .msg__content {
   overflow-wrap: anywhere;
+
+  p,
+  ul,
+  ol {
+    margin: 0;
+  }
+
+  p + p,
+  p + ul,
+  p + ol,
+  ul + p,
+  ol + p,
+  ul + ol,
+  ol + ul {
+    margin-top: 0.6em;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.4em;
+  }
+
+  li + li {
+    margin-top: 0.2em;
+  }
 
   code {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;

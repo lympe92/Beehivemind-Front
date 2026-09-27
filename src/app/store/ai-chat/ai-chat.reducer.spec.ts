@@ -22,7 +22,7 @@ describe('aiChatReducer', () => {
     expect(state.messages.map(m => m.id)).toEqual([-1]);
 
     state = aiChatReducer(state, AiChatActions.sendMessageSuccess({
-      conversationId: 1, message: msg(5, 'user', 'done', 'Hi'), reply: msg(6, 'assistant', 'pending', ''), quota: quota(9),
+      conversationId: 1, beehiveId: null, message: msg(5, 'user', 'done', 'Hi'), reply: msg(6, 'assistant', 'pending', ''), quota: quota(9),
     }));
     expect(state.sending).toBe(true);
     expect(state.pendingReplyId).toBe(6);
@@ -37,7 +37,7 @@ describe('aiChatReducer', () => {
 
   it('keeps the question and reports the error when the reply fails', () => {
     let state = aiChatReducer(initialAiChatState, AiChatActions.sendMessageSuccess({
-      conversationId: 1, message: msg(5, 'user'), reply: msg(6, 'assistant', 'pending', ''), quota: quota(9),
+      conversationId: 1, beehiveId: null, message: msg(5, 'user'), reply: msg(6, 'assistant', 'pending', ''), quota: quota(9),
     }));
     state = aiChatReducer(state, AiChatActions.replyFailed({ replyId: 6, error: 'Ollama is down.' }));
 
@@ -48,7 +48,7 @@ describe('aiChatReducer', () => {
 
   it('locks the composer when the allowance is spent, from the send or from a 429', () => {
     let state = aiChatReducer(initialAiChatState, AiChatActions.sendMessageSuccess({
-      conversationId: 1, message: msg(5, 'user'), reply: msg(6, 'assistant', 'pending', ''), quota: quota(0),
+      conversationId: 1, beehiveId: null, message: msg(5, 'user'), reply: msg(6, 'assistant', 'pending', ''), quota: quota(0),
     }));
     expect(state.quotaExceeded).toBe(true);
 
@@ -61,6 +61,26 @@ describe('aiChatReducer', () => {
 
     state = aiChatReducer(initialAiChatState, AiChatActions.loadQuotaSuccess({ quota: quota(null, null) }));
     expect(state.quotaExceeded).toBe(false);
+  });
+
+  it('builds the conversation from the first send, hive included, and takes its title from the list', () => {
+    let state = aiChatReducer(initialAiChatState, AiChatActions.sendMessageSuccess({
+      conversationId: 7, beehiveId: 12, message: msg(5, 'user', 'done', 'Syrup or fondant?'), reply: msg(6, 'assistant', 'pending', ''), quota: quota(9),
+    }));
+    expect(state.activeConversation?.id).toBe(7);
+    expect(state.activeConversation?.beehiveId).toBe(12);
+    expect(state.activeConversation?.title).toBe('Syrup or fondant?');
+
+    state = aiChatReducer(state, AiChatActions.loadConversationsSuccess({
+      conversations: [{ id: 7, beehiveId: 12, title: 'Syrup or fondant', status: 'active', lastMessageAt: 'l', createdAt: 'c' }],
+    }));
+    expect(state.activeConversation?.title).toBe('Syrup or fondant');
+
+    // A later message in the same conversation keeps it.
+    state = aiChatReducer(state, AiChatActions.sendMessageSuccess({
+      conversationId: 7, beehiveId: null, message: msg(8, 'user'), reply: msg(9, 'assistant', 'pending', ''), quota: quota(8),
+    }));
+    expect(state.activeConversation?.beehiveId).toBe(12);
   });
 
   it('resumes polling a reply that was still pending when the conversation is reopened', () => {

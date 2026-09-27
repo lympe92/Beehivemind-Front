@@ -109,6 +109,7 @@ export class DiagnosisService {
       map(res => ({
         ...res,
         data: (res.data ?? []).map(h => ({
+          id:            h.beehive.id,
           beehiveId:     h.beehive.id,
           beehiveNumber: h.beehive.number,
           diagnosis:     h.diagnosis ? summaryFromApi(h.diagnosis) : null,

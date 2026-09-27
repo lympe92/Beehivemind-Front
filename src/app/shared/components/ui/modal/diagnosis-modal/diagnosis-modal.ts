@@ -1,8 +1,11 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { DatePipe, formatDate } from '@angular/common';
 import { DialogRef } from '@angular/cdk/dialog';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { MODAL_DATA } from '../../../../../core/modal/modal.types';
+import { selectAllBeehives } from '../../../../../store/beehives/beehives.selectors';
+import { selectAllApiaries } from '../../../../../store/apiaries/apiaries.selectors';
 import { DiagnosisService } from '../../../../../core/services/diagnosis.service';
 import {
   ActionUrgency,
@@ -16,15 +19,16 @@ import { ToastService } from '../../toast/toast.service';
 
 /**
  * Open it for an inspection (`recordId`) or for a hive's current diagnosis
- * (`beehiveId`); `title` and `subtitle` name the hive for the header while
- * the diagnosis loads. Closes with nothing — it is read-only apart from the
- * beekeeper's "helpful / not helpful" on it.
+ * (`beehiveId`). The header is the same from every entry point — "Beehive 12
+ * · North Field", the inspection's date under it — named by the dialog
+ * itself from the stores and the diagnosis, so callers pass no title; a
+ * `beehiveId` beside a `recordId` only names the hive while it loads. Closes
+ * with nothing — it is read-only apart from the beekeeper's "helpful / not
+ * helpful" on it.
  */
 export interface DiagnosisModalData {
   recordId?: number;
   beehiveId?: number;
-  title?: string;
-  subtitle?: string;
 }
 
 @Component({
@@ -37,14 +41,35 @@ export interface DiagnosisModalData {
 export class DiagnosisModalComponent implements OnInit {
   private dialogRef = inject(DialogRef);
   private router    = inject(Router);
+  private store     = inject(Store);
   private service   = inject(DiagnosisService);
   private toast     = inject(ToastService);
   readonly data     = inject<DiagnosisModalData>(MODAL_DATA);
+
+  private beehives = this.store.selectSignal(selectAllBeehives);
+  private apiaries = this.store.selectSignal(selectAllApiaries);
 
   diagnosis = signal<Diagnosis | null>(null);
   loading   = signal(true);
   missing   = signal(false);
   sendingFeedback = signal(false);
+
+  /** "Beehive 12 · North Field": the hive's name from the store, else the diagnosis' number. */
+  readonly title = computed(() => {
+    const d  = this.diagnosis();
+    const id = this.data.beehiveId ?? d?.beehiveId ?? null;
+    if (id === null) return 'Diagnosis';
+    const hive   = this.beehives().find(b => b.id === id);
+    const apiary = hive ? this.apiaries().find(a => a.id === hive.apiaryId)?.name ?? d?.apiaryName : d?.apiaryName;
+    const name   = hive?.name ?? (d?.beehiveNumber !== null && d?.beehiveNumber !== undefined ? String(d.beehiveNumber) : `#${id}`);
+    const label  = /^(bee)?hive\b/i.test(name) ? name : `Beehive ${name}`;
+    return apiary ? `${label} · ${apiary}` : label;
+  });
+
+  readonly subtitle = computed(() => {
+    const date = this.diagnosis()?.date;
+    return date ? `Inspection of ${formatDate(date, 'mediumDate', 'en-US')}` : '';
+  });
 
   ngOnInit(): void {
     const request = this.data.recordId
@@ -62,14 +87,6 @@ export class DiagnosisModalComponent implements OnInit {
         this.loading.set(false);
       },
     });
-  }
-
-  title(): string {
-    const d = this.diagnosis();
-    if (this.data.title) return this.data.title;
-    if (!d) return 'Diagnosis';
-    const hive = d.beehiveNumber !== null ? `Hive ${d.beehiveNumber}` : `Hive #${d.beehiveId}`;
-    return d.apiaryName ? `${hive} · ${d.apiaryName}` : hive;
   }
 
   severityClass(severity: RiskSeverity): string {

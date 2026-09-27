@@ -120,10 +120,7 @@ export class UserDashboardComponent implements OnInit {
     await this.modal.open(DiagnosisModalComponent, {
       type: 'center',
       width: '640px',
-      data: {
-        beehiveId: d.beehiveId,
-        title: d.apiaryName ? `${this.hiveLabel(d)} · ${d.apiaryName}` : this.hiveLabel(d),
-      },
+      data: { beehiveId: d.beehiveId },
     });
   }
 

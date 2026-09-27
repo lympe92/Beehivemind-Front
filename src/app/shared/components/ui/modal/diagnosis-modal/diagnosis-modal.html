@@ -1,4 +1,4 @@
-<app-modal-shell [title]="title()" [subtitle]="data.subtitle ?? ''" (close)="close()">
+<app-modal-shell [title]="title()" [subtitle]="subtitle()" (close)="close()">
 
   @if (loading()) {
     <div class="app-state">Reading the inspection…</div>

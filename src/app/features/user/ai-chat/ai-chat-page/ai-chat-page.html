@@ -78,7 +78,6 @@
           <textarea
             #composer
             class="app-input ai-chat__textarea"
-            [value]="inputMessage()"
             (input)="onInput($event)"
             (keydown)="onKeydown($event)"
             [disabled]="isSending() || quotaExceeded()"

@@ -111,10 +111,7 @@ export class ApiaryViewComponent implements OnInit {
     await this.modal.open(DiagnosisModalComponent, {
       type: 'center',
       width: '640px',
-      data: {
-        beehiveId: hive.beehiveId,
-        title: `Beehive ${this.beehiveName(hive.beehiveId)} · ${this.apiary()?.name ?? ''}`,
-      },
+      data: { beehiveId: hive.beehiveId },
     });
   }
 

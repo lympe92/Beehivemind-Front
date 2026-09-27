@@ -225,7 +225,9 @@ dashboard (every serious hive, not a top few), and the bell — the morning run
 writes one `hive_attention` notification per serious hive (`entity_type:
 beehive`), and clicking it opens the hive's diagnosis. The dialog is
 `shared/components/ui/modal/diagnosis-modal/` (`{ recordId }` or
-`{ beehiveId }`); the badge `shared/components/ui/diagnosis-badge/`. Its
+`{ beehiveId }`; it names the hive itself — "Beehive 12 · North Field",
+the inspection's date under it — the same from every entry point, so callers
+pass no title); the badge `shared/components/ui/diagnosis-badge/`. Its
 **Ask the assistant** opens the chat with that hive's data in front of the
 model (`/user/ai-chat?beehive=ID`): the chat explains a diagnosis, it never
 produces one. See [`features/user/ai-chat/CLAUDE.md`](src/app/features/user/ai-chat/CLAUDE.md).

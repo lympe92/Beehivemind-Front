@@ -77,7 +77,7 @@ export class NotificationBellComponent implements OnInit {
       await this.modal.open(DiagnosisModalComponent, {
         type: 'center',
         width: '640px',
-        data: { beehiveId: notification.entityId, title: notification.title },
+        data: { beehiveId: notification.entityId },
       });
     }
   }
