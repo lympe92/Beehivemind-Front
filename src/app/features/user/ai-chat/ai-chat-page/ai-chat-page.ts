@@ -85,8 +85,11 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
   contextBeehiveId = signal<number | null>(null);
 
   // ── Computed ─────────────────────────────────────────────────
+  // A pending reply shows as the thinking row; a failed one is not shown
+  // at all (the moment it fails the callout says so, and after a reload an
+  // empty bubble would say nothing). The question it answered stays.
   visibleMessages = computed(() =>
-    this.allMessages().filter(m => (m.role === 'user' || m.role === 'assistant') && m.status !== 'pending')
+    this.allMessages().filter(m => (m.role === 'user' || m.role === 'assistant') && m.status === 'done')
   );
   characterCount = computed(() => this.inputMessage().length);
   canSend = computed(() =>

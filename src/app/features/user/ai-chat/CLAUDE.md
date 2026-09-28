@@ -37,7 +37,7 @@ diagnosis in front of the model for that conversation.
 - **Context chip:** "About Beehive 12 · North Field" from the `beehives` and `apiaries` slices — from `?beehive=` before the first message (with "Ask without it", which clears the query param), from the conversation's `beehiveId` after it.
 - **Composer:** the textarea is not `[value]`-bound; an `effect` writes the signal into the element when they differ. The one-way binding left the sent text in the disabled box when Angular saw no change.
 - **Renderer:** `chat-message.ts` `formatContent()` (exported, `chat-message.spec.ts`) reads lists line by line (`-`/`*` bullets → `<ul>`, `1.` → `<ol>`) before the inline pass, so a `* item` is never the start of an italic run; paragraphs split on blank lines.
-- `visibleMessages` filters to `user`/`assistant` with status other than `pending`. Send disabled when empty, > 4000 chars, sending, or the allowance is spent.
+- `visibleMessages` filters to `user`/`assistant` with status `done`: pending is the thinking row, failed is not shown (an empty bubble said nothing after a reload; the callout already did at the time). Send disabled when empty, > 4000 chars, sending, or the allowance is spent.
 
 ## Related
 [Root](../../../../../CLAUDE.md) · `store/ai-chat/` · Diagnosis dialog's **Ask the assistant** (`shared/components/ui/modal/diagnosis-modal/`) · Admin: [AI Responses](../../admin/ai-responses/CLAUDE.md).
