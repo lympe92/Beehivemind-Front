@@ -306,7 +306,9 @@ export function openers(doc, win, limit) {
     if (out.length >= limit) return;
     if (el.closest(CHROME)) return;
     if (!visible(el, win)) return;
-    const label = (el.textContent || "").trim();
+    // An opener whose text is a value (the diagnosis badge, the dashboard's
+    // attention tiles) says what it opens in aria-label.
+    const label = (el.getAttribute("aria-label") || "").trim() || (el.textContent || "").trim();
     if (!OPENERS.test(label)) return;
     out.push({ el: el, label: label.slice(0, 32) });
   });

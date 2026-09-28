@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { mock, TEAM_SUMMARY } from './mocks.mjs';
 
 const BASE = 'http://localhost:4301';
-const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
+const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const args = Object.fromEntries(process.argv.slice(2).map(a => { const [k, v = '1'] = a.replace(/^--/, '').split('='); return [k, v]; }));
 const WIDTHS = (args.widths ? args.widths.split(',').map(Number) : [375, 768, 1024, 1440]);
 const DIALOGS = args.dialogs !== '0';

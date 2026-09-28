@@ -14,7 +14,7 @@ const SEED = {
 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const browser = await puppeteer.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
+const browser = await puppeteer.launch({ executablePath: process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
 let failed = false;
 
 try {

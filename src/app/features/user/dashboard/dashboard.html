@@ -27,7 +27,7 @@
     } @else {
       <div class="app-list">
         @for (d of attention(); track d.id) {
-          <button type="button" class="app-tile app-tile--action" (click)="openDiagnosis(d)">
+          <button type="button" class="app-tile app-tile--action" [attr.aria-label]="'Open the diagnosis of ' + hiveLabel(d)" (click)="openDiagnosis(d)">
             <div class="app-tile__header">
               <div class="app-tile__title">
                 <span class="app-tile__name">{{ hiveLabel(d) }}</span>

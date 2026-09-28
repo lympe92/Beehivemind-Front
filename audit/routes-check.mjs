@@ -37,7 +37,7 @@ const CASES = [
 
 const NOT_FOUND = 'There is nothing at this address';
 
-const browser = await puppeteer.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true, args: ['--no-sandbox'] });
+const browser = await puppeteer.launch({ executablePath: process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true, args: ['--no-sandbox'] });
 let failures = 0;
 
 for (const [seed, path, expected] of CASES) {
@@ -52,6 +52,9 @@ for (const [seed, path, expected] of CASES) {
       if (res && res.status === 204) return req.respond({ status: 204, headers });
       return req.respond({ status: 200, headers, body: JSON.stringify(res) });
     }
+    // ConsentService asks Cloudflare where the visitor is; the dev server never
+    // answers it, and a page with a request in flight never reaches networkidle0.
+    if (url === BASE + '/cdn-cgi/trace') return req.respond({ status: 200, body: 'loc=US\n' });
     if (url.startsWith(BASE) || url.startsWith('data:') || url.startsWith('blob:')) return req.continue();
     return req.abort();
   });
