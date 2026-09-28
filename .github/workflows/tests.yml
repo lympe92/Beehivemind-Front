@@ -1,0 +1,30 @@
+# Unit tests and a production build (the build is where the bundle budget is
+# enforced). Runs on every pull request and every push to a branch other than
+# main; the deploy calls it (workflow_call) before it builds for the server,
+# so a push to main runs it exactly once.
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main, master]
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Unit tests
+        run: npx ng test --watch=false
+
+      - name: Production build (bundle budget)
+        run: npm run build

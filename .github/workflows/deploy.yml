@@ -5,7 +5,12 @@ on:
     branches: [main, master]
 
 jobs:
+  # Nothing reaches the server with a red suite: tests.yml first.
+  test:
+    uses: ./.github/workflows/tests.yml
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       # Full history: tools/build-sitemap.mjs dates every page by the last
