@@ -1,0 +1,166 @@
+<div class="app-page">
+  <div class="app-page-header">
+    <div>
+      <h1 class="app-page-title">Voice quality</h1>
+      <p class="app-page-lead">Counts only — no audio or speech text is collected.</p>
+    </div>
+    @if (data(); as d) {
+      <span class="app-page-meta">{{ d.summary.rounds | number }} rounds</span>
+    }
+  </div>
+
+  <!-- Filters: every change refetches -->
+  <div class="fb">
+    <div class="fb__group">
+      <label class="fb__label" for="vq-from">From</label>
+      <input id="vq-from" type="date" class="app-input" [min]="earliest" [max]="today"
+             [value]="from()" (change)="onFromChange($event)" aria-describedby="vq-range-hint" />
+    </div>
+    <div class="fb__group">
+      <label class="fb__label" for="vq-to">To</label>
+      <input id="vq-to" type="date" class="app-input" [min]="earliest" [max]="today"
+             [value]="to()" (change)="onToChange($event)" aria-describedby="vq-range-hint" />
+    </div>
+    <div class="fb__group">
+      <label class="fb__label" for="vq-build">App build</label>
+      <select id="vq-build" class="fb__select" [value]="build()" (change)="onBuildChange($event)">
+        <option value="">All builds</option>
+        @for (b of builds(); track b) {
+          <option [value]="b" [selected]="b === build()">{{ b }}</option>
+        }
+      </select>
+    </div>
+    <div class="fb__group">
+      <label class="fb__label" for="vq-model">Phone model</label>
+      <select id="vq-model" class="fb__select" [value]="deviceModel()" (change)="onDeviceModelChange($event)">
+        <option value="">All phones</option>
+        @for (m of deviceModels(); track m) {
+          <option [value]="m" [selected]="m === deviceModel()">{{ m }}</option>
+        }
+      </select>
+    </div>
+  </div>
+  <p id="vq-range-hint" class="app-page-lead">
+    Raw counts are kept for 90 days, so the range reaches back 90 days at most.
+  </p>
+
+  @if (error()) {
+    <app-error [message]="error()!" [retry]="true" (retried)="load()" />
+  } @else if (loading() && !data()) {
+    <div class="app-state">Loading…</div>
+  } @else if (data(); as d) {
+    @if (empty()) {
+      <app-card>
+        <div class="app-state">No voice rounds were recorded in this range.</div>
+      </app-card>
+    } @else {
+      <!-- The accent once, on the figure everything else is a share of. -->
+      <div class="admin-stats">
+        <div class="admin-stat">
+          <span class="admin-stat__label"><span class="admin-stat__dot admin-stat__dot--accent"></span>Rounds</span>
+          <span class="admin-stat__value">{{ d.summary.rounds | number }}</span>
+          <span class="admin-stat__sub">{{ d.summary.devices | number }} phones · {{ d.summary.phrases | number }} phrases</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat__label"><span class="admin-stat__dot"></span>Users</span>
+          <span class="admin-stat__value">{{ d.summary.users | number }}</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat__label"><span class="admin-stat__dot"></span>Not understood</span>
+          <span class="admin-stat__value">{{ formatRate(d.summary.not_understood_rate) }}</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat__label"><span class="admin-stat__dot"></span>"Say the beehive again"</span>
+          <span class="admin-stat__value">{{ formatRate(d.summary.say_again_rate) }}</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat__label"><span class="admin-stat__dot"></span>Hive not in apiary</span>
+          <span class="admin-stat__value">{{ formatRate(d.summary.hive_not_in_apiary_rate) }}</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat__label"><span class="admin-stat__dot"></span>Fell back to Google</span>
+          <span class="admin-stat__value">{{ formatRate(d.summary.fallback_rate) }}</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat__label"><span class="admin-stat__dot"></span>Response time</span>
+          <span class="admin-stat__value">{{ formatLatency(d.summary.latency_p50_ms) }}</span>
+          <span class="admin-stat__sub">median · p90 {{ formatLatency(d.summary.latency_p90_ms) }}</span>
+        </div>
+        <div class="admin-stat">
+          <span class="admin-stat__label"><span class="admin-stat__dot"></span>Room noise ignored</span>
+          <span class="admin-stat__value">{{ formatRate(d.summary.ignored_noise_rate) }}</span>
+        </div>
+      </div>
+
+      <app-card title="Problems per day">
+        <app-apex-chart [options]="ratesChart()" [loading]="loading()" height="300"
+                        emptyMessage="No rounds in this range." />
+      </app-card>
+
+      <app-card title="Rounds per day">
+        <app-apex-chart [options]="roundsChart()" [loading]="loading()" height="240"
+                        emptyMessage="No rounds in this range." />
+      </app-card>
+
+      <app-card title="Why it fell back to Google">
+        <div class="admin-stats">
+          <div class="admin-stat">
+            <span class="admin-stat__label">Self-test failed</span>
+            <span class="admin-stat__value">{{ d.fallback_reasons.self_test_failed | number }}</span>
+          </div>
+          <div class="admin-stat">
+            <span class="admin-stat__label">Could not start</span>
+            <span class="admin-stat__value">{{ d.fallback_reasons.start_failed | number }}</span>
+          </div>
+          <div class="admin-stat">
+            <span class="admin-stat__label">Stopped mid-round</span>
+            <span class="admin-stat__value">{{ d.fallback_reasons.stopped_mid_round | number }}</span>
+          </div>
+        </div>
+      </app-card>
+
+      <app-card title="Phones" [flush]="true">
+        <app-data-table
+          [columns]="deviceColumns"
+          [rows]="devices()"
+          [loading]="loading()"
+          [showActions]="false"
+          emptyMessage="No phones in this range.">
+          <ng-template #cellTpl let-row let-col="col">
+            @switch (col.key) {
+              @case ('device_model') { <span class="dt__nowrap">{{ row.device_model }}</span> }
+              @case ('devices') { {{ row.devices | number }} }
+              @case ('rounds') { {{ row.rounds | number }} }
+              @case ('self_test_failed') { {{ row.self_test_failed | number }} }
+              @case ('self_test_rtf_avg') { {{ formatRtf(row.self_test_rtf_avg) }} }
+              @case ('latency_p50_ms') { {{ formatLatency(row.latency_p50_ms) }} }
+              @case ('not_understood_rate') { {{ formatRate(row.not_understood_rate) }} }
+              @case ('say_again_rate') { {{ formatRate(row.say_again_rate) }} }
+              @case ('fallback_rate') { {{ formatRate(row.fallback_rate) }} }
+              @default { {{ row[col.key] ?? '—' }} }
+            }
+          </ng-template>
+        </app-data-table>
+      </app-card>
+
+      <app-card title="Self-test failures" [flush]="true">
+        <app-data-table
+          [columns]="failureColumns"
+          [rows]="failures()"
+          [loading]="loading()"
+          [showActions]="false"
+          emptyMessage="No phone failed the self-test in this range.">
+          <ng-template #cellTpl let-row let-col="col">
+            @switch (col.key) {
+              @case ('device_model') { <span class="dt__nowrap">{{ row.device_model }}</span> }
+              @case ('ram_mb') { {{ formatRam(row.ram_mb) }} }
+              @case ('self_test_rtf') { {{ formatRtf(row.self_test_rtf) }} }
+              @case ('reported_at') { <span class="dt__nowrap">{{ (row.reported_at || '').slice(0, 10) || '—' }}</span> }
+              @default { {{ row[col.key] ?? '—' }} }
+            }
+          </ng-template>
+        </app-data-table>
+      </app-card>
+    }
+  }
+</div>

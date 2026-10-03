@@ -309,6 +309,25 @@ const ADMIN_BLOG_POSTS = BLOG_POSTS.map((p, i) => ({
   updated_at: p.updated_at,
 }));
 
+const VOICE_DAYS = Array.from({ length: 30 }, (_, i) => new Date(Date.now() - (29 - i) * 864e5).toISOString().slice(0, 10));
+const VOICE_QUALITY = {
+  summary: { rounds: 412, users: 37, devices: 41, phrases: 6830, not_understood_rate: 0.062, ignored_noise_rate: 0.118, say_again_rate: 0.034, hive_not_in_apiary_rate: 0.009, fallback_rate: 0.041, latency_p50_ms: 870, latency_p90_ms: 1940 },
+  daily: VOICE_DAYS.flatMap((date, i) => [
+    { date, build: '1.0 (4)', rounds: 8 + (i % 5), not_understood_rate: 0.08 - i * 0.001, say_again_rate: 0.04, fallback_rate: 0.05, latency_p50_ms: 950 },
+    ...(i > 20 ? [{ date, build: '1.1 (5)', rounds: 6, not_understood_rate: 0.04, say_again_rate: 0.02, fallback_rate: 0.02, latency_p50_ms: 820 }] : []),
+  ]),
+  devices: [
+    { device_model: 'Redmi Note 9', devices: 6, rounds: 58, self_test_failed: 4, self_test_rtf_avg: 1.31, latency_p50_ms: 1620, not_understood_rate: 0.14, say_again_rate: 0.07, fallback_rate: 0.21 },
+    { device_model: 'Pixel 9', devices: 9, rounds: 131, self_test_failed: 0, self_test_rtf_avg: 0.22, latency_p50_ms: 640, not_understood_rate: 0.03, say_again_rate: 0.02, fallback_rate: 0 },
+  ],
+  self_test_failures: [
+    { device_model: 'Redmi Note 9', manufacturer: 'Xiaomi', soc: 'Helio G85', android: '12', ram_mb: 4096, build: '1.0 (4)', model_id: 'zipformer-70m', self_test_rtf: 1.42, reported_at: '2026-09-28T07:40:00Z' },
+  ],
+  fallback_reasons: { self_test_failed: 4, start_failed: 9, stopped_mid_round: 4 },
+  builds: ['1.0 (4)', '1.1 (5)'],
+  device_models: ['Pixel 9', 'Redmi Note 9'],
+};
+
 const ok = (data, meta) => ({ success: true, code: 200, message: 'OK', data, ...(meta ? { meta } : {}) });
 const page = (items) => ok(items, { page: 1, per_page: 25, total: items.length, total_pages: 1 });
 
@@ -380,6 +399,7 @@ export function mock(method, path) {
   if (route === 'admin/raw/counts') return ok(RAW_COUNTS);
   if (route === 'admin/raw/users') return ok(RAW_USERS, { page: 1, per_page: 25, total: 1284, total_pages: 52 });
   if (route.startsWith('admin/raw/')) return page([]);
+  if (route === 'admin/voice-quality') return ok(VOICE_QUALITY);
   if (route === 'admin/ai-responses/pending') return page(PENDING_AI);
   if (route === 'admin/ai-responses') return page(JUDGED_AI);
   if (/^admin\/ai-responses\/\d+$/.test(route)) return ok({ judgment: JUDGED_AI[0], conversation: { id: 2, title: 'When to treat for varroa', messages: CONVERSATION_1.messages } });
