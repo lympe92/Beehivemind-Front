@@ -63,7 +63,7 @@
               <label class="checkbox-group__option">
                 <input type="checkbox" [checked]="isChecked(b.id)"
                   (change)="toggleBeehive(b.id, $any($event.target).checked)" />
-                <span class="checkbox-group__option--label">{{ b.name }}</span>
+                <span class="checkbox-group__option--label">Beehive {{ b.number }}</span>
               </label>
             }
           </div>

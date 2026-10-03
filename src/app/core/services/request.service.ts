@@ -19,8 +19,8 @@ export class RequestService {
     return this.http.post<ApiResponse<T>>(environment.apiUrl + suffix, data, options);
   }
 
-  putRequest<T>(suffix: string, data = {}): Observable<ApiResponse<T>> {
-    return this.http.put<ApiResponse<T>>(environment.apiUrl + suffix, data);
+  putRequest<T>(suffix: string, data = {}, options: { context?: HttpContext } = {}): Observable<ApiResponse<T>> {
+    return this.http.put<ApiResponse<T>>(environment.apiUrl + suffix, data, options);
   }
 
   patchRequest<T>(suffix: string, data = {}): Observable<ApiResponse<T>> {

@@ -26,7 +26,7 @@ Defined in `features/user/user.routes.ts`, under `authGuard` (user zone).
 **Store slices (display data via `selectSignal`):**
 - `store/treatment-types` — `selectAllTreatmentTypes`, `selectTreatmentTypesLoading`
 - `store/treatment-sessions` — `selectAllTreatmentSessions`, `selectTreatmentSessionsLoading`
-- Also reads `store/apiaries` (`selectAllApiaries`) and `store/beehives` for names / selection.
+- Also reads `store/apiaries` (`selectAllApiaries`) and `store/beehives` for labels ("Beehive 12") / selection.
 
 `ngOnInit` dispatches `load()` for all of the above (cached — no-op if already loaded).
 

@@ -21,32 +21,41 @@
 
   <app-card title="Beehives" [flush]="true">
     <app-data-table
-      [columns]="columns"
+      [columns]="columns()"
       [rows]="beehives()"
       [loading]="loading()"
       [editingId]="editingId"
       emptyMessage="No beehives found.">
 
-      <ng-template #cellTpl let-row let-col="col" let-i="index">
+      <ng-template #cellTpl let-row let-col="col">
         @switch (col.key) {
-          @case ('_idx') { <span class="dt__muted">{{ i + 1 }}</span> }
+          @case ('number') { <span class="dt__nowrap">{{ label(row) }}</span> }
+          @case ('apiary') { {{ apiaryName(row.apiaryId) }} }
           @case ('queen_year') { {{ row.queen?.year ?? '—' }} }
           @default { {{ row[col.key] ?? '—' }} }
         }
       </ng-template>
 
-      <ng-template #editRowTpl let-row let-i="index">
-        <td><span class="dt__muted">{{ i + 1 }}</span></td>
+      <ng-template #editRowTpl let-row>
         <td>
-          <input class="app-input" [(ngModel)]="editForm.name" name="edit_name"
-                 placeholder="Beehive name" aria-label="Beehive name" />
+          <input id="edit-number" class="app-input app-input--sm" type="number" min="1" step="1" required
+                 [ngModel]="editForm.number" (ngModelChange)="onNumberInput($event)" name="edit_number"
+                 placeholder="e.g. 12" aria-label="Beehive number"
+                 [attr.aria-invalid]="numberError() ? true : null"
+                 [attr.aria-describedby]="numberError() ? 'edit-number-error' : null" />
+          @if (numberError(); as problem) {
+            <div id="edit-number-error" class="error" role="alert">{{ problem }}</div>
+          }
         </td>
+        @if (selectedApiaryId() === 0) {
+          <td>{{ apiaryName(row.apiaryId) }}</td>
+        }
         <td>
           <input class="app-input app-input--sm" type="number" min="2000" [(ngModel)]="editForm.queen_year"
                  name="edit_qy" placeholder="e.g. 2023" aria-label="Queen year" />
         </td>
         <td class="dt__actions">
-          <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="confirmEdit()">Save</button>
+          <button type="button" class="app-btn app-btn--primary app-btn--sm" [disabled]="!!numberError()" (click)="confirmEdit()">Save</button>
           <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="cancelEdit()">Cancel</button>
         </td>
       </ng-template>

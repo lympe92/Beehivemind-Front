@@ -16,7 +16,7 @@
       <select class="fb__select" [ngModel]="beehiveId()" (ngModelChange)="beehiveId.set($event)" name="beehive">
         <option [ngValue]="0">— All —</option>
         @for (b of beehives(); track b.id) {
-          <option [ngValue]="b.id">{{ b.name }}</option>
+          <option [ngValue]="b.id">Beehive {{ b.number }}</option>
         }
       </select>
     </div>

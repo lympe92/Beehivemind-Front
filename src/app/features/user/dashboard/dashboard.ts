@@ -19,6 +19,7 @@ import { AuthActions } from '../../../store/auth/auth.actions';
 import { selectCurrentUser } from '../../../store/auth/auth.selectors';
 import { TeamService } from '../../../core/services/team.service';
 import { teamName } from '../../../core/models/team.model';
+import { beehiveLabel } from '../../../core/models/beehive.model';
 import { DiagnosisService } from '../../../core/services/diagnosis.service';
 import { DiagnosisSummary } from '../../../core/models/diagnosis.model';
 import { DiagnosisBadgeComponent } from '../../../shared/components/ui/diagnosis-badge/diagnosis-badge';
@@ -111,9 +112,9 @@ export class UserDashboardComponent implements OnInit {
   });
 
   hiveLabel(d: DiagnosisSummary): string {
-    const name = this.allBeehives().find(b => b.id === d.beehiveId)?.name
-      ?? (d.beehiveNumber !== null ? String(d.beehiveNumber) : `#${d.beehiveId}`);
-    return `Beehive ${name}`;
+    const hive = this.allBeehives().find(b => b.id === d.beehiveId);
+    if (hive) return beehiveLabel(hive);
+    return d.beehiveNumber !== null ? beehiveLabel({ number: d.beehiveNumber }) : 'Beehive';
   }
 
   async openDiagnosis(d: DiagnosisSummary): Promise<void> {

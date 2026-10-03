@@ -9,12 +9,12 @@ const APIARIES = [
 ];
 
 const BEEHIVES = [
-  { id: 11, uuid: 'bhm-a41f8c2e-11', name: 'Beehive 11', apiary_id: 1, queen: { year: 2024 } },
-  { id: 12, uuid: 'bhm-a41f8c2e-12', name: 'Beehive 12', apiary_id: 1, queen: { year: 2024 } },
-  { id: 13, uuid: 'bhm-a41f8c2e-13', name: 'Beehive 13', apiary_id: 1, queen: { year: 2025 } },
-  { id: 14, uuid: 'bhm-a41f8c2e-14', name: 'Beehive 14', apiary_id: 1, queen: null },
-  { id: 21, uuid: 'bhm-7d90b155-01', name: 'Beehive 1', apiary_id: 2, queen: { year: 2023 } },
-  { id: 22, uuid: 'bhm-7d90b155-02', name: 'Beehive 2', apiary_id: 2, queen: { year: 2023 } },
+  { id: 11, uuid: 'bhm-a41f8c2e-11', number: 11, apiary_id: 1, queen: { year: 2024 } },
+  { id: 12, uuid: 'bhm-a41f8c2e-12', number: 12, apiary_id: 1, queen: { year: 2024 } },
+  { id: 13, uuid: 'bhm-a41f8c2e-13', number: 13, apiary_id: 1, queen: { year: 2025 } },
+  { id: 14, uuid: 'bhm-a41f8c2e-14', number: 14, apiary_id: 1, queen: null },
+  { id: 21, uuid: 'bhm-7d90b155-01', number: 1, apiary_id: 2, queen: { year: 2023 } },
+  { id: 22, uuid: 'bhm-7d90b155-02', number: 2, apiary_id: 2, queen: { year: 2023 } },
 ];
 
 const INSPECTIONS = [

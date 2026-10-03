@@ -14,6 +14,7 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ExportFormat } from '../../../../core/services/export.service';
+import { beehiveLabel } from '../../../../core/models/beehive.model';
 
 /** The menu's labels, as the API names the formats. */
 export function exportFormat(label: string): ExportFormat {
@@ -26,13 +27,14 @@ export function exportFormat(label: string): ExportFormat {
  */
 export function exportScope(
   apiaries: { id: number; name: string }[],
-  beehives: { id: number; name: string }[],
+  beehives: { id: number; number: number }[],
   apiaryId: number,
   beehiveId: number,
   rows: number,
 ): string {
   const where = apiaryId ? apiaries.find(a => a.id === apiaryId)?.name ?? 'Apiary' : 'All apiaries';
-  const which = beehiveId ? ` · Beehive ${beehives.find(b => b.id === beehiveId)?.name ?? ''}`.trimEnd() : '';
+  const hive  = beehiveId ? beehives.find(b => b.id === beehiveId) : undefined;
+  const which = beehiveId ? ` · ${hive ? beehiveLabel(hive) : 'Beehive'}` : '';
   return `${where}${which} · ${rows} row${rows === 1 ? '' : 's'}`;
 }
 

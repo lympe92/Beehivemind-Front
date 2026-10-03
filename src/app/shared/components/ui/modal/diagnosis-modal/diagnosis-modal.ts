@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { MODAL_DATA } from '../../../../../core/modal/modal.types';
 import { selectAllBeehives } from '../../../../../store/beehives/beehives.selectors';
+import { beehiveLabel } from '../../../../../core/models/beehive.model';
 import { selectAllApiaries } from '../../../../../store/apiaries/apiaries.selectors';
 import { DiagnosisService } from '../../../../../core/services/diagnosis.service';
 import { AiAssistantStatusService } from '../../../../../core/services/ai-assistant-status.service';
@@ -57,15 +58,15 @@ export class DiagnosisModalComponent implements OnInit {
   missing   = signal(false);
   sendingFeedback = signal(false);
 
-  /** "Beehive 12 · North Field": the hive's name from the store, else the diagnosis' number. */
+  /** "Beehive 12 · North Field": the hive's number from the store, else the diagnosis' own. */
   readonly title = computed(() => {
     const d  = this.diagnosis();
     const id = this.data.beehiveId ?? d?.beehiveId ?? null;
     if (id === null) return 'Diagnosis';
     const hive   = this.beehives().find(b => b.id === id);
     const apiary = hive ? this.apiaries().find(a => a.id === hive.apiaryId)?.name ?? d?.apiaryName : d?.apiaryName;
-    const name   = hive?.name ?? (d?.beehiveNumber !== null && d?.beehiveNumber !== undefined ? String(d.beehiveNumber) : `#${id}`);
-    const label  = /^(bee)?hive\b/i.test(name) ? name : `Beehive ${name}`;
+    const number = hive?.number ?? d?.beehiveNumber ?? null;
+    const label  = number !== null ? beehiveLabel({ number }) : 'Beehive';
     return apiary ? `${label} · ${apiary}` : label;
   });
 

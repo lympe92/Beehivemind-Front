@@ -2,14 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { RequestService } from './request.service';
 import { ApiResponse } from '../models/api-response.model';
-import { Beehive } from '../models/beehive.model';
+import { Beehive, compareBeehives } from '../models/beehive.model';
+import { inlineErrors } from '../interceptors/error.interceptor';
 
 /** Raw beehive payload as returned by the API (snake_case). */
 interface BeehivePayload {
   id: number;
   uuid: string;
-  name?: string;
-  number?: number;
+  number: number;
   apiary_id: number;
   queen?: Beehive['queen'];
 }
@@ -18,27 +18,33 @@ interface BeehivePayload {
 export class BeehiveService {
   private request = inject(RequestService);
 
+  /** In number order, an apiary's hives together (`compareBeehives`). */
   getBeehives(): Observable<ApiResponse<Beehive[]>> {
     return this.request.getRequest<BeehivePayload[]>('beehives').pipe(
-      map(res => ({ ...res, data: (res.data ?? []).map(b => this.fromApi(b)) }))
+      map(res => ({ ...res, data: (res.data ?? []).map(b => this.fromApi(b)).sort(compareBeehives) }))
     );
   }
 
   getBeehivesOfApiary(apiaryId: number): Observable<ApiResponse<Beehive[]>> {
     return this.request.getRequest<BeehivePayload[]>(`beehives/apiary/${apiaryId}`).pipe(
-      map(res => ({ ...res, data: (res.data ?? []).map(b => this.fromApi(b)) }))
+      map(res => ({ ...res, data: (res.data ?? []).map(b => this.fromApi(b)).sort(compareBeehives) }))
     );
   }
 
+  /** The API numbers the new hives itself, after the apiary's highest number. */
   createBeehives(apiaryId: number, count: number): Observable<ApiResponse<Beehive[]>> {
     return this.request.postRequest<Beehive[]>('beehives', { apiary_id: apiaryId, hives_number: count });
   }
 
-
+  /**
+   * A number already taken in the apiary answers 422 ("Beehive 3 already
+   * exists in this apiary."); the edit row shows it under the field, so that
+   * status is not toasted too (`inlineErrors(422)`).
+   */
   updateBeehive(id: number, data: Partial<Beehive>): Observable<ApiResponse<Beehive>> {
-    const payload: { number?: number | null } = {};
-    if (data.name !== undefined) payload.number = parseInt(data.name, 10) || null;
-    return this.request.putRequest<BeehivePayload>(`beehives/${id}`, payload).pipe(
+    const payload: { number?: number } = {};
+    if (data.number !== undefined) payload.number = data.number;
+    return this.request.putRequest<BeehivePayload>(`beehives/${id}`, payload, { context: inlineErrors(422) }).pipe(
       map(res => ({ ...res, data: this.fromApi(res.data) }))
     );
   }
@@ -60,10 +66,9 @@ export class BeehiveService {
     return {
       id:       b.id,
       uuid:     b.uuid,
-      name:     b.name ?? String(b.number ?? b.id),
+      number:   b.number,
       apiaryId: b.apiary_id,
       queen:    b.queen ?? null,
     };
   }
 }
-

@@ -5,12 +5,12 @@ import { MODAL_DATA } from '../../../../../core/modal/modal.types';
 import { ModalShellComponent } from '../modal-shell/modal-shell';
 
 export interface DeleteBeehiveModalData {
-  /** The hive being deleted, as the table names it. */
-  name: string;
+  /** The hive being deleted, as the table names it — "Beehive 12". */
+  label: string;
   /** True when the hive still holds a queen — the only case that needs an answer. */
   hasQueen: boolean;
-  /** Where a queen could move to: every other hive, named as the table names them. */
-  targets: { id: number; name: string }[];
+  /** Where a queen could move to: every other hive — "Beehive 3 · North Field". */
+  targets: { id: number; label: string }[];
 }
 
 /** What the API needs to know before it deletes: what happens to the queen. */

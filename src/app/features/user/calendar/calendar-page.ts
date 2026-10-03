@@ -7,6 +7,7 @@ import { InspectionsActions } from '../../../store/inspections/inspections.actio
 import { selectAllInspections } from '../../../store/inspections/inspections.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
+import { beehiveLabel } from '../../../core/models/beehive.model';
 
 @Component({
   selector: 'app-calendar-page',
@@ -29,7 +30,7 @@ export class CalendarPageComponent implements OnInit {
       const beehive = beehiveMap.get(i.beehiveId);
       return {
         id:    i.id,
-        title: beehive ? beehive.name : `Beehive #${i.beehiveId}`,
+        title: beehive ? beehiveLabel(beehive) : 'Beehive',
         date:  i.date,
         color: 'blue',
         meta:  { type: 'inspection', id: i.id },

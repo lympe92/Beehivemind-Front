@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Inspection } from '../../../core/models/inspection.model';
+import { beehiveLabel, beehiveTag } from '../../../core/models/beehive.model';
 import { InspectionService } from '../../../core/services/inspection.service';
 import { ExportService } from '../../../core/services/export.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
@@ -91,7 +92,8 @@ export class InspectionsComponent implements OnInit {
   private allBeehives = this.store.selectSignal(selectAllBeehives);
 
   beehiveName(beehiveId: number): string {
-    return this.allBeehives().find(b => b.id === beehiveId)?.name ?? '—';
+    const hive = this.allBeehives().find(b => b.id === beehiveId);
+    return hive ? beehiveTag(hive) : '—';
   }
   private allInspections = this.store.selectSignal(selectAllInspections);
   loading = this.store.selectSignal(selectInspectionsLoading);
@@ -228,7 +230,7 @@ export class InspectionsComponent implements OnInit {
             options: (apiaryId: unknown) => of(
               allBeehives
                 .filter(b => b.apiaryId === apiaryId)
-                .map(b => ({ displayValue: b.name, returnValue: b.id })),
+                .map(b => ({ displayValue: beehiveLabel(b), returnValue: b.id })),
             ),
           },
           ...this.inspectionBaseFields(),
@@ -243,8 +245,8 @@ export class InspectionsComponent implements OnInit {
       i => i.beehiveId === beehiveId && i.date === value.date
     );
     if (duplicate) {
-      const beehiveName = allBeehives.find(b => b.id === beehiveId)?.name ?? '';
-      this.toast.warning(`A record for ${value.date} on beehive "${beehiveName}" already exists.`);
+      const hive = allBeehives.find(b => b.id === beehiveId);
+      this.toast.warning(`A record for ${value.date} on ${hive ? beehiveLabel(hive) : 'this beehive'} already exists.`);
       return;
     }
 
@@ -294,10 +296,10 @@ export class InspectionsComponent implements OnInit {
   // ── Delete ───────────────────────────────────────────────
 
   async deleteRow(row: Inspection): Promise<void> {
-    const beehiveName = this.allBeehives().find(b => b.id === row.beehiveId)?.name ?? '';
+    const hive = this.allBeehives().find(b => b.id === row.beehiveId);
     const confirmed = await this.modal.confirm({
       title: 'Delete Record',
-      message: `Delete inspection for beehive "${beehiveName}" on ${row.date}?`,
+      message: `Delete inspection for ${hive ? beehiveLabel(hive) : 'this beehive'} on ${row.date}?`,
       confirmLabel: 'Delete',
       danger: true,
     });

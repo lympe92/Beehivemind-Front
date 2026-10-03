@@ -1,7 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Beehive } from '../../../core/models/beehive.model';
+import { Beehive, beehiveLabel } from '../../../core/models/beehive.model';
 import { BeehiveService } from '../../../core/services/beehive.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
@@ -20,7 +20,7 @@ import {
 } from '../../../shared/components/ui/modal/delete-beehive-modal/delete-beehive-modal';
 
 interface BeehiveForm {
-  name: string;
+  number: number | null;
   queen_year: number | null;
 }
 
@@ -49,15 +49,20 @@ export class BeehivesComponent implements OnInit {
       : this.allBeehives().filter(b => b.apiaryId === id);
   });
 
-  readonly columns: ColumnDef[] = [
-    { key: '_idx', label: '#', width: '48px' },
-    { key: 'name', label: 'Name' },
+  /** All apiaries at once: "Beehive 1" alone no longer says which one, so the apiary gets a column. */
+  columns = computed<ColumnDef[]>(() => [
+    { key: 'number', label: 'Beehive' },
+    ...(this.selectedApiaryId() === 0 ? [{ key: 'apiary', label: 'Apiary' }] : []),
     { key: 'queen_year', label: 'Queen Year' },
-  ];
+  ]);
+
+  readonly label = beehiveLabel;
 
   beehivesToCreate: number | null = null;
   editingId: number | null = null;
   editForm: BeehiveForm = this.blank();
+  /** The API's refusal of the number (422: already taken in this apiary). */
+  numberRefusal = signal<string | null>(null);
 
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
@@ -104,19 +109,36 @@ export class BeehivesComponent implements OnInit {
 
   startEdit(row: Beehive): void {
     this.editingId = row.id;
-    this.editForm = { name: row.name, queen_year: row.queen?.year ?? null };
+    this.editForm = { number: row.number, queen_year: row.queen?.year ?? null };
+    this.numberRefusal.set(null);
   }
 
   cancelEdit(): void {
     this.editingId = null;
+    this.numberRefusal.set(null);
+  }
+
+  /** What is wrong with the number being typed, shown under the field; null when it is fine. */
+  numberError(): string | null {
+    const value = this.editForm.number;
+    if (value === null || value === undefined || String(value).trim() === '') return 'Enter the beehive number.';
+    const n = Number(value);
+    if (!Number.isInteger(n) || n < 1) return 'The number is a whole number, 1 or more.';
+    return this.numberRefusal();
+  }
+
+  onNumberInput(value: number | null): void {
+    this.editForm.number = value;
+    this.numberRefusal.set(null);
+  }
+
+  apiaryName(apiaryId: number): string {
+    return this.apiaries().find(a => a.id === apiaryId)?.name ?? '—';
   }
 
   confirmEdit(): void {
     if (this.editingId === null) return;
-    if (!this.editForm.name?.trim()) {
-      this.toast.error('Beehive name is required.');
-      return;
-    }
+    if (this.numberError()) return;
     if (this.editForm.queen_year !== null && this.editForm.queen_year !== undefined) {
       const yr = Number(this.editForm.queen_year);
       if (isNaN(yr) || yr < 2000) {
@@ -126,7 +148,7 @@ export class BeehivesComponent implements OnInit {
     }
 
     const payload: Partial<Beehive> = {
-      name: this.editForm.name.trim(),
+      number: Number(this.editForm.number),
       queen: this.editForm.queen_year ? { year: Number(this.editForm.queen_year) } : null,
     };
 
@@ -140,7 +162,12 @@ export class BeehivesComponent implements OnInit {
           this.toast.error('Something went wrong. Please try again.');
         }
       },
-      error: () => {},
+      // 422 is the only status the interceptor leaves to this row: the number is taken.
+      error: err => {
+        if (err?.status === 422) {
+          this.numberRefusal.set(err.error?.message ?? 'That number is already taken in this apiary.');
+        }
+      },
     });
   }
 
@@ -152,7 +179,7 @@ export class BeehivesComponent implements OnInit {
       type: 'center',
       data: {
         value: beehive.uuid,
-        title: `Beehive ${beehive.name}`,
+        title: beehiveLabel(beehive),
         subtitle: apiary?.name,
         downloadName: `beehive-${beehive.uuid}`,
       } satisfies QrCodeModalData,
@@ -166,11 +193,12 @@ export class BeehivesComponent implements OnInit {
       type: 'center',
       width: '460px',
       data: {
-        name: row.name,
+        label: beehiveLabel(row),
         hasQueen: !!row.queen,
+        // Every other hive, in any apiary — so each one says where it stands.
         targets: this.allBeehives()
           .filter(b => b.id !== row.id)
-          .map(b => ({ id: b.id, name: b.name })),
+          .map(b => ({ id: b.id, label: `${beehiveLabel(b)} · ${this.apiaryName(b.apiaryId)}` })),
       } satisfies DeleteBeehiveModalData,
     });
     if (!answer) return;
@@ -214,6 +242,6 @@ export class BeehivesComponent implements OnInit {
   }
 
   private blank(): BeehiveForm {
-    return { name: '', queen_year: null };
+    return { number: null, queen_year: null };
   }
 }

@@ -1,4 +1,4 @@
-<app-modal-shell [title]="'Delete beehive ' + data.name + '?'" (close)="cancel()">
+<app-modal-shell [title]="'Delete ' + data.label + '?'" (close)="cancel()">
   <div class="form-stack">
     <p class="team__dialog-copy">
       The hive goes, and with it every inspection, feeding and harvest recorded on it. This can't be undone.
@@ -24,7 +24,7 @@
                   [ngModel]="target()" (ngModelChange)="target.set($event)">
             <option [ngValue]="null">Select a beehive</option>
             @for (hive of data.targets; track hive.id) {
-              <option [ngValue]="hive.id">{{ hive.name }}</option>
+              <option [ngValue]="hive.id">{{ hive.label }}</option>
             }
           </select>
         </div>

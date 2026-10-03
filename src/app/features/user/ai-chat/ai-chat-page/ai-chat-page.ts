@@ -27,6 +27,7 @@ import {
   selectSending,
 } from '../../../../store/ai-chat/ai-chat.selectors';
 import { AiMessage, SendMessageRequest } from '../../../../core/models/ai-chat.model';
+import { beehiveLabel } from '../../../../core/models/beehive.model';
 import { selectAllBeehives } from '../../../../store/beehives/beehives.selectors';
 import { BeehivesActions } from '../../../../store/beehives/beehives.actions';
 import { selectAllApiaries } from '../../../../store/apiaries/apiaries.selectors';
@@ -104,7 +105,7 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
     if (id === null) return null;
     const hive   = this.beehives().find(b => b.id === id);
     const apiary = hive ? this.apiaries().find(a => a.id === hive.apiaryId) : null;
-    const name   = hive ? `Beehive ${hive.name}` : `Beehive #${id}`;
+    const name   = hive ? beehiveLabel(hive) : 'Beehive';
     return apiary ? `${name} · ${apiary.name}` : name;
   });
 
