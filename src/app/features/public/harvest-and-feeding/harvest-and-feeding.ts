@@ -92,9 +92,9 @@ export class HarvestAndFeedingComponent {
     infoColumns: {
       title: 'Built for the apiary',
       items: [
+        { title: '10+', description: 'Customers' },
         { title: 'Free', description: 'For your first hive' },
         { title: 'By voice', description: 'Inspections recorded hands-free' },
-        { title: 'No signal?', description: 'Records wait on the phone and sync later' },
       ],
     },
     ctaBanner: {
