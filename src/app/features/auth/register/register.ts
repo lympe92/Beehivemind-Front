@@ -12,12 +12,13 @@ import { environment } from '../../../../environments/environment';
 import { COUNTRIES, Country } from '../../../core/data/countries';
 import { getFailedPasswordRules, passwordStrengthValidator, PasswordRule } from '../../../shared/components/ui/form/password-rules';
 import { AuthCardComponent } from '../../../shared/components/forms/auth-card/auth-card';
+import { AppleSignInButtonComponent } from '../../../shared/components/forms/apple-signin-button/apple-signin-button';
 import { InputComponent } from '../../../shared/components/form-fields/input/input.component';
 
 @Component({
   selector: 'app-auth-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, AuthCardComponent, InputComponent],
+  imports: [ReactiveFormsModule, RouterLink, AuthCardComponent, InputComponent, AppleSignInButtonComponent],
   templateUrl: './register.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

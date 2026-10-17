@@ -14,7 +14,7 @@ export class AuthEffects {
   private router = inject(Router);
 
   /** Which door the sign-in came through, reported on the `login` event. */
-  private loginMethod: 'email' | 'google' = 'email';
+  private loginMethod: 'email' | 'google' | 'apple' = 'email';
 
   login$ = createEffect(() =>
     this.actions$.pipe(
@@ -64,6 +64,34 @@ export class AuthEffects {
           }),
           catchError((err) =>
             of(AuthActions.loginFailure({ error: err?.error?.message ?? 'Google sign-in failed' })),
+          ),
+        );
+      }),
+    ),
+  );
+
+  // Apple, like Google, is also the sign-up form; it asks for no country either.
+  loginWithApple$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.loginWithApple),
+      exhaustMap(({ credential, givenName, familyName }) => {
+        this.loginMethod = 'apple';
+        return this.authService.loginWithApple(credential, givenName, familyName).pipe(
+          map((res) => {
+            if (res.requires_2fa) {
+              return AuthActions.loginRequires2FA({ twoFactorToken: res.twoFactorToken! });
+            }
+            if (res.isNewUser) {
+              this.analytics.event('sign_up', { method: 'apple' });
+            }
+            const user = res.user!;
+            const token = res.token!;
+            return user.country
+              ? AuthActions.loginSuccess({ user, token })
+              : AuthActions.loginNeedsCountry({ user, token });
+          }),
+          catchError((err) =>
+            of(AuthActions.loginFailure({ error: err?.error?.message ?? 'Apple sign-in failed' })),
           ),
         );
       }),

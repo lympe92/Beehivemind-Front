@@ -14,12 +14,13 @@ import {
 } from '../../../store/auth/auth.selectors';
 import { environment } from '../../../../environments/environment';
 import { AuthCardComponent } from '../../../shared/components/forms/auth-card/auth-card';
+import { AppleSignInButtonComponent } from '../../../shared/components/forms/apple-signin-button/apple-signin-button';
 import { InputComponent } from '../../../shared/components/form-fields/input/input.component';
 
 @Component({
   selector: 'app-auth-login',
   standalone: true,
-  imports: [ReactiveFormsModule, AsyncPipe, RouterLink, AuthCardComponent, InputComponent],
+  imports: [ReactiveFormsModule, AsyncPipe, RouterLink, AuthCardComponent, InputComponent, AppleSignInButtonComponent],
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
