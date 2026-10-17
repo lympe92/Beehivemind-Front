@@ -90,11 +90,11 @@ export class ApiariesAndBeehivesComponent {
       ],
     },
     infoColumns: {
-      title: 'Trusted partner',
+      title: 'Built for the apiary',
       items: [
-        { title: '1.000+', description: 'Customers' },
-        { title: '10.000+', description: 'Social followers' },
-        { title: '3 years', description: 'Online' },
+        { title: 'Free', description: 'For your first hive' },
+        { title: 'By voice', description: 'Inspections recorded hands-free' },
+        { title: 'No signal?', description: 'Records wait on the phone and sync later' },
       ],
     },
     ctaBanner: {

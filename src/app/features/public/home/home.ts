@@ -215,15 +215,13 @@ export class HomeComponent {
       logo: { src: '/assets/img/logo1.webp', alt: 'BeehiveMind logo', width: 105, height: 105 },
       storeLinks: storeBadges('home'),
     },
-    // TODO(content): the two figures marked need real numbers from the
-    // database — they are the shape the band should have, not confirmed values.
     infoColumns: {
       mode: 'light',
-      title: 'Trusted partner',
+      title: 'Built for the apiary',
       items: [
-        { title: '1.000+', description: 'Beekeepers' },
-        { title: '18.000+', description: 'Hives managed' },
-        { title: '260.000+', description: 'Inspections recorded' },
+        { title: 'Free', description: 'For your first hive' },
+        { title: 'By voice', description: 'Inspections recorded hands-free' },
+        { title: 'No signal?', description: 'Records wait on the phone and sync later' },
       ],
     },
     ctaBanner: {
