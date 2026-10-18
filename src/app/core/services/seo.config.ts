@@ -19,9 +19,8 @@ const SITE = environment.appName;
  * this for "what is it, what does it run on, what does it cost" — none of which
  * a WebPage node carries.
  *
- * The prices mirror what `pricing.ts` puts on screen; structured data must not
- * disagree with the visible page. Enterprise is deliberately absent: it is
- * "Talk to us", and an Offer without a price is not one. Likewise the operating
+ * The prices mirror `PLAN_TIERS` (core/data/plans.ts), what /pricing puts on
+ * screen; structured data must not disagree with the visible page. Likewise the operating
  * systems: the iOS build does not exist yet, so it is not claimed here.
  */
 const SOFTWARE_APPLICATION: SoftwareApplicationSchema = {
@@ -44,6 +43,7 @@ const SOFTWARE_APPLICATION: SoftwareApplicationSchema = {
   offers: [
     { '@type': 'Offer', name: 'Free',  price: '0', priceCurrency: 'EUR', category: 'free',         url: `${BASE}/pricing` },
     { '@type': 'Offer', name: 'Pro',   price: '5', priceCurrency: 'EUR', category: 'subscription', url: `${BASE}/pricing` },
+    { '@type': 'Offer', name: 'Pro Unlimited', price: '10', priceCurrency: 'EUR', category: 'subscription', url: `${BASE}/pricing` },
   ],
   // The Android app's listing. Only the Play address: the App Store badge on
   // the page is a stand-in that also opens Play, and structured data claims
@@ -56,7 +56,7 @@ const SOFTWARE_APPLICATION: SoftwareApplicationSchema = {
 export const SEO_CONFIG: Record<string, SEOModel> = {
   home: {
     meta_title: `Beekeeping App & Hive Management Software | ${SITE}`,
-    meta_description: 'Record hive inspections by voice, offline, from the apiary. Track harvest, feeding, treatments and costs per hive. Free for one apiary.',
+    meta_description: 'Record hive inspections by voice, offline, from the apiary. Track harvest, feeding, treatments and costs per hive. Free for one hive.',
     focus_keyword: 'beekeeping app, beekeeping software, hive management software, beehive inspection app, apiary management',
     canonical_url: `${BASE}/`,
     robots: 'index, follow',
@@ -267,20 +267,20 @@ export const SEO_CONFIG: Record<string, SEOModel> = {
   },
 
   pricing: {
-    meta_title: `Beekeeping Software Pricing: Free & Pro Plans | ${SITE}`,
-    meta_description: 'Free forever for one apiary and ten hives. Pro at €5 a month for unlimited apiaries, treatment reminders, finances and weather. No card to start.',
+    meta_title: `Beekeeping Software Pricing: Free, €5 and €10 Plans | ${SITE}`,
+    meta_description: 'Free forever for one hive. Pro at €5 a month for up to 50 hives, Pro Unlimited at €10 for more. Every plan has every feature. No card to start.',
     focus_keyword: 'beekeeping software pricing, beekeeping app free, hive management software plans',
     canonical_url: `${BASE}/pricing`,
     robots: 'index, follow',
     image_url: `${BASE}/assets/images/og-pricing.jpg`,
-    og_title: `Beekeeping Software Pricing: Free & Pro Plans | ${SITE}`,
-    og_description: 'Free forever for one apiary. Pro at €5 a month for unlimited apiaries. No card to start.',
+    og_title: `Beekeeping Software Pricing: Free, €5 and €10 Plans | ${SITE}`,
+    og_description: 'Free for one hive. €5 a month up to 50 hives, €10 above. No card to start.',
     og_type: 'website',
     og_locale: 'en_US',
     og_site_name: SITE,
     twitter_card: 'summary_large_image',
     twitter_title: `Plans | ${SITE}`,
-    twitter_description: 'Free forever for one apiary. Pro at €5 a month for unlimited apiaries. No card to start.',
+    twitter_description: 'Free for one hive. €5 a month up to 50 hives, €10 above. No card to start.',
     schema: [
       {
         '@context': 'https://schema.org',

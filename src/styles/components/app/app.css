@@ -1079,6 +1079,34 @@
    carry a small semantic dot. No filled variants — the source has
    --accent, --warn and --danger fills, and eleven coloured cards would put
    the accent well past its 15% budget and stop it meaning anything. */
+
+/* The "Free for everyone" switch above the stats: one line of state, one action. */
+.admin-billing {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: var(--app-gap);
+  padding: var(--app-pad);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-bg-panel);
+}
+
+.admin-billing__title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--app-text-primary);
+}
+
+.admin-billing__text {
+  margin: 4px 0 0;
+  max-width: 72ch;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--app-text-muted);
+}
+
 .admin-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -2600,6 +2628,93 @@
 .dx__last {
   font-size: 0.8rem;
   color: var(--app-text-muted);
+}
+
+/* ---------- Plan ----------
+   Profile's plan card: what the plan holds, the two paid plans side by side. */
+
+.bill__lead {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--app-text-primary);
+}
+
+.bill__intro,
+.bill__meta,
+.bill__note {
+  margin: 6px 0 0;
+  max-width: 68ch;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--app-text-muted);
+}
+
+.bill__current {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: var(--app-gap);
+}
+
+.bill__plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--app-gap);
+  margin-top: var(--app-gap);
+}
+
+.bill__plan {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: var(--app-pad);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+}
+
+.bill__plan--current {
+  border-color: var(--app-accent);
+}
+
+.bill__plan-name {
+  margin: 0;
+  font-weight: 600;
+  color: var(--app-text-primary);
+}
+
+.bill__plan-price {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--app-text-primary);
+}
+
+.bill__plan-price span {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--app-text-muted);
+}
+
+.bill__plan-holds {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  color: var(--app-text-muted);
+}
+
+.bill__plan-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--app-accent);
+}
+
+.bill__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: var(--app-gap);
 }
 
 /* ---------- Team ----------

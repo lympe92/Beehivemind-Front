@@ -336,7 +336,7 @@ app.get('/rss.xml', async (_req, res, next) => {
  */
 const LLMS_TXT_HEAD = `# BeehiveMind
 
-> Beehive management software for working beekeepers. Hive inspections are recorded by voice, offline, from the apiary; harvests, feedings, treatment schedules, weather and costs per hive live on the web dashboard. Built in Greece. Free for one apiary; Pro plan for unlimited apiaries.
+> Beehive management software for working beekeepers. Hive inspections are recorded by voice, offline, from the apiary; harvests, feedings, treatment schedules, weather and costs per hive live on the web dashboard. Built in Greece. Free for one hive; €5 a month up to 50 hives, €10 above.
 
 BeehiveMind is one account across two clients: an Android app that records inspections and harvests by voice (works with no signal, syncs later) and a web dashboard at https://beehivemind.tech/user that turns those records into tables, charts, treatment reminders, a diagnosis per inspection and an AI assistant grounded in the beekeeper's own data.
 
@@ -350,7 +350,7 @@ BeehiveMind is one account across two clients: an Android app that records inspe
 - [Apiaries and beehives](https://beehivemind.tech/apiariesandbeehives): apiaries on a map, hives in bulk, queen records
 - [Harvest and feeding](https://beehivemind.tech/harvestandfeeding): honey, pollen, propolis, royal jelly; syrup, fondant, patties
 - [Financial](https://beehivemind.tech/financial): costs and income by category, cost per hive
-- [Plans](https://beehivemind.tech/pricing): Free (one apiary, ten hives) and Pro (€5 a month)
+- [Plans](https://beehivemind.tech/pricing): Free (one hive), Pro (€5 a month, up to 50 hives) and Pro Unlimited (€10 a month, more than 50)
 - [Help](https://beehivemind.tech/help): the ten voice phrases and troubleshooting
 - [About](https://beehivemind.tech/about)
 - [Contact](https://beehivemind.tech/contact)

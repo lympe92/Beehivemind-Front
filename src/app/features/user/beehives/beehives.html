@@ -29,7 +29,12 @@
 
       <ng-template #cellTpl let-row let-col="col">
         @switch (col.key) {
-          @case ('number') { <span class="dt__nowrap">{{ label(row) }}</span> }
+          @case ('number') {
+            <span class="dt__nowrap">{{ label(row) }}</span>
+            @if (row.readOnly) {
+              <span class="app-badge app-badge--pending" title="Past your plan's hive limit: no new records until you move up a plan or remove a hive">Read-only</span>
+            }
+          }
           @case ('apiary') { {{ apiaryName(row.apiaryId) }} }
           @case ('queen_year') { {{ row.queen?.year ?? '—' }} }
           @default { {{ row[col.key] ?? '—' }} }
