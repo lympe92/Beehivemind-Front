@@ -34,7 +34,7 @@ describe('BeehiveService', () => {
     });
 
     expect(result.map(b => [b.apiaryId, b.number])).toEqual([[1, 2], [1, 10], [2, 1]]);
-    expect(result[0]).toEqual({ id: 7, uuid: 'g', number: 2, apiaryId: 1, queen: { year: 2025 } });
+    expect(result[0]).toEqual({ id: 7, uuid: 'g', number: 2, apiaryId: 1, queen: { year: 2025 }, readOnly: false });
   });
 
   it('sends the number on an edit', () => {
@@ -70,7 +70,7 @@ describe('beehive labels', () => {
   });
 
   it('orders by apiary, then number', () => {
-    const hive = (id: number, apiaryId: number, number: number): Beehive => ({ id, uuid: '', number, apiaryId, queen: null });
+    const hive = (id: number, apiaryId: number, number: number): Beehive => ({ id, uuid: '', number, apiaryId, queen: null, readOnly: false });
     expect([hive(1, 1, 10), hive(2, 1, 9), hive(3, 0, 50)].sort(compareBeehives).map(b => b.id)).toEqual([3, 2, 1]);
   });
 });

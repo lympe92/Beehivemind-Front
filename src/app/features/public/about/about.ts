@@ -62,9 +62,9 @@ export class AboutComponent {
     // Three principles, each one falsifiable. TODO(content): confirm these are
     // the three you want to be held to.
     principles: [
-      { title: 'The records are yours', description: 'Exportable on every plan, including the free one. A downgrade makes an apiary read-only, never deleted. We do not sell data and we do not show your hives to anyone.' },
+      { title: 'The records are yours', description: 'Exportable on every plan, including the free one. A downgrade makes the hives over the plan read-only, never deleted. We do not sell data and we do not show your hives to anyone.' },
       { title: 'It works where the bees are', description: 'The app records without a connection and syncs when it finds one. An apiary with no signal is the normal case, not the edge case.' },
-      { title: 'Free stays free', description: 'One apiary and ten hives, with no card and no expiry. A beekeeper starting out should not have to pay to find out whether this suits them.' },
+      { title: 'Free stays free', description: 'One hive, with every feature, no card and no expiry. A beekeeper starting out should not have to pay to find out whether this suits them.' },
     ],
     // The facts band counts the company, not the product.
     facts: {
@@ -78,7 +78,7 @@ export class AboutComponent {
       ],
     },
     cta: {
-      title: 'Start with one apiary',
+      title: 'Start with one hive',
       description: 'The free plan takes a minute and needs no card. If it suits how you work, the rest is there.',
       cta: { label: 'Create an account', routerLink: '/auth/register', variant: 'outline' },
     },

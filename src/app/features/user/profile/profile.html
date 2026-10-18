@@ -190,6 +190,10 @@
         (cancel)="cancelInvitation($event)" />
     }
 
+    <!-- Everyone sees the team's plan; only the owner can change it. Stripe's
+         Checkout returns here with ?billing=success. -->
+    <app-billing-card />
+
     <!-- Above Danger zone: it answers the question that card raises. -->
     <app-data-export-card
       [lastExport]="profile()?.last_exported_at ?? null"

@@ -12,6 +12,7 @@ interface BeehivePayload {
   number: number;
   apiary_id: number;
   queen?: Beehive['queen'];
+  read_only?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -69,6 +70,7 @@ export class BeehiveService {
       number:   b.number,
       apiaryId: b.apiary_id,
       queen:    b.queen ?? null,
+      readOnly: b.read_only ?? false,
     };
   }
 }

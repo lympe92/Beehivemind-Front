@@ -3,6 +3,27 @@
     <h1 class="app-page-title">Dashboard</h1>
   </div>
 
+  @if (billing(); as b) {
+    <div class="admin-billing">
+      <div>
+        <p class="admin-billing__title">{{ b.free_for_all ? 'Everything is free for everyone' : 'Plans are on' }}</p>
+        <p class="admin-billing__text">
+          @if (b.free_for_all) {
+            No hive limit, no checkout. Turning this off applies the plans (Free 1 hive, €5 up to 50, €10 above) to every team.
+          } @else {
+            Teams pay for more than one hive. Turning free for all back on lifts every limit.
+          }
+          @if (!b.checkout_open) { Stripe's keys and prices are not set on the server yet. }
+        </p>
+      </div>
+      @if (b.free_for_all) {
+        <button type="button" class="app-btn app-btn--danger" [disabled]="switching() || !b.checkout_open" (click)="setFreeForAll(false)">Start charging</button>
+      } @else {
+        <button type="button" class="app-btn app-btn--ghost" [disabled]="switching()" (click)="setFreeForAll(true)">Make everything free</button>
+      }
+    </div>
+  }
+
   @if (loading()) {
     <div class="app-state">Loading stats…</div>
   } @else if (error()) {
@@ -33,8 +54,12 @@
         <span class="admin-stat__value">{{ s.users.by_plan.free | number }}</span>
       </div>
       <div class="admin-stat">
-        <span class="admin-stat__label"><span class="admin-stat__dot"></span>Pro plan</span>
+        <span class="admin-stat__label"><span class="admin-stat__dot"></span>Pro (€5)</span>
         <span class="admin-stat__value">{{ s.users.by_plan.pro | number }}</span>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat__label"><span class="admin-stat__dot"></span>Pro Unlimited (€10)</span>
+        <span class="admin-stat__value">{{ s.users.by_plan.pro_unlimited | number }}</span>
       </div>
       <div class="admin-stat">
         <span class="admin-stat__label"><span class="admin-stat__dot"></span>Enterprise</span>

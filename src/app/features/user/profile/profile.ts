@@ -31,6 +31,7 @@ import { InviteMemberModalComponent, InviteMemberResult } from '../../../shared/
 import { TeamMembersCardComponent } from './team-members-card/team-members-card';
 import { DataExportCardComponent, DataExportRequest } from './data-export-card/data-export-card';
 import { DeleteAccountCardComponent } from './delete-account-card/delete-account-card';
+import { BillingCardComponent } from './billing-card/billing-card';
 
 const UNITS = [
   { value: 'kg',    label: 'Kg / Lt (Metric)' },
@@ -44,7 +45,7 @@ type TfaStep = 'idle' | 'setup' | 'backup' | 'disable';
   standalone: true,
   imports: [
     FormsModule, LoaderComponent, CardComponent, CalloutComponent,
-    TeamMembersCardComponent, DataExportCardComponent, DeleteAccountCardComponent,
+    TeamMembersCardComponent, BillingCardComponent, DataExportCardComponent, DeleteAccountCardComponent,
   ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',

@@ -12,6 +12,11 @@ export interface Beehive {
   number: number;
   apiaryId: number;
   queen: Queen | null;
+  /**
+   * Past the team's plan: it can be seen, exported and deleted but takes no
+   * new record until the team moves up a plan or removes a hive.
+   */
+  readOnly: boolean;
 }
 
 /** "Beehive 12" — how every page names a hive. */

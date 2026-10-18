@@ -21,7 +21,7 @@ interface AdminUser {
   email: string;
   status: 'active' | 'suspended' | 'banned';
   /** For an editor, the team owner's plan — an editor has none of their own. */
-  plan: 'free' | 'pro' | 'enterprise';
+  plan: 'free' | 'pro' | 'pro_unlimited' | 'enterprise';
   team: AdminUserTeam | null;
   email_verified: boolean;
   created_at: string;
