@@ -56,7 +56,11 @@
           @if (s.trialDays > 0 && !subscribed()) {
             <p class="bill__note">The first {{ s.trialDays }} days are free. Your card is taken now and first charged when the trial ends; cancel before then and you pay nothing.</p>
           }
-          <p class="bill__note">Monthly, by card through Stripe. Cancel any time; the plan stays until the paid month ends.</p>
+          @if (s.refundableUntil && !s.subscription?.cancelAtPeriodEnd) {
+            <p class="bill__note">Monthly, by card through Stripe. Cancel by {{ s.refundableUntil | date:'d MMM y' }} and the whole payment comes back to your card within a few days; after that, cancelling keeps the plan until the paid month ends.</p>
+          } @else {
+            <p class="bill__note">Monthly, by card through Stripe. Cancel any time; the plan stays until the paid month ends.</p>
+          }
 
           @if (subscribed()) {
             <div class="bill__actions">

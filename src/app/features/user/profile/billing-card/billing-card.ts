@@ -1,4 +1,4 @@
-import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, computed, inject, output, signal } from '@angular/core';
 import { DatePipe, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CardComponent } from '../../../../shared/components/ui/card/card';
@@ -28,8 +28,15 @@ const PAID_PLANS: PlanOption[] = [
  * `?billing=success`; a running one switches in place. Editors see the plan
  * and who manages it, nothing to press.
  *
+ * Cancelling has two outcomes, and the API decides which (Terms §3): within 14
+ * days of the first payment the plan ends at once and the whole payment goes
+ * back to the card — the confirm and the toast say so, in those words;
+ * otherwise the plan stops renewing at the period's end.
+ *
  * Unlike the other cards it loads its own state: nothing else on the page
- * reads the plan, and it has to re-read it after the return from Stripe.
+ * reads the plan, and it has to re-read it after the return from Stripe. The
+ * Danger zone below needs one thing from it — whether a paid plan is running,
+ * and whether ending it refunds — so every summary read is also emitted.
  */
 @Component({
   selector: 'app-billing-card',
@@ -47,6 +54,9 @@ export class BillingCardComponent implements OnInit {
 
   readonly summary = signal<BillingSummary | null>(null);
   readonly busy = signal(false);
+
+  /** Every summary read, for the page: the Danger zone's copy depends on the plan. */
+  readonly summaryChange = output<BillingSummary>();
 
   readonly options = PAID_PLANS;
   readonly planName = computed(() => {
@@ -110,7 +120,7 @@ export class BillingCardComponent implements OnInit {
           return;
         }
         this.busy.set(false);
-        if (result.billing) this.summary.set(result.billing);
+        if (result.billing) this.setSummary(result.billing);
         this.toast.success(`You are on ${option.name}.`);
       },
       error: () => this.busy.set(false),
@@ -118,23 +128,31 @@ export class BillingCardComponent implements OnInit {
   }
 
   async cancel(): Promise<void> {
-    const ends = this.summary()?.subscription?.periodEndsAt;
+    const s = this.summary();
+    const ends = s?.subscription?.periodEndsAt;
+    const refunds = !!s?.refundableUntil;
     const confirmed = await this.modal.confirm({
       title: 'Cancel your plan?',
-      message: ends
-        ? `It stays until ${new Date(ends).toLocaleDateString()}, then your team moves to Free. Nothing is deleted.`
-        : 'At the end of the paid month your team moves to Free. Nothing is deleted.',
-      confirmLabel: 'Cancel plan',
+      message: refunds
+        ? 'Your plan ends now and the whole payment comes back to your card within a few days. Your team moves to Free; nothing is deleted.'
+        : ends
+          ? `It stays until ${new Date(ends).toLocaleDateString()}, then your team moves to Free. Nothing is deleted.`
+          : 'At the end of the paid month your team moves to Free. Nothing is deleted.',
+      confirmLabel: refunds ? 'Cancel and refund' : 'Cancel plan',
       danger: true,
     });
     if (!confirmed) return;
 
     this.busy.set(true);
     this.billing.cancel().subscribe({
-      next: summary => {
-        this.summary.set(summary);
+      next: result => {
+        this.setSummary(result.summary);
         this.busy.set(false);
-        this.toast.success('Your plan will not renew.');
+        this.toast.success(
+          result.refunded !== null
+            ? `Your plan has ended. €${result.refunded.toFixed(2)} is on its way back to your card and shows within a few days.`
+            : 'Your plan will not renew.',
+        );
       },
       error: () => this.busy.set(false),
     });
@@ -144,7 +162,7 @@ export class BillingCardComponent implements OnInit {
     this.busy.set(true);
     this.billing.resume().subscribe({
       next: summary => {
-        this.summary.set(summary);
+        this.setSummary(summary);
         this.busy.set(false);
         this.toast.success('Your plan will renew as before.');
       },
@@ -161,6 +179,11 @@ export class BillingCardComponent implements OnInit {
   }
 
   private load(): void {
-    this.billing.summary().subscribe(summary => this.summary.set(summary));
+    this.billing.summary().subscribe(summary => this.setSummary(summary));
+  }
+
+  private setSummary(summary: BillingSummary): void {
+    this.summary.set(summary);
+    this.summaryChange.emit(summary);
   }
 }

@@ -191,8 +191,9 @@
     }
 
     <!-- Everyone sees the team's plan; only the owner can change it. Stripe's
-         Checkout returns here with ?billing=success. -->
-    <app-billing-card />
+         Checkout returns here with ?billing=success. The Danger zone's confirm
+         reads the plan from here: deleting the account ends it. -->
+    <app-billing-card (summaryChange)="billing.set($event)" />
 
     <!-- Above Danger zone: it answers the question that card raises. -->
     <app-data-export-card

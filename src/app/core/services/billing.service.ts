@@ -29,6 +29,12 @@ export interface BillingSummary {
   monthlyPrices: Record<PaidPlan, number>;
   /** Free days a Checkout would start with: only before the owner's first subscription. */
   trialDays: number;
+  /**
+   * Until when cancelling ends the plan at once and gives the whole payment
+   * back (Terms §3: 14 days from the first payment). Null once that has passed,
+   * or when nothing has been paid yet.
+   */
+  refundableUntil: string | null;
   subscription: {
     status: string;
     cancelAtPeriodEnd: boolean;
@@ -53,6 +59,7 @@ interface BillingSummaryPayload {
   checkout_open: boolean;
   monthly_prices: Record<PaidPlan, number>;
   trial_days?: number;
+  refundable_until?: string | null;
   subscription: { status: string; cancel_at_period_end: boolean; period_ends_at: string | null } | null;
 }
 
@@ -60,6 +67,16 @@ interface BillingSummaryPayload {
 export interface CheckoutResult {
   url: string | null;
   billing: BillingSummary | null;
+}
+
+/**
+ * What a cancellation did. Within the refund window the plan ended at once and
+ * `refunded` is the amount in euros on its way back to the card; otherwise the
+ * plan stops renewing and `refunded` is null.
+ */
+export interface CancelResult {
+  summary: BillingSummary;
+  refunded: number | null;
 }
 
 /** The plan names the site uses, in one place. */
@@ -99,8 +116,10 @@ export class BillingService {
     return this.request.postRequest<{ url: string }>('billing/portal').pipe(map(res => res.data.url));
   }
 
-  cancel(): Observable<BillingSummary> {
-    return this.request.postRequest<BillingSummaryPayload>('billing/cancel').pipe(map(res => fromApi(res.data)));
+  cancel(): Observable<CancelResult> {
+    return this.request
+      .postRequest<BillingSummaryPayload & { refunded?: number | null }>('billing/cancel')
+      .pipe(map(res => ({ summary: fromApi(res.data), refunded: res.data.refunded ?? null })));
   }
 
   resume(): Observable<BillingSummary> {
@@ -119,6 +138,7 @@ function fromApi(p: BillingSummaryPayload): BillingSummary {
     checkoutOpen: p.checkout_open,
     monthlyPrices: p.monthly_prices,
     trialDays: p.trial_days ?? 0,
+    refundableUntil: p.refundable_until ?? null,
     subscription: p.subscription
       ? {
           status: p.subscription.status,
