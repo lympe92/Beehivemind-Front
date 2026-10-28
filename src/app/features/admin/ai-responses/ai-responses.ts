@@ -45,6 +45,18 @@ interface ConversationMessage {
   created_at: string;
 }
 
+/** What the judge endpoint answers: the judgment at once (sync queue), or a ticket to poll. */
+type JudgeResponse = JudgmentResult | { message_id: number; status: 'queued' };
+type JudgmentStatus =
+  | { status: 'done'; judgment: JudgmentResult }
+  | { status: 'queued' }
+  | { status: 'failed'; error: string }
+  | { status: 'none' };
+
+/** The queued judge is polled this often, for this long, before the page gives up. */
+const JUDGE_POLL_MS = 2000;
+const JUDGE_POLL_MAX = 45;
+
 type Tab = 'pending' | 'judged';
 type JudgedFilter = '' | 'hallucination' | 'safety' | 'low_score' | 'unreviewed' | 'flagged_for_retraining';
 
@@ -154,27 +166,62 @@ export class AiResponsesComponent implements OnInit {
     this.loadPending();
   }
 
-  /** Runs the judge on one reply; the result opens in the detail panel. */
+  /**
+   * Queues the judge on one reply and polls until it is scored; the result
+   * opens in the detail panel. The API answers at once (202 queued, or the
+   * judgment itself when its queue is synchronous) — the Anthropic call used
+   * to run inside the request and outran it.
+   */
   judge(messageId: number): void {
     if (this.judgingId() !== null) return;
     this.judgingId.set(messageId);
     this.error.set(null);
 
     this.request
-      .postRequest<JudgmentResult>(`admin/ai-responses/${messageId}/judge`, {})
+      .postRequest<JudgeResponse>(`admin/ai-responses/${messageId}/judge`, {})
       .subscribe({
         next: (res) => {
-          this.judgingId.set(null);
-          this.pending.update(rows => rows.filter(r => r.message_id !== messageId));
-          this.pendingTotal.update(n => Math.max(0, n - 1));
-          this.judgedLoaded.set(false);
-          this.open(res.data);
+          if ('judgment' in res.data) {
+            this.showJudgment(messageId, res.data);
+          } else {
+            this.pollJudgment(messageId, 0);
+          }
         },
-        error: () => {
-          this.error.set('The judgment did not complete. Try again.');
-          this.judgingId.set(null);
-        },
+        error: () => this.judgeFailed('The judgment did not complete. Try again.'),
       });
+  }
+
+  private pollJudgment(messageId: number, attempt: number): void {
+    if (attempt >= JUDGE_POLL_MAX) {
+      this.judgeFailed('The judge is taking too long. The result will be in the Judged tab once it is ready.');
+      return;
+    }
+    setTimeout(() => {
+      this.request
+        .getRequest<JudgmentStatus>(`admin/ai-responses/${messageId}/judgment`)
+        .subscribe({
+          next: (res) => {
+            const s = res.data;
+            if (s.status === 'done') this.showJudgment(messageId, s.judgment);
+            else if (s.status === 'failed') this.judgeFailed(s.error);
+            else this.pollJudgment(messageId, attempt + 1);
+          },
+          error: () => this.judgeFailed('The judgment did not complete. Try again.'),
+        });
+    }, JUDGE_POLL_MS);
+  }
+
+  private showJudgment(messageId: number, result: JudgmentResult): void {
+    this.judgingId.set(null);
+    this.pending.update(rows => rows.filter(r => r.message_id !== messageId));
+    this.pendingTotal.update(n => Math.max(0, n - 1));
+    this.judgedLoaded.set(false);
+    this.open(result);
+  }
+
+  private judgeFailed(message: string): void {
+    this.error.set(message);
+    this.judgingId.set(null);
   }
 
   // ── Judged ─────────────────────────────────────────────────

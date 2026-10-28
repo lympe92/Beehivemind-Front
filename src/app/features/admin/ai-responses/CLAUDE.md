@@ -19,7 +19,8 @@ role too. Nav link in `admin-layout.html` (🤖, admin+).
 ## State & Data
 - **No store, no domain service** — calls `RequestService` directly:
   - `GET admin/ai-responses/pending?page` → un-judged replies (`{ data, meta }`)
-  - `POST admin/ai-responses/{messageId}/judge` → runs the judge synchronously, returns the judgment
+  - `POST admin/ai-responses/{messageId}/judge` → queues the judge: 200 the existing judgment, 201 the judgment (sync queue), 202 `{ message_id, status: 'queued' }`
+  - `GET admin/ai-responses/{messageId}/judgment` → `{ status: done | queued | failed | none, judgment?, error? }`, polled every 2 s for up to 90 s after a 202
   - `GET admin/ai-responses?page&flag&sort` → judged replies
   - `GET admin/ai-responses/{id}` → the judgment with the conversation's messages
   - `PATCH admin/ai-responses/{id}/admin-review` `{ admin_notes, flagged_for_retraining }`
@@ -28,7 +29,8 @@ role too. Nav link in `admin-layout.html` (🤖, admin+).
 
 ## Patterns / gotchas
 - **Judge once:** the backend returns the existing judgment if one exists. A judged row leaves the pending list and the judged tab reloads next time it is opened.
-- The rubric has no tool score any more (the chat has no tools): factual accuracy, refusal appropriateness (null when no refusal was needed), helpfulness, the two flags, the composite (1.0 whenever a flag is set). `detector_flags` are the deterministic checks (unknown treatment, frame count out of range, reading not in the hive context, tool-like prose).
+- **The judge is queued, not awaited:** `judge()` polls the status endpoint while `judgingId` holds the row (single-flight); `failed` shows the API's reason (the daily cost cap, the judge giving up), and after 90 s the page says the result will appear in the Judged tab.
+- The rubric has no tool score any more (the chat has no tools): factual accuracy, refusal appropriateness (null when no refusal was needed), helpfulness, the two flags, the composite (1.0 whenever a flag is set, else the mean of accuracy and helpfulness). `detector_flags` are the deterministic checks (unknown treatment, frame count out of range, reading not in the hive context, tool-like prose) — hints shown beside the verdict; only tool-like prose sets the hallucination flag.
 - The conversation in the detail reuses the chat's `.app-chat__log` / `.app-msg` classes.
 
 ## Related

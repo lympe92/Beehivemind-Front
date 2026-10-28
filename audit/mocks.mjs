@@ -402,6 +402,7 @@ export function mock(method, path) {
   if (route === 'admin/voice-quality') return ok(VOICE_QUALITY);
   if (route === 'admin/ai-responses/pending') return page(PENDING_AI);
   if (route === 'admin/ai-responses') return page(JUDGED_AI);
+  if (/^admin\/ai-responses\/\d+\/judgment$/.test(route)) return ok({ status: 'done', judgment: JUDGED_AI[0] });
   if (/^admin\/ai-responses\/\d+$/.test(route)) return ok({ judgment: JUDGED_AI[0], conversation: { id: 2, title: 'When to treat for varroa', messages: CONVERSATION_1.messages } });
   return ok([]);
 }
