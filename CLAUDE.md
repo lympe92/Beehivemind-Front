@@ -276,6 +276,7 @@ Each row links to that feature's own `CLAUDE.md`.
 | Admin · Employees | `/admin/employees` | — | [↗](src/app/features/admin/employee-management/CLAUDE.md) |
 | Admin · Coupons | `/admin/coupons` | — | [↗](src/app/features/admin/coupons/CLAUDE.md) |
 | Admin · AI Responses | `/admin/ai-responses` | — (direct `RequestService`) | [↗](src/app/features/admin/ai-responses/CLAUDE.md) |
+| Admin · Voice Quality | `/admin/voice-quality` | — (direct `RequestService`) | [↗](src/app/features/admin/voice-quality/CLAUDE.md) |
 | Admin · Blog | `/admin/blog` (+ `/new`, `/:id`, `/categories`) | — (direct `RequestService`) | [↗](src/app/features/admin/blog/CLAUDE.md) |
 | Admin · Moderation | `/admin/moderation` | — (placeholder page; no brief yet) | `features/admin/moderation/` |
 | Admin · Raw Data | `/admin/raw` (+ `/:model`) | — | [↗](src/app/features/admin/raw-data/CLAUDE.md) |

@@ -68,6 +68,12 @@ export const adminRoutes: Routes = [
       import('./ai-responses/ai-responses').then((m) => m.AiResponsesComponent),
   },
   {
+    path: 'voice-quality',
+    canActivate: [employeeRoleGuard('admin')],
+    loadComponent: () =>
+      import('./voice-quality/voice-quality').then((m) => m.VoiceQualityComponent),
+  },
+  {
     path: 'raw',
     canActivate: [employeeRoleGuard('superadmin')],
     loadComponent: () =>

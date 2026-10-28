@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { environment } from '../../../environments/environment';
 import { ToastService } from '../../shared/components/ui/toast/toast.service';
 import { AuthActions } from '../../store/auth/auth.actions';
-import { errorInterceptor } from './error.interceptor';
+import { errorInterceptor, inlineErrors } from './error.interceptor';
 
 describe('errorInterceptor', () => {
   const store = { dispatch: vi.fn() };
@@ -53,5 +53,18 @@ describe('errorInterceptor', () => {
 
     expect(store.dispatch).toHaveBeenCalledWith(AuthActions.accountRemoved());
     expect(toast.error).not.toHaveBeenCalled();
+  });
+
+  it('leaves only the named statuses to the caller', () => {
+    const put = (status: number) => {
+      http.put(environment.apiUrl + 'beehives/3', {}, { context: inlineErrors(422) }).subscribe({ error: () => {} });
+      backend.expectOne(environment.apiUrl + 'beehives/3').flush({ message: 'Taken.' }, { status, statusText: 'Error' });
+    };
+
+    put(422);
+    expect(toast.error).not.toHaveBeenCalled();
+
+    put(401);
+    expect(store.dispatch).toHaveBeenCalledWith(AuthActions.logout());
   });
 });

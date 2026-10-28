@@ -48,12 +48,9 @@ export class PublicFooterComponent {
   // no longer exists; add it back here and in index.html's `sameAs` once a
   // page is live again. There is no Facebook page and no Twitter/X account,
   // by decision.
-  // TikTok is due to become @beehivemindapp, like Instagram, once TikTok
-  // allows the rename (2026-10-12); the old address stops resolving then, so
-  // change it here and in `sameAs` the same day.
   readonly social: FooterLink[] = [
     { label: 'Instagram', href: 'https://www.instagram.com/beehivemindapp', external: true },
-    { label: 'TikTok', href: 'https://www.tiktok.com/@beehivemind.tech', external: true },
+    { label: 'TikTok', href: 'https://www.tiktok.com/@beehivemindapp', external: true },
     { label: 'Youtube', href: 'https://www.youtube.com/@beehivemindapp', external: true },
   ];
 

@@ -33,7 +33,7 @@ with the beekeeper's "useful? yes/no" at the bottom (`POST inspections/{id}/feed
 Service `core/services/diagnosis.service.ts`, model `diagnosis.model.ts`.
 
 ## Gotchas
-- The table leads with a **Beehive** column (name resolved from the `beehives` slice via `beehiveName()`) and a `mediumDate` date, both wrapped in `.dt__nowrap`; headers use the design system's short forms ("Pop.", "Q. year") so all fourteen readings fit one row. Feeding and Harvest follow the same shape (Beehive · Date · … · Quantity with unit).
+- The table leads with a **Beehive** column (`#12`, resolved from the `beehives` slice via `beehiveName()` → `beehiveTag()`; the add dialog's dropdown says "Beehive 12") and a `mediumDate` date, both wrapped in `.dt__nowrap`; headers use the design system's short forms ("Pop.", "Q. year") so all fourteen readings fit one row. Feeding and Harvest follow the same shape (Beehive · Date · … · Quantity with unit).
 - Edit strips `beehive_id` from the payload (`const { beehive_id, ...payload }`) — the beehive isn't reassigned on edit.
 - Toggle fields use `value: !!row?.field`; `queen_exists` defaults to `true` on add.
 

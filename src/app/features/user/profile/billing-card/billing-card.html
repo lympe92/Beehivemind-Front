@@ -1,0 +1,85 @@
+<app-card title="Plan">
+  @if (summary(); as s) {
+    @if (s.freeForAll) {
+      <p class="bill__lead">Everything is free for everyone right now.</p>
+      <p class="bill__intro">
+        Every feature, no hive limit, nothing to pay. You have {{ s.hiveCount }} {{ s.hiveCount === 1 ? 'hive' : 'hives' }}.
+        When paid plans start, the plan you need is chosen here.
+      </p>
+    } @else {
+      <div class="bill__current">
+        <div>
+          <p class="bill__lead">{{ planName() }}</p>
+          <p class="bill__meta">
+            {{ holds() }} · you have {{ s.hiveCount }} {{ s.hiveCount === 1 ? 'hive' : 'hives' }}
+            @if (s.subscription; as sub) {
+              @if (sub.periodEndsAt) {
+                @if (sub.status === 'trialing') {
+                  · free trial {{ sub.cancelAtPeriodEnd ? 'ends, no charge,' : 'ends, first charge' }} {{ sub.periodEndsAt | date:'d MMM y' }}
+                } @else {
+                  · {{ sub.cancelAtPeriodEnd ? 'ends' : 'renews' }} {{ sub.periodEndsAt | date:'d MMM y' }}
+                }
+              }
+            }
+          </p>
+        </div>
+        @if (s.subscription?.cancelAtPeriodEnd) {
+          <span class="app-badge app-badge--pending">Not renewing</span>
+        }
+      </div>
+
+      @if (s.readOnlyHives > 0) {
+        <app-callout tone="warning" [title]="s.readOnlyHives + (s.readOnlyHives === 1 ? ' hive is read-only' : ' hives are read-only')">
+          Your plan holds {{ s.hiveLimit === 1 ? 'one hive' : s.hiveLimit + ' hives' }} and your team has {{ s.hiveCount }}.
+          The oldest stay as they are; the rest can be seen, exported and deleted, but take no new record until you move up a plan or remove a hive.
+        </app-callout>
+      }
+
+      @if (s.canManage) {
+        @if (s.checkoutOpen) {
+          <div class="bill__plans">
+            @for (option of options; track option.plan) {
+              <div class="bill__plan" [class.bill__plan--current]="isCurrent(option.plan)">
+                <p class="bill__plan-name">{{ option.name }}</p>
+                <p class="bill__plan-price">€{{ price(option.plan) }} <span>/ month</span></p>
+                <p class="bill__plan-holds">{{ option.holds }}</p>
+                @if (isCurrent(option.plan) && !s.subscription?.cancelAtPeriodEnd) {
+                  <span class="bill__plan-badge">Your plan</span>
+                } @else {
+                  <button type="button" class="app-btn app-btn--primary" [disabled]="busy()" (click)="choose(option)">
+                    {{ subscribed() ? (isCurrent(option.plan) ? 'Keep ' + option.name : 'Switch to ' + option.name) : 'Choose ' + option.name }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+          @if (s.trialDays > 0 && !subscribed()) {
+            <p class="bill__note">The first {{ s.trialDays }} days are free. Your card is taken now and first charged when the trial ends; cancel before then and you pay nothing.</p>
+          }
+          @if (s.refundableUntil && !s.subscription?.cancelAtPeriodEnd) {
+            <p class="bill__note">Monthly, by card through Stripe. Cancel by {{ s.refundableUntil | date:'d MMM y' }} and the whole payment comes back to your card within a few days; after that, cancelling keeps the plan until the paid month ends.</p>
+          } @else {
+            <p class="bill__note">Monthly, by card through Stripe. Cancel any time; the plan stays until the paid month ends.</p>
+          }
+
+          @if (subscribed()) {
+            <div class="bill__actions">
+              <button type="button" class="app-btn app-btn--ghost" [disabled]="busy()" (click)="openPortal()">Card &amp; invoices</button>
+              @if (s.subscription?.cancelAtPeriodEnd) {
+                <button type="button" class="app-btn app-btn--primary" [disabled]="busy()" (click)="resume()">Keep my plan</button>
+              } @else {
+                <button type="button" class="app-btn app-btn--danger" [disabled]="busy()" (click)="cancel()">Cancel plan</button>
+              }
+            </div>
+          }
+        } @else {
+          <p class="bill__intro">Paid plans open soon.</p>
+        }
+      } @else {
+        <p class="bill__intro">Your team's owner chooses and pays for the plan.</p>
+      }
+    }
+  } @else {
+    <p class="bill__intro">Loading your plan…</p>
+  }
+</app-card>

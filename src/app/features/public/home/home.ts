@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { BillingService } from '../../../core/services/billing.service';
+import { FREE_FOR_ALL_NOTE, PLAN_TIERS } from '../../../core/data/plans';
 import { HeroLeftContentComponent } from '../../../shared/components/hero-sections/hero-left-content/hero-left-content';
 import { RibbonComponent } from '../../../shared/components/info-sections/ribbon/ribbon';
 import { SplitContentComponent } from '../../../shared/components/info-sections/split-content/split-content';
@@ -58,7 +61,20 @@ interface HomePageConfig {
   ],
   templateUrl: './home.html',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
+  private billing = inject(BillingService);
+  private platformId = inject(PLATFORM_ID);
+
+  /** The plans band's note: the free-for-all line while it holds, read in the browser. */
+  readonly pricingNote = signal('Start free with one hive. Every plan has every feature, records by voice, works offline and exports your data.');
+
+  ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    this.billing.plans().subscribe(plans => {
+      if (plans.freeForAll) this.pricingNote.set(FREE_FOR_ALL_NOTE);
+    });
+  }
+
   readonly page: HomePageConfig = {
     hero: {
       title: 'Beekeeping software that records by voice',
@@ -173,41 +189,12 @@ export class HomeComponent {
       image: { src: '/assets/img/comb.webp', alt: 'Ink illustration of honeycomb dripping with honey', width: 548, height: 542 },
       cta: { label: 'How the voice beekeeping app works »', routerLink: '/app' },
     },
-    // TODO(content): every figure below needs confirming. The tier names are
-    // real (the admin panel filters on them); the prices and limits are the
-    // shape the band should have, not agreed numbers. This band is also a
-    // second copy of /pricing — change a price and two files need it.
+    // The same tiers as /pricing (core/data/plans.ts); the note is
+    // `pricingNote`, which says so while everything is free for everyone.
     pricing: {
       title: 'Plans',
-      note: 'Start free and stay free if one apiary is all you keep. Every plan records by voice, works offline and exports your data.',
-      // The band is a copy of /pricing; the link says which one is the source.
       noteLink: { label: 'Compare the plans in full »', routerLink: '/pricing' },
-      tiers: [
-        {
-          name: 'Free',
-          price: '€0',
-          period: 'forever',
-          forWhom: 'One apiary, for a beekeeper starting out.',
-          includes: ['1 apiary, up to 10 hives', 'Voice inspections and harvest', 'Offline recording', 'Your data exportable at any time'],
-          cta: { label: 'Create an account', routerLink: '/auth/register' },
-        },
-        {
-          name: 'Pro',
-          price: '€5',
-          period: '/ month',
-          featured: true,
-          forWhom: 'The working beekeeper, one to twenty apiaries.',
-          includes: ['Unlimited apiaries and hives', 'Treatment schedules and reminders', 'Financial tracking by category', 'Weather per apiary', 'QR labels for every hive'],
-          cta: { label: 'Start with Pro', routerLink: '/auth/register' },
-        },
-        {
-          name: 'Enterprise',
-          price: 'Talk to us',
-          forWhom: 'Cooperatives and operations with staff.',
-          includes: ['Everything in Pro', 'Several users on one operation', 'Per-user roles and permissions', 'Bulk import of existing records', 'Support with setup'],
-          cta: { label: 'Contact us', routerLink: '/contact' },
-        },
-      ],
+      tiers: PLAN_TIERS,
     },
     applicationDownload: {
       title: 'The app is where the recording happens',
@@ -215,15 +202,13 @@ export class HomeComponent {
       logo: { src: '/assets/img/logo1.webp', alt: 'BeehiveMind logo', width: 105, height: 105 },
       storeLinks: storeBadges('home'),
     },
-    // TODO(content): the two figures marked need real numbers from the
-    // database — they are the shape the band should have, not confirmed values.
     infoColumns: {
       mode: 'light',
-      title: 'Trusted partner',
+      title: 'Built for the apiary',
       items: [
-        { title: '1.000+', description: 'Beekeepers' },
-        { title: '18.000+', description: 'Hives managed' },
-        { title: '260.000+', description: 'Inspections recorded' },
+        { title: '10+', description: 'Customers' },
+        { title: 'Free', description: 'For your first hive' },
+        { title: 'By voice', description: 'Inspections recorded hands-free' },
       ],
     },
     ctaBanner: {

@@ -80,6 +80,26 @@ export class AuthService {
       })));
   }
 
+  /** Sign in with Apple: the identity token, and the name Apple hands over on the first sign-in only. */
+  loginWithApple(credential: string, givenName: string, familyName: string): Observable<{
+    user?: User; token?: string;
+    requires_2fa?: boolean; twoFactorToken?: string;
+    isNewUser?: boolean;
+  }> {
+    return this.request
+      .postRequest<{ token?: string; user?: User; requires_2fa?: boolean; two_factor_token?: string; is_new_user?: boolean }>(
+        'user/auth/apple',
+        { credential, given_name: givenName, family_name: familyName },
+      )
+      .pipe(map((res) => ({
+        user: res.data.user,
+        token: res.data.token,
+        requires_2fa: res.data.requires_2fa,
+        twoFactorToken: res.data.two_factor_token,
+        isNewUser: res.data.is_new_user,
+      })));
+  }
+
   logout(): Observable<void> {
     return this.request.postRequest('user/logout').pipe(map(() => void 0));
   }

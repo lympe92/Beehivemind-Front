@@ -7,6 +7,7 @@ import { AgendaService } from '../../../../core/services/agenda.service';
 import { InspectionService } from '../../../../core/services/inspection.service';
 import { TreatmentSessionService } from '../../../../core/services/treatment-session.service';
 import { Apiary } from '../../../../core/models/apiary.model';
+import { beehiveTag } from '../../../../core/models/beehive.model';
 import { Inspection } from '../../../../core/models/inspection.model';
 import { AgendaItem } from '../../../../core/models/agenda-item.model';
 import { TreatmentSession } from '../../../../core/models/treatment-session.model';
@@ -116,7 +117,8 @@ export class ApiaryViewComponent implements OnInit {
   }
 
   beehiveName(id: number): string {
-    return this.beehives().find(b => b.id === id)?.name ?? `#${id}`;
+    const hive = this.beehives().find(b => b.id === id);
+    return hive ? beehiveTag(hive) : '—';
   }
 
   instancesDone(session: TreatmentSession): number {

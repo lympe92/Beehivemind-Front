@@ -2,6 +2,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { of } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { beehiveLabel, beehiveTag } from '../../../core/models/beehive.model';
 import {
   Feeding,
   FEEDING_TYPES,
@@ -54,7 +55,8 @@ export class FeedingComponent implements OnInit {
 
   beehiveName(beehiveId: number | null): string {
     if (!beehiveId) return 'All beehives';
-    return this.allBeehives().find(b => b.id === beehiveId)?.name ?? '—';
+    const hive = this.allBeehives().find(b => b.id === beehiveId);
+    return hive ? beehiveTag(hive) : '—';
   }
   private allFeeding = this.store.selectSignal(selectAllFeeding);
   loading = this.store.selectSignal(selectFeedingLoading);
@@ -153,7 +155,7 @@ export class FeedingComponent implements OnInit {
               { displayValue: '— All beehives —', returnValue: null },
               ...allBeehives
                 .filter(b => b.apiaryId === apiaryId)
-                .map(b => ({ displayValue: b.name, returnValue: b.id })),
+                .map(b => ({ displayValue: beehiveLabel(b), returnValue: b.id })),
             ]),
           },
           {
@@ -212,8 +214,8 @@ export class FeedingComponent implements OnInit {
         f => f.beehiveId === beehiveId && f.date === value.date
       );
       if (duplicate) {
-        const beehiveName = allBeehives.find(b => b.id === beehiveId)?.name ?? '';
-        this.toast.warning(`A record for ${value.date} on beehive "${beehiveName}" already exists. Edit that record instead.`);
+        const hive = allBeehives.find(b => b.id === beehiveId);
+        this.toast.warning(`A record for ${value.date} on ${hive ? beehiveLabel(hive) : 'this beehive'} already exists. Edit that record instead.`);
         return;
       }
     }
@@ -332,10 +334,10 @@ export class FeedingComponent implements OnInit {
   // ── Delete ───────────────────────────────────────────────
 
   async deleteRow(row: Feeding): Promise<void> {
-    const beehiveName = this.allBeehives().find(b => b.id === row.beehiveId)?.name ?? '';
+    const hive = this.allBeehives().find(b => b.id === row.beehiveId);
     const confirmed = await this.modal.confirm({
       title: 'Delete Record',
-      message: `Delete feeding record${beehiveName ? ` for beehive "${beehiveName}"` : ''} on ${row.date}?`,
+      message: `Delete feeding record${hive ? ` for ${beehiveLabel(hive)}` : ''} on ${row.date}?`,
       confirmLabel: 'Delete',
       danger: true,
     });

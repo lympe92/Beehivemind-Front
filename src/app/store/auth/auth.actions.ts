@@ -8,6 +8,8 @@ export const AuthActions = createActionGroup({
     'Login Success': props<{ user: User; token: string }>(),
     'Login Failure': props<{ error: string; retryAfterMinutes?: number }>(),
     'Login With Google': props<{ credential: string; inviteToken?: string }>(),
+    // Apple sends the name with the first sign-in only, outside the token.
+    'Login With Apple': props<{ credential: string; givenName: string; familyName: string }>(),
     'Login Needs Country': props<{ user: User; token: string }>(),
 
     // 2FA during login

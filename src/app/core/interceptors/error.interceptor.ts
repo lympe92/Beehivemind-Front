@@ -1,4 +1,4 @@
-import { HttpContext, HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpContext, HttpContextToken, HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { catchError, throwError } from 'rxjs';
@@ -43,12 +43,19 @@ const SILENT_PATHS = ['blog/posts', 'blog/categories', 'contact'];
 /**
  * For one request whose failure the caller shows in place — the invite dialog
  * turns every refusal into a field error, and a toast on top of it would say
- * the same thing twice.
+ * the same thing twice. Given statuses, only those are left to the caller —
+ * the beehive edit row shows a 422 (number taken) under its field, while a 401
+ * still signs the user out here.
  */
-const INLINE_ERRORS = new HttpContextToken<boolean>(() => false);
+const INLINE_ERRORS = new HttpContextToken<boolean | readonly number[]>(() => false);
 
-export function inlineErrors(): HttpContext {
-  return new HttpContext().set(INLINE_ERRORS, true);
+export function inlineErrors(...statuses: number[]): HttpContext {
+  return new HttpContext().set(INLINE_ERRORS, statuses.length ? statuses : true);
+}
+
+function isInline(req: HttpRequest<unknown>, status: number): boolean {
+  const inline = req.context.get(INLINE_ERRORS);
+  return inline === true || (Array.isArray(inline) && inline.includes(status));
 }
 
 /**
@@ -75,7 +82,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
-      if (SILENT_PATHS.some((p) => req.url.includes(p)) || req.context.get(INLINE_ERRORS)) {
+      if (SILENT_PATHS.some((p) => req.url.includes(p)) || isInline(req, error.status)) {
         return throwError(() => error);
       }
 

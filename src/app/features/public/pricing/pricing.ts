@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { PageIntroComponent } from '../../../shared/components/info-sections/page-intro/page-intro';
 import { PricingTiersComponent } from '../../../shared/components/cta-sections/pricing-tiers/pricing-tiers';
 import { TextColumnsComponent } from '../../../shared/components/info-sections/text-columns/text-columns';
@@ -6,6 +7,8 @@ import { CtaBannerComponent } from '../../../shared/components/cta-sections/cta-
 import { CtaBannerConfig, PageIntroConfig, PricingConfig, TextColumnsConfig } from '../public-page.model';
 import { SeoService } from '../../../core/services/seo.service';
 import { SEO_CONFIG } from '../../../core/services/seo.config';
+import { BillingService } from '../../../core/services/billing.service';
+import { FREE_FOR_ALL_NOTE, PLAN_TIERS } from '../../../core/data/plans';
 import { faqPageSchema, withFaq } from '../../../core/utils/faq-schema';
 import { environment } from '../../../../environments/environment';
 
@@ -17,9 +20,10 @@ interface PricingPageConfig {
 }
 
 /**
- * The plans page. TODO(content): every figure needs confirming — the tier
- * names are real (the admin panel filters on them); the prices and the limits
- * are the shape the page should have, not agreed numbers.
+ * The plans page. The tiers are `PLAN_TIERS` (core/data/plans.ts), shared
+ * with the home page's band. While everything is free for everyone (the admin
+ * console's switch) a note above the tiers says so; it is read in the browser,
+ * so the prerendered page shows the plans alone.
  *
  * Like `HelpComponent`, it applies its own SEO rather than going through the
  * route's `seoKey`, because the FAQPage node is built from `questions` — the
@@ -32,54 +36,33 @@ interface PricingPageConfig {
   imports: [PageIntroComponent, PricingTiersComponent, TextColumnsComponent, CtaBannerComponent],
   templateUrl: './pricing.html',
 })
-export class PricingComponent {
+export class PricingComponent implements OnInit {
   private seoService = inject(SeoService);
+  private billing = inject(BillingService);
+  private platformId = inject(PLATFORM_ID);
+
+  readonly note = signal('');
 
   readonly page: PricingPageConfig = {
     intro: {
       title: 'Beekeeping software pricing',
-      lead: 'Start free and stay free if one apiary is all you keep. Every plan records by voice, works without signal, and lets you take your data out whenever you want.',
+      lead: 'Start free with one hive. Every plan has every feature, records by voice, works without signal, and lets you take your data out whenever you want; what a plan adds is hives.',
     },
     pricing: {
-      title: 'What each plan lifts',
-      tiers: [
-        {
-          name: 'Free',
-          price: '€0',
-          period: 'forever',
-          forWhom: 'One apiary, for a beekeeper starting out.',
-          includes: ['1 apiary, up to 10 hives', 'Voice inspections and harvest', 'Offline recording', 'Your data exportable at any time'],
-          cta: { label: 'Create an account', routerLink: '/auth/register' },
-        },
-        {
-          name: 'Pro',
-          price: '€5',
-          period: '/ month',
-          featured: true,
-          forWhom: 'The working beekeeper, one to twenty apiaries.',
-          includes: ['Unlimited apiaries and hives', 'Treatment schedules and reminders', 'Financial tracking by category', 'Weather per apiary', 'QR labels for every hive'],
-          cta: { label: 'Start with Pro', routerLink: '/auth/register' },
-        },
-        {
-          name: 'Enterprise',
-          price: 'Talk to us',
-          forWhom: 'Cooperatives and operations with staff.',
-          includes: ['Everything in Pro', 'Several users on one operation', 'Per-user roles and permissions', 'Bulk import of existing records', 'Support with setup'],
-          cta: { label: 'Contact us', routerLink: '/contact' },
-        },
-      ],
+      title: 'What each plan holds',
+      tiers: PLAN_TIERS,
     },
     // The three questions a plans page has to answer before someone will pick
     // one, and none of them is about features. Phrased as questions because
     // that is what they are — and what the FAQ markup below needs.
     questions: [
-      { title: 'Can I change plan later?', description: 'Yes, up or down whenever you like, from your profile. Going down never deletes a record — the apiaries over your new limit become read-only until you remove one or move back up.' },
+      { title: 'Can I change plan later?', description: 'Yes, up or down whenever you like, from your profile. Going down never deletes a record: the hives over your new plan become read-only, your oldest stay as they are, until you remove one or move back up.' },
       { title: 'Who owns my data?', description: 'You do. Every inspection, harvest, feeding and cost you have entered is exportable, on every plan including the free one. Closing an account does not hold your records hostage.' },
-      { title: 'How does paying work?', description: 'Monthly, and you can stop at the end of any month. Coupons apply at checkout if you have one from a cooperative or an event.' },
+      { title: 'How does paying work?', description: 'Monthly, by card through Stripe, and you can stop at the end of any month from your profile. Your team works under the plan of whoever owns it.' },
     ],
     ctaBanner: {
       title: 'What are you waiting for?',
-      description: 'The free plan takes a minute to set up and one apiary is enough to see whether recording by voice suits how you work.',
+      description: 'The free plan takes a minute to set up and one hive is enough to see whether recording by voice suits how you work.',
       cta: { label: 'Get Started', routerLink: '/auth/register', variant: 'outline' },
     },
   };
@@ -91,5 +74,10 @@ export class PricingComponent {
     const questions = this.page.questions.map((item) => ({ question: item.title, answer: item.description }));
     const faq = faqPageSchema(`Plans | ${environment.appName}`, '/pricing', seo.meta_description, questions);
     this.seoService.applySEO(withFaq(seo, faq));
+  }
+
+  ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    this.billing.plans().subscribe(plans => this.note.set(plans.freeForAll ? FREE_FOR_ALL_NOTE : ''));
   }
 }

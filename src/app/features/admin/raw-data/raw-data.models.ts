@@ -41,6 +41,7 @@ export const RAW_MODELS: Record<string, ModelConfig> = {
       { key: 'plan', label: 'Plan', type: 'select', options: [
         { value: 'free',       label: 'Free' },
         { value: 'pro',        label: 'Pro' },
+        { value: 'pro_unlimited', label: 'Pro Unlimited' },
         { value: 'enterprise', label: 'Enterprise' },
       ]},
       { key: 'country', label: 'Country', type: 'text' },

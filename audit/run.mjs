@@ -42,7 +42,7 @@ const PAGES = [
   ['user', '/user/ai-chat/1'], ['user', '/user/profile'],
   ['none', '/admin/login'],
   ['admin', '/admin/dashboard'], ['admin', '/admin/users'], ['admin', '/admin/moderation'],
-  ['admin', '/admin/employees'], ['admin', '/admin/coupons'], ['admin', '/admin/ai-responses'],
+  ['admin', '/admin/employees'], ['admin', '/admin/coupons'], ['admin', '/admin/ai-responses'], ['admin', '/admin/voice-quality'],
   ['admin', '/admin/blog'], ['admin', '/admin/blog/categories'],
   ['admin', '/admin/blog/new'], ['admin', '/admin/blog/1'],
   ['admin', '/admin/raw'], ['admin', '/admin/raw/users'], ['admin', '/admin/profile'],

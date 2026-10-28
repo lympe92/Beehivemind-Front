@@ -13,7 +13,7 @@ export const authReducer = createReducer(
     pendingToken: token,
   })),
 
-  on(AuthActions.login, AuthActions.loginWithGoogle, (state) => ({
+  on(AuthActions.login, AuthActions.loginWithGoogle, AuthActions.loginWithApple, (state) => ({
     ...state,
     loading: true,
     error: null,

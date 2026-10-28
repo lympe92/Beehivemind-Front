@@ -31,6 +31,8 @@ import { InviteMemberModalComponent, InviteMemberResult } from '../../../shared/
 import { TeamMembersCardComponent } from './team-members-card/team-members-card';
 import { DataExportCardComponent, DataExportRequest } from './data-export-card/data-export-card';
 import { DeleteAccountCardComponent } from './delete-account-card/delete-account-card';
+import { BillingCardComponent } from './billing-card/billing-card';
+import { BillingSummary } from '../../../core/services/billing.service';
 
 const UNITS = [
   { value: 'kg',    label: 'Kg / Lt (Metric)' },
@@ -44,7 +46,7 @@ type TfaStep = 'idle' | 'setup' | 'backup' | 'disable';
   standalone: true,
   imports: [
     FormsModule, LoaderComponent, CardComponent, CalloutComponent,
-    TeamMembersCardComponent, DataExportCardComponent, DeleteAccountCardComponent,
+    TeamMembersCardComponent, BillingCardComponent, DataExportCardComponent, DeleteAccountCardComponent,
   ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
@@ -95,6 +97,9 @@ export class ProfileComponent implements OnInit {
 
   readonly exporting = signal(false);
   readonly deleting  = signal(false);
+
+  /** The team's plan, as the Plan card last read it; the deletion confirm says what happens to it. */
+  readonly billing = signal<BillingSummary | null>(null);
 
   // Personal info form — kept in sync with store when profile loads
   infoForm = { name: '', surname: '', country: '', unit: 'kg' };
@@ -270,7 +275,7 @@ export class ProfileComponent implements OnInit {
 
     const confirmed = await this.modal.confirm({
       title: 'Delete your account?',
-      message,
+      message: message + this.planEndsNote(),
       confirmLabel: 'Delete account',
       danger: true,
     });
@@ -294,6 +299,24 @@ export class ProfileComponent implements OnInit {
         this.toast.error(err?.status === 401 ? 'That password is not correct.' : (err?.error?.message ?? 'Something went wrong. Please try again.'));
       },
     });
+  }
+
+  /**
+   * What deleting the account does to a paid plan, for the owner's confirm:
+   * the API ends the subscription at once (Terms §3). Within 14 days of the
+   * first payment that comes with the whole payment back; after that the days
+   * left are gone, so the sentence names the way to keep them. An editor has
+   * no plan of their own, a team on Free has nothing to end.
+   */
+  private planEndsNote(): string {
+    const b = this.billing();
+    if (this.role() !== 'owner' || !b?.subscription) return '';
+    if (b.refundableUntil) {
+      return ' Your paid plan ends now and the whole payment comes back to your card within a few days.';
+    }
+    return b.subscription.cancelAtPeriodEnd
+      ? ' Your paid plan ends now; the days left in it are not refunded. To use them, delete your account when it ends.'
+      : ' Your paid plan ends now; the days left in this month are not refunded. To use them, cancel the plan first and delete your account when it ends.';
   }
 
   // ── Personal info ────────────────────────────────────────

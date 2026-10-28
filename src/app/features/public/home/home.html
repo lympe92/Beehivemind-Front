@@ -41,7 +41,7 @@
 
   <section app-pricing-tiers
     [title]="page.pricing.title"
-    [note]="page.pricing.note ?? ''"
+    [note]="pricingNote()"
     [noteLink]="page.pricing.noteLink ?? null"
     [tiers]="page.pricing.tiers"></section>
 

@@ -764,6 +764,37 @@ select.form-control,
   justify-content: center;
 }
 
+/* Sign in with Apple: Apple's black button under Google's, at the same width. */
+.auth-apple-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.auth-apple-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 340px;
+  min-height: 40px;
+  padding: 10px 12px;
+  border: 1px solid #000;
+  border-radius: var(--form-radius);
+  background: #000;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.auth-apple-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .auth-google-placeholder {
   display: flex;
   align-items: center;
