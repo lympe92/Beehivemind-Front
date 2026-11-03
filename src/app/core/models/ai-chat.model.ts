@@ -9,6 +9,8 @@
 export type MessageRole = 'system' | 'user' | 'assistant' | 'tool';
 export type MessageStatus = 'pending' | 'done' | 'failed';
 export type ConversationStatus = 'active' | 'archived' | 'deleted';
+/** The beekeeper's own verdict on a reply. */
+export type MessageFeedback = 'helpful' | 'not_helpful';
 
 export interface AiMessage {
   id: number;
@@ -18,6 +20,8 @@ export interface AiMessage {
   content: string;
   /** Why a `failed` reply failed, in words for the beekeeper. */
   error: string | null;
+  /** Set by the beekeeper on a finished reply; null until they say. */
+  userFeedback: MessageFeedback | null;
   createdAt: string;
 }
 

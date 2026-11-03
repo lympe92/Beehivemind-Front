@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { AiChatService } from '../../../../core/services/ai-chat.service';
+import { MessageFeedback } from '../../../../core/models/ai-chat.model';
+import { ToastService } from '../../../../shared/components/ui/toast/toast.service';
+import { AiChatActions } from '../../../../store/ai-chat/ai-chat.actions';
 import { DatePipe } from '@angular/common';
 import { AiMessage } from '../../../../core/models/ai-chat.model';
 
@@ -78,8 +83,32 @@ export function formatContent(content: string): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatMessageComponent {
+  private service = inject(AiChatService);
+  private store   = inject(Store);
+  private toast   = inject(ToastService);
+
   message = input.required<AiMessage>();
 
   formattedContent = computed(() => formatContent(this.message().content));
   isUser = computed(() => this.message().role === 'user');
+  /** A finished reply of the assistant can be rated; a question cannot. */
+  canRate = computed(() => this.message().role === 'assistant' && this.message().status === 'done');
+  saving = signal(false);
+
+  /** Pressing the chosen verdict again takes it back. */
+  rate(feedback: MessageFeedback): void {
+    if (this.saving()) return;
+    const next = this.message().userFeedback === feedback ? null : feedback;
+    this.saving.set(true);
+    this.service.sendFeedback(this.message().id, next).subscribe({
+      next: message => {
+        this.saving.set(false);
+        this.store.dispatch(AiChatActions.feedbackSaved({ message }));
+      },
+      error: () => {
+        this.saving.set(false);
+        this.toast.error('Something went wrong. Please try again.');
+      },
+    });
+  }
 }

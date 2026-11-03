@@ -42,6 +42,18 @@
   }
 }
 
+// `.app-msg` is a flex row (bubble beside nothing, today); the verdict row
+// wraps under the bubble and takes the row's full width.
+.app-msg--assistant {
+  flex-wrap: wrap;
+}
+
+.msg__rate {
+  flex-basis: 100%;
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
 .app-msg--user .msg__content code {
   background: rgba(255, 255, 255, 0.18);
 }

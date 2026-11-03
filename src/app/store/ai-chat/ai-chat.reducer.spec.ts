@@ -6,7 +6,7 @@ import { AuthActions } from '../auth/auth.actions';
 import { AiMessage, ChatQuota } from '../../core/models/ai-chat.model';
 
 const msg = (id: number, role: AiMessage['role'], status: AiMessage['status'] = 'done', content = 'x'): AiMessage => ({
-  id, conversationId: 1, role, status, content, error: null, createdAt: '2026-09-26T10:00:00Z',
+  id, conversationId: 1, role, status, content, error: null, userFeedback: null, createdAt: '2026-09-26T10:00:00Z',
 });
 
 const quota = (remaining: number | null, limit: number | null = 10): ChatQuota => ({
@@ -92,6 +92,16 @@ describe('aiChatReducer', () => {
     }));
     expect(state.sending).toBe(true);
     expect(state.pendingReplyId).toBe(2);
+  });
+
+  it('keeps the beekeeper\'s verdict on the reply it was given for', () => {
+    const reply = { id: 2, conversationId: 1, role: 'assistant' as const, status: 'done' as const, content: 'A', error: null, userFeedback: null, createdAt: 't' };
+    const state = { ...initialAiChatState, messages: [{ ...reply, id: 1, role: 'user' as const }, reply] };
+
+    const next = aiChatReducer(state, AiChatActions.feedbackSaved({ message: { ...reply, userFeedback: 'not_helpful' } }));
+
+    expect(next.messages[1].userFeedback).toBe('not_helpful');
+    expect(next.messages[0].userFeedback).toBeNull();
   });
 
   it('forgets everything when the account signs out', () => {

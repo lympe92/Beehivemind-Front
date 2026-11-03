@@ -20,6 +20,7 @@ export const AiChatActions = createActionGroup({
     'Send Message Failure': props<{ error: string; quotaExceeded: boolean; quota: ChatQuota | null }>(),
     'Reply Received':       props<{ reply: AiMessage }>(),
     'Reply Failed':         props<{ replyId: number; error: string }>(),
+    'Feedback Saved':       props<{ message: AiMessage }>(),
 
     'Delete Conversation Success': props<{ id: number }>(),
 

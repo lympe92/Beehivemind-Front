@@ -8,6 +8,7 @@ import {
   AiMessage,
   ChatQuota,
   Conversation,
+  MessageFeedback,
   SendMessageRequest,
   SendMessageResult,
 } from '../models/ai-chat.model';
@@ -21,6 +22,7 @@ interface MessagePayload {
   status?: AiMessage['status'];
   content: string | null;
   error?: string | null;
+  user_feedback?: MessageFeedback | null;
   created_at: string;
 }
 
@@ -77,6 +79,13 @@ export class AiChatService {
       .pipe(map(res => messageFromApi(res.data)));
   }
 
+  /** The beekeeper's verdict on a finished reply of their own; null takes it back. */
+  sendFeedback(id: number, feedback: MessageFeedback | null): Observable<AiMessage> {
+    return this.request
+      .postRequest<MessagePayload>(`ai/messages/${id}/feedback`, { feedback })
+      .pipe(map(res => messageFromApi(res.data)));
+  }
+
   /** Whether the assistant takes messages on this server (`AI_CHAT_ENABLED`). */
   getStatus(): Observable<boolean> {
     return this.request
@@ -117,6 +126,7 @@ export function messageFromApi(m: MessagePayload): AiMessage {
     status:         m.status ?? 'done',
     content:        m.content ?? '',
     error:          m.error ?? null,
+    userFeedback:   m.user_feedback ?? null,
     createdAt:      m.created_at,
   };
 }

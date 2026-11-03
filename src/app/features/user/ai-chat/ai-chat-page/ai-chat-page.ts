@@ -242,6 +242,7 @@ export class AiChatPageComponent implements OnInit, AfterViewChecked {
       status: 'done',
       content,
       error: null,
+      userFeedback: null,
       createdAt: new Date().toISOString(),
     };
 

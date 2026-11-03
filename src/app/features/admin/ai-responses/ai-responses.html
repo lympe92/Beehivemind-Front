@@ -110,6 +110,14 @@
         Judged
       </button>
     </div>
+    @if (tab() === 'pending') {
+      <div class="app-tile__actions">
+        <select class="app-input" aria-label="Filter" [value]="pendingFilter()" (change)="onPendingFilterChange($event)">
+          <option value="">All awaiting</option>
+          <option value="not_helpful">Flagged by beekeepers</option>
+        </select>
+      </div>
+    }
     @if (tab() === 'judged') {
       <div class="app-tile__actions">
         <select class="app-input" aria-label="Filter" [value]="judgedFilter()" (change)="onFilterChange($event)">
@@ -140,6 +148,8 @@
           @switch (col.key) {
             @case ('user_question') { {{ row.user_question || '—' }} }
             @case ('ai_response') {
+              @if (row.user_feedback === 'not_helpful') { <span class="app-badge app-badge--banned">Not helpful</span> }
+              @else if (row.user_feedback === 'helpful') { <span class="app-badge app-badge--active">Helpful</span> }
               {{ (row.ai_response || '—') | slice:0:120 }}{{ row.ai_response && row.ai_response.length > 120 ? '…' : '' }}
             }
             @case ('created_at') { {{ row.created_at | slice:0:10 }} }

@@ -216,8 +216,8 @@ const RAW_COUNTS = { users: 1284, employees: 9, apiaries: 2417, beehives: 18963,
 const RAW_USERS = ADMIN_USERS.map(({ team, ...u }) => ({ ...u, role: 'user', country: 'Greece', unit: 'kg' }));
 
 const PENDING_AI = [
-  { message_id: 12, conversation_id: 1, user_question: 'Which hives lost population since July?', ai_response: 'Two: Beehive 13 at Kalamos North dropped from 6 to 4 frames of bees, and Beehive 14 from 4 to 3. Both had a detection in the last inspection.', tool_calls: null, created_at: '2026-09-06T10:12:00Z' },
-  { message_id: 15, conversation_id: 2, user_question: 'When should I treat my hives for Varroa?', ai_response: 'Your last mite counts were taken on 28 August. With the thyme flow finished, a formic course now and an oxalic drip in the broodless window is the usual sequence.', tool_calls: null, created_at: '2026-09-02T18:40:00Z' },
+  { message_id: 12, conversation_id: 1, user_question: 'Which hives lost population since July?', ai_response: 'Two: Beehive 13 at Kalamos North dropped from 6 to 4 frames of bees, and Beehive 14 from 4 to 3. Both had a detection in the last inspection.', tool_calls: null, user_feedback: 'not_helpful', created_at: '2026-09-06T10:12:00Z' },
+  { message_id: 15, conversation_id: 2, user_question: 'When should I treat my hives for Varroa?', ai_response: 'Your last mite counts were taken on 28 August. With the thyme flow finished, a formic course now and an oxalic drip in the broodless window is the usual sequence.', tool_calls: null, user_feedback: null, created_at: '2026-09-02T18:40:00Z' },
 ];
 
 /* --- blog ---------------------------------------------------------------
@@ -370,6 +370,7 @@ export function mock(method, path) {
   if (route.startsWith('team/invite/')) return ok({ state: 'valid', owner_name: 'Daniel Hart', email: 'sam.green@example.com' });
   if (route === 'notifications') return NOTIFICATIONS;
   if (route === 'weather') return ok(WEATHER);
+  if (/^ai\/messages\/\d+\/feedback$/.test(route)) return ok({ ...CONVERSATION_1.messages[1], id: Number(route.split('/')[2]), user_feedback: 'helpful' });
   if (route === 'ai/conversations') return ok(CONVERSATIONS);
   if (/^ai\/conversations\/\d+$/.test(route)) return ok(CONVERSATION_1);
   if (route === 'ai/status') return ok({ enabled: true });

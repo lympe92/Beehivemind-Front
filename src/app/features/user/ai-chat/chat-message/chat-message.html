@@ -2,4 +2,10 @@
   <div class="app-msg__bubble" [attr.title]="message().createdAt | date:'d MMM, HH:mm'">
     <div class="msg__content" [innerHTML]="formattedContent()"></div>
   </div>
+  @if (canRate()) {
+    <div class="msg__rate" role="group" aria-label="Was this reply helpful?">
+      <button type="button" class="app-btn app-btn--sm" [class.app-btn--primary]="message().userFeedback === 'helpful'" [class.app-btn--ghost]="message().userFeedback !== 'helpful'" [attr.aria-pressed]="message().userFeedback === 'helpful'" [disabled]="saving()" (click)="rate('helpful')">Helpful</button>
+      <button type="button" class="app-btn app-btn--sm" [class.app-btn--primary]="message().userFeedback === 'not_helpful'" [class.app-btn--ghost]="message().userFeedback !== 'not_helpful'" [attr.aria-pressed]="message().userFeedback === 'not_helpful'" [disabled]="saving()" (click)="rate('not_helpful')">Not helpful</button>
+    </div>
+  }
 </div>

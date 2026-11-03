@@ -12,6 +12,8 @@ interface PendingResponse {
   conversation_id: number;
   user_question: string | null;
   ai_response: string | null;
+  /** What the beekeeper said about it, if anything. */
+  user_feedback: 'helpful' | 'not_helpful' | null;
   created_at: string;
 }
 
@@ -32,6 +34,7 @@ interface JudgmentResult {
   conversation_id: number;
   user_question: string | null;
   ai_response: string | null;
+  user_feedback: 'helpful' | 'not_helpful' | null;
   judgment: JudgmentRubric;
   admin: { reviewed_by: number | null; notes: string | null; flagged_for_retraining: boolean };
   created_at: string | null;
@@ -58,7 +61,8 @@ const JUDGE_POLL_MS = 2000;
 const JUDGE_POLL_MAX = 45;
 
 type Tab = 'pending' | 'judged';
-type JudgedFilter = '' | 'hallucination' | 'safety' | 'low_score' | 'unreviewed' | 'flagged_for_retraining';
+type JudgedFilter = '' | 'not_helpful' | 'hallucination' | 'safety' | 'low_score' | 'unreviewed' | 'flagged_for_retraining';
+type PendingFilter = '' | 'not_helpful';
 
 @Component({
   selector: 'app-ai-responses',
@@ -79,6 +83,8 @@ export class AiResponsesComponent implements OnInit {
   pendingTotal = signal(0);
   pendingTotalPages = signal(1);
   pendingPage = signal(1);
+  /** '' = every unjudged reply; 'not_helpful' = the ones beekeepers flagged. */
+  pendingFilter = signal<PendingFilter>('');
   /** message_id currently being judged (spinner state) */
   judgingId = signal<number | null>(null);
 
@@ -116,6 +122,7 @@ export class AiResponsesComponent implements OnInit {
 
   readonly filters: { value: JudgedFilter; label: string }[] = [
     { value: '', label: 'All judged' },
+    { value: 'not_helpful', label: 'Flagged by beekeepers' },
     { value: 'low_score', label: 'Low score (≤ 2.5)' },
     { value: 'hallucination', label: 'Hallucination' },
     { value: 'safety', label: 'Safety concern' },
@@ -146,7 +153,7 @@ export class AiResponsesComponent implements OnInit {
     this.pendingLoading.set(true);
     this.error.set(null);
     this.request
-      .getRequest<PendingResponse[]>(`admin/ai-responses/pending?page=${this.pendingPage()}`)
+      .getRequest<PendingResponse[]>(`admin/ai-responses/pending?page=${this.pendingPage()}${this.pendingFilter() ? '&feedback=' + this.pendingFilter() : ''}`)
       .subscribe({
         next: (res) => {
           this.pending.set(res.data);
@@ -159,6 +166,12 @@ export class AiResponsesComponent implements OnInit {
           this.pendingLoading.set(false);
         },
       });
+  }
+
+  onPendingFilterChange(event: Event): void {
+    this.pendingFilter.set((event.target as HTMLSelectElement).value as PendingFilter);
+    this.pendingPage.set(1);
+    this.loadPending();
   }
 
   goToPendingPage(p: number): void {

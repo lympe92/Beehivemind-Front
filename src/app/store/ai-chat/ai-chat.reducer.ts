@@ -116,6 +116,11 @@ export const aiChatReducer = createReducer(
   })),
 
   // ── Delete conversation ───────────────────────────────────────
+  on(AiChatActions.feedbackSaved, (state, { message }) => ({
+    ...state,
+    messages: state.messages.map(m => m.id === message.id ? message : m),
+  })),
+
   on(AiChatActions.deleteConversationSuccess, (state, { id }) => ({
     ...state,
     conversations:        state.conversations.filter(c => c.id !== id),
