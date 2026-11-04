@@ -3,14 +3,19 @@ import { isPlatformBrowser } from '@angular/common';
 
 export type ConsentChoice = 'granted' | 'denied';
 
-/** The stored answer, so the banner is asked once per browser. */
+/**
+ * The stored answer, so the banner is asked once per browser. Version 2 since
+ * 2026-11: the one answer now covers advertising measurement as well as
+ * analytics, so an answer given under version 1 is asked again.
+ */
 const STORAGE_KEY = 'bhm_consent';
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 
 /**
- * Where analytics storage needs an opt-in: the EEA, the UK and Switzerland.
- * One list, used twice — as the regional `denied` default for Google's own
- * geolocation, and to decide whether this visitor sees the banner at all.
+ * Where analytics and advertising storage need an opt-in: the EEA, the UK and
+ * Switzerland. One list, used twice — as the regional `denied` default for
+ * Google's own geolocation, and to decide whether this visitor sees the banner
+ * at all.
  */
 const OPT_IN_COUNTRIES = [
   'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT',
@@ -48,8 +53,12 @@ interface StoredGeo {
  * Google's tags read consent from the same `dataLayer` the tag manager reads,
  * through `gtag('consent', …)`. The defaults are set **before** the container
  * loads, so no tag can write a cookie before the answer is known: granted
- * everywhere, then denied by `region` in the countries that require an opt-in,
- * with advertising storage denied throughout because the site runs no ads.
+ * everywhere, then denied by `region` in the countries that require an opt-in.
+ * Advertising storage and the user-data signal follow the same rule as
+ * analytics, which is what lets a GA4 key event reach Google Ads as a
+ * conversion of the search ad that brought the visitor; without them Ads
+ * recorded none of the key events GA4 measured (2026-11-04). Personalised
+ * advertising stays denied everywhere: the site runs no remarketing.
  *
  * The banner is shown only where consent is required, which is decided by
  * Cloudflare's `/cdn-cgi/trace` rather than by a geolocation service: it is on
@@ -81,8 +90,8 @@ export class ConsentService {
     };
 
     window.gtag('consent', 'default', {
-      ad_storage: 'denied',
-      ad_user_data: 'denied',
+      ad_storage: 'granted',
+      ad_user_data: 'granted',
       ad_personalization: 'denied',
       analytics_storage: 'granted',
       functionality_storage: 'granted',
@@ -90,6 +99,8 @@ export class ConsentService {
     });
     // Google resolves the region itself, from the request, before any tag runs.
     window.gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
       analytics_storage: 'denied',
       region: OPT_IN_COUNTRIES,
       wait_for_update: 500,
@@ -106,7 +117,7 @@ export class ConsentService {
     void this.decideBanner();
   }
 
-  /** The visitor accepted analytics cookies. */
+  /** The visitor accepted measurement: analytics, and whether an ad brought them here. */
   accept(): void {
     this.store('granted');
   }
@@ -136,11 +147,16 @@ export class ConsentService {
     }
   }
 
-  private update(analytics: ConsentChoice): void {
-    window.gtag?.('consent', 'update', { analytics_storage: analytics });
+  private update(choice: ConsentChoice): void {
+    // One answer, three signals: the banner asks about measurement as a whole.
+    window.gtag?.('consent', 'update', {
+      ad_storage: choice,
+      ad_user_data: choice,
+      analytics_storage: choice,
+    });
     // Something to trigger on inside the container, and the record of when the
     // answer changed.
-    window.dataLayer?.push({ event: 'consent_update', consent_analytics: analytics });
+    window.dataLayer?.push({ event: 'consent_update', consent_analytics: choice });
   }
 
   private read(): StoredConsent | null {
