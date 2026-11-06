@@ -66,9 +66,35 @@
   gap: var(--spacing-sm);
 }
 
-// On a phone the two answers share the width, so neither reads as the
-// expected one.
+.consent__short {
+  display: none;
+}
+
+// On a phone the panel stays out of the way of the page beneath it: on a
+// 392×735 screen the full version took 38% of the height and sat on the sign-up
+// form's "Create Account" (2026-11-06). The label goes, the text is the short
+// one, the spacing tightens. The two answers keep the md size and share the
+// width, so neither reads as the expected one.
 @media (max-width: 559px) {
+  .consent {
+    padding-block: var(--spacing-sm);
+    padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom));
+  }
+
+  .consent__panel {
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .consent__title,
+  .consent__long {
+    display: none;
+  }
+
+  .consent__short {
+    display: inline;
+  }
+
   .consent__actions {
     width: 100%;
   }
