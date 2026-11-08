@@ -53,3 +53,5 @@ Thumbs.db
 /audit/*.log
 /audit/shots
 /audit/shots-prev
+/audit/xb-report.json
+/audit/xb-shots

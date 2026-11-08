@@ -13,9 +13,14 @@
     "selects": "node select-check.mjs",
     "invite-logout": "node invite-logout-check.mjs",
     "beehive-delete": "node beehive-delete-check.mjs",
-    "apiary-map": "node apiary-map-check.mjs"
+    "apiary-map": "node apiary-map-check.mjs",
+    "xb": "node cross-browser.mjs",
+    "xb-flows": "node cross-flows.mjs"
   },
   "dependencies": {
     "puppeteer-core": "^23.11.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
   }
 }
