@@ -1085,6 +1085,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 16px;
   margin-bottom: var(--app-gap);
   padding: var(--app-pad);
@@ -1093,9 +1094,15 @@
   background: var(--app-bg-panel);
 }
 
+/* The copy takes the line; on a phone the button drops below it instead of
+   squeezing it into a 110px column. */
+.admin-billing > div {
+  flex: 1 1 280px;
+}
+
 .admin-billing__title {
   margin: 0;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--app-text-primary);
 }
 
