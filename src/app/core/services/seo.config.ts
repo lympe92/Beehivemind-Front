@@ -1,5 +1,5 @@
 import { SEOModel, SoftwareApplicationSchema } from '../models/seo.model';
-import { PLAY_STORE_URL } from '../data/app-stores';
+import { APP_STORE_URL, PLAY_STORE_URL } from '../data/app-stores';
 import { environment } from '../../../environments/environment';
 
 const BASE = environment.appUrl;
@@ -21,7 +21,7 @@ const SITE = environment.appName;
  *
  * The prices mirror `PLAN_TIERS` (core/data/plans.ts), what /pricing puts on
  * screen; structured data must not disagree with the visible page. Likewise the operating
- * systems: the iOS build does not exist yet, so it is not claimed here.
+ * systems: only the ones with a live store listing are claimed.
  */
 const SOFTWARE_APPLICATION: SoftwareApplicationSchema = {
   '@context': 'https://schema.org',
@@ -31,7 +31,7 @@ const SOFTWARE_APPLICATION: SoftwareApplicationSchema = {
     'Beehive management software for working beekeepers. Record inspections, harvest, feeding, treatments and costs by voice, offline, from the apiary.',
   url: `${BASE}/`,
   applicationCategory: 'BusinessApplication',
-  operatingSystem: 'Android, Web',
+  operatingSystem: 'Android, iOS, Web',
   featureList: [
     'Voice-recorded hive inspections',
     'Offline recording with later sync',
@@ -45,11 +45,9 @@ const SOFTWARE_APPLICATION: SoftwareApplicationSchema = {
     { '@type': 'Offer', name: 'Pro',   price: '5', priceCurrency: 'EUR', category: 'subscription', url: `${BASE}/pricing` },
     { '@type': 'Offer', name: 'Pro Unlimited', price: '10', priceCurrency: 'EUR', category: 'subscription', url: `${BASE}/pricing` },
   ],
-  // The Android app's listing. Only the Play address: the App Store badge on
-  // the page is a stand-in that also opens Play, and structured data claims
-  // only what exists.
-  installUrl: PLAY_STORE_URL,
-  downloadUrl: PLAY_STORE_URL,
+  // The two store listings, the same addresses the badges on the page open.
+  installUrl: [PLAY_STORE_URL, APP_STORE_URL],
+  downloadUrl: [PLAY_STORE_URL, APP_STORE_URL],
   publisher: { '@type': 'Organization', name: SITE, url: BASE },
 };
 

@@ -171,8 +171,8 @@ export class AnalyticsService {
         const page_path = location.pathname;
         const text = anchor.textContent?.trim().slice(0, 60) ?? '';
 
-        // A store badge says which store it stands for; the address alone would
-        // count App Store clicks as Play while the App Store badge points there.
+        // A store badge says which store it stands for; a plain store link in
+        // running text is recognised by its address.
         const store = anchor.dataset['store']
           ?? (href.includes('play.google.com') ? 'google_play' : href.includes('apps.apple.com') ? 'app_store' : null);
 

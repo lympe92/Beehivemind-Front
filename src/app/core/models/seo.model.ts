@@ -122,9 +122,9 @@ export interface SoftwareApplicationSchema extends BaseSchema {
   operatingSystem: string;
   offers: OfferSchema[];
   featureList?: string[];
-  /** Where the app is installed from — a store listing. */
-  installUrl?: string;
-  downloadUrl?: string;
+  /** Where the app is installed from — the store listings. */
+  installUrl?: string | string[];
+  downloadUrl?: string | string[];
   publisher?: { '@type': 'Organization'; name: string; url?: string };
 }
 

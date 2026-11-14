@@ -24,8 +24,7 @@ interface FooterLink {
 export class PublicFooterComponent {
   readonly year = new Date().getFullYear();
 
-  // Store addresses come from core/data/app-stores.ts. "iOS App" opens the
-  // Play listing until the iOS build exists (see `appStoreUrl`).
+  // Store addresses come from core/data/app-stores.ts.
   readonly software: FooterLink[] = [
     { label: 'Features', href: '/features' },
     { label: 'App', href: '/app' },

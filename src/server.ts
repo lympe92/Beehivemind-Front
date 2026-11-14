@@ -9,7 +9,7 @@ import compression from 'compression';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { environment } from './environments/environment';
-import { PLAY_STORE_URL } from './app/core/data/app-stores';
+import { APP_STORE_URL, PLAY_STORE_URL } from './app/core/data/app-stores';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -338,14 +338,15 @@ const LLMS_TXT_HEAD = `# BeehiveMind
 
 > Beehive management software for working beekeepers. Hive inspections are recorded by voice, offline, from the apiary; harvests, feedings, treatment schedules, weather and costs per hive live on the web dashboard. Built in Greece. Free for one hive; €5 a month up to 50 hives, €10 above.
 
-BeehiveMind is one account across two clients: an Android app that records inspections and harvests by voice (works with no signal, syncs later) and a web dashboard at https://beehivemind.tech/user that turns those records into tables, charts, treatment reminders, a diagnosis per inspection and an AI assistant grounded in the beekeeper's own data.
+BeehiveMind is one account across two clients: a phone app, for Android and iPhone, that records inspections and harvests by voice (works with no signal, syncs later) and a web dashboard at https://beehivemind.tech/user that turns those records into tables, charts, treatment reminders, a diagnosis per inspection and an AI assistant grounded in the beekeeper's own data.
 
 ## Product
 
 - [Home](https://beehivemind.tech/): what BeehiveMind is and who it is for
 - [Features](https://beehivemind.tech/features): inspections, treatments, harvest and feeding, finances, weather, QR labels
-- [The app](https://beehivemind.tech/app): the voice-driven Android field app
+- [The app](https://beehivemind.tech/app): the voice-driven field app, for Android and iPhone
 - [BeehiveMind on Google Play](${PLAY_STORE_URL}): install the Android app
+- [BeehiveMind on the App Store](${APP_STORE_URL}): install the iPhone app
 - [Hive inspections](https://beehivemind.tech/inspections): the fourteen readings recorded per visit
 - [Apiaries and beehives](https://beehivemind.tech/apiariesandbeehives): apiaries on a map, hives in bulk, queen records
 - [Harvest and feeding](https://beehivemind.tech/harvestandfeeding): honey, pollen, propolis, royal jelly; syrup, fondant, patties
