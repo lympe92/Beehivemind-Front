@@ -6,10 +6,11 @@ export type ConsentChoice = 'granted' | 'denied';
 /**
  * The stored answer, so the banner is asked once per browser. Version 2 since
  * 2026-11: the one answer now covers advertising measurement as well as
- * analytics, so an answer given under version 1 is asked again.
+ * analytics, so an answer given under version 1 is asked again. Version 3
+ * (2026-11-14): it also covers Microsoft Clarity's session recordings.
  */
 const STORAGE_KEY = 'bhm_consent';
-const STORAGE_VERSION = 2;
+const STORAGE_VERSION = 3;
 
 /**
  * Where analytics and advertising storage need an opt-in: the EEA, the UK and
@@ -73,6 +74,13 @@ export class ConsentService {
   readonly showBanner = signal(false);
   /** The stored answer, or null while it has never been given. */
   readonly choice = signal<ConsentChoice | null>(null);
+  /**
+   * Whether analytics may run for this visitor right now: a stored Accept, or
+   * no answer in a country that is not asked. False while the country is still
+   * unknown. Google's tags work this out for themselves from the `region`
+   * defaults; a script the app loads by hand (Clarity) waits for this.
+   */
+  readonly analyticsAllowed = signal(false);
 
   /**
    * Creates the `gtag` queue, publishes the defaults and restores a stored
@@ -110,6 +118,7 @@ export class ConsentService {
     const stored = this.read();
     if (stored) {
       this.choice.set(stored.analytics);
+      this.analyticsAllowed.set(stored.analytics === 'granted');
       this.update(stored.analytics);
       return;
     }
@@ -135,6 +144,7 @@ export class ConsentService {
 
   private store(analytics: ConsentChoice): void {
     this.choice.set(analytics);
+    this.analyticsAllowed.set(analytics === 'granted');
     this.showBanner.set(false);
     this.update(analytics);
 
@@ -181,7 +191,10 @@ export class ConsentService {
     }
 
     // An unknown country is treated as one that needs asking.
-    this.showBanner.set(country === null || OPT_IN_COUNTRIES.includes(country));
+    const asked = country === null || OPT_IN_COUNTRIES.includes(country);
+    this.showBanner.set(asked);
+    // An answer given while the edge was being asked stands.
+    if (this.choice() === null) this.analyticsAllowed.set(!asked);
   }
 
   private async fetchCountry(): Promise<string | null> {

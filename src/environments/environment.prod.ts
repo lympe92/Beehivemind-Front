@@ -7,5 +7,7 @@ export const environment = {
   googleClientId: '416173920739-mu01bo21nv4l007gmmhlob9s61lqamis.apps.googleusercontent.com',
   /** Sign in with Apple's Services ID (Apple Developer > Identifiers); the API accepts tokens for it. */
   appleServicesId: 'tech.beehivemind.web',
+  /** Microsoft Clarity project (session recordings on the public site). Empty = never loaded. */
+  clarityProjectId: 'zdgi15h2a5',
   googleTagManagerId: 'GTM-TL4DLVB8',
 };

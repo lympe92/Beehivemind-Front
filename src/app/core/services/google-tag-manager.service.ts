@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { Injectable, Injector, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -18,7 +18,8 @@ const INTERNAL_KEY = 'bhm_internal';
  * The whole measurement stack starts here: consent defaults, the page views,
  * the signed-in user, the click listener, and last of all the container itself.
  *
- * Google Tag Manager is the only script this app loads for measurement. GA4
+ * Google Tag Manager is the only script this app loads for Google's
+ * measurement (Microsoft Clarity is the other one, in `ClarityService`). GA4
  * lives inside the container, configured there rather than in code, so a tag
  * can be added or a parameter renamed without a deploy. What the app owns is
  * the `dataLayer` contract in `AnalyticsService`.
@@ -30,6 +31,7 @@ export class GoogleTagManagerService {
   private store      = inject(Store);
   private analytics  = inject(AnalyticsService);
   private consent    = inject(ConsentService);
+  private injector   = inject(Injector);
 
   init(): void {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -41,11 +43,19 @@ export class GoogleTagManagerService {
     // the audit battery too, neither of which ever loads a container.
     this.consent.init();
 
-    if (!environment.googleTagManagerId) return;
-
     // The audit harness, and any other driven browser, announce themselves
     // here. Keeping them out is what makes "users" mean people.
     if (navigator.webdriver) return;
+
+    // Session recordings, which wait for consent and keep to the public site
+    // on their own; see `ClarityService`. In a chunk of its own, so the initial
+    // bundle stays inside its budget.
+    if (environment.clarityProjectId) {
+      const internal = this.isInternal();
+      void import('./clarity.service').then(({ ClarityService }) => this.injector.get(ClarityService).init(internal));
+    }
+
+    if (!environment.googleTagManagerId) return;
 
     // The container's opening message, pushed here rather than beside the
     // script tag. GTM replays the dataLayer in order when it boots, and the

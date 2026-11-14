@@ -1,6 +1,6 @@
 <main>
   <section app-page-intro
-    eyebrow="Last updated 27 October 2026"
+    eyebrow="Last updated 14 November 2026"
     title="Privacy policy"
     lead="What BeehiveMind records, why we record it, and what you can ask us to do about it."></section>
 
@@ -68,7 +68,7 @@
         <li><strong>To keep the service and your account secure</strong> — sign-in history, two-factor settings, request logs and backups. The basis is our legitimate interest in running a service that is safe and recoverable (Article 6(1)(f)).</li>
         <li><strong>To send an invitation to join a team</strong> — the invited person's email address, given to us by the team's owner. The basis is the owner's and our legitimate interest in letting people work together (Article 6(1)(f)); the address is kept only as long as described under How long we keep it.</li>
         <li><strong>To check the quality of the AI assistant's answers.</strong> The basis is our legitimate interest in giving correct answers (Article 6(1)(f)).</li>
-        <li><strong>To measure how the website is used</strong> — Google Analytics. In the EEA, the UK and Switzerland the basis is your consent (Article 6(1)(a)); elsewhere it is our legitimate interest, and you can turn it off (see Cookies and analytics).</li>
+        <li><strong>To measure how the website is used</strong> — Google Analytics and Microsoft Clarity. In the EEA, the UK and Switzerland the basis is your consent (Article 6(1)(a)); elsewhere it is our legitimate interest, and you can turn it off (see Cookies and analytics).</li>
         <li><strong>To bill you, if you choose a paid plan.</strong> The basis is our contract with you, and our legal obligation to keep invoices (Article 6(1)(c)). Payments are handled by Stripe; we never see or store your card number.</li>
       </ul>
 
@@ -134,6 +134,23 @@
         advertising: nothing you do here is used to show you ads anywhere.
       </p>
       <p>
+        Alongside it runs Microsoft Clarity, which shows us how a page is
+        actually used: where people click, how far they scroll, and a replay of
+        the visit as movements on the page. It runs on the public website, on
+        the sign-in and sign-up screens and inside the app. Inside the app
+        every piece of text is masked in your browser before anything is sent,
+        so Clarity receives where you clicked and how far you scrolled, never
+        the names of your apiaries, your hives or anything in your records.
+        What you type into a form is masked everywhere, your email and password
+        included. It sets cookies
+        named <code>_clck</code> (one year) and <code>_clsk</code> (one day) on
+        this site, and Microsoft sets its own (<code>CLID</code>,
+        <code>MUID</code>, <code>ANONCHK</code>, <code>MR</code>,
+        <code>SM</code>) on its domains. It follows the same choice as Google
+        Analytics: if you refuse or change your mind, it stops and its cookies
+        are deleted.
+      </p>
+      <p>
         In the EEA, the UK and Switzerland nothing analytical or
         advertising-related is set until you accept it. Everywhere else it is
         on unless you turn it off. Either way
@@ -155,6 +172,7 @@
         <li><strong>DigitalOcean</strong> — hosts the website, the API and the database, on servers in Frankfurt, Germany, including the backups.</li>
         <li><strong>Cloudflare</strong> — delivers and protects the website (not the app's data), through its global network.</li>
         <li><strong>Google</strong> — sends the service's emails (Google Workspace), measures website use (Google Analytics and Tag Manager, as described above), draws the apiary maps (Google Maps, which your browser asks directly, so it receives your IP address and the map area shown) and, if you choose it, signs you in (Google Sign-In).</li>
+        <li><strong>Microsoft</strong> — records how the website and the app are used, with the app's content masked (Microsoft Clarity, as described above).</li>
         <li><strong>Tomorrow.io</strong> — the weather forecast for an apiary. It receives the apiary's coordinates, not who you are.</li>
         <li><strong>Anthropic</strong> — automated scoring of AI assistant answers under review: the answer and the question it answered.</li>
         <li><strong>Stripe</strong> — payments for paid plans.</li>

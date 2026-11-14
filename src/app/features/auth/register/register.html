@@ -19,7 +19,7 @@
       <a routerLink="/auth/login">Back to login</a>
     </p>
   } @else {
-    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate data-clarity-mask="true">
       @if (error()) {
         <div class="auth-form__error" role="alert">{{ error() }}</div>
       }

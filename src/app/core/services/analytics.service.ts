@@ -74,9 +74,17 @@ export class AnalyticsService {
   private lastUrl = '';
   /** The last `internal` answer published; `null` until the first one. */
   private trafficInternal: boolean | null = null;
+  /** Clarity, once its chunk has arrived; it picks the few events it wants. */
+  private listener: ((name: string, params: EventParams) => void) | null = null;
+
+  /** Hands every event to one more reader, before the dataLayer and its guard. */
+  listen(listener: (name: string, params: EventParams) => void): void {
+    this.listener = listener;
+  }
 
   /** One GA4 event. `params` are the event's own; they do not outlive it. */
   event(name: string, params: EventParams = {}): void {
+    this.listener?.(name, params);
     if (!this.enabled) return;
     this.push({ ga4: null });
     this.push({ event: 'ga4', ga4_event: name, ga4: params });
