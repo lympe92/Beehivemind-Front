@@ -1,56 +1,65 @@
 <div class="app-page">
 
-  <app-card title="Create Treatments">
-    <button card-header-end type="button" class="app-btn app-btn--primary" (click)="addType()">+ New Type</button>
+  @if (typesEmpty()) {
+    <app-empty-state
+      icon="treatment"
+      heading="No treatment types yet"
+      text="A treatment type describes a treatment once: its name, the disease it is for, the product and the dose. It is then applied to hives as a session, as often as needed."
+      buttonLabel="Add treatment type"
+      (buttonClick)="addType()" />
+  } @else {
+    <app-card title="Create Treatments">
+      <button card-header-end type="button" class="app-btn app-btn--primary" (click)="addType()">+ New Type</button>
 
-    @if (typesLoading()) {
-      <div class="app-state">Loading…</div>
-    } @else if (types().length === 0) {
-      <div class="app-state">No treatment types yet. Create one to get started.</div>
-    } @else {
-      <div class="app-cards-grid">
-        @for (type of types(); track type.id) {
-          <div class="app-tile">
+      @if (typesLoading()) {
+        <div class="app-state">Loading…</div>
+      } @else if (types().length === 0) {
+        <div class="app-state">No treatment types yet. Create one to get started.</div>
+      } @else {
+        <div class="app-cards-grid">
+          @for (type of types(); track type.id) {
+            <div class="app-tile">
 
-            <div class="app-tile__header">
-              <div class="app-tile__title">
-                <span class="app-tile__name">{{ type.name }}</span>
-                <span class="app-badge app-badge--disease">{{ type.disease }}</span>
+              <div class="app-tile__header">
+                <div class="app-tile__title">
+                  <span class="app-tile__name">{{ type.name }}</span>
+                  <span class="app-badge app-badge--disease">{{ type.disease }}</span>
+                </div>
+                <div class="app-tile__actions">
+                  <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="editType(type)">Edit</button>
+                  <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteType(type)">Delete</button>
+                </div>
               </div>
-              <div class="app-tile__actions">
-                <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="editType(type)">Edit</button>
-                <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteType(type)">Delete</button>
-              </div>
-            </div>
 
-            <div class="app-tile__meta">
-              <span>{{ type.product }}</span>
-              @if (type.dose) {
+              <div class="app-tile__meta">
+                <span>{{ type.product }}</span>
+                @if (type.dose) {
+                  <span class="app-tile__sep">·</span>
+                  <span>{{ type.dose }}</span>
+                }
                 <span class="app-tile__sep">·</span>
-                <span>{{ type.dose }}</span>
+                @if (type.isRecurring) {
+                  <span class="app-badge app-badge--recurring">
+                    {{ (type.repetitions ?? 0) + 1 }}× / {{ type.intervalDays }}d
+                  </span>
+                } @else {
+                  <span class="app-badge app-badge--single">Single</span>
+                }
+              </div>
+
+              @if (type.notes) {
+                <p class="app-tile__notes">{{ type.notes }}</p>
               }
-              <span class="app-tile__sep">·</span>
-              @if (type.isRecurring) {
-                <span class="app-badge app-badge--recurring">
-                  {{ (type.repetitions ?? 0) + 1 }}× / {{ type.intervalDays }}d
-                </span>
-              } @else {
-                <span class="app-badge app-badge--single">Single</span>
-              }
+
+              <button type="button" class="app-btn app-btn--primary app-btn--block" (click)="applyType(type)">
+                Apply Treatment
+              </button>
+
             </div>
-
-            @if (type.notes) {
-              <p class="app-tile__notes">{{ type.notes }}</p>
-            }
-
-            <button type="button" class="app-btn app-btn--primary app-btn--block" (click)="applyType(type)">
-              Apply Treatment
-            </button>
-
-          </div>
-        }
-      </div>
-    }
-  </app-card>
+          }
+        </div>
+      }
+    </app-card>
+  }
 
 </div>

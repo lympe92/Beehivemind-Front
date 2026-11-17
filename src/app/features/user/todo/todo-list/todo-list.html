@@ -1,52 +1,61 @@
 <div class="app-page">
 
-  <app-card title="To-Do List">
-    @if (loading()) {
-      <div class="app-state">Loading…</div>
-    } @else if (pending().length === 0 && done().length === 0) {
-      <div class="app-state">All caught up! Nothing pending.</div>
-    } @else {
+  @if (isEmpty()) {
+    <app-empty-state
+      icon="todo"
+      heading="Nothing scheduled"
+      text="The doses of each treatment you apply are listed here by date and ticked when done. Overdue ones are marked."
+      buttonLabel="Go to treatments"
+      (buttonClick)="goToTreatments()" />
+  } @else {
+    <app-card title="To-Do List">
+      @if (loading()) {
+        <div class="app-state">Loading…</div>
+      } @else if (pending().length === 0 && done().length === 0) {
+        <div class="app-state">All caught up! Nothing pending.</div>
+      } @else {
 
-      <div class="app-list">
-        @for (item of pending(); track item.entityId) {
-          <label class="todo-row" [class.todo-row--static]="!completable(item)">
-            <input
-              type="checkbox"
-              class="todo-row__check"
-              [checked]="false"
-              [disabled]="!completable(item)"
-              [attr.aria-label]="'Mark ' + item.title + ' as done'"
-              (change)="toggle(item)" />
-            <span class="todo-row__title">{{ item.title }}</span>
-            @if (apiaryName(item); as apiary) {
-              <span class="app-badge app-badge--apiary">{{ apiary }}</span>
-            }
-            <span class="todo-row__date" [class.todo-row__date--overdue]="item.isOverdue">
-              {{ item.scheduledDate | date:'mediumDate' }}
-            </span>
-          </label>
-        }
-      </div>
-
-      @if (done().length) {
-        <div class="todo-done">
-          <span class="app-field__label">Done</span>
-          <div class="app-list">
-            @for (item of done(); track item.entityId) {
-              <label class="todo-row todo-row--done">
-                <input type="checkbox" class="todo-row__check" checked disabled />
-                <span class="todo-row__title">{{ item.title }}</span>
-                @if (apiaryName(item); as apiary) {
-                  <span class="app-badge app-badge--apiary">{{ apiary }}</span>
-                }
-                <span class="todo-row__date">{{ item.scheduledDate | date:'mediumDate' }}</span>
-              </label>
-            }
-          </div>
+        <div class="app-list">
+          @for (item of pending(); track item.entityId) {
+            <label class="todo-row" [class.todo-row--static]="!completable(item)">
+              <input
+                type="checkbox"
+                class="todo-row__check"
+                [checked]="false"
+                [disabled]="!completable(item)"
+                [attr.aria-label]="'Mark ' + item.title + ' as done'"
+                (change)="toggle(item)" />
+              <span class="todo-row__title">{{ item.title }}</span>
+              @if (apiaryName(item); as apiary) {
+                <span class="app-badge app-badge--apiary">{{ apiary }}</span>
+              }
+              <span class="todo-row__date" [class.todo-row__date--overdue]="item.isOverdue">
+                {{ item.scheduledDate | date:'mediumDate' }}
+              </span>
+            </label>
+          }
         </div>
-      }
 
-    }
-  </app-card>
+        @if (done().length) {
+          <div class="todo-done">
+            <span class="app-field__label">Done</span>
+            <div class="app-list">
+              @for (item of done(); track item.entityId) {
+                <label class="todo-row todo-row--done">
+                  <input type="checkbox" class="todo-row__check" checked disabled />
+                  <span class="todo-row__title">{{ item.title }}</span>
+                  @if (apiaryName(item); as apiary) {
+                    <span class="app-badge app-badge--apiary">{{ apiary }}</span>
+                  }
+                  <span class="todo-row__date">{{ item.scheduledDate | date:'mediumDate' }}</span>
+                </label>
+              }
+            </div>
+          </div>
+        }
+
+      }
+    </app-card>
+  }
 
 </div>

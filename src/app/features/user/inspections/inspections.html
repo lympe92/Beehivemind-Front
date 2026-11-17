@@ -1,71 +1,87 @@
 <div class="app-page">
 
-  <app-filter-bar
-    [apiaries]="apiaries()"
-    [beehives]="beehives()"
-    [apiaryId]="selectedApiaryId()"
-    (apiaryIdChange)="onApiaryChange($event)"
-    [beehiveId]="selectedBeehiveId()"
-    (beehiveIdChange)="onBeehiveChange($event)">
-    <app-export-menu [note]="exportNote()" (export)="export($event)" />
-  </app-filter-bar>
+  @if (emptyState() === 'no-hive') {
+    <app-empty-state
+      icon="hive"
+      heading="Add a hive first"
+      text="An inspection belongs to a hive, and you have none yet. Add one and come back here to record what you saw in it."
+      buttonLabel="Add a hive"
+      (buttonClick)="goTo('/user/beehives')" />
+  } @else if (emptyState() === 'none') {
+    <app-empty-state
+      icon="inspection"
+      heading="No inspections yet"
+      text="An inspection is what you saw in a hive on one visit. Each one you save is read at once and turned into a diagnosis: what the hive needs, and why."
+      buttonLabel="Add inspection"
+      (buttonClick)="startAdd()" />
+  } @else {
+    <app-filter-bar
+      [apiaries]="apiaries()"
+      [beehives]="beehives()"
+      [apiaryId]="selectedApiaryId()"
+      (apiaryIdChange)="onApiaryChange($event)"
+      [beehiveId]="selectedBeehiveId()"
+      (beehiveIdChange)="onBeehiveChange($event)">
+      <app-export-menu [note]="exportNote()" (export)="export($event)" />
+    </app-filter-bar>
 
   <app-card title="Inspection Data" [flush]="true">
     <button card-header-end type="button" class="app-btn app-btn--primary" (click)="startAdd()">+ Add Record</button>
 
-    <app-data-table
-      [columns]="columns"
-      [rows]="pagedInspections()"
-      [loading]="loading()"
-      [pagination]="tablePagination()"
-      (pageChange)="goToPage($event)"
-      [showActions]="true"
-      emptyMessage="No inspection records found.">
+      <app-data-table
+        [columns]="columns"
+        [rows]="pagedInspections()"
+        [loading]="loading()"
+        [pagination]="tablePagination()"
+        (pageChange)="goToPage($event)"
+        [showActions]="true"
+        emptyMessage="No inspection records found.">
 
-      <!-- A detection reads red; its absence stays muted, so a scan of the
-           column shows only what needs attention. -->
-      <ng-template #cellTpl let-row let-col="col">
-        @switch (col.key) {
-          @case ('beehiveId') { <span class="dt__nowrap">{{ beehiveName(row.beehiveId) }}</span> }
-          @case ('date') { <span class="dt__nowrap">{{ row.date | date:'mediumDate' }}</span> }
-          @case ('diagnosis') {
-            @if (diagnosisOf(row.id); as d) {
-              <button type="button" class="app-badge-btn" [attr.aria-label]="'Open the diagnosis of this inspection'" (click)="openDiagnosis(row)">
-                <app-diagnosis-badge [level]="d.level" />
-              </button>
-            } @else {
-              <span class="app-badge app-badge--neutral">—</span>
+        <!-- A detection reads red; its absence stays muted, so a scan of the
+             column shows only what needs attention. -->
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('beehiveId') { <span class="dt__nowrap">{{ beehiveName(row.beehiveId) }}</span> }
+            @case ('date') { <span class="dt__nowrap">{{ row.date | date:'mediumDate' }}</span> }
+            @case ('diagnosis') {
+              @if (diagnosisOf(row.id); as d) {
+                <button type="button" class="app-badge-btn" [attr.aria-label]="'Open the diagnosis of this inspection'" (click)="openDiagnosis(row)">
+                  <app-diagnosis-badge [level]="d.level" />
+                </button>
+              } @else {
+                <span class="app-badge app-badge--neutral">—</span>
+              }
             }
+            @case ('varroa') {
+              <span class="app-bool" [class.app-bool--yes]="row.varroa">{{ row.varroa ? 'Yes' : 'No' }}</span>
+            }
+            @case ('american_foulbrood') {
+              <span class="app-bool" [class.app-bool--yes]="row.american_foulbrood">{{ row.american_foulbrood ? 'Yes' : 'No' }}</span>
+            }
+            @case ('european_foulbrood') {
+              <span class="app-bool" [class.app-bool--yes]="row.european_foulbrood">{{ row.european_foulbrood ? 'Yes' : 'No' }}</span>
+            }
+            @case ('nosema') {
+              <span class="app-bool" [class.app-bool--yes]="row.nosema">{{ row.nosema ? 'Yes' : 'No' }}</span>
+            }
+            @case ('queen_exists') {
+              <span class="app-bool" [class.app-bool--yes]="row.queen_exists">{{ row.queen_exists ? 'Yes' : 'No' }}</span>
+            }
+            @case ('queen_cells') {
+              <span class="app-bool" [class.app-bool--yes]="row.queen_cells">{{ row.queen_cells ? 'Yes' : 'No' }}</span>
+            }
+            @case ('queen_year') { {{ row.queen_year ?? '—' }} }
+            @default { {{ row[col.key] ?? '—' }} }
           }
-          @case ('varroa') {
-            <span class="app-bool" [class.app-bool--yes]="row.varroa">{{ row.varroa ? 'Yes' : 'No' }}</span>
-          }
-          @case ('american_foulbrood') {
-            <span class="app-bool" [class.app-bool--yes]="row.american_foulbrood">{{ row.american_foulbrood ? 'Yes' : 'No' }}</span>
-          }
-          @case ('european_foulbrood') {
-            <span class="app-bool" [class.app-bool--yes]="row.european_foulbrood">{{ row.european_foulbrood ? 'Yes' : 'No' }}</span>
-          }
-          @case ('nosema') {
-            <span class="app-bool" [class.app-bool--yes]="row.nosema">{{ row.nosema ? 'Yes' : 'No' }}</span>
-          }
-          @case ('queen_exists') {
-            <span class="app-bool" [class.app-bool--yes]="row.queen_exists">{{ row.queen_exists ? 'Yes' : 'No' }}</span>
-          }
-          @case ('queen_cells') {
-            <span class="app-bool" [class.app-bool--yes]="row.queen_cells">{{ row.queen_cells ? 'Yes' : 'No' }}</span>
-          }
-          @case ('queen_year') { {{ row.queen_year ?? '—' }} }
-          @default { {{ row[col.key] ?? '—' }} }
-        }
-      </ng-template>
+        </ng-template>
 
       <ng-template #actionsTpl let-row>
         <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
         <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
       </ng-template>
 
-    </app-data-table>
-  </app-card>
+      </app-data-table>
+    </app-card>
+  }
 
 </div>

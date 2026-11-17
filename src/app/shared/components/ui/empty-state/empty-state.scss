@@ -1,0 +1,50 @@
+// The design draws the empty-state block inline (Onboarding, frames 3a / 3c);
+// these are its proportions, on tokens only.
+:host {
+  display: block;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-state--inline {
+  // Inside a card that already pads its body: a narrow card (Financial's
+  // two columns at 1024) keeps its width for the sentence.
+  padding: 32px 0;
+}
+
+.empty-state__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--app-gray-100);
+  color: var(--text-body);
+}
+
+.empty-state__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--text-heading);
+}
+
+.empty-state__text {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-body);
+}
+
+.empty-state__button {
+  margin-top: 8px;
+}

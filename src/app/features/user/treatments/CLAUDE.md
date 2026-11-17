@@ -5,7 +5,7 @@
 ## Purpose
 Manage hive treatments (e.g. varroa). Two concepts:
 - **Treatment Type** — a reusable definition (name, etc.). Created/edited/deleted here.
-- **Treatment Session** — an applied treatment: a type + start date + a set of beehives (optionally scoped to one apiary) + notes. A session fans out into per-hive **Instances** (each with a `status`, e.g. `'done'`).
+- **Treatment Session** — an applied treatment: a type + start date + a set of beehives (optionally scoped to one apiary) + notes. A session fans out into **Instances**: one dose per scheduled date for the whole session (`repetitions + 1` of them, `intervalDays` apart, from `generateInstances` in the API's `TreatmentSessionService`), not one per hive. Each has a `status`, e.g. `'done'`.
 
 ## Routes
 Defined in `features/user/user.routes.ts`, under `authGuard` (user zone).
@@ -44,9 +44,15 @@ Both live under `shared/components/ui/modal/` (reusable, not feature-scoped):
 ## Flow (canonical mutation pattern)
 Same as the root convention: open modal → `if (!result) return` → call service → on `res.success` dispatch `reload()` + `toast.success`, else `toast.error`. Deleting a **type** also reloads `treatmentSessions` (cascade — deleting a type removes its sessions). Deleting a **session** removes its instances.
 
+## Empty pages
+Both pages show `<app-empty-state>` once their slice has loaded with nothing in it (Onboarding design, frame 3d). Types: "No treatment types yet" → `addType()`. Sessions (`emptyState` computed): no type → "Add a treatment type first" (to `/user/treatments`); no hive → "Add a hive first" (to `/user/beehives`); otherwise "No treatments applied yet" → `applyTreatment()`. The page's own card and "+" buttons are unchanged once there is a record.
+
 ## Helpers worth knowing
 - `apiaryName(id)` — resolves an apiary id to its name, `'All Apiaries'` when `null`.
 - `instancesDone(session)` — counts `instances` with `status === 'done'` (drives progress display).
+
+## Deep links (Getting started)
+On `/user/treatments`, `?add=type` opens New treatment type and `?add=session` opens Apply treatment on the newest type (with none, New treatment type instead), once types, apiaries and beehives have loaded. See the root `CLAUDE.md`, "Getting started (tutorials)".
 
 ## Related
 - [Root CLAUDE.md](../../../../../CLAUDE.md) · [Form System](../../../shared/components/ui/form/CLAUDE.md)

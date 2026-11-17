@@ -5,6 +5,8 @@
   </a>
 
   <div class="auth-card">
+    <!-- Above the heading: the setup wizard's step indicator. -->
+    <ng-content select="[authCardLead]" />
     @if (title()) {
       <div class="auth-card__header">
         <h1>{{ title() }}</h1>

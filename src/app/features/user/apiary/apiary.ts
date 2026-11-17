@@ -5,18 +5,20 @@ import { Store } from '@ngrx/store';
 import { Apiary } from '../../../core/models/apiary.model';
 import { ApiaryService } from '../../../core/services/apiary.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
-import { selectAllApiaries, selectApiariesLoading } from '../../../store/apiaries/apiaries.selectors';
+import { selectAllApiaries, selectApiariesLoaded, selectApiariesLoading } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { DataTableComponent, ColumnDef, TablePagination } from '../../../shared/components/ui/data-table/data-table';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
+import { EmptyStateComponent } from '../../../shared/components/ui/empty-state/empty-state';
 import { ApiaryFormModalComponent } from '../../../shared/components/ui/modal/apiary-form-modal/apiary-form-modal';
+import { onDeepLink } from '../../../core/onboarding/deep-link';
 
 @Component({
   selector: 'app-apiary',
   standalone: true,
-  imports: [DatePipe, RouterLink, DataTableComponent, CardComponent],
+  imports: [DatePipe, RouterLink, DataTableComponent, CardComponent, EmptyStateComponent],
   templateUrl: './apiary.html',
 })
 export class ApiaryComponent implements OnInit {
@@ -37,6 +39,13 @@ export class ApiaryComponent implements OnInit {
 
   private allApiaries = this.store.selectSignal(selectAllApiaries);
   loading = this.store.selectSignal(selectApiariesLoading);
+  private loaded = this.store.selectSignal(selectApiariesLoaded);
+
+  /** Loaded and nothing at all: the page says what an apiary is instead of an empty table. */
+  readonly isEmpty = computed(() => this.loaded() && this.allApiaries().length === 0);
+
+  /** `?add=1` (the guide's "Add apiary"): the Add apiary dialog, once the names it checks against are in. */
+  private readonly addLink = onDeepLink(['add'], () => this.loaded(), () => this.startAdd());
 
   apiaries = computed(() => {
     const start = (this.page() - 1) * this.perPage;

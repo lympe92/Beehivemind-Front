@@ -7,7 +7,7 @@ import { mock, TEAM_SUMMARY } from './mocks.mjs';
 
 const BASE = 'http://localhost:4301';
 const API = 'http://localhost:8000/api/';
-const USER = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true, team: TEAM_SUMMARY };
+const USER = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true, onboarding: null, onboarding_progress: { seen: [], panel: 'open' }, team: TEAM_SUMMARY };
 const SEED = {
   auth: { token: null, loading: false, error: null, twoFactorToken: null, twoFactorPending: null, pendingUser: null, pendingToken: null, retryAfterMinutes: null, user: USER },
   employeeAuth: { token: null, loading: false, error: null, twoFactorToken: null, twoFactorStep: null, employee: null },

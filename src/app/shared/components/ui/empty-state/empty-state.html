@@ -1,0 +1,47 @@
+@if (framed()) {
+  <div class="card">
+    <div class="card__body empty-state">
+      <ng-container [ngTemplateOutlet]="block" />
+    </div>
+  </div>
+} @else {
+  <div class="empty-state empty-state--inline">
+    <ng-container [ngTemplateOutlet]="block" />
+  </div>
+}
+
+<ng-template #block>
+  <span class="empty-state__icon" [attr.data-icon]="icon()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      @switch (icon()) {
+        @case ('apiary') {
+          <svg:path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z" /><svg:circle cx="12" cy="10" r="2" />
+        }
+        @case ('hive') { <svg:path d="M12 2l8 5v9l-8 5-8-5V7z" /> }
+        @case ('inspection') { <svg:circle cx="11" cy="11" r="7" /><svg:path d="M21 21l-4-4" /> }
+        @case ('feeding') { <svg:path d="M12 3c3 4 5 7 5 10a5 5 0 0 1-10 0c0-3 2-6 5-10z" /> }
+        @case ('harvest') { <svg:path d="M7 7h10l-1 13H8z" /><svg:path d="M9 7V4h6v3" /> }
+        @case ('treatment') {
+          <svg:path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" /><svg:path d="m8.5 8.5 7 7" />
+        }
+        @case ('cost') {
+          <svg:path d="M4 19V5" /><svg:path d="M4 19h16" /><svg:path d="M8 15v-4" /><svg:path d="M12 15V8" /><svg:path d="M16 15v-6" />
+        }
+        @case ('category') {
+          <svg:path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" /><svg:circle cx="8" cy="8" r="1.5" />
+        }
+        @case ('todo') {
+          <svg:path d="M9 11l3 3 8-8" /><svg:path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9" />
+        }
+      }
+    </svg>
+  </span>
+  <h2 class="empty-state__title">{{ heading() }}</h2>
+  <p class="empty-state__text">{{ text() }}</p>
+  @if (buttonLabel()) {
+    <button type="button" class="app-btn app-btn--primary empty-state__button" (click)="buttonClick.emit()">
+      {{ buttonLabel() }}
+    </button>
+  }
+</ng-template>

@@ -21,6 +21,9 @@ import { NotificationBellComponent } from '../../shared/components/ui/notificati
 import { TooltipDirective } from '../../shared/components/ui/tooltip/tooltip.directive';
 import { teamName } from '../../core/models/team.model';
 import { AiAssistantStatusService } from '../../core/services/ai-assistant-status.service';
+import { OnboardingActions } from '../../store/onboarding/onboarding.actions';
+import { selectGuideVisible } from '../../store/onboarding/onboarding.selectors';
+import { GettingStartedComponent } from '../../shared/components/ui/getting-started/getting-started';
 
 /** Below this width the sidebar is an overlay rather than a column. */
 const OVERLAY_BREAKPOINT = 992;
@@ -37,7 +40,7 @@ const OVERLAY_BREAKPOINT = 992;
 @Component({
   selector: 'app-user-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent, TooltipDirective],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent, TooltipDirective, GettingStartedComponent],
   templateUrl: './user-layout.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -52,6 +55,8 @@ export class UserLayoutComponent implements OnInit {
   /** The assistant's link shows only where the API takes messages. */
   readonly assistant = inject(AiAssistantStatusService);
   readonly teamName = teamName;
+  /** The "Getting started" popup is fetched (`@defer`) only once the guide is active. */
+  readonly guideVisible = this.store.selectSignal(selectGuideVisible);
   sidebarOpen = signal(true);
   openGroups = signal<Set<string>>(new Set());
 
@@ -77,6 +82,8 @@ export class UserLayoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.assistant.load();
+    // The guide's counts; a no-op when the /user guard already read them.
+    this.store.dispatch(OnboardingActions.load());
 
     // Below 992 the sidebar is an overlay, so it must start closed.
     if (this.isOverlay()) this.sidebarOpen.set(false);
@@ -134,6 +141,11 @@ export class UserLayoutComponent implements OnInit {
 
   private isOverlay(): boolean {
     return this.isBrowser && window.innerWidth < OVERLAY_BREAKPOINT;
+  }
+
+  /** The sidebar's "Getting started": back to active and open, whatever the guide's state. */
+  openGuide(): void {
+    this.store.dispatch(OnboardingActions.reopen());
   }
 
   logout(): void {

@@ -13,6 +13,7 @@ import { storeDevtools } from './store/devtools';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { analyticsInterceptor } from './core/interceptors/analytics.interceptor';
+import { apiWritesInterceptor } from './core/interceptors/api-writes.interceptor';
 import { createHydrationMetaReducer } from './store/hydration.meta-reducer';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
@@ -25,7 +26,7 @@ export const appConfig: ApplicationConfig = {
     // is what stands between a crawler burst and the API's per-address limit.
     provideHttpClient(
       withFetch(),
-      withInterceptors([authInterceptor, errorInterceptor, analyticsInterceptor]),
+      withInterceptors([authInterceptor, errorInterceptor, analyticsInterceptor, apiWritesInterceptor]),
     ),
     provideStore(appReducers),
     {

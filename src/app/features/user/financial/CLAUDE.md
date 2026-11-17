@@ -28,5 +28,11 @@ Financial overview: income/outgoing cost tracking with charts, plus management o
 - **Monthly chart window:** the API's `costs/stats/monthly` returns the last twelve months keyed by month number only, so `monthlyBarOptions` draws a window of the last **seven** months ending with the current one (`CHART_MONTHS`, the design system's column count); labels get a two-digit year suffix only when the window crosses a year. Twelve columns rotated the labels at 375.
 - CRUD still uses `FormModalComponent` + `ModalService.confirm` + `ToastService` (same as records pattern), just without the store.
 
+## Empty cards
+The two cards show `<app-empty-state [framed]="false">` inside themselves (their toolbar hidden) once loaded with nothing: categories "No categories yet" → `startAdd()`; costs "No costs yet" → `startAdd()`, or with no category "Add a category first", whose button emits `addCategory` and `FinancialComponent` opens the categories card's dialog through `viewChild`. `categoriesLoaded` keeps the costs card from guessing before the categories answer.
+
+## Deep links (Getting started)
+`?add=category` opens Add Cost Category, `?add=cost` opens Add Cost (Add Cost Category while there is none), once the categories have answered; `financial.ts` reaches both child cards through `viewChild`. See the root `CLAUDE.md`, "Getting started (tutorials)".
+
 ## Related
 [Root](../../../../../CLAUDE.md) · [Inspections](../inspections/CLAUDE.md) (form-modal pattern) · apex-chart, data-table, form-modal UI.

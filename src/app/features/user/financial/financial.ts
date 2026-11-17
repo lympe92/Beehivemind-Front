@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { catchError, forkJoin, of } from 'rxjs';
 import { ApexOptions } from 'ngx-apexcharts';
 import { CostCategory } from '../../../core/models/cost-category.model';
@@ -10,6 +10,7 @@ import { ApexChartComponent } from '../../../shared/components/ui/apex-chart/ape
 import { CardComponent } from '../../../shared/components/ui/card/card';
 import { CostCategoriesComponent } from '../cost-categories/cost-categories';
 import { CostsComponent } from '../costs/costs';
+import { onDeepLink } from '../../../core/onboarding/deep-link';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -30,6 +31,24 @@ export class FinancialComponent implements OnInit {
 
   // Data for sub-components
   costCategories = signal<CostCategory[]>([]);
+  /** Until the categories answer, the costs card cannot tell "no category" from "not yet known". */
+  categoriesLoaded = signal(false);
+
+  private categoriesCard = viewChild(CostCategoriesComponent);
+  private costsCard = viewChild(CostsComponent);
+
+  /**
+   * `?add=category` opens Add Cost Category, `?add=cost` opens Add Cost (or
+   * the category dialog while there is none: every cost goes under one).
+   */
+  private readonly addLink = onDeepLink(
+    ['add'],
+    () => this.categoriesLoaded() && !!this.categoriesCard() && !!this.costsCard(),
+    link => {
+      if (link['add'] === 'cost' && this.costCategories().length) this.costsCard()?.startAdd();
+      else this.categoriesCard()?.startAdd();
+    },
+  );
 
   // Chart data
   chartsLoading = signal(true);
@@ -103,7 +122,10 @@ export class FinancialComponent implements OnInit {
 
   ngOnInit(): void {
     this.costCategoryService.getCategories().subscribe(res => {
-      if (res.success) this.costCategories.set(res.data);
+      if (res.success) {
+        this.costCategories.set(res.data);
+        this.categoriesLoaded.set(true);
+      }
     });
     this.loadCharts();
   }
@@ -112,6 +134,12 @@ export class FinancialComponent implements OnInit {
 
   onCategoriesChange(categories: CostCategory[]): void {
     this.costCategories.set(categories);
+    this.categoriesLoaded.set(true);
+  }
+
+  /** The empty costs card's "Add a category" opens the categories card's own dialog. */
+  addCategory(): void {
+    this.categoriesCard()?.startAdd();
   }
 
   onCostsChange(): void {

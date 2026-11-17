@@ -197,6 +197,7 @@
 
     <!-- Above Danger zone: it answers the question that card raises. -->
     <app-data-export-card
+      id="your-data"
       [lastExport]="profile()?.last_exported_at ?? null"
       [busy]="exporting()"
       (exportData)="exportData($event)" />

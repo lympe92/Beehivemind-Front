@@ -1,29 +1,47 @@
-<div class="app-toolbar">
-  <app-export-menu chrome="bare" size="sm"
-                   [note]="'All apiaries · ' + costs().length + (costs().length === 1 ? ' row' : ' rows')"
-                   (export)="export($event)" />
-  <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="startAdd()">+ Add</button>
-</div>
+@if (emptyState() === 'no-category') {
+  <app-empty-state
+    [framed]="false"
+    icon="category"
+    heading="Add a category first"
+    text="Every cost goes under a category, and you have none yet."
+    buttonLabel="Add a category"
+    (buttonClick)="addCategory.emit()" />
+} @else if (emptyState() === 'none') {
+  <app-empty-state
+    [framed]="false"
+    icon="cost"
+    heading="No costs yet"
+    text="A cost is one amount with a date, a name and a category. The charts on this page are drawn from these entries."
+    buttonLabel="Add cost"
+    (buttonClick)="startAdd()" />
+} @else {
+  <div class="app-toolbar">
+    <app-export-menu chrome="bare" size="sm"
+                     [note]="'All apiaries · ' + costs().length + (costs().length === 1 ? ' row' : ' rows')"
+                     (export)="export($event)" />
+    <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="startAdd()">+ Add</button>
+  </div>
 
-<app-data-table
-  [columns]="columns"
-  [rows]="costs()"
-  [loading]="loading()"
-  [showActions]="true"
-  emptyMessage="No costs yet.">
+  <app-data-table
+    [columns]="columns"
+    [rows]="costs()"
+    [loading]="loading()"
+    [showActions]="true"
+    emptyMessage="No costs yet.">
 
-  <ng-template #cellTpl let-row let-col="col">
-    @switch (col.key) {
-      @case ('date') { {{ row.date | date:'mediumDate' }} }
-      @case ('category') { <span class="dt__muted">{{ categoryName()(row.category_id) }}</span> }
-      @case ('amount') { €{{ row.amount | number:'1.0-2' }} }
-      @default { {{ row[col.key] ?? '—' }} }
-    }
-  </ng-template>
+    <ng-template #cellTpl let-row let-col="col">
+      @switch (col.key) {
+        @case ('date') { {{ row.date | date:'mediumDate' }} }
+        @case ('category') { <span class="dt__muted">{{ categoryName()(row.category_id) }}</span> }
+        @case ('amount') { €{{ row.amount | number:'1.0-2' }} }
+        @default { {{ row[col.key] ?? '—' }} }
+      }
+    </ng-template>
 
   <ng-template #actionsTpl let-row>
     <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
     <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
   </ng-template>
 
-</app-data-table>
+  </app-data-table>
+}

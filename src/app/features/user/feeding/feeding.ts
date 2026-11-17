@@ -1,6 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { of } from 'rxjs';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { beehiveLabel, beehiveTag } from '../../../core/models/beehive.model';
 import {
@@ -15,15 +16,17 @@ import {
 import { FeedingService } from '../../../core/services/feeding.service';
 import { ExportService } from '../../../core/services/export.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
-import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
+import { selectAllApiaries, selectApiariesLoaded } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
-import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
+import { selectAllBeehives, selectBeehivesLoaded } from '../../../store/beehives/beehives.selectors';
+import { onDeepLink } from '../../../core/onboarding/deep-link';
 import { FeedingActions } from '../../../store/feeding/feeding.actions';
-import { selectAllFeeding, selectFeedingLoading } from '../../../store/feeding/feeding.selectors';
+import { selectAllFeeding, selectFeedingLoaded, selectFeedingLoading } from '../../../store/feeding/feeding.selectors';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
+import { EmptyStateComponent } from '../../../shared/components/ui/empty-state/empty-state';
 import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
 import { ExportMenuComponent, exportFormat, exportScope } from '../../../shared/components/ui/export-menu/export-menu';
 import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
@@ -32,7 +35,7 @@ import { syncValidators } from '../../../shared/components/ui/form/validators.co
 @Component({
   selector: 'app-feeding',
   standalone: true,
-  imports: [DataTableComponent, CardComponent, FilterBarComponent, ExportMenuComponent, DatePipe],
+  imports: [DataTableComponent, CardComponent, EmptyStateComponent, FilterBarComponent, ExportMenuComponent, DatePipe],
   templateUrl: './feeding.html',
 })
 export class FeedingComponent implements OnInit {
@@ -41,6 +44,7 @@ export class FeedingComponent implements OnInit {
   private exportService = inject(ExportService);
   private toast = inject(ToastService);
   private modal = inject(ModalService);
+  private router = inject(Router);
 
   readonly columns: ColumnDef[] = [
     { key: 'beehiveId', label: 'Beehive', width: '30%' },
@@ -60,6 +64,18 @@ export class FeedingComponent implements OnInit {
   }
   private allFeeding = this.store.selectSignal(selectAllFeeding);
   loading = this.store.selectSignal(selectFeedingLoading);
+  private loaded = this.store.selectSignal(selectFeedingLoaded);
+  private apiariesLoaded = this.store.selectSignal(selectApiariesLoaded);
+
+  /**
+   * No record at all (a filter that matches none keeps the table's line):
+   * 'none' invites the first; 'no-apiary' sends to Apiaries, since a record
+   * belongs to an apiary. Null while loading, or when there are records.
+   */
+  readonly emptyState = computed<'none' | 'no-apiary' | null>(() => {
+    if (!this.loaded() || this.allFeeding().length > 0 || !this.apiariesLoaded()) return null;
+    return this.apiaries().length === 0 ? 'no-apiary' : 'none';
+  });
 
   beehives = computed(() =>
     this.allBeehives().filter(b => b.apiaryId === this.selectedApiaryId())
@@ -85,6 +101,15 @@ export class FeedingComponent implements OnInit {
   exportNote = computed(() =>
     exportScope(this.apiaries(), this.allBeehives(), this.selectedApiaryId(), this.selectedBeehiveId(), this.feeding().length)
   );
+
+  private beehivesLoaded = this.store.selectSignal(selectBeehivesLoaded);
+
+  /** `?add=1`: the Add Feeding Record dialog, once its apiary and beehive selects have their options. */
+  private readonly addLink = onDeepLink(['add'], () => this.apiariesLoaded() && this.beehivesLoaded(), () => this.startAdd());
+
+  goTo(path: string): void {
+    this.router.navigate([path]);
+  }
 
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());

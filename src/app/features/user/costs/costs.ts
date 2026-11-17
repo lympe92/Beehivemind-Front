@@ -12,10 +12,11 @@ import { FormModalComponent } from '../../../shared/components/ui/modal/form-mod
 import { ExportMenuComponent, exportFormat } from '../../../shared/components/ui/export-menu/export-menu';
 import { syncValidators } from '../../../shared/components/ui/form/validators.config';
 
+import { EmptyStateComponent } from '../../../shared/components/ui/empty-state/empty-state';
 @Component({
   selector: 'app-costs',
   standalone: true,
-  imports: [DataTableComponent, ExportMenuComponent, DatePipe, DecimalPipe],
+  imports: [DataTableComponent, ExportMenuComponent, DatePipe, DecimalPipe, EmptyStateComponent],
   templateUrl: './costs.html',
 })
 export class CostsComponent implements OnInit {
@@ -26,6 +27,10 @@ export class CostsComponent implements OnInit {
 
   readonly costCategories = input<CostCategory[]>([]);
   readonly costsChange = output<void>();
+  /** Whether the parent's list of categories has arrived: until then "no category" is unknown. */
+  readonly categoriesLoaded = input(false);
+  /** The empty card's "Add a category": the categories card beside it opens its dialog. */
+  readonly addCategory = output<void>();
 
   readonly columns: ColumnDef[] = [
     { key: 'date', label: 'Date' },
@@ -36,6 +41,17 @@ export class CostsComponent implements OnInit {
 
   costs = signal<Cost[]>([]);
   loading = signal(false);
+  loaded  = signal(false);
+
+  /**
+   * No cost at all: 'none' invites the first; every cost goes under a
+   * category, so with none 'no-category' asks for one first. Null while
+   * loading, or when there are costs.
+   */
+  readonly emptyState = computed<'none' | 'no-category' | null>(() => {
+    if (!this.loaded() || this.costs().length > 0 || !this.categoriesLoaded()) return null;
+    return this.costCategories().length === 0 ? 'no-category' : 'none';
+  });
 
   readonly categoryName = computed(() => {
     const map = new Map(this.costCategories().map(c => [c.id, c.name]));
@@ -218,7 +234,10 @@ export class CostsComponent implements OnInit {
   private load(): void {
     this.loading.set(true);
     this.costService.getCosts().subscribe(res => {
-      if (res.success) this.costs.set(res.data);
+      if (res.success) {
+        this.costs.set(res.data);
+        this.loaded.set(true);
+      }
       this.loading.set(false);
     });
   }

@@ -21,5 +21,11 @@ An **agenda**: scheduled/overdue tasks (mostly treatment instances) shown as a l
 - **Mark done:** only `entityType === 'treatment_instance'` items have an enabled checkbox (`completable()`) → `TreatmentInstanceService.update(id, { status: 'done' })`, then add to a local `doneIds` set and dispatch `NotificationsActions.reload()` (keeps the notification bell in sync). Inspection items render a disabled checkbox: an inspection is recorded, not ticked.
 - Row layout is the tokens-only `todo-list.scss` (`.todo-row*`); everything else is the app vocabulary.
 
+## Empty page
+`todo-list.ts` shows `<app-empty-state>` "Nothing scheduled" when the agenda answered with no item (`loaded` + `isEmpty`; a failed request keeps the one-line state). The page has no add button of its own, so its button goes to `/user/treatments`. The copy says doses: an instance is one dose per scheduled date, not one per hive.
+
+## Getting started
+Ticking a dose reloads `treatmentSessions` as well as the notifications (it did not before): the sessions' doses-done counts live there, and the guide's "Tick a dose" step reads the same fact from the API. The guide's "See the calendar" step opens `/user/todo/calendar` and ticks when pressed.
+
 ## Related
 [Root](../../../../../CLAUDE.md) · [Apiaries](../apiary/CLAUDE.md) (apiary-view shares mark-done) · [Treatments](../treatments/CLAUDE.md) · calendar UI component.

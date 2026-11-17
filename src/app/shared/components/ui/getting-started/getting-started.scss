@@ -1,0 +1,377 @@
+// The "Getting started" popup (Onboarding design, frames 2a to 2i). The design
+// system has no class for a floating, non-modal panel, so its inline styles
+// are reproduced here, on tokens only. Grouped selectors keep it under the
+// 4 kB component-style budget.
+//
+// Layering: below the CDK overlay container (1000), so a dialog, the bell's
+// panel, popovers and the phone sidebar's scrim all cover it; the toasts
+// (9999) stay above it. The one-line hint is the exception: it sits above a
+// dialog's backdrop (1001) and takes no pointer events, so it can neither be
+// clicked nor take focus from the dialog.
+
+:host {
+  display: contents;
+}
+
+// ── The four surfaces: panel (2a, 2c, 2e, 2h, 2i), folded (2b), hint (2g), bar (2d)
+
+.gs-panel,
+.gs-folded,
+.gs-hint,
+.gs-bar {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 999;
+  box-sizing: border-box;
+  display: flex;
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-heading);
+  outline: none;
+}
+
+.gs-panel {
+  flex-direction: column;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  // Clear of the header and its bell: the panel scrolls inside rather than climbing.
+  max-height: calc(100dvh - 112px);
+  border-radius: var(--radius);
+}
+
+.gs-folded,
+.gs-hint {
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  max-width: calc(100vw - 32px);
+  padding: 0 16px;
+  font: inherit;
+  font-size: 0.875rem;
+  border-radius: var(--radius-pill);
+}
+
+.gs-folded {
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.gs-hint {
+  z-index: 1001;
+  pointer-events: none;
+}
+
+.gs-bar {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px 16px;
+  border-width: 1px 0 0;
+}
+
+// ── Type ───────────────────────────────────────────────────
+
+.gs-label {
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+}
+
+.gs-count,
+.gs-text,
+.gs-hint__text,
+.gs-folded__count {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--text-body);
+}
+
+.gs-count {
+  white-space: nowrap;
+}
+
+.gs-text {
+  line-height: 1.5;
+}
+
+.gs-hint__text {
+  font-size: inherit;
+  min-width: 0;
+}
+
+.gs-hint__step,
+.gs-row__title {
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.gs-row__title {
+  flex-shrink: 1;
+  font-size: 0.875rem;
+}
+
+// Done and later steps carry no emphasis: the current one is the only one raised.
+.gs-row__title--plain {
+  flex: 1;
+  font-weight: 400;
+  color: var(--text-body);
+}
+
+.gs-finished__title {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+// ── Marks: the dot, the tick, the step number, the microphone
+
+.gs-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+.gs-tick,
+.gs-num,
+.gs-icon {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gs-tick {
+  background: var(--color-success);
+  color: var(--color-white);
+}
+
+.gs-tick--lg {
+  width: 28px;
+  height: 28px;
+}
+
+.gs-num {
+  border: 2px solid var(--border-color);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-body);
+}
+
+.gs-num--current {
+  border-color: var(--color-primary);
+}
+
+// ── Layout ─────────────────────────────────────────────────
+
+.gs-head,
+.gs-bar__head,
+.gs-row,
+.gs-step,
+.gs-row__main,
+.gs-finished,
+.gs-row__line,
+.gs-actions,
+.gs-bar__actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.gs-head,
+.gs-bar__head {
+  align-items: center;
+  gap: 10px;
+}
+
+.gs-head {
+  flex-shrink: 0;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+
+  .gs-count {
+    margin-left: auto;
+  }
+}
+
+.gs-panel--padded {
+  padding: 16px;
+  gap: 12px;
+}
+
+.gs-body,
+.gs-stack,
+.gs-box,
+.gs-row__copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gs-body {
+  padding: 14px 16px 16px;
+  gap: 12px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.gs-body--finished {
+  padding: 16px;
+  gap: 14px;
+}
+
+.gs-stack--2,
+.gs-row__copy {
+  gap: 2px;
+}
+
+.gs-stack--4 {
+  gap: 4px;
+}
+
+.gs-row__copy {
+  flex: 1;
+}
+
+.gs-row__line {
+  align-items: baseline;
+  gap: 8px;
+
+  .gs-row__title {
+    flex: 1;
+  }
+}
+
+.gs-actions,
+.gs-bar__actions {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gs-box,
+.gs-row--next {
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+}
+
+.gs-progress {
+  display: flex;
+  gap: 6px;
+}
+
+.gs-progress__seg {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-color);
+}
+
+.gs-progress__seg--done {
+  background: var(--color-primary);
+}
+
+.gs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gs-row--done,
+.gs-step--done {
+  align-items: center;
+}
+
+.gs-row--done,
+.gs-row--later {
+  padding: 10px 0;
+}
+
+.gs-row--later,
+.gs-step--optional {
+  border-top: 1px solid var(--border-color);
+}
+
+// The current one: raised in a box, its button under its words.
+.gs-row--next {
+  flex-direction: column;
+  margin: 4px 0;
+}
+
+.gs-row--next + .gs-row--later {
+  border-top: 0;
+}
+
+.gs-step {
+  padding: 8px 0;
+}
+
+.gs-step--optional {
+  margin-top: 4px;
+  padding-top: 12px;
+
+  .gs-num {
+    border-style: dashed;
+  }
+}
+
+// The step's button lines up with its title, past the 22px mark and its gap.
+.gs-indent {
+  margin-left: 34px;
+}
+
+.gs-indent,
+.gs-start {
+  align-self: flex-start;
+}
+
+.gs-end {
+  align-self: flex-end;
+}
+
+.gs-bar__fold {
+  margin-left: auto;
+}
+
+.gs-bar__primary {
+  flex: 1;
+}
+
+.gs-bar .app-btn {
+  min-height: 44px;
+}
+
+// ── Phone: the full list and an open tutorial take the bar's place, as a sheet
+
+@media (max-width: 767px) {
+  .gs-panel {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-width: none;
+    max-height: 80dvh;
+    border-width: 1px 0 0;
+    border-radius: 0;
+
+    .app-btn {
+      min-height: 44px;
+    }
+  }
+
+  .gs-folded,
+  .gs-hint {
+    right: 16px;
+    bottom: 16px;
+  }
+}

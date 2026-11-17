@@ -1,42 +1,58 @@
 <div class="app-page">
 
-  <app-filter-bar
-    [apiaries]="apiaries()"
-    [beehives]="beehives()"
-    [apiaryId]="selectedApiaryId()"
-    (apiaryIdChange)="onApiaryChange($event)"
-    [beehiveId]="selectedBeehiveId()"
-    (beehiveIdChange)="onBeehiveChange($event)">
-    <app-export-menu [note]="exportNote()" (export)="export($event)" />
-  </app-filter-bar>
+  @if (emptyState() === 'no-apiary') {
+    <app-empty-state
+      icon="apiary"
+      heading="Add an apiary first"
+      text="A harvest record belongs to an apiary or to one hive in it, and you have no apiary yet."
+      buttonLabel="Add an apiary"
+      (buttonClick)="goTo('/user/apiary')" />
+  } @else if (emptyState() === 'none') {
+    <app-empty-state
+      icon="harvest"
+      heading="No harvests yet"
+      text="A harvest record is what you took, how much and on which day, from one hive or from a whole apiary. Together the records show what each apiary has given and when."
+      buttonLabel="Add harvest"
+      (buttonClick)="startAdd()" />
+  } @else {
+    <app-filter-bar
+      [apiaries]="apiaries()"
+      [beehives]="beehives()"
+      [apiaryId]="selectedApiaryId()"
+      (apiaryIdChange)="onApiaryChange($event)"
+      [beehiveId]="selectedBeehiveId()"
+      (beehiveIdChange)="onBeehiveChange($event)">
+      <app-export-menu [note]="exportNote()" (export)="export($event)" />
+    </app-filter-bar>
 
   <app-card title="Harvest Data" [flush]="true">
     <button card-header-end type="button" class="app-btn app-btn--primary" (click)="startAdd()">+ Add Record</button>
 
-    <app-data-table
-      [columns]="columns"
-      [rows]="harvest()"
-      [loading]="loading()"
-      [showActions]="true"
-      emptyMessage="No harvest records found.">
+      <app-data-table
+        [columns]="columns"
+        [rows]="harvest()"
+        [loading]="loading()"
+        [showActions]="true"
+        emptyMessage="No harvest records found.">
 
-      <ng-template #cellTpl let-row let-col="col">
-        @switch (col.key) {
-          @case ('beehiveId') { <span class="dt__nowrap">{{ getBeehiveName(row.beehiveId) }}</span> }
-          @case ('date') { <span class="dt__nowrap">{{ row.date | date:'mediumDate' }}</span> }
-          <!-- The source uses || rather than ??, so an empty string also falls back to the dash. -->
-          @case ('honey_description') { {{ row.honey_description || '—' }} }
-          @case ('food_quantity') { <span class="dt__nowrap">{{ row.food_quantity }} {{ row.unit }}</span> }
-          @default { {{ row[col.key] ?? '—' }} }
-        }
-      </ng-template>
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('beehiveId') { <span class="dt__nowrap">{{ getBeehiveName(row.beehiveId) }}</span> }
+            @case ('date') { <span class="dt__nowrap">{{ row.date | date:'mediumDate' }}</span> }
+            <!-- The source uses || rather than ??, so an empty string also falls back to the dash. -->
+            @case ('honey_description') { {{ row.honey_description || '—' }} }
+            @case ('food_quantity') { <span class="dt__nowrap">{{ row.food_quantity }} {{ row.unit }}</span> }
+            @default { {{ row[col.key] ?? '—' }} }
+          }
+        </ng-template>
 
       <ng-template #actionsTpl let-row>
         <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
         <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
       </ng-template>
 
-    </app-data-table>
-  </app-card>
+      </app-data-table>
+    </app-card>
+  }
 
 </div>

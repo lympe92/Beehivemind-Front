@@ -37,5 +37,11 @@ Service `core/services/diagnosis.service.ts`, model `diagnosis.model.ts`.
 - Edit strips `beehive_id` from the payload (`const { beehive_id, ...payload }`) — the beehive isn't reassigned on edit.
 - Toggle fields use `value: !!row?.field`; `queen_exists` defaults to `true` on add.
 
+## Empty page
+`emptyState` (inspections and beehives loaded, no inspection at all): `no-hive` → "Add a hive first" (to `/user/beehives`); `none` → "No inspections yet" → `startAdd()`. Either replaces the filter bar and the table card; a filter that matches nothing keeps the table's line.
+
+## Deep links (Getting started)
+`?add=1` opens Add Inspection once apiaries and beehives have loaded (the selects need their options); `?diagnosis=latest` opens the diagnosis of the newest inspection. `DiagnosisModalComponent` dispatches `OnboardingActions.markSeen({ key: 'diagnosis', level })` when a reading loads, from any page: that ticks the guide's "Open its diagnosis", and an `unknown` level changes the tutorial's closing line. See the root `CLAUDE.md`, "Getting started (tutorials)".
+
 ## Related
 [Root](../../../../../CLAUDE.md) · [Feeding](../feeding/CLAUDE.md) · [Harvest](../harvest/CLAUDE.md) · [Form System](../../../shared/components/ui/form/CLAUDE.md) · form-modal, filter-bar, data-table.

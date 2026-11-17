@@ -1,23 +1,27 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { TreatmentType } from '../../../core/models/treatment-type.model';
 import { TreatmentTypeService } from '../../../core/services/treatment-type.service';
 import { TreatmentTypesActions } from '../../../store/treatment-types/treatment-types.actions';
 import { TreatmentSessionsActions } from '../../../store/treatment-sessions/treatment-sessions.actions';
-import { selectAllTreatmentTypes, selectTreatmentTypesLoading } from '../../../store/treatment-types/treatment-types.selectors';
+import { selectAllTreatmentTypes, selectTreatmentTypesLoaded, selectTreatmentTypesLoading } from '../../../store/treatment-types/treatment-types.selectors';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
+import { EmptyStateComponent } from '../../../shared/components/ui/empty-state/empty-state';
 import { TreatmentTypeModalComponent } from '../../../shared/components/ui/modal/treatment-type-modal/treatment-type-modal';
 import { TreatmentSessionModalComponent } from '../../../shared/components/ui/modal/treatment-session-modal/treatment-session-modal';
 import { TreatmentSessionService } from '../../../core/services/treatment-session.service';
+import { onDeepLink } from '../../../core/onboarding/deep-link';
+import { selectApiariesLoaded } from '../../../store/apiaries/apiaries.selectors';
+import { selectBeehivesLoaded } from '../../../store/beehives/beehives.selectors';
 
 @Component({
   selector: 'app-treatments',
   standalone: true,
-  imports: [CardComponent],
+  imports: [CardComponent, EmptyStateComponent],
   templateUrl: './treatments.html',
 })
 export class TreatmentsComponent implements OnInit {
@@ -29,6 +33,27 @@ export class TreatmentsComponent implements OnInit {
 
   readonly types        = this.store.selectSignal(selectAllTreatmentTypes);
   readonly typesLoading = this.store.selectSignal(selectTreatmentTypesLoading);
+  private readonly typesLoaded = this.store.selectSignal(selectTreatmentTypesLoaded);
+
+  /** Loaded and none at all: the page says what a treatment type is. */
+  readonly typesEmpty = computed(() => this.typesLoaded() && this.types().length === 0);
+
+  private readonly apiariesLoaded = this.store.selectSignal(selectApiariesLoaded);
+  private readonly beehivesLoaded = this.store.selectSignal(selectBeehivesLoaded);
+
+  /**
+   * `?add=type` opens New treatment type; `?add=session` opens Apply
+   * treatment on the newest type (none yet: New treatment type instead).
+   */
+  private readonly addLink = onDeepLink(
+    ['add'],
+    () => this.typesLoaded() && this.apiariesLoaded() && this.beehivesLoaded(),
+    link => {
+      const types = this.types();
+      if (link['add'] === 'session' && types.length) this.applyType(types.reduce((a, b) => (b.id > a.id ? b : a)));
+      else this.addType();
+    },
+  );
 
   ngOnInit(): void {
     this.store.dispatch(TreatmentTypesActions.load());

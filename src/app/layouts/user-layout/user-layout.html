@@ -187,6 +187,17 @@
           @if (sidebarOpen()) { <span>AI Assistant</span> }
         </a>
       }
+
+      <div class="sidebar__divider"></div>
+
+      <!-- Opens the tutorials from any state: dismissed, done or never started. -->
+      <button type="button" class="sidebar__link" (click)="openGuide()"
+              [appTip]="tip('Getting started')" [attr.aria-label]="sidebarOpen() ? null : 'Getting started'">
+        <span class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 4 3c-1 0-1 1-1 2"/><path d="M12 17v1"/></svg>
+        </span>
+        @if (sidebarOpen()) { <span>Getting started</span> }
+      </button>
     </nav>
 
     <div class="sidebar__footer">
@@ -235,5 +246,13 @@
       <router-outlet />
     </main>
   </div>
+
+  <!-- The "Getting started" popup. Fixed in the corner, so where it sits in
+       the DOM does not matter; inside the masked shell all the same. -->
+  @defer (when guideVisible()) {
+    @if (guideVisible()) {
+      <app-getting-started />
+    }
+  }
 
 </div>

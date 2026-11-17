@@ -1,4 +1,5 @@
 import { UserTeamSummary } from '../../core/models/team.model';
+import { OnboardingProgress, OnboardingState } from '../../core/models/onboarding.model';
 
 export type UserRole = 'user' | 'admin' | 'superadmin';
 
@@ -16,6 +17,9 @@ export interface User {
   /** Absent on a session stored before teams existed; the shell then reads it as an owner's. */
   team?: UserTeamSummary | null;
   last_exported_at?: string | null;
+  /** The "Getting started" guide, as of sign-in. Absent on a session stored before it existed. */
+  onboarding?: OnboardingState | null;
+  onboarding_progress?: OnboardingProgress | null;
 }
 
 export interface AuthState {

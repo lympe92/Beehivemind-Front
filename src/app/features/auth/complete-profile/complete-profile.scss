@@ -1,0 +1,103 @@
+// The setup wizard's two pieces the design draws inline (Onboarding,
+// frames 1a / 1c): the step indicator and the "What happens next" box.
+// Tokens only.
+
+.wizard-steps {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 var(--spacing-lg);
+  padding: 0;
+  list-style: none;
+}
+
+.wizard-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wizard-step__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  color: var(--text-body);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.wizard-step__mark--current {
+  border: 0;
+  background: var(--color-primary);
+}
+
+.wizard-step__mark--done {
+  border: 0;
+  background: var(--color-success);
+  color: var(--color-white);
+}
+
+.wizard-step__label {
+  font-size: 0.875rem;
+  color: var(--text-body);
+}
+
+.wizard-step--current .wizard-step__label {
+  font-weight: 500;
+  color: var(--text-heading);
+}
+
+.wizard-step__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.wizard-next {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+}
+
+.wizard-next__label {
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--text-heading);
+}
+
+.wizard-next__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-body);
+
+  li {
+    display: flex;
+    gap: 10px;
+  }
+}
+
+.wizard-next__n {
+  min-width: 14px;
+  font-weight: 700;
+}
+
+.wizard-footer {
+  display: flex;
+  justify-content: space-between;
+}

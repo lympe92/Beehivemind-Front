@@ -39,6 +39,7 @@ Layered architecture. Data flows: **`RequestService` → domain service → `Api
 | `src/app/core/guards/` | Route guards (`auth`, `employee`, `employee-role`) |
 | `src/app/core/interceptors/` | `auth.interceptor` (token), `error.interceptor` (global error → toast) |
 | `src/app/core/modal/` | `ModalService` + types (see Modal System below) |
+| `src/app/core/onboarding/` | The "Getting started" tutorials (pure), the pages' `?add=` deep links, the setup wizard's `/user` redirect (see [Getting started](#getting-started-tutorials)) |
 | `src/app/store/` | NgRx slices — one folder per entity (see State Management) |
 | `src/app/features/` | Route-level pages, grouped by zone: `public/ auth/ user/ admin/` |
 | `src/app/layouts/` | Shell layouts: `public-layout`, `user-layout`, `admin-layout` |
@@ -138,7 +139,7 @@ getAll(): Observable<ApiResponse<TreatmentSession[]>> {
 
 - **`RequestService`** (`core/services/request.service.ts`) — thin wrapper: `getRequest / postRequest / putRequest / patchRequest / deleteRequest`, prefixes `environment.apiUrl`, types everything as `ApiResponse<T>`.
 - **`ApiResponse<T>`** (`core/models/api-response.model.ts`) — every response has `success` + `data`. Components branch on `res.success`.
-- **Interceptors** (registered in `app.config.ts`): `authInterceptor` attaches the token; `errorInterceptor` catches HTTP errors and surfaces them (hence empty `error: () => {}` in components); `analyticsInterceptor` turns successful creation POSTs into GA4 events (see [Analytics](#analytics)).
+- **Interceptors** (registered in `app.config.ts`): `authInterceptor` attaches the token; `errorInterceptor` catches HTTP errors and surfaces them (hence empty `error: () => {}` in components); `analyticsInterceptor` turns successful creation POSTs into GA4 events (see [Analytics](#analytics)); `apiWritesInterceptor` announces a successful write to a record endpoint on `ApiWrites.done$`, which the "Getting started" guide refetches its counts on (it knows nothing of the guide).
 
 ---
 
@@ -187,6 +188,8 @@ One **slice per entity** in `store/<entity>/`, registered in `store/index.ts` (`
 - `reload()` → always re-fetches. Dispatch after a mutation (create/update/delete) to refresh.
 
 Components never subscribe to services for *display* data — they `selectSignal` from the store. Services are called directly only for **mutations**, followed by `reload()`.
+
+**Slices on a route, not in the root store:** `aiChat` (its route) and `onboarding` (the component-less parent of every `/user` page, `user.routes.ts`), so neither is in the initial bundle. Their selectors read `s?.…` because the feature exists only once its route has been entered.
 
 **SSR/hydration:** `store/hydration.meta-reducer.ts` rehydrates store state on the client (registered as a `META_REDUCERS` factory in `app.config.ts`). Platform-sensitive code must guard with `PLATFORM_ID` / `isPlatformBrowser`.
 
@@ -273,6 +276,7 @@ Each row links to that feature's own `CLAUDE.md`.
 | Todo / Calendar | `/user/todo/{list,calendar}` | `inspections`, `beehives` | [↗](src/app/features/user/todo/CLAUDE.md) |
 | AI Chat | `/user/ai-chat` (+ `/:id`, `?beehive=`) | `aiChat` (registered on the route) | [↗](src/app/features/user/ai-chat/CLAUDE.md) |
 | Profile | `/user/profile` | `profile`, `team` | [↗](src/app/features/user/profile/CLAUDE.md) |
+| Getting started | — (a popup in `user-layout`; pages take `?add=`) | `onboarding` (registered on `/user`) | [below](#getting-started-tutorials) |
 | Admin · Users | `/admin/users` | — (direct `RequestService`) | [↗](src/app/features/admin/user-management/CLAUDE.md) |
 | Admin · Employees | `/admin/employees` | — | [↗](src/app/features/admin/employee-management/CLAUDE.md) |
 | Admin · Coupons | `/admin/coupons` | — | [↗](src/app/features/admin/coupons/CLAUDE.md) |
@@ -677,3 +681,91 @@ Apiary + beehive selector used at the top of record list pages (inspections, fee
 | `beehiveId` | `model<number>` | Two-way; **`0` = "all"** |
 
 > Convention: `0` means "no filter / all". Parents keep `selectedApiaryId` / `selectedBeehiveId` signals and derive the visible list with a `computed` (the "records" pattern — see [`inspections/CLAUDE.md`](src/app/features/user/inspections/CLAUDE.md)).
+
+---
+
+## Setup Wizard
+
+`/auth/complete-profile` (`features/auth/complete-profile/`) is a two-step `AuthCard` screen, reached after a new Google or Apple sign-in with no country. **Step 1** saves the country (`PUT user/profile`, `complete_profile` event) exactly as "One last step" did; **step 2** creates the first apiary through `ApiaryService.createApiary(firstApiaryPayload(name, location))` — a name, an optional place in words, `hives_number: 1` on every plan, no coordinates — then reloads `apiaries` + `beehives` and lands on the dashboard (`create_apiary` comes from the analytics interceptor). The step indicator sits above the card heading through `AuthCard`'s `[authCardLead]` slot. An invited editor (`team.role === 'editor'`) or a team whose `apiaries` slice already holds one gets step 1 only and no indicator; a signed-in reload with a country set resumes on step 2, and leaves it for the dashboard as soon as the slice shows an apiary. Skip, on either step, goes to the dashboard.
+
+---
+
+## Empty State Component
+
+### Overview
+What a list page shows once its slice has loaded with **no record at all** (Onboarding design, frames 3a/3c/3d): an icon, a heading, one sentence, an optional primary button. A filter that matches nothing keeps the table's own line, and a page still loading shows what it always did. When the page cannot be used yet (no hive to inspect), the page passes the missing step's icon and words and the button navigates there.
+
+### Key file
+`src/app/shared/components/ui/empty-state/empty-state.ts` — `EmptyStateComponent` (+ a tokens-only `.scss` for the proportions the design draws inline).
+
+### Usage
+```html
+<app-empty-state
+  icon="inspection"
+  heading="No inspections yet"
+  text="An inspection is what you saw in a hive on one visit. …"
+  buttonLabel="Add inspection"
+  (buttonClick)="startAdd()" />
+```
+
+| Member | Type | Notes |
+|--------|------|-------|
+| `icon` | `EmptyStateIcon` | `apiary` `hive` `inspection` `feeding` `harvest` `treatment` `cost` `category` `todo` — the sidebar's stroke icons |
+| `heading` / `text` | `string` | Required. Copy comes from frame 3d |
+| `buttonLabel` | `string` | Empty = no button |
+| `framed` | `boolean` (`true`) | Draws its own `.card`; `false` inside a card already on the page (Financial) |
+| `buttonClick` | `output<void>` | The page's own add handler, or a `router.navigate` to the missing step |
+
+Pages decide with a `computed` over their `…Loaded` selectors (`emptyState` → `'none' \| 'no-apiary' \| …` or `null`), never while a slice is loading.
+
+---
+
+## Getting started (tutorials)
+
+### Overview
+A popup in the corner of the signed-in app (Onboarding design, frames 2a to 2j; brief `ONBOARDING-2026-11-16`, section 5) with seven short tutorials in the owner's order: Apiary and hive, Feeding, Treatments, Inspection and diagnosis, Harvest, Costs, Around the app. Each is one to four steps; a step's button goes to the page where the thing lives and opens the real form, and the step ticks itself when the record exists. No backdrop and not a modal: the page behind stays usable, nothing traps focus, Escape inside it folds it. Below 768 px it is a bar along the bottom (2d), and the list or an open tutorial a sheet in its place.
+
+### Key files
+| File | Role |
+|------|------|
+| `core/onboarding/tutorials.ts` | `TUTORIALS` (every word from the brief) and `guideView(summary, { isEditor, assistant })`, the one pure function: per step done / current / later (the optional assistant row: `optional`), per tutorial done / in progress / not started plus `blockedBy` (frame 2i), and `next`, the first tutorial in order neither done nor blocked |
+| `core/services/onboarding.service.ts` | `getSummary()`, `setState()`, `updateProgress()`; `summaryFromApi()` returns null for anything that is not a summary |
+| `store/onboarding/` | The slice, registered on the `/user` route. `load`/`reload`, `setState({ states })`, `setPanel`, `reopen`, `markSeen({ key, level? })`, `saved` (what the API stored). The reducer applies Fold and Close ahead of the answer |
+| `shared/components/ui/getting-started/` | The popup. Mounted by `user-layout` as `@defer (when guideVisible())`, so it is fetched only while the guide is active; inside the masked shell, though it shows no records |
+| `core/interceptors/api-writes.interceptor.ts` | `ApiWrites.done$` after a successful non-GET to `apiaries`, `beehives`, `records`, `treatment-*`, `costs`, `cost-categories`, `team/*` |
+| `core/onboarding/deep-link.ts` | `onDeepLink(keys, ready, open)`: the pages' `?add=` |
+| `core/onboarding/wizard-redirect.ts` | `wizardRedirectGuard` on the `/user` parent route, and `shouldOfferWizard()` |
+
+### State rules
+- **Shown** only while the API's `onboarding` is `active`. An unknown or failed summary shows nothing.
+- **Fold** stores `panel: folded` (`POST user/onboarding/progress`); the folded button (2b) opens it again. **Close** stores `state: dismissed`. All seven done: the closing state (2c), whose Close stores `done`, then `closed` (null).
+- **The sidebar's "Getting started"** stores `active` and `panel: open` from any state and refetches the counts.
+- **Which tutorial is open** is not stored by the API: it lives in `sessionStorage` (`bhm_guide_tutorial`).
+- **Fresh counts, no polling:** the summary is fetched again on every `NavigationEnd` inside `/user` and after every `ApiWrites.done$`, only while the guide is showing. Record steps read the team's counts, so work done on the phone or by a team member ticks them too.
+- **Seen steps** (no record to count) post `seen` once (`markSeen`; a stored key is not posted again): `diagnosis` when `DiagnosisModalComponent` shows a reading, from anywhere; `export` after any download (`ExportService`); `dashboard`, `calendar` and `team` when their step's button is pressed (the brief's "opened from this step"). The team step also ticks on an invitation or a member. An editor has no team step.
+- **While a CDK dialog is open** the popup is either the one line of frame 2g ("Step 2 of 3 · Fill in the form and save"), when the open tutorial's current step is a form, or nothing. The line is `z-index: 1001` over the overlay container's 1000 with `pointer-events: none`; the popup itself is 999, under dialogs, the bell's panel, popovers and the phone sidebar, and the toasts (9999) stay over it.
+
+### The `?add=` convention
+A page reads its deep link once, takes it off the URL (`replaceUrl`, other parameters kept: a reload does not reopen the form), and calls its own handler once the data that handler needs has loaded. In a field initializer:
+```ts
+private readonly addLink = onDeepLink(['add'], () => this.apiariesLoaded() && this.beehivesLoaded(), () => this.startAdd());
+```
+| URL | Opens |
+|-----|-------|
+| `/user/apiary?add=1` | Add apiary |
+| `/user/beehives?add=1&apiary=ID` | The apiary chosen in the filter (`apiary` optional: the first), Beehives to Create focused with 1 |
+| `/user/inspections?add=1` · `?diagnosis=latest` | Add Inspection · the newest inspection's diagnosis |
+| `/user/feeding?add=1` · `/user/harvest?add=1` | Add Feeding Record · Add Harvest Record |
+| `/user/treatments?add=type` · `?add=session` | New treatment type · Apply treatment on the newest type |
+| `/user/financial?add=category` · `?add=cost` | Add Cost Category · Add Cost |
+| `/user/profile?add=invite` · `?show=data` | Invite member (owner) · scrolls to Your data |
+
+`/user/ai-chat?beehive=ID` is the older precedent and works the same way by hand.
+
+### The setup wizard for everyone
+`wizardRedirectGuard` runs once on entering `/user` (the parent route's guard, not per page) and before anything renders. An owner whose guide is `active`, whose team has no apiary and who has not skipped or finished the wizard lands on `/auth/complete-profile`, whose step 2 is the apiary when a country is already set: an email sign-up would otherwise never see it. Its one request is the summary, handed to the slice so the hub does not ask again. The wizard stores `seen: ['wizard']` on Skip (either step) and on success, and `sessionStorage.bhm_wizard_offered` stops a second redirect in the same tab even before that answer lands. Editors, teams with an apiary, a session that already says the guide is over, and any API failure go straight through.
+
+### Adding a tutorial or a step
+1. Add it to `TUTORIALS` in `core/onboarding/tutorials.ts`, in the owner's order, with the brief's words: `done` reads the summary only. A count the summary lacks is an API change (`OnboardingController::summary`); a "seen" step needs its key in `User::ONBOARDING_SEEN_KEYS` and in `OnboardingSeenKey`.
+2. Its link: an existing page's `?add=` or a new `onDeepLink` on the target page.
+3. A test in `tutorials.spec.ts` for its done / current / blocked cases. The hub's "1 of 7" counts `TUTORIALS`; "All seven tutorials are done" is copy and changes by hand.

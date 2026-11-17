@@ -3,8 +3,11 @@ import { provideState } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { aiChatReducer } from '../../store/ai-chat/ai-chat.reducer';
 import { AiChatEffects } from '../../store/ai-chat/ai-chat.effects';
+import { onboardingReducer } from '../../store/onboarding/onboarding.reducer';
+import { OnboardingEffects } from '../../store/onboarding/onboarding.effects';
+import { wizardRedirectGuard } from '../../core/onboarding/wizard-redirect';
 
-export const userRoutes: Routes = [
+const pages: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
     path: 'dashboard',
@@ -103,5 +106,21 @@ export const userRoutes: Routes = [
         loadComponent: () => import('./ai-chat/ai-chat-page/ai-chat-page').then(m => m.AiChatPageComponent),
       },
     ],
+  },
+];
+
+/**
+ * One component-less parent for the whole zone, for what every page shares:
+ * the "Getting started" guide's slice (here, not in the root store, so none
+ * of it is in the initial bundle; the layout's popup reads it) and the setup
+ * wizard's redirect, which runs once on entering /user and before any page
+ * renders, not on every page change.
+ */
+export const userRoutes: Routes = [
+  {
+    path: '',
+    providers: [provideState('onboarding', onboardingReducer), provideEffects(OnboardingEffects)],
+    canActivate: [wizardRedirectGuard],
+    children: pages,
   },
 ];

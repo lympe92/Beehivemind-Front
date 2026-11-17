@@ -99,7 +99,19 @@ export const TEAM_SUMMARY = {
   editor: { role: 'editor', owner_name: 'Daniel Hart', member_count: 2, show_welcome: true },
 }[ROLE];
 
-const PROFILE = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true, team: TEAM_SUMMARY, last_exported_at: '2026-03-12T09:14:00Z' };
+const PROFILE = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true, team: TEAM_SUMMARY, last_exported_at: '2026-03-12T09:14:00Z', onboarding: null, onboarding_progress: { seen: [], panel: 'open' } };
+
+/* The "Getting started" guide (GET user/onboarding/summary). `onboarding: null`
+   is an account that finished or never had the guide: nothing shows, so the
+   visual runs see the pages as they always were and the /user guard lets the
+   seeded user straight through. A script that wants the hub on screen builds
+   on this with `onboarding: 'active'`. */
+export const ONBOARDING_SUMMARY = {
+  apiaries: 3, beehives: 8, inspections: 6, feedings: 3, harvests: 3,
+  treatment_types: 2, treatment_sessions: 2, treatment_doses_done: 1,
+  costs: 5, cost_categories: 4, team_members: ROLE === 'owner' ? 2 : 0, pending_invitations: ROLE === 'owner' ? 2 : 0,
+  onboarding: null, onboarding_progress: { seen: [], panel: 'open' },
+};
 
 const TEAM = ROLE === 'editor'
   ? { role: 'editor', owner: { name: 'Daniel', surname: 'Hart' } }
@@ -366,6 +378,8 @@ export function mock(method, path) {
   if (route === 'costs/stats/by-category/outcome') return ok([{ category: 'Jars', amount: 385 }, { category: 'Feeding', amount: 210 }, { category: 'Tools', amount: 160 }]);
   if (route === 'agenda') return ok(q.get('apiary_id') ? AGENDA.filter(a => a.apiary_id === Number(q.get('apiary_id'))) : AGENDA);
   if (route === 'user/profile') return ok(PROFILE);
+  if (route === 'user/onboarding/summary') return ok(ONBOARDING_SUMMARY);
+  if (route === 'user/onboarding' || route === 'user/onboarding/progress') return ok(PROFILE);
   if (route === 'team') return ok(TEAM);
   if (route.startsWith('team/invite/')) return ok({ state: 'valid', owner_name: 'Daniel Hart', email: 'sam.green@example.com' });
   if (route === 'notifications') return NOTIFICATIONS;

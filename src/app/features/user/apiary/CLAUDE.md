@@ -27,5 +27,11 @@ Manage apiaries (μελισσοκομεία) — locations with GPS coordinates 
 - `apiary.ts` paginates **client-side** via a `page` signal + `computed` slice (`perPage = 10`).
 - `apiary-view` edits the apiary through the same `ApiaryFormModal` as the list (then reloads the apiary and the `apiaries` slice) and deletes sessions through `TreatmentSessionService.delete` + `TreatmentSessionsActions.reload()`. Marking a dose done lives on the to-do list, not here.
 
+## Empty page
+Once the `apiaries` slice has loaded with none, `apiary.ts` (`isEmpty`) shows `<app-empty-state>` "No apiaries yet" in place of the table card; its button is `startAdd()`. A brand-new account usually arrives with one already, made by the setup wizard (`/auth/complete-profile`, one hive, no coordinates).
+
+## Deep links (Getting started)
+`?add=1` opens the Add apiary dialog once the slice has loaded (`addLink` in `apiary.ts`, `core/onboarding/deep-link.ts`), then leaves the URL; it is the "Getting started" guide's Add apiary step. See the root `CLAUDE.md`, "Getting started (tutorials)".
+
 ## Related
 [Root](../../../../../CLAUDE.md) · [Beehives](../beehives/CLAUDE.md) · [Treatments](../treatments/CLAUDE.md) · weather-card, map-picker UI components.

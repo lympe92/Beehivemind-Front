@@ -35,5 +35,8 @@ Account + Details (one row) · Security · **Team members** (owner only) · **Pl
 - The Security rows keep the kit's terse subtitles ("Not enabled" / "Enabled"); the password row says what the button does because the API has no "last changed" date.
 - Not built: the kit's "Change photo" button (no avatar upload). The kit's read-only "Role" field is replaced by the "Preferred unit" select the app needs.
 
+## Deep links (Getting started)
+`?add=invite` opens Invite member (owners only), `?show=data` scrolls to the Your data card (`id="your-data"`). `ExportService` dispatches `OnboardingActions.markSeen({ key: 'export' })` after any download, a page's or the account's. See the root `CLAUDE.md`, "Getting started (tutorials)".
+
 ## Related
 [Root](../../../../../CLAUDE.md) · `store/profile/` · `store/team/` · `core/services/team.service.ts` · `core/services/export.service.ts` · `features/auth/invite/` · qrcode lib.

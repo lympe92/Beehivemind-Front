@@ -1,15 +1,17 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { afterNextRender, Component, computed, inject, Injector, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Beehive, beehiveLabel } from '../../../core/models/beehive.model';
 import { BeehiveService } from '../../../core/services/beehive.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
-import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
+import { selectAllApiaries, selectApiariesLoaded } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
-import { selectAllBeehives, selectBeehivesLoading } from '../../../store/beehives/beehives.selectors';
+import { selectAllBeehives, selectBeehivesLoaded, selectBeehivesLoading } from '../../../store/beehives/beehives.selectors';
 import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/ui/data-table/data-table';
 import { CardComponent } from '../../../shared/components/ui/card/card';
+import { EmptyStateComponent } from '../../../shared/components/ui/empty-state/empty-state';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
 import { QrCodeModalComponent, QrCodeModalData } from '../../../shared/components/ui/modal/qr-code-modal/qr-code-modal';
@@ -18,6 +20,7 @@ import {
   DeleteBeehiveModalData,
   DeleteBeehiveResult,
 } from '../../../shared/components/ui/modal/delete-beehive-modal/delete-beehive-modal';
+import { DeepLink, onDeepLink } from '../../../core/onboarding/deep-link';
 
 interface BeehiveForm {
   number: number | null;
@@ -27,7 +30,7 @@ interface BeehiveForm {
 @Component({
   selector: 'app-beehives',
   standalone: true,
-  imports: [FormsModule, FilterBarComponent, DataTableComponent, CardComponent],
+  imports: [FormsModule, FilterBarComponent, DataTableComponent, CardComponent, EmptyStateComponent],
   templateUrl: './beehives.html',
 })
 export class BeehivesComponent implements OnInit {
@@ -35,10 +38,24 @@ export class BeehivesComponent implements OnInit {
   private beehiveService = inject(BeehiveService);
   private toast = inject(ToastService);
   private modal = inject(ModalService);
+  private router = inject(Router);
+  private injector = inject(Injector);
 
   apiaries = this.store.selectSignal(selectAllApiaries);
   private allBeehives = this.store.selectSignal(selectAllBeehives);
   loading = this.store.selectSignal(selectBeehivesLoading);
+  private apiariesLoaded = this.store.selectSignal(selectApiariesLoaded);
+  private beehivesLoaded = this.store.selectSignal(selectBeehivesLoaded);
+
+  /**
+   * The team has no hive at all (a filter that matches none keeps the table's
+   * line): 'none' invites the first one, 'no-apiary' sends to Apiaries first.
+   * Null while either slice is still loading, or when there are hives.
+   */
+  readonly emptyState = computed<'none' | 'no-apiary' | null>(() => {
+    if (!this.beehivesLoaded() || this.allBeehives().length > 0 || !this.apiariesLoaded()) return null;
+    return this.apiaries().length === 0 ? 'no-apiary' : 'none';
+  });
 
   selectedApiaryId = signal<number>(0);
 
@@ -64,12 +81,50 @@ export class BeehivesComponent implements OnInit {
   /** The API's refusal of the number (422: already taken in this apiary). */
   numberRefusal = signal<string | null>(null);
 
+  /**
+   * `?add=1&apiary=ID` (the guide's "Add a hive"). The page has no add
+   * dialog: the apiary is chosen in the filter (the one named, or the first)
+   * and the count field waits with 1 in it, which fits every plan.
+   */
+  private readonly addLink = onDeepLink(['add', 'apiary'], () => this.apiariesLoaded(), link => this.prepareAdd(link));
+
+  private prepareAdd(link: DeepLink): void {
+    const apiaries = this.apiaries();
+    const named = apiaries.find(a => a.id === Number(link['apiary']));
+    const apiary = named ?? apiaries[0];
+    if (!apiary) return;
+    this.onApiaryChange(apiary.id);
+    this.beehivesToCreate = 1;
+    afterNextRender(() => {
+      const field = document.getElementById('bh-count') as HTMLInputElement | null;
+      field?.focus();
+      field?.select();
+    }, { injector: this.injector });
+  }
+
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());
     this.store.dispatch(BeehivesActions.load());
   }
 
   // ── Apiary filter ─────────────────────────────────────────
+
+  goTo(path: string): void {
+    this.router.navigate([path]);
+  }
+
+  /**
+   * The empty page's button. The page has no add dialog: a count is created
+   * in the chosen apiary. With one apiary there is nothing to choose, so it is
+   * chosen; with several and none chosen, addBeehives asks for one.
+   */
+  addFirstHive(): void {
+    if (this.selectedApiaryId() === 0 && this.apiaries().length === 1) {
+      this.selectedApiaryId.set(this.apiaries()[0].id);
+    }
+    this.beehivesToCreate = 1;
+    this.addBeehives();
+  }
 
   onApiaryChange(apiaryId: number): void {
     this.selectedApiaryId.set(apiaryId);

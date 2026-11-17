@@ -15,7 +15,7 @@ const args = Object.fromEntries(process.argv.slice(2).map(a => { const [k, v = '
 const WIDTHS = args.widths ? args.widths.split(',').map(Number) : [375, 768, 1024, 1440];
 const ONLY = args.only ? args.only.split(',') : null;
 
-const USER = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true };
+const USER = { id: 10, name: 'Nikos', surname: 'Lymperis', email: 'nikos@beehivemind.tech', role: 'user', country: 'Greece', unit: 'kg', show_hints: true, two_factor_enabled: false, has_password: true, onboarding: null, onboarding_progress: { seen: [], panel: 'open' } };
 const EMPLOYEE = { id: 1, name: 'Anna', surname: 'Ioannou', email: 'anna@beehivemind.tech', role: 'superadmin' };
 const AUTH_BASE = { token: null, loading: false, error: null, twoFactorToken: null, twoFactorPending: null, pendingUser: null, pendingToken: null, retryAfterMinutes: null };
 const EMP_BASE = { token: null, loading: false, error: null, twoFactorToken: null, twoFactorStep: null };

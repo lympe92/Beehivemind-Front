@@ -10,7 +10,8 @@
 
     <app-card title="Costs">
       <div class="app-scroll-body">
-        <app-costs [costCategories]="costCategories()" (costsChange)="onCostsChange()" />
+        <app-costs [costCategories]="costCategories()" [categoriesLoaded]="categoriesLoaded()"
+                   (costsChange)="onCostsChange()" (addCategory)="addCategory()" />
       </div>
     </app-card>
   </div>

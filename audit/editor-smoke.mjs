@@ -38,6 +38,9 @@ page.on('request', (req) => {
     if (res && res.status === 204) return req.respond({ status: 204, headers });
     return req.respond({ status: 200, headers, body: JSON.stringify(res) });
   }
+  // ConsentService asks Cloudflare where the visitor is; the dev server never
+  // answers it, and a page with a request in flight never reaches networkidle0.
+  if (url === BASE + '/cdn-cgi/trace') return req.respond({ status: 200, body: 'loc=US\n' });
   if (url.startsWith(BASE) || url.startsWith('data:') || url.startsWith('blob:')) return req.continue();
   return req.abort();
 });

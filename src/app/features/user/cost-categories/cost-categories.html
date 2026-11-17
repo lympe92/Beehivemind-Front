@@ -1,25 +1,35 @@
-<div class="app-toolbar">
-  <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="startAdd()">+ Add</button>
-</div>
+@if (isEmpty()) {
+  <app-empty-state
+    [framed]="false"
+    icon="category"
+    heading="No categories yet"
+    text="A category groups costs and marks them as income or expenses. Every cost goes under one."
+    buttonLabel="Add category"
+    (buttonClick)="startAdd()" />
+} @else {
+  <div class="app-toolbar">
+    <button type="button" class="app-btn app-btn--primary app-btn--sm" (click)="startAdd()">+ Add</button>
+  </div>
 
-<app-data-table
-  [columns]="columns"
-  [rows]="categories()"
-  [loading]="loading()"
-  [showActions]="true"
-  emptyMessage="No categories yet.">
+  <app-data-table
+    [columns]="columns"
+    [rows]="categories()"
+    [loading]="loading()"
+    [showActions]="true"
+    emptyMessage="No categories yet.">
 
-  <ng-template #cellTpl let-row let-col="col">
-    @switch (col.key) {
-      @case ('description') { <span class="dt__muted">{{ row.description }}</span> }
-      @case ('type') { <span class="app-badge app-badge--{{ row.type }}">{{ row.type }}</span> }
-      @default { {{ row[col.key] ?? '—' }} }
-    }
-  </ng-template>
+    <ng-template #cellTpl let-row let-col="col">
+      @switch (col.key) {
+        @case ('description') { <span class="dt__muted">{{ row.description }}</span> }
+        @case ('type') { <span class="app-badge app-badge--{{ row.type }}">{{ row.type }}</span> }
+        @default { {{ row[col.key] ?? '—' }} }
+      }
+    </ng-template>
 
   <ng-template #actionsTpl let-row>
     <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
     <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
   </ng-template>
 
-</app-data-table>
+  </app-data-table>
+}

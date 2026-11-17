@@ -1,0 +1,255 @@
+@if (guide(); as g) {
+  @switch (mode()) {
+
+    <!-- 2g · A form dialog is open: one line above its backdrop. No button, no
+         focus: the dialog keeps the keyboard. -->
+    @case ('hint') {
+      @if (hint(); as h) {
+        <div class="gs-hint" role="status">
+          <span class="gs-dot" aria-hidden="true"></span>
+          <span class="gs-hint__step">{{ h.step }}</span>
+          <span class="gs-hint__text">{{ h.text }}</span>
+        </div>
+      }
+    }
+
+    <!-- 2b · Folded: a button in the corner. -->
+    @case ('folded') {
+      <button type="button" class="gs-folded" (click)="unfold()" aria-label="Open the getting started panel">
+        <span class="gs-dot" aria-hidden="true"></span>
+        <span>Getting started</span>
+        <span class="gs-folded__count">{{ g.doneCount }} of {{ g.total }}</span>
+      </button>
+    }
+
+    <!-- 2c · All tutorials done. -->
+    @case ('all-done') {
+      <div #panel class="gs-panel gs-panel--padded" role="dialog" aria-modal="false" aria-label="Getting started, finished" tabindex="-1">
+        <div class="gs-finished">
+          <span class="gs-tick gs-tick--lg" aria-hidden="true">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>
+          </span>
+          <div class="gs-stack gs-stack--4">
+            <span class="gs-finished__title">{{ allDoneTitle }}</span>
+            <span class="gs-text">{{ allDoneText }}</span>
+          </div>
+        </div>
+        <button type="button" class="app-btn app-btn--primary gs-end" (click)="finish()">Close</button>
+      </div>
+    }
+
+    <!-- 2d · Phone: a bar along the bottom with the suggestion. -->
+    @case ('bar') {
+      <div #panel class="gs-bar" role="dialog" aria-modal="false" aria-label="Getting started" tabindex="-1">
+        <div class="gs-bar__head">
+          <span class="gs-label">Getting started · {{ g.doneCount }} of {{ g.total }}</span>
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm gs-bar__fold" (click)="fold()" aria-label="Fold the getting started bar">Fold</button>
+        </div>
+        @if (g.next; as n) {
+          <div class="gs-stack gs-stack--2">
+            <span class="gs-finished__title">Next: {{ n.def.title }}</span>
+            <span class="gs-text">{{ n.def.afterwards }}</span>
+          </div>
+          <div class="gs-bar__actions">
+            <button type="button" class="app-btn app-btn--primary gs-bar__primary" (click)="openTutorial(n.def.id)"
+                        [attr.aria-label]="rowAction(n) + ' the ' + n.def.title + ' tutorial'">{{ rowAction(n) }}</button>
+            <button type="button" class="app-btn app-btn--ghost gs-bar__secondary" (click)="showList()">See all tutorials</button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- 2a · The hub: every tutorial, the suggested one raised. -->
+    @case ('hub') {
+      <div #panel class="gs-panel" role="dialog" aria-modal="false" aria-label="Getting started" tabindex="-1">
+        <div class="gs-head">
+          <span class="gs-label">Getting started</span>
+          <span class="gs-count">{{ g.doneCount }} of {{ g.total }}</span>
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="fold()" aria-label="Fold the getting started panel">Fold</button>
+          <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="dismiss()" aria-label="Close the getting started panel">Close</button>
+        </div>
+        <div class="gs-body">
+          <div class="gs-progress" aria-hidden="true">
+            @for (t of g.tutorials; track t.def.id) {
+              <span class="gs-progress__seg" [class.gs-progress__seg--done]="t.status === 'done'"></span>
+            }
+          </div>
+          <ol class="gs-list">
+            @for (t of g.tutorials; track t.def.id; let i = $index) {
+              @if (t.status === 'done') {
+                <li class="gs-row gs-row--done">
+                  <span class="gs-tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Done"><path d="M5 12l5 5 9-10"/></svg></span>
+                  <span class="gs-row__title gs-row__title--plain">{{ t.def.title }}</span>
+                  <span class="gs-count">Done</span>
+                </li>
+              } @else if (g.next?.def?.id === t.def.id) {
+                <li class="gs-row gs-row--next">
+                  <div class="gs-row__main">
+                    <span class="gs-num gs-num--current" aria-hidden="true">{{ i + 1 }}</span>
+                    <div class="gs-row__copy">
+                      <span class="gs-row__line"><span class="gs-row__title">{{ t.def.title }}</span><span class="gs-count">{{ rowLabel(t) }}</span></span>
+                      <span class="gs-text">{{ t.def.afterwards }}</span>
+                    </div>
+                  </div>
+                  <button type="button" class="app-btn app-btn--primary gs-indent" (click)="openTutorial(t.def.id)"
+                              [attr.aria-label]="rowAction(t) + ' the ' + t.def.title + ' tutorial'">{{ rowAction(t) }}</button>
+                </li>
+              } @else {
+                <li class="gs-row gs-row--later">
+                  <span class="gs-num" aria-hidden="true">{{ i + 1 }}</span>
+                  <div class="gs-row__copy">
+                    <span class="gs-row__line"><span class="gs-row__title">{{ t.def.title }}</span><span class="gs-count">{{ rowLabel(t) }}</span></span>
+                    <span class="gs-text">{{ t.def.afterwards }}</span>
+                  </div>
+                  <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="openTutorial(t.def.id)"
+                              [attr.aria-label]="rowAction(t) + ' the ' + t.def.title + ' tutorial'">{{ rowAction(t) }}</button>
+                </li>
+              }
+            }
+          </ol>
+        </div>
+      </div>
+    }
+
+    <!-- 2h · The open tutorial is done: its closing line and the next one. -->
+    @case ('finished') {
+      @if (open(); as t) {
+        <div #panel class="gs-panel" role="dialog" aria-modal="false" [attr.aria-label]="'Getting started, ' + t.def.title + ' finished'" tabindex="-1">
+          <ng-container *ngTemplateOutlet="tutorialHead; context: { $implicit: t }" />
+          <div class="gs-body gs-body--finished">
+            <div class="gs-finished">
+              <span class="gs-tick gs-tick--lg" aria-hidden="true">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>
+              </span>
+              <div class="gs-stack gs-stack--4">
+                <span class="gs-finished__title">{{ t.def.title }}, done</span>
+                @if (closing()) { <span class="gs-text">{{ closing() }}</span> }
+              </div>
+            </div>
+            @if (next(); as n) {
+              <div class="gs-box">
+                <span class="gs-label">Next</span>
+                <div class="gs-stack gs-stack--2">
+                  <span class="gs-row__line"><span class="gs-row__title">{{ n.def.title }}</span><span class="gs-count">{{ rowLabel(n) }}</span></span>
+                  <span class="gs-text">{{ n.def.afterwards }}</span>
+                </div>
+                <div class="gs-actions">
+                  <button type="button" class="app-btn app-btn--primary" (click)="openTutorial(n.def.id)" [attr.aria-label]="rowAction(n) + ' the ' + n.def.title + ' tutorial'">{{ rowAction(n) }}</button>
+                  <button type="button" class="app-btn app-btn--ghost" (click)="showList()">See all tutorials</button>
+                </div>
+              </div>
+            } @else {
+              <button type="button" class="app-btn app-btn--ghost gs-start" (click)="showList()">See all tutorials</button>
+            }
+          </div>
+        </div>
+      }
+    }
+
+    <!-- 2e / 2f / 2i · One tutorial open. -->
+    @case ('tutorial') {
+      @if (open(); as t) {
+        <div #panel class="gs-panel" role="dialog" aria-modal="false" [attr.aria-label]="'Getting started, ' + t.def.title" tabindex="-1">
+          <ng-container *ngTemplateOutlet="tutorialHead; context: { $implicit: t }" />
+          <div class="gs-body gs-body--tutorial">
+            <span class="gs-text">{{ t.def.afterwards }}</span>
+
+            @if (t.def.phoneApp) {
+              <div class="gs-box">
+                <div class="gs-row__main">
+                  <span class="gs-icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v4"/></svg>
+                  </span>
+                  <div class="gs-stack gs-stack--4">
+                    <span class="gs-label">Best at the hive, by voice</span>
+                    <span class="gs-text">The phone app records an inspection hands free: tap the microphone, say the hive number, then say what you see. It records into the apiaries and hives set up here.</span>
+                  </div>
+                </div>
+                <div class="gs-actions gs-indent">
+                  <a class="app-btn app-btn--ghost app-btn--sm" [href]="appStoreUrl" target="_blank" rel="noopener noreferrer">App Store</a>
+                  <a class="app-btn app-btn--ghost app-btn--sm" [href]="playStoreUrl" target="_blank" rel="noopener noreferrer">Google Play</a>
+                </div>
+              </div>
+              <span class="gs-text">At a desk, the form on the website takes the same readings.</span>
+            }
+
+            @if (t.blockedBy; as need) {
+              <div class="gs-box">
+                <div class="gs-stack gs-stack--2">
+                  <span class="gs-row__title">{{ need.heading }}</span>
+                  <span class="gs-text">{{ need.text }}</span>
+                </div>
+                <button type="button" class="app-btn app-btn--primary gs-start" (click)="openTutorial(need.opens)">Open Apiary and hive</button>
+              </div>
+            }
+
+            <ol class="gs-list gs-list--steps">
+              @for (s of t.steps; track s.def.id) {
+                @switch (s.status) {
+                  @case ('done') {
+                    <li class="gs-step gs-step--done">
+                      <span class="gs-tick"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Done"><path d="M5 12l5 5 9-10"/></svg></span>
+                      <span class="gs-row__title gs-row__title--plain">{{ s.def.title }}</span>
+                    </li>
+                  }
+                  @case ('current') {
+                    @if (t.blockedBy) {
+                      <li class="gs-step">
+                        <span class="gs-num" aria-hidden="true">{{ s.number }}</span>
+                        <div class="gs-stack gs-stack--2">
+                          <span class="gs-row__title gs-row__title--plain">{{ s.def.title }}</span>
+                          <span class="gs-text">{{ t.blockedBy.waits }}</span>
+                        </div>
+                      </li>
+                    } @else {
+                      <li class="gs-row gs-row--next" aria-current="step">
+                        <div class="gs-row__main">
+                          <span class="gs-num gs-num--current" aria-hidden="true">{{ s.number }}</span>
+                          <div class="gs-stack gs-stack--2">
+                            <span class="gs-row__title">{{ s.def.title }}</span>
+                            <span class="gs-text">{{ s.def.text }}</span>
+                          </div>
+                        </div>
+                        <button type="button" class="app-btn app-btn--primary gs-indent" (click)="go(s)">{{ s.def.button }}</button>
+                      </li>
+                    }
+                  }
+                  @case ('later') {
+                    <li class="gs-step">
+                      <span class="gs-num" aria-hidden="true">{{ s.number }}</span>
+                      <div class="gs-stack gs-stack--2">
+                        <span class="gs-row__title gs-row__title--plain">{{ s.def.title }}</span>
+                        <span class="gs-text">{{ s.def.short }}</span>
+                      </div>
+                    </li>
+                  }
+                  @case ('optional') {
+                    <li class="gs-step gs-step--optional">
+                      <span class="gs-num" aria-hidden="true"></span>
+                      <div class="gs-stack gs-stack--2">
+                        <span class="gs-row__title gs-row__title--plain">{{ s.def.title }} (optional)</span>
+                        <span class="gs-text">{{ s.def.short }}</span>
+                      </div>
+                      <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="go(s)">{{ s.def.button }}</button>
+                    </li>
+                  }
+                }
+              }
+            </ol>
+          </div>
+        </div>
+      }
+    }
+  }
+}
+
+<ng-template #tutorialHead let-t>
+  <div class="gs-head">
+    <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="backToList()" aria-label="Back to all tutorials">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>
+    <span class="gs-label gs-head__title">{{ t.def.title }}</span>
+    <span class="gs-count">{{ t.doneCount }} of {{ t.total }}</span>
+    <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="fold()" aria-label="Fold the getting started panel">Fold</button>
+  </div>
+</ng-template>

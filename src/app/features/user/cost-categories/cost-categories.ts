@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, output, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, output, signal } from '@angular/core';
 import { of } from 'rxjs';
 import { CostCategory, CostType } from '../../../core/models/cost-category.model';
 import { CostCategoryService } from '../../../core/services/cost-category.service';
@@ -8,10 +8,11 @@ import { ModalService } from '../../../core/modal/modal.service';
 import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
 import { syncValidators } from '../../../shared/components/ui/form/validators.config';
 
+import { EmptyStateComponent } from '../../../shared/components/ui/empty-state/empty-state';
 @Component({
   selector: 'app-cost-categories',
   standalone: true,
-  imports: [DataTableComponent],
+  imports: [DataTableComponent, EmptyStateComponent],
   templateUrl: './cost-categories.html',
 })
 export class CostCategoriesComponent implements OnInit {
@@ -28,6 +29,10 @@ export class CostCategoriesComponent implements OnInit {
 
   categories = signal<CostCategory[]>([]);
   loading = signal(false);
+  loaded  = signal(false);
+
+  /** Loaded and none at all: the card says what a category is instead of an empty table. */
+  readonly isEmpty = computed(() => this.loaded() && this.categories().length === 0);
 
   ngOnInit(): void {
     this.load();
@@ -172,6 +177,7 @@ export class CostCategoriesComponent implements OnInit {
     this.categoryService.getCategories().subscribe(res => {
       if (res.success) {
         this.categories.set(res.data);
+        this.loaded.set(true);
         this.categoriesChange.emit(res.data);
       }
       this.loading.set(false);

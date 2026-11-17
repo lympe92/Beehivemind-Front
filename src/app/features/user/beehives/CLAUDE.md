@@ -28,5 +28,11 @@ Manage beehives (κυψέλες) within apiaries — bulk-create, renumber, set 
 - `updateBeehive` sends only `number` — the queen year typed in the row is not part of the PUT (it never was; the service dropped it before the number change too).
 - The delete dialog gets `label` ("Beehive 12") and targets labelled "Beehive 3 · North Field" — the queen can move to a hive in another apiary.
 
+## Empty page
+`emptyState` (both slices loaded, no hive at all): `no-apiary` → "Add an apiary first" (to `/user/apiary`, the filter bar is hidden); `none` → "No hives yet", whose "Add a hive" is `addFirstHive()`: the one apiary is chosen when there is only one, the count set to 1, then the usual `addBeehives()`. A filter that matches no hive keeps the table's line.
+
+## Deep links (Getting started)
+`?add=1&apiary=ID` (the guide's Add a hive step): the page has no add dialog, so the apiary is chosen in the filter (the one named, or the first), the Beehives to Create field gets 1 and the focus. `apiary` is optional. See the root `CLAUDE.md`, "Getting started (tutorials)".
+
 ## Related
 [Root](../../../../../CLAUDE.md) · [Apiaries](../apiary/CLAUDE.md) · qr-code-modal, filter-bar, data-table UI.

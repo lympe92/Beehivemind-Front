@@ -1,21 +1,23 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { of } from 'rxjs';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Inspection } from '../../../core/models/inspection.model';
 import { beehiveLabel, beehiveTag } from '../../../core/models/beehive.model';
 import { InspectionService } from '../../../core/services/inspection.service';
 import { ExportService } from '../../../core/services/export.service';
 import { ApiariesActions } from '../../../store/apiaries/apiaries.actions';
-import { selectAllApiaries } from '../../../store/apiaries/apiaries.selectors';
+import { selectAllApiaries, selectApiariesLoaded } from '../../../store/apiaries/apiaries.selectors';
 import { BeehivesActions } from '../../../store/beehives/beehives.actions';
-import { selectAllBeehives } from '../../../store/beehives/beehives.selectors';
+import { selectAllBeehives, selectBeehivesLoaded } from '../../../store/beehives/beehives.selectors';
 import { InspectionsActions } from '../../../store/inspections/inspections.actions';
-import { selectAllInspections, selectInspectionsLoading } from '../../../store/inspections/inspections.selectors';
+import { selectAllInspections, selectInspectionsLoaded, selectInspectionsLoading } from '../../../store/inspections/inspections.selectors';
 import { ColumnDef, DataTableComponent, TablePagination } from '../../../shared/components/ui/data-table/data-table';
 import { ToastService } from '../../../shared/components/ui/toast/toast.service';
 import { ModalService } from '../../../core/modal/modal.service';
 import { CardComponent } from '../../../shared/components/ui/card/card';
+import { EmptyStateComponent } from '../../../shared/components/ui/empty-state/empty-state';
 import { FilterBarComponent } from '../../../shared/components/ui/filter-bar/filter-bar';
 import { ExportMenuComponent, exportFormat, exportScope } from '../../../shared/components/ui/export-menu/export-menu';
 import { FormModalComponent } from '../../../shared/components/ui/modal/form-modal/form-modal';
@@ -25,6 +27,7 @@ import { DiagnosisService } from '../../../core/services/diagnosis.service';
 import { DiagnosisSummary } from '../../../core/models/diagnosis.model';
 import { DiagnosisBadgeComponent } from '../../../shared/components/ui/diagnosis-badge/diagnosis-badge';
 import { DiagnosisModalComponent } from '../../../shared/components/ui/modal/diagnosis-modal/diagnosis-modal';
+import { onDeepLink } from '../../../core/onboarding/deep-link';
 
 /** Shape of the inspection add/edit form value. */
 interface InspectionFormValue {
@@ -49,7 +52,7 @@ interface InspectionFormValue {
 @Component({
   selector: 'app-inspections',
   standalone: true,
-  imports: [DataTableComponent, CardComponent, FilterBarComponent, ExportMenuComponent, DatePipe, DiagnosisBadgeComponent],
+  imports: [DataTableComponent, CardComponent, EmptyStateComponent, FilterBarComponent, ExportMenuComponent, DatePipe, DiagnosisBadgeComponent],
   templateUrl: './inspections.html',
 })
 export class InspectionsComponent implements OnInit {
@@ -59,6 +62,7 @@ export class InspectionsComponent implements OnInit {
   private exportService = inject(ExportService);
   private toast = inject(ToastService);
   private modal = inject(ModalService);
+  private router = inject(Router);
 
   readonly columns: ColumnDef[] = [
     // The design system's short headers ("Pop.", "Q. year"): fourteen readings
@@ -97,10 +101,33 @@ export class InspectionsComponent implements OnInit {
   }
   private allInspections = this.store.selectSignal(selectAllInspections);
   loading = this.store.selectSignal(selectInspectionsLoading);
+  private loaded = this.store.selectSignal(selectInspectionsLoaded);
+  private beehivesLoaded = this.store.selectSignal(selectBeehivesLoaded);
+
+  /**
+   * No inspection at all (a filter that matches none keeps the table's line):
+   * 'none' invites the first; 'no-hive' sends to Beehives, since an inspection
+   * belongs to a hive. Null while loading, or when there are records.
+   */
+  readonly emptyState = computed<'none' | 'no-hive' | null>(() => {
+    if (!this.loaded() || this.allInspections().length > 0 || !this.beehivesLoaded()) return null;
+    return this.allBeehives().length === 0 ? 'no-hive' : 'none';
+  });
 
   beehives = computed(() =>
     this.allBeehives().filter(b => b.apiaryId === this.selectedApiaryId())
   );
+
+  private apiariesLoaded = this.store.selectSignal(selectApiariesLoaded);
+
+  /** `?add=1`: the Add Inspection dialog, once its two selects have their options. */
+  private readonly addLink = onDeepLink(['add'], () => this.apiariesLoaded() && this.beehivesLoaded(), () => this.startAdd());
+
+  /** `?diagnosis=latest`: the reading of the newest inspection (the list is newest first, by date). */
+  private readonly diagnosisLink = onDeepLink(['diagnosis'], () => this.loaded(), () => {
+    const latest = [...this.allInspections()].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id)[0];
+    if (latest) this.openDiagnosis(latest);
+  });
 
   inspections = computed(() => {
     const all = this.allInspections();
@@ -149,6 +176,10 @@ export class InspectionsComponent implements OnInit {
   exportNote = computed(() =>
     exportScope(this.apiaries(), this.allBeehives(), this.selectedApiaryId(), this.selectedBeehiveId(), this.inspections().length)
   );
+
+  goTo(path: string): void {
+    this.router.navigate([path]);
+  }
 
   ngOnInit(): void {
     this.store.dispatch(ApiariesActions.load());

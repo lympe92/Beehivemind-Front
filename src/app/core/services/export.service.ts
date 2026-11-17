@@ -2,7 +2,9 @@ import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
 import { RequestService } from './request.service';
+import { OnboardingActions } from '../../store/onboarding/onboarding.actions';
 
 export type ExportFormat = 'csv' | 'xlsx';
 
@@ -23,6 +25,7 @@ export class ExportService {
   private request    = inject(RequestService);
   private document   = inject(DOCUMENT);
   private isBrowser  = isPlatformBrowser(inject(PLATFORM_ID));
+  private store      = inject(Store);
 
   /** The filter is the scope: the same year of rows the page lists, narrowed the same way. */
   downloadTable(
@@ -53,6 +56,8 @@ export class ExportService {
 
   private save(blob: Blob, fileName: string): void {
     if (!this.isBrowser) return;
+    // Any export, a page's or the account's, is the guide's "Export your records".
+    this.store.dispatch(OnboardingActions.markSeen({ key: 'export' }));
 
     const url  = URL.createObjectURL(blob);
     const link = this.document.createElement('a');

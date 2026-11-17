@@ -18,6 +18,7 @@ import {
 import { ModalShellComponent } from '../modal-shell/modal-shell';
 import { DiagnosisBadgeComponent } from '../../diagnosis-badge/diagnosis-badge';
 import { ToastService } from '../../toast/toast.service';
+import { OnboardingActions } from '../../../../../store/onboarding/onboarding.actions';
 
 /**
  * Open it for an inspection (`recordId`) or for a hive's current diagnosis
@@ -86,6 +87,8 @@ export class DiagnosisModalComponent implements OnInit {
       next: res => {
         this.diagnosis.set(res.data);
         this.loading.set(false);
+        // The guide's "Open its diagnosis" ticks on a reading actually shown, from anywhere.
+        if (res.data) this.store.dispatch(OnboardingActions.markSeen({ key: 'diagnosis', level: res.data.level }));
       },
       error: () => {
         // A hive without an inspection answers 404: nothing to read yet.

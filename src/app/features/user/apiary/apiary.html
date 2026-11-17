@@ -1,34 +1,43 @@
 <div class="app-page">
 
-  <app-card title="Apiaries List" [flush]="true">
-    <button card-header-end type="button" class="app-btn app-btn--primary" (click)="startAdd()">+ Add</button>
+  @if (isEmpty()) {
+    <app-empty-state
+      icon="apiary"
+      heading="No apiaries yet"
+      text="An apiary is the place where your hives stand. Hives and the records about them are kept under one."
+      buttonLabel="Add apiary"
+      (buttonClick)="startAdd()" />
+  } @else {
+    <app-card title="Apiaries List" [flush]="true">
+      <button card-header-end type="button" class="app-btn app-btn--primary" (click)="startAdd()">+ Add</button>
 
-    <app-data-table
-      [columns]="columns"
-      [rows]="apiaries()"
-      [loading]="loading()"
-      [pagination]="tablePagination"
-      (pageChange)="goToPage($event)"
-      emptyMessage="No apiaries yet. Add one to get started.">
+      <app-data-table
+        [columns]="columns"
+        [rows]="apiaries()"
+        [loading]="loading()"
+        [pagination]="tablePagination"
+        (pageChange)="goToPage($event)"
+        emptyMessage="No apiaries yet. Add one to get started.">
 
-      <ng-template #cellTpl let-row let-col="col">
-        @switch (col.key) {
-          @case ('name') {
-            <a class="app-link" [routerLink]="['/user/apiary', row.id]">{{ row.name }}</a>
+        <ng-template #cellTpl let-row let-col="col">
+          @switch (col.key) {
+            @case ('name') {
+              <a class="app-link" [routerLink]="['/user/apiary', row.id]">{{ row.name }}</a>
+            }
+            @case ('dateEstablished') {
+              {{ row.dateEstablished ? (row.dateEstablished | date:'mediumDate') : '—' }}
+            }
+            @default { {{ row[col.key] ?? '—' }} }
           }
-          @case ('dateEstablished') {
-            {{ row.dateEstablished ? (row.dateEstablished | date:'mediumDate') : '—' }}
-          }
-          @default { {{ row[col.key] ?? '—' }} }
-        }
-      </ng-template>
+        </ng-template>
 
       <ng-template #actionsTpl let-row>
         <button type="button" class="app-btn app-btn--ghost app-btn--sm" (click)="startEdit(row)">Edit</button>
         <button type="button" class="app-btn app-btn--danger app-btn--sm" (click)="deleteRow(row)">Delete</button>
       </ng-template>
 
-    </app-data-table>
-  </app-card>
+      </app-data-table>
+    </app-card>
+  }
 
 </div>

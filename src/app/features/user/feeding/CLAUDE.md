@@ -18,5 +18,11 @@ Record feeding events (ταΐσματα): feeding type, food type, quantity per 
 - Duplicate `(beehiveId, date)` guard only runs when a specific beehive is selected.
 - Defaults: `feeding_type='stimulation'`, `food_type='sugar syrup'`, `unit='kg'`.
 
+## Empty page
+`emptyState` (feeding and apiaries loaded, no record at all): `no-apiary` → "Add an apiary first" (to `/user/apiary`); `none` → "No feeding records yet" → `startAdd()`. Either replaces the filter bar and the table card; a filter that matches nothing keeps the table's line.
+
+## Deep links (Getting started)
+`?add=1` opens Add Feeding Record once apiaries and beehives have loaded. See the root `CLAUDE.md`, "Getting started (tutorials)".
+
 ## Related
 [Root](../../../../../CLAUDE.md) · [Inspections](../inspections/CLAUDE.md) (canonical) · [Harvest](../harvest/CLAUDE.md).

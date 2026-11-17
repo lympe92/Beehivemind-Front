@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { afterNextRender, Component, computed, effect, inject, Injector, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -33,6 +33,7 @@ import { DataExportCardComponent, DataExportRequest } from './data-export-card/d
 import { DeleteAccountCardComponent } from './delete-account-card/delete-account-card';
 import { BillingCardComponent } from './billing-card/billing-card';
 import { BillingSummary } from '../../../core/services/billing.service';
+import { onDeepLink } from '../../../core/onboarding/deep-link';
 
 const UNITS = [
   { value: 'kg',    label: 'Kg / Lt (Metric)' },
@@ -59,6 +60,7 @@ export class ProfileComponent implements OnInit {
   private teamService = inject(TeamService);
   private profileService = inject(ProfileService);
   private exportService = inject(ExportService);
+  private injector = inject(Injector);
 
   readonly UNITS = UNITS;
 
@@ -94,6 +96,19 @@ export class ProfileComponent implements OnInit {
     const count = this.team() ? this.members().length : (this.profile()?.team?.member_count ?? 0);
     return count > 0 ? `Owner · ${count} team member${count === 1 ? '' : 's'}` : null;
   });
+
+  /**
+   * The guide's links: `?add=invite` opens Invite member (owners only; the
+   * card is absent for an editor), `?show=data` brings the Your data card
+   * into view.
+   */
+  private readonly profileReady = computed(() => !!this.profile() && !this.loading());
+  private readonly inviteLink = onDeepLink(['add'], this.profileReady, link => {
+    if (link['add'] === 'invite' && this.role() === 'owner') this.inviteMember();
+  });
+  private readonly dataLink = onDeepLink(['show'], this.profileReady, () =>
+    afterNextRender(() => document.getElementById('your-data')?.scrollIntoView({ block: 'start' }), { injector: this.injector }),
+  );
 
   readonly exporting = signal(false);
   readonly deleting  = signal(false);
