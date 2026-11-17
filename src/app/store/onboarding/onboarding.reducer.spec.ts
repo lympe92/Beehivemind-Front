@@ -76,6 +76,17 @@ describe('onboardingReducer', () => {
     expect(saved.data?.apiaries).toBe(1);
   });
 
+  it('keeps a seen key when a summary asked for before the write answers after it', () => {
+    const stored = onboardingReducer(loaded, OnboardingActions.saved({
+      standing: { onboarding: 'active', progress: { seen: ['team'], panel: 'open' } },
+    }));
+    const late = onboardingReducer(stored, OnboardingActions.loadSuccess({
+      summary: { ...summary, apiaries: 2, progress: { seen: [], panel: 'open' } },
+    }));
+    expect(late.data?.progress.seen).toEqual(['team']);
+    expect(late.data?.apiaries).toBe(2);
+  });
+
   it('ignores writes before a summary exists', () => {
     expect(onboardingReducer(initialOnboardingState, OnboardingActions.setPanel({ panel: 'folded' })).data).toBeNull();
   });

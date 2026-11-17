@@ -19,6 +19,18 @@ function patch(state: OnboardingState, change: (d: OnboardingSummary) => Onboard
   return state.data ? { ...state, data: change(state.data) } : state;
 }
 
+/**
+ * A summary asked for while a "seen" key was being stored can answer without
+ * it and arrive after the write's own answer, which would untick the step
+ * until the next page change. The API never takes a key off, so the keys
+ * already known stay.
+ */
+function keepSeen(known: OnboardingSummary | null, summary: OnboardingSummary | null): OnboardingSummary | null {
+  const missing = known?.progress.seen.filter(key => !summary?.progress.seen.includes(key)) ?? [];
+  if (!summary || !missing.length) return summary;
+  return { ...summary, progress: { ...summary.progress, seen: [...summary.progress.seen, ...missing] } };
+}
+
 export const onboardingReducer = createReducer(
   initialOnboardingState,
 
@@ -31,7 +43,7 @@ export const onboardingReducer = createReducer(
 
   on(OnboardingActions.loadSuccess, (state, { summary }) => ({
     ...state,
-    data:    summary,
+    data:    keepSeen(state.data, summary),
     loading: false,
     loaded:  true,
     error:   null,
