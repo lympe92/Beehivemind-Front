@@ -57,7 +57,7 @@ export const onboardingReducer = createReducer(
   })),
 
   on(OnboardingActions.setState, (state, { states }) =>
-    patch(state, d => ({ ...d, onboarding: states.reduce(nextGuideState, d.onboarding) }))
+    patch({ ...state, listAsked: false }, d => ({ ...d, onboarding: states.reduce(nextGuideState, d.onboarding) }))
   ),
 
   on(OnboardingActions.setPanel, (state, { panel }) =>
@@ -65,7 +65,7 @@ export const onboardingReducer = createReducer(
   ),
 
   on(OnboardingActions.reopen, (state) =>
-    patch(state, d => ({ ...d, onboarding: 'active', progress: { ...d.progress, panel: 'open' } }))
+    patch({ ...state, listAsked: true }, d => ({ ...d, onboarding: 'active', progress: { ...d.progress, panel: 'open' } }))
   ),
 
   // The key itself is added by `saved`: the effect posts only what is not stored yet.

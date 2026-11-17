@@ -64,6 +64,13 @@ describe('onboardingReducer', () => {
     expect(reopened.data?.progress.panel).toBe('open');
   });
 
+  it('remembers that the sidebar asked for the list, until the guide is closed again', () => {
+    expect(loaded.listAsked).toBe(false);
+    const reopened = onboardingReducer(loaded, OnboardingActions.reopen());
+    expect(reopened.listAsked).toBe(true);
+    expect(onboardingReducer(reopened, OnboardingActions.setState({ states: ['done', 'closed'] })).listAsked).toBe(false);
+  });
+
   it('remembers the level of a diagnosis seen, and takes the key from the API’s answer', () => {
     const seen = onboardingReducer(loaded, OnboardingActions.markSeen({ key: 'diagnosis', level: 'unknown' }));
     expect(seen.lastDiagnosisLevel).toBe('unknown');

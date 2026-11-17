@@ -19,6 +19,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { OnboardingActions } from '../../../../store/onboarding/onboarding.actions';
 import {
+  selectGuideListAsked,
   selectGuidePanel,
   selectLastDiagnosisLevel,
   selectOnboardingSummary,
@@ -81,6 +82,7 @@ export class GettingStartedComponent implements OnInit {
   private readonly summary   = this.store.selectSignal(selectOnboardingSummary);
   private readonly panel     = this.store.selectSignal(selectGuidePanel);
   private readonly lastLevel = this.store.selectSignal(selectLastDiagnosisLevel);
+  private readonly listAsked = this.store.selectSignal(selectGuideListAsked);
   private readonly user      = this.store.selectSignal(selectCurrentUser);
   private readonly apiaries  = this.store.selectSignal(selectAllApiaries);
 
@@ -126,9 +128,12 @@ export class GettingStartedComponent implements OnInit {
       return t && step?.def.form && !t.blockedBy && this.panel() === 'open' ? 'hint' : 'hidden';
     }
     if (this.panel() === 'folded') return 'folded';
-    if (g.allDone) return 'all-done';
+    // The closing card is for the moment the last tutorial is finished. Asked for
+    // from the sidebar afterwards, the guide is the list, as that card promises.
+    const list = g.allDone && this.listAsked() && !t;
+    if (g.allDone && !list) return 'all-done';
     if (t) return t.status === 'done' ? 'finished' : 'tutorial';
-    return this.isPhone() && !this.listOpen() ? 'bar' : 'hub';
+    return this.isPhone() && !this.listOpen() && !list ? 'bar' : 'hub';
   });
 
   readonly hint = computed(() => {
@@ -176,8 +181,9 @@ export class GettingStartedComponent implements OnInit {
     this.focusPanel();
   }
 
-  /** The hub's Close: the guide is dismissed, and comes back from the sidebar. */
+  /** The hub's Close: the guide is dismissed, and comes back from the sidebar. With nothing left to do it is finished. */
   dismiss(): void {
+    if (this.guide()?.allDone) return this.finish();
     this.store.dispatch(OnboardingActions.setState({ states: ['dismissed'] }));
   }
 

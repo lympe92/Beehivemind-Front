@@ -739,7 +739,7 @@ A popup in the corner of the signed-in app (Onboarding design, frames 2a to 2j; 
 ### State rules
 - **Shown** only while the API's `onboarding` is `active`. An unknown or failed summary shows nothing.
 - **Fold** stores `panel: folded` (`POST user/onboarding/progress`); the folded button (2b) opens it again. **Close** stores `state: dismissed`. All seven done: the closing state (2c), whose Close stores `done`, then `closed` (null).
-- **The sidebar's "Getting started"** stores `active` and `panel: open` from any state and refetches the counts.
+- **The sidebar's "Getting started"** stores `active` and `panel: open` from any state and refetches the counts. With all seven done it opens the list, not the closing card (`listAsked` in the slice, set by `reopen`, cleared by Close): the card is for the moment the last tutorial is finished, and the list's Close then stores `done`, `closed` like the card's.
 - **Which tutorial is open** is not stored by the API: it lives in `sessionStorage` (`bhm_guide_tutorial`).
 - **Fresh counts, no polling:** the summary is fetched again on every `NavigationEnd` inside `/user` and after every `ApiWrites.done$`, only while the guide is showing. Record steps read the team's counts, so work done on the phone or by a team member ticks them too.
 - **Seen steps** (no record to count) post `seen` once (`markSeen`; a stored key is not posted again): `diagnosis` when `DiagnosisModalComponent` shows a reading, from anywhere; `export` after any download (`ExportService`); `dashboard`, `calendar` and `team` when their step's button is pressed (the brief's "opened from this step"). The team step also ticks on an invitation or a member. An editor has no team step.

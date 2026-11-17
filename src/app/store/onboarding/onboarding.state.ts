@@ -9,6 +9,8 @@ export interface OnboardingState {
   error: string | null;
   /** The level of the last diagnosis opened this session: `unknown` changes the tutorial's closing line. */
   lastDiagnosisLevel: DiagnosisLevel | null;
+  /** The sidebar's "Getting started" was pressed: with every tutorial done it shows the list, not the closing card. */
+  listAsked: boolean;
 }
 
 export const initialOnboardingState: OnboardingState = {
@@ -17,4 +19,5 @@ export const initialOnboardingState: OnboardingState = {
   loaded:             false,
   error:              null,
   lastDiagnosisLevel: null,
+  listAsked:          false,
 };
