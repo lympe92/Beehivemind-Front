@@ -107,8 +107,32 @@ export class ProfileComponent implements OnInit {
     if (link['add'] === 'invite' && this.role() === 'owner') this.inviteMember();
   });
   private readonly dataLink = onDeepLink(['show'], this.profileReady, () =>
-    afterNextRender(() => document.getElementById('your-data')?.scrollIntoView({ block: 'start' }), { injector: this.injector }),
+    afterNextRender(() => this.showYourData(), { injector: this.injector }),
   );
+
+  /**
+   * The cards above Your data (team, plan) fill in after the first scroll and
+   * push it back down, so the card is brought to the top again each time the
+   * page grows, for three seconds or until the reader moves the page.
+   */
+  private showYourData(): void {
+    const card = document.getElementById('your-data');
+    const page = card?.parentElement;
+    if (!card || !page) return;
+
+    const go = () => card.scrollIntoView({ block: 'start' });
+    const observer = new ResizeObserver(go);
+    const events = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const;
+    const stop = () => {
+      observer.disconnect();
+      clearTimeout(timer);
+      events.forEach(e => window.removeEventListener(e, stop));
+    };
+    const timer = setTimeout(stop, 3000);
+    events.forEach(e => window.addEventListener(e, stop, { passive: true }));
+    observer.observe(page);
+    go();
+  }
 
   readonly exporting = signal(false);
   readonly deleting  = signal(false);

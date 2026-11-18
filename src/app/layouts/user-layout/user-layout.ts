@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   DOCUMENT,
   effect,
@@ -22,7 +23,7 @@ import { TooltipDirective } from '../../shared/components/ui/tooltip/tooltip.dir
 import { teamName } from '../../core/models/team.model';
 import { AiAssistantStatusService } from '../../core/services/ai-assistant-status.service';
 import { OnboardingActions } from '../../store/onboarding/onboarding.actions';
-import { selectGuideVisible } from '../../store/onboarding/onboarding.selectors';
+import { selectGuidePanel, selectGuideVisible } from '../../store/onboarding/onboarding.selectors';
 import { GettingStartedComponent } from '../../shared/components/ui/getting-started/getting-started';
 
 /** Below this width the sidebar is an overlay rather than a column. */
@@ -57,6 +58,9 @@ export class UserLayoutComponent implements OnInit {
   readonly teamName = teamName;
   /** The "Getting started" popup is fetched (`@defer`) only once the guide is active. */
   readonly guideVisible = this.store.selectSignal(selectGuideVisible);
+  private readonly guidePanel = this.store.selectSignal(selectGuidePanel);
+  /** The guide's panel is on screen (not folded): the page keeps clear of it, see `_app-page.scss`. */
+  readonly guideOpen = computed(() => this.guideVisible() && this.guidePanel() === 'open');
   sidebarOpen = signal(true);
   openGroups = signal<Set<string>>(new Set());
 

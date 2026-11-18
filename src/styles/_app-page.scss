@@ -128,3 +128,37 @@
     display: none;
   }
 }
+
+/* The "Getting started" popup is fixed in the corner, with no backdrop, and
+   the page behind it stays in use: nothing on the page may end up under it
+   for good. On a wide screen the content keeps a column clear for it (the
+   panel is 380 px, 24 px from the edge); on a narrower one the content gets
+   the panel's height added under it (`--gs-clear`, set by the popup), so the
+   last row, a card's Export button or a phone's last field can be scrolled
+   clear. The toasts move out of its corner for the same reason: a "saved"
+   toast used to sit on the next step's button for four seconds. */
+@media (min-width: 1280px) {
+  .user-shell--guide .user-content {
+    padding-right: calc(380px + 24px + var(--app-page-x));
+  }
+}
+
+@media (max-width: 1279px) {
+  .user-content {
+    padding-bottom: calc(var(--app-page-y) + var(--gs-clear, 0px));
+  }
+}
+
+@media (min-width: 1024px) {
+  body:has(.gs-panel) .toast-container {
+    right: calc(380px + 24px + 16px);
+  }
+}
+
+@media (max-width: 1023px) {
+  body:has(.gs-panel) .toast-container,
+  body:has(.gs-bar) .toast-container {
+    top: 72px;
+    bottom: auto;
+  }
+}

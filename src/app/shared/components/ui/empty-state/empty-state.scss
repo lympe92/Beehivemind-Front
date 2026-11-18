@@ -34,6 +34,8 @@
   margin: 0;
   font-size: 1.125rem;
   font-weight: 500;
+  // The website's h2 tracking (-2px, for a 48px heading) would close the words up at this size.
+  letter-spacing: normal;
   color: var(--text-heading);
 }
 

@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  effect,
   ElementRef,
   inject,
   Injector,
@@ -168,6 +169,25 @@ export class GettingStartedComponent implements OnInit {
   ngOnInit(): void {
     this.store.dispatch(OnboardingActions.load());
   }
+
+  /**
+   * The panel's height, as `--gs-clear` on the document: the page behind adds
+   * it under its content (`_app-page.scss`), so whatever the panel covers can
+   * be scrolled out from under it. Gone when the panel is folded or closed.
+   */
+  private readonly clearance = effect(onCleanup => {
+    const el = this.isBrowser ? this.panelEl()?.nativeElement : null;
+    if (!el) return;
+    const root = document.documentElement;
+    const set = () => root.style.setProperty('--gs-clear', `${el.offsetHeight + 24}px`);
+    const observer = new ResizeObserver(set);
+    observer.observe(el);
+    set();
+    onCleanup(() => {
+      observer.disconnect();
+      root.style.removeProperty('--gs-clear');
+    });
+  });
 
   // ── Panel ────────────────────────────────────────────────
 
