@@ -7,6 +7,7 @@ import {
   OnboardingSummary,
 } from '../../core/models/onboarding.model';
 import { OnboardingStanding } from '../../core/services/onboarding.service';
+import type { TutorialId } from '../../core/onboarding/tutorials';
 
 export const OnboardingActions = createActionGroup({
   source: 'Onboarding',
@@ -21,6 +22,8 @@ export const OnboardingActions = createActionGroup({
     'Set Panel':    props<{ panel: OnboardingPanel }>(),
     /** The sidebar's "Getting started": back to active and open, from any state. */
     Reopen:         emptyProps(),
+    /** A page's help asks for its tutorial: the guide comes back as `Reopen` does, on that tutorial. */
+    'Open Tutorial': props<{ id: TutorialId }>(),
     /** Something the guide cannot count was seen. Posted once; a key already stored is ignored. */
     'Mark Seen':    props<{ key: OnboardingSeenKey; level?: DiagnosisLevel }>(),
     /** What the API stored after any of the writes above. */

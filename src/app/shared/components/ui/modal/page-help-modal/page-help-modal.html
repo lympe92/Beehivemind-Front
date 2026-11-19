@@ -1,0 +1,45 @@
+@if (help; as h) {
+  <app-modal-shell [title]="h.title" subtitle="How this page works" (close)="close()">
+    <div class="ph">
+
+      @if (h.video; as v) {
+        <figure class="ph__video">
+          <video controls preload="none" playsinline [src]="v.src" [attr.poster]="v.poster ?? null" [attr.aria-label]="v.title"></video>
+          <figcaption class="ph__text">{{ v.title }}</figcaption>
+        </figure>
+      }
+
+      <section class="ph__block">
+        <h3 class="ph__label">What this page is</h3>
+        <p class="ph__text">{{ h.about }}</p>
+      </section>
+
+      @for (note of h.notes ?? []; track note.heading) {
+        <section class="ph__block">
+          <h3 class="ph__label">{{ note.heading }}</h3>
+          <p class="ph__text">{{ note.text }}</p>
+        </section>
+      }
+
+      <section class="ph__block">
+        <h3 class="ph__label">What you can do here</h3>
+        <dl class="ph__actions">
+          @for (action of h.actions; track action.label) {
+            <div class="ph__action">
+              <dt class="ph__name" [class.ph__name--danger]="action.danger">{{ action.label }}</dt>
+              <dd class="ph__text">{{ action.text }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+
+    </div>
+
+    @if (h.tutorial) {
+      <ng-template #footer>
+        <span class="ph__text ph__aside">Rather do it step by step?</span>
+        <button type="button" class="app-btn app-btn--ghost" (click)="startTutorial()">Start the tutorial</button>
+      </ng-template>
+    }
+  </app-modal-shell>
+}

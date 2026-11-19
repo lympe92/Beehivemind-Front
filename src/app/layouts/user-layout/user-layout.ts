@@ -11,7 +11,7 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
@@ -24,6 +24,9 @@ import { AiAssistantStatusService } from '../../core/services/ai-assistant-statu
 import { OnboardingActions } from '../../store/onboarding/onboarding.actions';
 import { selectGuideVisible } from '../../store/onboarding/onboarding.selectors';
 import { GettingStartedComponent } from '../../shared/components/ui/getting-started/getting-started';
+import { ModalService } from '../../core/modal/modal.service';
+import type { PageHelpId } from '../../core/help/page-help';
+import type { PageHelpModalData, PageHelpModalResult } from '../../shared/components/ui/modal/page-help-modal/page-help-modal';
 
 /** Below this width the sidebar is an overlay rather than a column. */
 const OVERLAY_BREAKPOINT = 992;
@@ -47,6 +50,7 @@ const OVERLAY_BREAKPOINT = 992;
 export class UserLayoutComponent implements OnInit {
   private store = inject(Store);
   private router = inject(Router);
+  private modal = inject(ModalService);
   private document = inject(DOCUMENT);
   private destroyRef = inject(DestroyRef);
   private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
@@ -57,6 +61,8 @@ export class UserLayoutComponent implements OnInit {
   readonly teamName = teamName;
   /** The "Getting started" popup is fetched (`@defer`) only once the guide is active. */
   readonly guideVisible = this.store.selectSignal(selectGuideVisible);
+  /** The help entry the page on screen names in its route (`data: { help }`); null hides the button. */
+  readonly helpId = signal<PageHelpId | null>(this.routeHelp());
   sidebarOpen = signal(true);
   openGroups = signal<Set<string>>(new Set());
 
@@ -66,6 +72,7 @@ export class UserLayoutComponent implements OnInit {
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        this.helpId.set(this.routeHelp());
         if (this.isOverlay()) this.sidebarOpen.set(false);
       });
 
@@ -146,6 +153,31 @@ export class UserLayoutComponent implements OnInit {
   /** The sidebar's "Getting started": back to active and open, whatever the guide's state. */
   openGuide(): void {
     this.store.dispatch(OnboardingActions.reopen());
+  }
+
+  /**
+   * "How this page works". The panel and its copy are fetched on the first
+   * press, so neither is in any page's bundle; its footer button hands over
+   * to the page's tutorial in the "Getting started" guide.
+   */
+  async openHelp(id: PageHelpId): Promise<void> {
+    const [{ PageHelpModalComponent }, { pageHelp }] = await Promise.all([
+      import('../../shared/components/ui/modal/page-help-modal/page-help-modal'),
+      import('../../core/help/page-help'),
+    ]);
+    const result = await this.modal.open<PageHelpModalResult, PageHelpModalData>(PageHelpModalComponent, {
+      type: 'drawer',
+      data: { id },
+    });
+    const tutorial = pageHelp(id)?.tutorial;
+    if (result === 'tutorial' && tutorial) this.store.dispatch(OnboardingActions.openTutorial({ id: tutorial }));
+  }
+
+  /** The deepest active route's `data.help`. */
+  private routeHelp(): PageHelpId | null {
+    let route: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
+    while (route.firstChild) route = route.firstChild;
+    return (route.data['help'] as PageHelpId | undefined) ?? null;
   }
 
   logout(): void {

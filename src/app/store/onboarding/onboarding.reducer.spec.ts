@@ -94,6 +94,20 @@ describe('onboardingReducer', () => {
     expect(late.data?.apiaries).toBe(2);
   });
 
+  it('keeps the tutorial a page asked for, as a new request each time, until the guide is closed or reopened', () => {
+    const asked = onboardingReducer(onboardingReducer(loaded, OnboardingActions.setState({ states: ['dismissed'] })), OnboardingActions.openTutorial({ id: 'feeding' }));
+    expect(asked.askedTutorial).toEqual({ id: 'feeding' });
+    expect(asked.data?.onboarding).toBe('active');
+    expect(asked.data?.progress.panel).toBe('open');
+
+    const again = onboardingReducer(asked, OnboardingActions.openTutorial({ id: 'feeding' }));
+    expect(again.askedTutorial).not.toBe(asked.askedTutorial);
+
+    expect(onboardingReducer(asked, OnboardingActions.reopen()).askedTutorial).toBeNull();
+    expect(onboardingReducer(asked, OnboardingActions.setState({ states: ['dismissed'] })).askedTutorial).toBeNull();
+    expect(onboardingReducer(initialOnboardingState, OnboardingActions.openTutorial({ id: 'costs' })).askedTutorial).toEqual({ id: 'costs' });
+  });
+
   it('ignores writes before a summary exists', () => {
     expect(onboardingReducer(initialOnboardingState, OnboardingActions.setPanel({ panel: 'folded' })).data).toBeNull();
   });

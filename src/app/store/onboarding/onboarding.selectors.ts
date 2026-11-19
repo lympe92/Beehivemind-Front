@@ -8,6 +8,7 @@ export const selectOnboardingLoading = createSelector(selectOnboardingState, s =
 export const selectOnboardingLoaded  = createSelector(selectOnboardingState, s => s?.loaded ?? false);
 export const selectLastDiagnosisLevel = createSelector(selectOnboardingState, s => s?.lastDiagnosisLevel ?? null);
 export const selectGuideListAsked    = createSelector(selectOnboardingState, s => s?.listAsked ?? false);
+export const selectAskedTutorial     = createSelector(selectOnboardingState, s => s?.askedTutorial ?? null);
 
 /** The guide shows only while the API says `active`; an unknown or failed summary shows nothing. */
 export const selectGuideVisible = createSelector(selectOnboardingSummary, d => d?.onboarding === 'active');

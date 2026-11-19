@@ -351,6 +351,7 @@ Modals are powered by Angular CDK `Dialog`. All overlay styles are **global** be
 | `src/app/shared/components/ui/modal/form-modal/form-modal.ts` | Generic dialog around one `<app-form>` config (`title`, `fields`, `submitLabel`, `cancelLabel`) |
 | `src/app/shared/components/ui/modal/suspend-user-modal/` | Admin: how long to suspend an account |
 | `src/app/shared/components/ui/modal/diagnosis-modal/` | The full diagnosis of an inspection or a hive (see Diagnosis) |
+| `src/app/shared/components/ui/modal/page-help-modal/` | "How this page works": a drawer drawing one `PAGE_HELP` entry (see Page help) |
 | `src/styles/_modal.scss` | CDK overlay/backdrop/panel glue |
 
 ### ModalService API
@@ -717,6 +718,29 @@ What a list page shows once its slice has loaded with **no record at all** (Onbo
 | `buttonClick` | `output<void>` | The page's own add handler, or a `router.navigate` to the missing step |
 
 Pages decide with a `computed` over their `…Loaded` selectors (`emptyState` → `'none' \| 'no-apiary' \| …` or `null`), never while a slice is loading.
+
+---
+
+## Page help ("How this page works")
+
+### Overview
+One button in the top bar of the signed-in app, beside the bell (Page Help design, frames 1a to 3b; brief `PAGE-HELP-2026-11-19`). It opens a drawer about the page on screen: an optional video, what the page is for, optional notes, and one line per thing the page lets you do (a destructive one in the danger colour). Its footer hands over to the page's tutorial in "Getting started". The guide is for doing things once, in order; this is for looking something up.
+
+### Key files
+| File | Role |
+|------|------|
+| `core/help/page-help.ts` | `PAGE_HELP`: **every word of every panel**, one `PageHelp` object per page (`title`, `about`, `video?`, `notes?`, `actions[]`, `tutorial?`), and `pageHelp(id)` |
+| `features/user/user.routes.ts` | Each route names its entry: `data: help('inspections')` (typed `PageHelpId`) |
+| `shared/components/ui/modal/page-help-modal/` | Draws one entry. No copy of its own beyond the three fixed headings |
+| `layouts/user-layout/` | `helpId` (the deepest active route's `data.help`, re-read on `NavigationEnd`) and `openHelp()`. A route with no entry has no button (the AI chat) |
+
+### Rules
+- **Copy is data.** A new page gets an entry in `PAGE_HELP` and `data: help('…')` on its route; nothing else changes. `page-help.spec.ts` fails when a route names a missing entry, an entry has no route, or a `tutorial` is not one the guide has.
+- **An action's `label` is the control's own words** ("+ Add Record", "Delete"); `danger: true` when it removes something for good, and its text says what goes with it.
+- **Lazy.** `openHelp()` imports the component and the copy on the first press, so neither is in the initial bundle or in any page's chunk.
+- **A video** is `video: { src, title, poster? }`, a direct file URL played by a plain `<video preload="none">`; the panel is text only without it. Every entry has one, `tour('<id>', title)`: `src/assets/help/<id>.mp4` and its `.jpg` poster, a silent captioned screen recording (1536×864) of the page with the mocked API.
+- **The videos are generated, not edited.** `cd audit && npm run help-videos` (dev server on **4201**: the Google Maps key refuses 4301; `ffmpeg` on the PATH; `-- --only=feeding,harvest` narrows, `--explore` lists every page's buttons instead, `--explore --only=x --dialog="+ Add|Edit"` a dialog's fields). `help-videos.mjs` is the recorder (caption bar and pointer drawn as popovers over the page, since CDK dialogs sit in the top layer); `help-video-scenes.mjs` holds one scene per `PAGE_HELP` id: its path, its steps, and a `write()` that puts a saved row into the mock's list so the page shows it. When a page's controls or copy change, change its scene and record it again.
+- **"Start the tutorial"** closes the drawer with `'tutorial'` and the layout dispatches `OnboardingActions.openTutorial({ id })`: the guide comes back as the sidebar's entry brings it (`active`, `panel: open`) on that tutorial, also when it was closed or every tutorial is done (`askedTutorial` in the slice; the popup reads it when it mounts).
 
 ---
 

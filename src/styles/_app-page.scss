@@ -155,3 +155,26 @@
     bottom: auto;
   }
 }
+
+/* "How this page works", in the top bar beside the bell (Page Help design,
+   frames 1a and 3a). The design system draws the top bar with the toggle and
+   the bell only, so the button's two states are here: icon and words, and
+   the icon alone on a phone, at the bar's own 44 px target. */
+.user-header__help {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 767px) {
+  .user-header__help {
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding-inline: 0;
+  }
+
+  .user-header__help-label {
+    display: none;
+  }
+}

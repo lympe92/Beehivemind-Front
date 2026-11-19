@@ -11,6 +11,7 @@ import {
   OnInit,
   PLATFORM_ID,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { isPlatformBrowser, NgTemplateOutlet } from '@angular/common';
@@ -20,6 +21,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { OnboardingActions } from '../../../../store/onboarding/onboarding.actions';
 import {
+  selectAskedTutorial,
   selectGuideListAsked,
   selectGuidePanel,
   selectLastDiagnosisLevel,
@@ -84,6 +86,7 @@ export class GettingStartedComponent implements OnInit {
   private readonly panel     = this.store.selectSignal(selectGuidePanel);
   private readonly lastLevel = this.store.selectSignal(selectLastDiagnosisLevel);
   private readonly listAsked = this.store.selectSignal(selectGuideListAsked);
+  private readonly asked     = this.store.selectSignal(selectAskedTutorial);
   private readonly user      = this.store.selectSignal(selectCurrentUser);
   private readonly apiaries  = this.store.selectSignal(selectAllApiaries);
 
@@ -91,6 +94,8 @@ export class GettingStartedComponent implements OnInit {
   readonly openId = signal<TutorialId | null>(this.readOpenTutorial());
   /** On a phone the hub is a bar with the next tutorial; "See all tutorials" opens the list. */
   readonly listOpen = signal(false);
+  /** The open tutorial was asked for from a page's help: it shows even when every tutorial is done. */
+  private readonly askedOpen = signal(false);
   readonly isPhone  = signal(false);
   /** A CDK dialog is open: the guide becomes one line above its backdrop (frame 2g), or steps aside. */
   readonly dialogOpen = signal(false);
@@ -132,7 +137,7 @@ export class GettingStartedComponent implements OnInit {
     // The closing card is for the moment the last tutorial is finished. Asked for
     // from the sidebar afterwards, the guide is the list, as that card promises.
     const list = g.allDone && this.listAsked() && !t;
-    if (g.allDone && !list) return 'all-done';
+    if (g.allDone && !list && !(t && this.askedOpen())) return 'all-done';
     if (t) return t.status === 'done' ? 'finished' : 'tutorial';
     return this.isPhone() && !this.listOpen() && !list ? 'bar' : 'hub';
   });
@@ -169,6 +174,16 @@ export class GettingStartedComponent implements OnInit {
   ngOnInit(): void {
     this.store.dispatch(OnboardingActions.load());
   }
+
+  /** A page's help asked for a tutorial (`OnboardingActions.openTutorial`): open it, also when this mounts after the request. */
+  private readonly openAsked = effect(() => {
+    const asked = this.asked();
+    if (!asked) return;
+    untracked(() => {
+      this.setOpen(asked.id, true);
+      this.focusPanel();
+    });
+  });
 
   /**
    * The panel's height, as `--gs-clear` on the document: the page behind adds
@@ -260,8 +275,9 @@ export class GettingStartedComponent implements OnInit {
 
   // ── Private ──────────────────────────────────────────────
 
-  private setOpen(id: TutorialId | null): void {
+  private setOpen(id: TutorialId | null, asked = false): void {
     this.openId.set(id);
+    this.askedOpen.set(asked);
     if (!this.isBrowser) return;
     try {
       if (id) sessionStorage.setItem(OPEN_TUTORIAL_KEY, id);

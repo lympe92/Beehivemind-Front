@@ -94,7 +94,7 @@ export class OnboardingEffects {
 
   reopen$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(OnboardingActions.reopen),
+      ofType(OnboardingActions.reopen, OnboardingActions.openTutorial),
       concatMap(() =>
         this.service.setState('active').pipe(
           concatMap(() => this.service.updateProgress({ panel: 'open' })),

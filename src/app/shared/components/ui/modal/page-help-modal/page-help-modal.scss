@@ -1,0 +1,83 @@
+// "How this page works" (Page Help design, frames 2a to 2c). The design draws
+// the panel's body inline; these are its proportions, on tokens only.
+
+.ph {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ph__block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ph__label {
+  margin: 0;
+  font-size: var(--structural-size);
+  font-weight: var(--structural-weight);
+  letter-spacing: var(--structural-tracking);
+  text-transform: uppercase;
+  color: var(--text-heading);
+}
+
+.ph__text {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--text-body);
+}
+
+.ph__video {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+
+  video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius);
+    background: var(--text-heading);
+  }
+}
+
+.ph__actions {
+  margin: 0;
+}
+
+.ph__action {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px 0;
+
+  & + & {
+    border-top: 1px solid var(--border-color);
+  }
+}
+
+.ph__name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-heading);
+}
+
+.ph__name--danger {
+  color: var(--color-error);
+}
+
+// The footer's sentence takes the room; the button stays its own width.
+.ph__aside {
+  flex: 1;
+  min-width: 0;
+}
+
+// On a phone the footer stacks and the button is the full width: the sentence would sit under it.
+@media (max-width: 767px) {
+  .ph__aside {
+    display: none;
+  }
+}
